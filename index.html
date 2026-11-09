@@ -1,0 +1,1086 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🪼</text></svg>">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MDZ SKYNET - Gestión de Puntos</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+
+<!-- Leaflet -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+
+<style>
+*{box-sizing:border-box}
+:root {
+  --primary: #3b9bff;
+  --primary-light: #4ea8ff;
+  --primary-dark: #1d6fe0;
+  --primary-glow: rgba(59,155,255,.8);
+  --primary-bg: rgba(59,155,255,.35);
+
+  --bg-body-1: #3a4350; --bg-body-2: #1d2229; --bg-body-3: #14181d;
+  --bg-frame-1: #4a525d; --bg-frame-2: #2b3138;
+  --bg-rail: #12161b;
+  --bg-panel: #171b21;
+  --text-main: #e2e8f0;
+  --text-head: #ffffff;
+  --glass: rgba(255,255,255,.045);
+  --line: rgba(255,255,255,.08);
+  --map-grid: rgba(120,160,220,.05);
+}
+
+body.color-red {
+  --primary: #ef4444; --primary-light: #f87171; --primary-dark: #b91c1c;
+  --primary-glow: rgba(239, 68, 68, 0.8); --primary-bg: rgba(239, 68, 68, 0.35); --map-grid: rgba(239, 68, 68, 0.05);
+}
+body.color-red .text-sky-400 { color: var(--primary) !important; }
+body.color-red .text-sky-300 { color: var(--primary-light) !important; }
+body.color-red .bg-sky-500\/10, body.color-red .bg-sky-500\/15 { background-color: rgba(239, 68, 68, 0.15) !important; }
+body.color-red .text-sky-300.bg-sky-500\/15 { color: #fca5a5 !important; }
+body.color-red .border-sky-400\/30 { border-color: rgba(239, 68, 68, 0.3) !important; }
+body.color-red .border-sky-400 { border-color: var(--primary) !important; }
+
+body.theme-day {
+  --bg-body-1: #cbd5e1; --bg-body-2: #e2e8f0; --bg-body-3: #f1f5f9;
+  --bg-frame-1: #ffffff; --bg-frame-2: #f8fafc; --bg-rail: #e2e8f0; --bg-panel: #ffffff;
+  --text-main: #334155; --text-head: #0f172a; --glass: rgba(0,0,0,.03); --line: rgba(0,0,0,.1);
+}
+body.theme-day .text-white { color: var(--text-head) !important; }
+body.theme-day .text-slate-100, body.theme-day .text-slate-200, body.theme-day .text-slate-300 { color: #334155 !important; }
+body.theme-day .text-slate-400 { color: #64748b !important; }
+body.theme-day .text-slate-500 { color: #94a3b8 !important; }
+body.theme-day .border-slate-500 { border-color: #cbd5e1 !important; }
+body.theme-day .bg-\[\#12161b\] { background-color: #f8fafc !important; border-color: #cbd5e1 !important; }
+body.theme-day .bg-black\/30, body.theme-day .bg-black\/40, body.theme-day .bg-black\/50, body.theme-day .bg-black\/20 { background-color: #f1f5f9 !important; border-color: #cbd5e1 !important; color: #0f172a !important; }
+body.theme-day .bg-white\/5, body.theme-day .card { background: linear-gradient(145deg,#ffffff,#f8fafc) !important; border-color: rgba(0,0,0,0.1) !important; }
+body.theme-day .toast, body.theme-day .sel, body.theme-day .leaflet-popup-content-wrapper, body.theme-day .leaflet-popup-tip { background: #ffffff !important; border-color: #cbd5e1 !important; color: #0f172a !important; }
+body.theme-day #map-canvas { background: #e2e8f0 !important; }
+body.theme-day #map-canvas .leaflet-tile-pane { filter: none !important; }
+body.theme-day input { color: #0f172a !important; }
+
+html,body{height:100%}
+body{font-family:Inter,ui-sans-serif,system-ui,sans-serif;color:var(--text-main);margin:0;padding:18px;background:radial-gradient(circle at 20% 10%,var(--bg-body-1),var(--bg-body-2) 55%,var(--bg-body-3)); transition: background 0.3s, color 0.3s;}
+.frame{height:calc(100vh - 36px);min-height:560px;display:flex;gap:14px;padding:10px;border-radius:28px;background:linear-gradient(160deg,var(--bg-frame-1),var(--bg-frame-2));border:2px solid var(--primary-bg);box-shadow:0 30px 80px rgba(0,0,0,.5); transition: background 0.3s, border-color 0.3s;}
+.rail{width:64px;border-radius:20px;background:var(--bg-rail);display:flex;flex-direction:column;align-items:center;gap:18px;padding:18px 0;flex-shrink:0; transition: background 0.3s; z-index: 50;}
+.rail i{color:#64748b;font-size:15px}
+.rail button{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;background:none;border:0;cursor:pointer;transition:.2s}
+.rail button:hover i{color:var(--text-head)}
+.rail button.on{background:radial-gradient(circle,var(--primary-light),var(--primary-dark));box-shadow:0 0 24px var(--primary-glow)}
+.rail button.on i{color:#fff}
+.panel{background:var(--bg-panel);border-radius:22px;border:1px solid var(--line); transition: background 0.3s;}
+.map{background:radial-gradient(circle at 70% 30%,var(--primary-bg),transparent 45%),linear-gradient(var(--map-grid) 1px,transparent 1px) 0 0/38px 38px,linear-gradient(90deg,var(--map-grid) 1px,transparent 1px) 0 0/38px 38px,var(--bg-panel)}
+.chip{background:var(--glass);border:1px solid var(--line);border-radius:12px}
+.scroll::-webkit-scrollbar{width:6px;height:6px}.scroll::-webkit-scrollbar-thumb{background:#334155;border-radius:10px}
+.glow{animation:g 3s ease-in-out infinite}@keyframes g{50%{filter:drop-shadow(0 0 12px var(--primary-glow))}}
+
+@keyframes blink-alert {
+  0%, 100% { stroke-opacity: 1; fill-opacity: 0.9; filter: drop-shadow(0 0 5px currentColor); }
+  50% { stroke-opacity: 0.2; fill-opacity: 0.3; filter: none; }
+}
+.marker-blink {
+  animation: blink-alert 1.2s ease-in-out infinite;
+}
+.marker-fixed {
+  filter: drop-shadow(0 0 8px currentColor);
+}
+.zone-polygon {
+  stroke-dasharray: 8, 8;
+  animation: dash-flow 20s linear infinite;
+}
+@keyframes dash-flow {
+  to { stroke-dashoffset: -1000; }
+}
+
+@keyframes swim-alive {0%, 100% { transform: translateY(0) scale(1, 1); filter: drop-shadow(0 0 12px var(--primary-glow)); } 25% { transform: translateY(-5px) scale(0.92, 1.08); filter: drop-shadow(0 15px 20px var(--primary-glow)); } 50% { transform: translateY(-8px) scale(1.05, 0.95); filter: drop-shadow(0 20px 25px var(--primary-glow)); } 75% { transform: translateY(-3px) scale(0.96, 1.04); filter: drop-shadow(0 10px 15px var(--primary-glow)); }}
+.anim-filter #main-logo { animation: swim-alive 2.2s ease-in-out infinite; transform-origin: bottom center; }
+@keyframes bounce-float {0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); filter: drop-shadow(0 10px 8px var(--primary-glow)); }}
+.anim-map #main-logo { animation: bounce-float 2s ease-in-out infinite; }
+@keyframes spin-3d {0% { transform: perspective(400px) rotateY(0deg); } 100% { transform: perspective(400px) rotateY(360deg); }}
+.anim-tech #main-logo { animation: spin-3d 2.5s linear infinite; }
+@keyframes radar-pulse {0% { transform: scale(1); filter: drop-shadow(0 0 0 transparent); } 50% { transform: scale(1.15); filter: drop-shadow(0 0 25px var(--primary-glow)); } 100% { transform: scale(1); filter: drop-shadow(0 0 0 transparent); }}
+.anim-antenna #main-logo { animation: radar-pulse 1.5s ease-in-out infinite; }
+@keyframes float-wrench {0%, 100% { transform: rotate(0deg) translateY(0); } 25% { transform: rotate(-15deg) translateY(-3px); } 75% { transform: rotate(15deg) translateY(3px); }}
+.anim-maint #main-logo { animation: float-wrench 2s ease-in-out infinite; }
+@keyframes happy-shake {0%, 100% { transform: translateY(0) rotate(0); } 25% { transform: translateY(-4px) rotate(8deg); } 50% { transform: translateY(0) rotate(-8deg); } 75% { transform: translateY(-4px) rotate(8deg); }}
+.anim-price #main-logo { animation: happy-shake 1s ease-in-out infinite; }
+
+.btn{background:linear-gradient(135deg,var(--primary-light),var(--primary-dark));box-shadow:0 0 18px var(--primary-bg)}
+.btn:disabled{opacity:.4;box-shadow:none}
+.card{background:linear-gradient(145deg,rgba(255,255,255,.06),rgba(255,255,255,.02));border:1px solid var(--line);border-radius:20px;backdrop-filter:blur(8px)}
+.card:hover{border-color:var(--primary-bg)}
+.mono{font-family:"Cascadia Code",Consolas,monospace}
+.fade{animation:f .3s ease-out}@keyframes f{from{opacity:0;transform:translateY(8px)}}
+#drop-zone.drag{border-color:var(--primary)!important;background:var(--primary-bg)!important}
+.toast{position:fixed;left:50%;bottom:26px;transform:translate(-50%,100px);opacity:0;z-index:99;padding:12px 18px;border-radius:14px;background:#0b0e12;border:1px solid var(--line);transition:.3s;pointer-events:none}
+.toast.show{transform:translate(-50%,0);opacity:1}
+.sel{background:#0b0e12;border:1px solid var(--line);border-radius:10px;padding:6px 10px;font-size:12px;color:var(--text-main);max-width:240px}
+.leaflet-popup-content-wrapper,.leaflet-popup-tip{background:#171b21;color:#e2e8f0}
+#map-canvas{background:#10141a; transition: filter 0.3s;}
+#map-canvas .leaflet-tile-pane{filter:invert(1) hue-rotate(200deg) brightness(.9) contrast(.9) saturate(.7)}
+@media(max-width:900px){body{padding:0}.frame{height:auto;border-radius:0;flex-direction:column}.rail{display:none}.cols{flex-direction:column}.side{width:100%!important}}
+</style>
+</head>
+<body>
+<body class="color-red">
+<div class="frame">
+  <nav class="rail">
+    <div id="logo-container" class="relative inline-block mt-2">
+      <i id="main-logo" class="fa-brands fa-octopus-deploy text-[42px] glow transition-all" style="color:var(--primary)"></i>
+    </div>
+    
+    <button class="on mt-4" data-v="filter" onclick="setView('filter')" title="Filtrado"><i class="fa-solid fa-satellite-dish"></i></button>
+    <button data-v="map" onclick="setView('map')" title="Mapa y Distribución"><i class="fa-solid fa-location-dot"></i></button>
+    <button data-v="tech" onclick="setView('tech')" title="Analizador de tecnologías"><i class="fa-solid fa-microchip"></i></button>
+    <button data-v="antenna" onclick="setView('antenna')" title="Infraestructura y Antenas"><i class="fa-solid fa-tower-broadcast"></i></button>
+    <button data-v="maint" onclick="setView('maint')" title="Plan Mantenimiento Lógico"><i class="fa-solid fa-screwdriver-wrench"></i></button>
+    <button data-v="price" onclick="setView('price')" title="Analizador de precios"><i class="fa-solid fa-coins"></i></button>
+
+    <div class="mt-auto flex flex-col gap-3 pb-2">
+      <button onclick="toggleColor()" title="Cambiar Color (Azul/Rojo)"><i class="fa-solid fa-palette"></i></button>
+      <button onclick="toggleTheme()" title="Modo Día/Noche"><i id="theme-icon" class="fa-solid fa-moon"></i></button>
+    </div>
+  </nav>
+
+  <div class="flex-1 flex flex-col gap-3 min-w-0">
+    <header class="flex items-center justify-between px-2 pt-1">
+      <div>
+        <h1 class="text-2xl font-bold text-white">MDZ SKYNET</h1>
+        <p class="text-xs text-slate-300/70">Gestión de puntos · Control RF / AVL</p>
+      </div>
+      <div class="flex items-center gap-2 px-4 py-2 rounded-full bg-[#12161b] border border-white/10 text-xs font-semibold">
+        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> En línea
+      </div>
+    </header>
+
+    <div class="cols flex-1 flex gap-3 min-h-0">
+      <aside id="side" class="side panel p-4 w-[340px] shrink-0 overflow-y-auto scroll">
+        <h2 class="text-sm font-semibold text-white mb-3">Cargar datos</h2>
+        <div id="drop-zone" class="relative cursor-pointer border-2 border-dashed border-white/15 rounded-2xl p-5 text-center chip transition">
+          <input type="file" id="file-upload" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" accept=".xlsx,.xls,.csv">
+          <i class="fa-solid fa-cloud-arrow-up text-2xl text-sky-400 mb-2"></i>
+          <p class="text-sm text-slate-300"><b class="text-sky-400">Haz clic para subir</b> o arrastra el archivo</p>
+          <p class="text-xs text-slate-500 mt-1">Excel (.xlsx / .xls) o CSV</p>
+        </div>
+        <div id="file-status-container" class="hidden mt-3 chip p-3 flex items-center gap-3">
+          <i class="fa-solid fa-circle-check text-emerald-400"></i>
+          <div class="min-w-0"><p class="text-[11px] text-emerald-400 font-semibold">Archivo cargado</p><p id="file-name" class="text-sm truncate"></p></div>
+        </div>
+        <div id="file-error-container" class="hidden mt-3 p-3 rounded-xl bg-red-500/10 border border-red-500/30 flex gap-3">
+          <i class="fa-solid fa-triangle-exclamation text-red-400 mt-0.5"></i><p id="file-error-msg" class="text-sm text-red-300"></p>
+        </div>
+
+        <h2 class="text-sm font-semibold text-white mt-6 mb-3">Búsqueda universal</h2>
+        <div class="relative">
+          <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500 text-xs"></i>
+          <input id="search-input" disabled autocomplete="off" placeholder="LIMA-50 COMAS, PL004, DETEKTOR..." class="w-full py-3 pl-9 pr-3 text-sm rounded-xl bg-black/30 border border-white/10 outline-none focus:border-sky-400 disabled:opacity-40 placeholder-slate-600">
+        </div>
+        <button id="search-btn" disabled class="btn w-full mt-2 py-2.5 rounded-xl text-sm font-semibold text-white transition">Buscar</button>
+        <p class="text-xs text-slate-500 mt-2">Busca por fragmento de punto, ID, tecnología o cualquier dato.</p>
+
+        <div id="global-stats-container" class="hidden mt-6">
+          <h2 class="text-sm font-semibold text-white mb-3">Resumen global</h2>
+          <div id="globalStatsContent" class="grid grid-cols-2 gap-2"></div>
+          <div id="globalTechStats" class="flex flex-wrap gap-1.5 mt-3"></div>
+        </div>
+      </aside>
+
+      <!-- PANEL PRINCIPAL (FILTRO) -->
+      <section id="view-filter" class="map panel flex-1 min-w-0 flex flex-col overflow-hidden">
+        <div class="flex items-center justify-between px-5 pt-4 pb-3 gap-3 flex-wrap">
+          <h2 class="text-lg font-semibold text-white">Resultados</h2>
+          <div id="results-count" class="hidden px-3 py-1 rounded-full text-xs font-semibold bg-sky-500/15 text-sky-300 border border-sky-400/30"></div>
+        </div>
+        <div id="tech-summary-container" class="hidden px-5 pb-3"><div id="tech-badges-wrapper" class="flex flex-wrap gap-2"></div></div>
+        <div id="results-container" class="flex-1 overflow-y-auto scroll px-5 pb-5 space-y-4">
+          <div class="text-center py-24 text-slate-500">
+            <i class="fa-brands fa-octopus-deploy text-6xl text-slate-700 mb-4 block"></i>
+            <p class="text-lg font-semibold text-slate-300">Esperando datos de SKYNET</p>
+            <p class="text-sm mt-1">Sube tu archivo Excel para comenzar.</p>
+          </div>
+        </div>
+      </section>
+      
+      <!-- MAPA CON ZONIFICACIÓN DE MANTENIMIENTO -->
+      <section id="view-map" class="view hidden map panel flex-1 min-w-0 flex flex-col overflow-hidden">
+        <div class="flex flex-wrap items-center gap-3 px-5 pt-4 pb-3">
+          <h2 class="text-lg font-semibold text-white mr-auto">Mapa y Distribución</h2>
+          <span id="map-info" class="text-xs text-slate-400"></span>
+          
+          <select id="map-unique-filter" class="sel font-bold text-sky-300 border-sky-500/40" onchange="renderMap()">
+             <option value="unique" selected>Agrupar Punto Único</option>
+             <option value="all">Registros Individuales</option>
+          </select>
+          <select id="map-type-filter" class="sel font-bold text-emerald-300 border-emerald-500/40" onchange="renderMap()">
+             <option value="all">Todos los tipos</option>
+             <option value="fijos" selected>Solo Antenas (Puntos Fijos)</option>
+             <option value="moviles">Solo Móviles (Rastreo)</option>
+          </select>
+
+          <!-- Dropdown que se llenará con las combinaciones -->
+          <select id="map-tech-filter" class="sel font-bold text-amber-300 border-amber-500/40" onchange="renderMap()">
+             <option value="all">Todas las tecnologías combinadas</option>
+          </select>
+          
+          <select id="map-sector-filter" class="sel" onchange="renderMap()">
+             <option value="all">Todos los sectores</option>
+             <option value="NORTE">Zona Norte</option>
+             <option value="SUR">Zona Sur</option>
+             <option value="CENTRO">Zona Centro/Lima</option>
+             <option value="ESTE">Zona Este/Selva</option>
+          </select>
+          <select id="map-mode" class="sel" onchange="renderMap()">
+            <option value="all">Puntos Individuales</option>
+            <option value="cluster" selected>Agrupación Mantenimiento (Máx 4 cercanos)</option>
+            <option value="filter">Solo resultado de búsqueda</option>
+          </select>
+          <select id="map-color" class="sel" onchange="renderMap()">
+            <option value="tec" selected>Color por tecnología</option>
+            <option value="tipo">Color por tipo</option>
+          </select>
+        </div>
+        <div id="map-legend" class="px-5 pb-2 flex flex-wrap gap-2 text-xs"></div>
+        <div id="map-canvas" class="flex-1 mx-5 mb-5 rounded-2xl overflow-hidden" style="min-height:360px; z-index: 10;"></div>
+      </section>
+      
+      <!-- ANALIZADOR DE TECNOLOGÍA -->
+      <section id="view-tech" class="view hidden map panel flex-1 min-w-0 flex flex-col overflow-hidden">
+        <div class="flex flex-col xl:flex-row xl:items-center justify-between gap-3 px-5 pt-4 pb-3 border-b border-white/5">
+          <h2 class="text-lg font-semibold text-white mr-auto">Analizador de Tecnologías</h2>
+          <div class="flex bg-black/40 p-1.5 rounded-xl border border-white/10 w-full xl:w-auto overflow-x-auto scroll" id="tech-tabs">
+            <button id="tab-tech-ALL" class="px-4 py-1.5 text-xs font-bold rounded-lg bg-[var(--primary)] text-white shadow-md transition whitespace-nowrap" onclick="setTechGroup('ALL')">Global</button>
+            <button id="tab-tech-FIJOS" class="px-4 py-1.5 text-xs font-bold rounded-lg text-slate-400 hover:text-white transition whitespace-nowrap" onclick="setTechGroup('FIJOS')">Antenas™</button>
+            <button id="tab-tech-RASTREO" class="px-4 py-1.5 text-xs font-bold rounded-lg text-slate-400 hover:text-white transition whitespace-nowrap" onclick="setTechGroup('RASTREO')">Rastreo™</button>
+            <button id="tab-tech-LAB" class="px-4 py-1.5 text-xs font-bold rounded-lg text-slate-400 hover:text-white transition whitespace-nowrap" onclick="setTechGroup('LAB')">Lab™</button>
+          </div>
+        </div>
+        <div id="tech-body" class="flex-1 overflow-y-auto scroll px-5 py-4"></div>
+      </section>
+
+      <!-- INFRAESTRUCTURA Y ANTENAS -->
+      <section id="view-antenna" class="view hidden map panel flex-1 min-w-0 flex flex-col overflow-hidden">
+        <div class="flex flex-wrap items-center gap-3 px-5 pt-4 pb-3">
+          <h2 class="text-lg font-semibold text-white mr-auto">Infraestructura y Antenas</h2>
+        </div>
+        <div class="flex-1 overflow-y-auto scroll px-5 pb-5 flex items-center justify-center fade">
+          <div class="card p-8 text-center max-w-[550px] w-full border-[var(--primary)]/40 relative overflow-hidden shadow-2xl">
+            <div class="absolute -top-16 -right-16 w-48 h-48 bg-[var(--primary)]/10 rounded-full blur-3xl"></div>
+            <div class="absolute -bottom-16 -left-16 w-48 h-48 bg-[var(--primary)]/10 rounded-full blur-3xl"></div>
+            <div class="relative z-10">
+              <div class="inline-flex items-center justify-center w-24 h-24 rounded-full bg-[var(--primary)]/10 border-2 border-[var(--primary)]/30 mb-6 shadow-[0_0_30px_var(--primary-bg)]">
+                 <i class="fa-solid fa-satellite-dish text-4xl text-[var(--primary)] animate-pulse"></i>
+              </div>
+              <h3 class="text-2xl font-bold text-white mb-2">Módulo en Construcción</h3>
+              <p class="text-sm text-slate-400 mb-8 px-4">Estamos calibrando los receptores. Muy pronto podrás evaluar la infraestructura física, radiación y altitud en esta sección.</p>
+              <div class="grid grid-cols-2 gap-4 text-left">
+                <div class="chip p-4 border-l-[3px] border-[var(--primary)]/50 bg-black/20">
+                  <p class="text-[10px] text-slate-400 uppercase font-bold tracking-widest"><i class="fa-solid fa-bolt mr-1 text-[var(--primary)]"></i>Potencia</p>
+                  <div class="h-2 w-full bg-white/5 rounded-full mt-3 overflow-hidden"><div class="h-full bg-[var(--primary)]/50 w-3/4 animate-pulse"></div></div>
+                </div>
+                <div class="chip p-4 border-l-[3px] border-emerald-500/50 bg-black/20">
+                  <p class="text-[10px] text-slate-400 uppercase font-bold tracking-widest"><i class="fa-solid fa-satellite mr-1 text-emerald-400"></i>Tipo de Antena</p>
+                  <div class="h-2 w-full bg-white/5 rounded-full mt-3 overflow-hidden"><div class="h-full bg-emerald-500/50 w-1/2 animate-pulse"></div></div>
+                </div>
+              </div>
+              <div class="mt-8 inline-block px-5 py-2.5 rounded-xl bg-[var(--primary)]/10 border border-[var(--primary)]/30 text-[var(--primary-light)] text-xs font-bold uppercase tracking-widest">
+                <i class="fa-solid fa-hourglass-half mr-2 animate-spin" style="animation-duration: 3s;"></i> Próximamente
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- PLAN DE MANTENIMIENTO LOGÍSTICO -->
+      <section id="view-maint" class="view hidden map panel flex-1 min-w-0 flex flex-col overflow-hidden">
+        <div class="flex flex-col md:flex-row items-center gap-3 px-5 pt-4 pb-3 border-b border-white/5">
+          <h2 class="text-lg font-semibold text-white mr-auto"><i class="fa-solid fa-calendar-check text-emerald-400 mr-2"></i>Plan de Mantenimiento</h2>
+          <div class="flex gap-2 w-full md:w-auto">
+              <select id="maint-scope" class="sel flex-1 md:w-auto text-sm py-2 px-3 font-bold" onchange="renderMaint()">
+                 <option value="global">Vista Global</option>
+                 <option value="month" selected>Vista Mensual</option>
+                 <option value="week">Vista Semanal</option>
+              </select>
+              <select id="maint-period" class="sel flex-1 md:w-auto text-sm py-2 px-3 font-semibold" onchange="renderMaint()"></select>
+          </div>
+        </div>
+        <div id="maint-body" class="flex-1 overflow-y-auto scroll px-5 py-5 space-y-6 fade"></div>
+      </section>
+      
+      <!-- ANALIZADOR DE PRECIOS -->
+      <section id="view-price" class="view hidden map panel flex-1 min-w-0 flex flex-col overflow-hidden">
+        <div class="flex flex-wrap items-center gap-3 px-5 pt-4 pb-3"><h2 class="text-lg font-semibold text-white mr-auto">Analizador de precios</h2><label class="text-xs text-slate-400">Precio <select id="price-col" class="sel" onchange="renderPrice()"></select></label><label class="text-xs text-slate-400">Agrupar por <select id="price-grp" class="sel" onchange="renderPrice()"></select></label></div>
+        <div id="price-body" class="flex-1 overflow-y-auto scroll px-5 pb-5 space-y-4"></div>
+      </section>
+    </div>
+  </div>
+</div>
+
+<div id="toast" class="toast flex items-center gap-2 text-sm"><i class="fa-solid fa-check text-emerald-400"></i><span id="toast-msg"></span></div>
+
+<script>
+let excelData=[];
+const $=id=>document.getElementById(id);
+const fileInput=$("file-upload"),dropZone=$("drop-zone"),searchInput=$("search-input"),searchBtn=$("search-btn"),
+resultsContainer=$("results-container"),resultsCount=$("results-count"),techSummary=$("tech-summary-container"),techBadges=$("tech-badges-wrapper");
+
+let currentPriceRows = []; 
+let currentTotalSoles = 0;
+let currentTechRows = []; 
+let currentTechGroup = 'ALL'; 
+let maintSchedule = null;
+
+function toggleColor() {
+  document.body.classList.toggle("color-red");
+  if(map && ($("map-color").value==="tec" || $("map-mode").value==="cluster")) renderMap();
+  if(!$("view-tech").classList.contains("hidden")) renderTech();
+  if(!$("view-price").classList.contains("hidden")) renderPrice();
+  if(!$("view-maint").classList.contains("hidden")) renderMaint();
+}
+
+function toggleTheme() {
+  const isDay = document.body.classList.toggle("theme-day");
+  $("theme-icon").className = isDay ? "fa-solid fa-sun" : "fa-solid fa-moon";
+}
+
+const normalizeText=v=>v==null?"":String(v).normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().trim();
+const escapeHtml=v=>v==null?"":String(v).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#039;");
+const isEmpty=v=>v==null||["","nan","null","undefined"].includes(String(v).trim().toLowerCase());
+function findColumn(row,patterns){const keys=Object.keys(row);for(const p of patterns){const f=keys.find(k=>normalizeText(k).includes(normalizeText(p)));if(f)return f}return null}
+
+const msg=(icon,title,sub)=>`<div class="text-center py-20 text-slate-500"><i class="fa-solid ${icon} text-5xl mb-4 block"></i><p class="text-lg font-semibold text-slate-300">${title}</p><p class="text-sm mt-1">${sub}</p></div>`;
+
+fileInput.addEventListener("change",handleFile);
+function handleFile(e){
+  const file=e.target.files[0];if(!file)return;
+  ["file-status-container","file-error-container","global-stats-container"].forEach(i=>$(i).classList.add("hidden"));
+  techSummary.classList.add("hidden");
+  
+  $("logo-container").className = "relative inline-block mt-2"; 
+  
+  resultsContainer.innerHTML=msg("fa-circle-notch fa-spin text-sky-400","Procesando archivo...","Analizando registros y columnas.");
+  const reader=new FileReader();
+  reader.onload=ev=>{
+    try{
+      const wb=XLSX.read(new Uint8Array(ev.target.result),{type:"array",cellDates:true});
+      if(!wb.SheetNames.length)throw new Error("El archivo no contiene hojas.");
+      const raw=XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]],{header:1,defval:"",raw:false});
+      if(!raw.length)throw new Error("La hoja está vacía.");
+      let hi=0,best=0;const kw=["PUNTOS","PUNTO","IMEI","ID","TECNOLOGIA","LATITUD","LONGITUD"];
+      for(let i=0;i<Math.min(20,raw.length);i++){let s=0;(raw[i]||[]).forEach(c=>{const v=normalizeText(c);if(v)kw.forEach(k=>{if(v.includes(normalizeText(k)))s++})});if(s>best){best=s;hi=i}}
+      const headers=raw[hi].map((h,i)=>(String(h||"").trim()||`COLUMNA_${i+1}`).toUpperCase());
+      excelData=raw.slice(hi+1).map(r=>{const o={};headers.forEach((h,i)=>o[h]=r[i]!==undefined?r[i]:"");return o})
+        .filter(r=>{const k=findColumn(r,["PUNTOS","PUNTO"]);return k&&!isEmpty(r[k])});
+      if(!excelData.length)throw new Error("No se encontraron registros válidos. Verifica que exista una columna PUNTOS.");
+      $("file-name").textContent=file.name;
+      $("file-status-container").classList.remove("hidden");
+      
+      $("logo-container").classList.add("anim-filter");
+      
+      searchInput.disabled=false;searchBtn.disabled=false;
+      updateGlobalStats();
+      $("map-tech-filter").dataset.hash = ""; 
+      
+      maintSchedule = null;
+
+      resultsContainer.innerHTML=msg("fa-database text-sky-400","Base SKYNET lista",`${excelData.length.toLocaleString()} registros cargados. Usa el buscador.`);
+      searchInput.focus();if(searchInput.value.trim())executeSearch();
+    }catch(err){showFileError(err.message||"Error al procesar el archivo.")}
+  };
+  reader.onerror=()=>showFileError("No fue posible leer el archivo.");
+  reader.readAsArrayBuffer(file);
+}
+function showFileError(m){
+  $("file-error-msg").textContent=m;$("file-error-container").classList.remove("hidden");
+  $("logo-container").className = "relative inline-block mt-2";
+  searchInput.disabled=true;searchBtn.disabled=true;
+  resultsContainer.innerHTML=msg("fa-file-circle-xmark text-red-400","No se pudo cargar el archivo","Revisa el formato e inténtalo nuevamente.");
+}
+function updateGlobalStats(){
+  const pts=new Set(),tc={};
+  excelData.forEach(r=>{
+    const pk=findColumn(r,["PUNTOS","PUNTO"]);if(pk&&!isEmpty(r[pk]))pts.add(normalizeText(r[pk]));
+    const tk=findColumn(r,["TECNOLOGIA"]);if(tk&&!isEmpty(r[tk])){const t=String(r[tk]).trim().toUpperCase();tc[t]=(tc[t]||0)+1}
+  });
+  const stat=(i,l,v)=>`<div class="chip p-3"><i class="fa-solid ${i} text-sky-400 text-xs"></i><p class="text-xl font-bold text-white mt-1">${v.toLocaleString()}</p><p class="text-[11px] text-slate-400">${l}</p></div>`;
+  $("globalStatsContent").innerHTML=stat("fa-database","Registros",excelData.length)+stat("fa-location-dot","Puntos únicos",pts.size);
+  $("globalTechStats").innerHTML=Object.entries(tc).sort((a,b)=>b[1]-a[1]).map(([t,c])=>`<span class="chip px-2.5 py-1 text-[11px] font-semibold">${escapeHtml(t)} <span class="text-sky-400 ml-1">${c}</span></span>`).join("");
+  $("global-stats-container").classList.remove("hidden");
+}
+
+function getEquipmentInfo(imei){
+  const s=String(imei||"").trim(),p=(...a)=>a.some(x=>s.startsWith(x));
+  if(p("8682640","81350046"))return{modelo:"GV58CG",comandos:[{name:"Bloquear Detektor",cmd:"AT+GTDOS=PEEC14,0,2,1,1,,,,,2,,,,,,3,,,,,,FFFF$"},{name:"Desbloquear Detektor",cmd:"AT+GTDOS=PEEC14,0,2,1,0,,,,,2,,,,,,3,,,,,,FFFF$"},{name:"Bloquear LoJack",cmd:"AT+GTDOS=PEEC14,0,2,1,,,,,,2,1,,,,,3,,,,,,FFFF$"},{name:"Desbloquear LoJack",cmd:"AT+GTDOS=PEEC14,0,2,1,,,,,,2,0,,,,,3,,,,,,FFFF$"}]};
+  const out=(m)=>({modelo:m,comandos:[{name:"Bloquear",cmd:"AT+GTOUT=PEEC14,1,,,,,,,,,,,,,,,,,,,,,,FFFF$"},{name:"Desbloquear",cmd:"AT+GTOUT=PEEC14,0,,,,,,,,,,,,,,,,,,,,,,FFFF$"}]});
+  if(p("8634570","1662037"))return out("GV300W");
+  if(p("8663140","60833918"))return{modelo:"GV58LAU",comandos:[{name:"Bloquear",cmd:"AT+GTDOS=PEEC14,,,1,1,,,,,,,,,,,,,,,,,,,,,,,FFFF$"},{name:"Desbloquear",cmd:"AT+GTDOS=PEEC14,,,1,0,,,,,,,,,,,,,,,,,,,,,,,FFFF$"}]};
+  if(p("8685740","42652821"))return out("GV55W");
+  if(p("8646960","62236054"))return{modelo:"GV57CG",comandos:[{name:"Bloquear",cmd:"AT+GTDOS=PEEC14,,1,1,1,,,,,,,,,,,FFFF$"},{name:"Desbloquear",cmd:"AT+GTDOS=PEEC14,,1,1,0,,,,,,,,,,,FFFF$"}]};
+  return{modelo:"Desconocido",comandos:[]};
+}
+
+function executeSearch(){
+  const q=normalizeText(searchInput.value);
+  resultsCount.classList.add("hidden");techSummary.classList.add("hidden");
+  if(!q){resultsContainer.innerHTML=msg("fa-database text-sky-400","Base SKYNET lista",`${excelData.length.toLocaleString()} registros cargados. Usa el buscador.`);return}
+  const m=excelData.filter(r=>Object.values(r).some(v=>normalizeText(v).includes(q)));
+  if(!m.length){resultsContainer.innerHTML=msg("fa-face-frown-open","No hay resultados",`Sin coincidencias para "${escapeHtml(searchInput.value)}"`);return}
+  resultsCount.textContent=`${m.length.toLocaleString()} encontrado${m.length!==1?"s":""}`;resultsCount.classList.remove("hidden");
+  const c={};m.forEach(r=>{const k=findColumn(r,["TECNOLOGIA"]);const t=k&&!isEmpty(r[k])?String(r[k]).trim().toUpperCase():"SIN ESPECIFICAR";c[t]=(c[t]||0)+1});
+  techBadges.innerHTML=Object.entries(c).sort((a,b)=>b[1]-a[1]).map(([t,n])=>`<span class="chip px-3 py-1.5 text-xs font-semibold"><i class="fa-solid fa-tower-broadcast text-sky-400 mr-1"></i>${escapeHtml(t)} <span class="text-sky-400 ml-1">${n}</span></span>`).join("");
+  techSummary.classList.remove("hidden");
+  renderResults(m);
+}
+
+function renderResults(matches){
+  resultsContainer.innerHTML=matches.map((row,index)=>{
+    const K=p=>findColumn(row,p);
+    const pk=K(["PUNTOS","PUNTO"]),tk=K(["TECNOLOGIA"]),ik=K(["IMEI RESETEADOR","IMEI"]),sk=K(["SIM RESETEADOR","SIM MODEM","SIM"]),
+    ok=K(["OBSERVACION"]),lk=K(["LATITUD","LAT"]),gk=K(["LONGITUD","LON","LNG"]),yk=K(["TIPO"]);
+    const punto=pk?row[pk]:"Desconocido",tec=tk?row[tk]:"-",imei=ik?row[ik]:"-",sim=sk?row[sk]:"-",obs=ok?row[ok]:"",lat=lk?row[lk]:"",lon=gk?row[gk]:"";
+    const tipo=yk&&!isEmpty(row[yk])?String(row[yk]).toUpperCase():"";
+    const P=String(punto).toUpperCase();
+    const movil=tipo.includes("RASTREO")||P.startsWith("R-")||P.includes("RASTREO");
+    const eq=getEquipmentInfo(imei),hasObs=!isEmpty(obs);
+    const hasLoc=!isEmpty(lat)&&!isNaN(Number(lat))&&!isEmpty(lon)&&!isNaN(Number(lon));
+    
+    const ss=String(sim).trim();let op="",oc="";
+    if(ss.startsWith("893")){op="Movistar";oc="bg-sky-500/15 text-sky-300 border-sky-400/30"}else if(ss.startsWith("8951")){op="Claro";oc="bg-red-500/15 text-red-300 border-red-400/30"}
+    const cmds=eq.comandos.length?eq.comandos.map(c=>{
+      const un=normalizeText(c.name).includes("desbloquear");
+      const col=un?"emerald":"sky";
+      const safe=c.cmd.replace(/\\/g,"\\\\").replace(/'/g,"\\'");
+      return `<div class="chip overflow-hidden mb-2 flex flex-col md:flex-row">
+        <div class="px-3 py-2.5 md:w-48 shrink-0 flex items-center gap-2 bg-${col}-500/10 text-${col}-300 text-xs font-semibold"><i class="fa-solid ${un?"fa-lock-open":"fa-lock"}"></i>${escapeHtml(c.name)}</div>
+        <div class="flex-1 min-w-0 flex items-stretch">
+          <code class="mono flex-1 min-w-0 px-3 py-2.5 text-xs text-slate-300 whitespace-nowrap overflow-x-auto scroll">${escapeHtml(c.cmd)}</code>
+          <button onclick="copyToClipboard('${safe}')" class="px-4 text-xs font-semibold text-white bg-${col}-500/80 hover:bg-${col}-500 active:scale-95 transition" title="Copiar comando"><i class="fa-regular fa-copy mr-1"></i>Copiar</button>
+        </div></div>`}).join("")
+      :`<div class="p-3 rounded-xl bg-amber-500/10 border border-amber-400/30 text-xs text-amber-200"><b>Comandos no registrados.</b> El prefijo del IMEI ${escapeHtml(imei)} no coincide con un equipo configurado.</div>`;
+    return `<article class="card fade overflow-hidden">
+      <div class="p-5 flex flex-col xl:flex-row xl:justify-between gap-4">
+        <div class="min-w-0">
+          <div class="flex items-center gap-2 mb-2 text-[11px] font-semibold">
+            <span class="px-2 py-1 rounded-md border ${movil?"bg-indigo-500/15 text-indigo-300 border-indigo-400/30":"bg-emerald-500/15 text-emerald-300 border-emerald-400/30"}"><i class="fa-solid ${movil?"fa-truck-fast":"fa-tower-cell"} mr-1"></i>${movil?"Móvil / Rastreo":"Torre / Fija"}</span>
+            <span class="text-slate-500">#${index+1}</span>
+          </div>
+          <h3 class="text-2xl font-bold text-white break-words">${escapeHtml(punto)}</h3>
+          <div class="flex flex-wrap gap-2 mt-3 text-xs font-semibold">
+            <span class="chip px-3 py-1.5 text-sky-300"><i class="fa-solid fa-microchip mr-1"></i>${escapeHtml(eq.modelo)}</span>
+            <span class="chip px-3 py-1.5 text-emerald-300"><i class="fa-solid fa-tower-broadcast mr-1"></i>${escapeHtml(tec)}</span>
+          </div>
+        </div>
+        <div class="flex flex-col gap-2 xl:min-w-[320px]">
+          <div class="chip px-3 py-2.5 flex justify-between gap-4 items-center"><span class="text-[11px] text-slate-400 shrink-0">IMEI reseteador</span><span class="mono text-xs truncate">${escapeHtml(imei)}</span></div>
+          <div class="chip px-3 py-2.5 flex justify-between gap-4 items-center"><span class="text-[11px] text-slate-400 shrink-0">SIM reseteador ${op?`<span class="ml-1 px-1.5 py-0.5 rounded border text-[10px] ${oc}">${op}</span>`:""}</span><span class="mono text-xs truncate">${escapeHtml(sim)}</span></div>
+        </div>
+      </div>
+      ${hasObs?`<div class="mx-5 mb-4 px-3 py-2.5 rounded-lg bg-red-500/10 border-l-[3px] border-red-400 flex gap-2.5"><i class="fa-solid fa-triangle-exclamation text-red-400 mt-0.5"></i><div><p class="text-[11px] font-semibold text-red-300">Observación</p><p class="text-xs text-red-100 mt-0.5 break-words">${escapeHtml(obs)}</p></div></div>`:""}
+      <div class="px-5 py-3 flex justify-between items-center border-t border-white/5 bg-black/20">
+        <span class="text-xs text-slate-400">Detalles operativos</span>
+        <button onclick="toggleCard(${index})" class="chip px-3 py-1.5 text-xs font-semibold hover:border-sky-400 transition"><span id="toggle-text-${index}">Desplegar</span> <i id="toggle-icon-${index}" class="fa-solid fa-chevron-down ml-1"></i></button>
+      </div>
+      <div id="card-details-${index}" class="hidden border-t border-white/5">
+        <div class="p-5 grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div class="lg:col-span-2"><h4 class="text-sm font-semibold text-white mb-3"><i class="fa-solid fa-terminal text-sky-400 mr-2"></i>Comandos del equipo</h4>${cmds}</div>
+          <div><h4 class="text-sm font-semibold text-white mb-3"><i class="fa-solid fa-list-ul text-sky-400 mr-2"></i>Datos adicionales</h4>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2 gap-2 max-h-[24rem] overflow-y-auto scroll pr-1">${renderAdditionalData(row,[pk,tk,ik,sk,ok,lk,gk])}</div></div>
+        </div>
+        ${hasLoc?`<div class="px-5 py-3 border-t border-white/5 bg-black/20 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+          <span class="text-xs text-slate-400"><i class="fa-solid fa-location-dot text-red-400 mr-1"></i>${escapeHtml(lat)},${escapeHtml(lon)}</span>
+          <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(lat)},${encodeURIComponent(lon)}" target="_blank" rel="noopener noreferrer" class="btn text-white px-4 py-2 rounded-lg text-xs font-semibold text-center"><i class="fa-solid fa-map-location-dot mr-1"></i>Ver ubicación</a></div>`:""}
+      </div></article>`}).join("");
+}
+
+function toggleCard(i){
+  const d=$(`card-details-${i}`),t=$(`toggle-text-${i}`),ic=$(`toggle-icon-${i}`),h=d.classList.toggle("hidden");
+  t.textContent=h?"Desplegar":"Contraer";ic.className="fa-solid ml-1 "+(h?"fa-chevron-down":"fa-chevron-up");
+}
+
+function renderAdditionalData(row,excluded){
+  const ex=new Set(excluded.filter(Boolean).map(k=>String(k).toUpperCase()));
+  const T={modem:"bg-sky-500/10 border-sky-400 text-sky-300",slot:"bg-amber-500/10 border-amber-400 text-amber-300",rest:"bg-white/5 border-slate-500 text-slate-400"};
+  let h="";
+  Object.entries(row).forEach(([k,v])=>{
+    if(ex.has(k.toUpperCase())||isEmpty(v))return;
+    const n=normalizeText(k);
+    if(n==="vlu"){h+=`<div class="col-span-full p-3 rounded-xl bg-gradient-to-r from-amber-400/20 to-transparent border border-amber-400/30"><p class="text-[11px] font-semibold text-amber-300"><i class="fa-solid fa-key mr-1"></i>VLU</p><p class="text-base font-bold text-amber-100 break-words">${escapeHtml(v)}</p></div>`;return}
+    const t=n.includes("modem")?T.modem:n.includes("slot")?T.slot:T.rest;
+    h+=`<div class="${t} border-l-[3px] rounded-md px-2.5 py-2"><p class="text-[10px] font-semibold truncate">${escapeHtml(k)}</p><p class="text-xs font-semibold text-slate-100 break-words mt-0.5">${escapeHtml(v)}</p></div>`;
+  });
+  return h||`<div class="col-span-full text-xs text-slate-500 italic p-3">No hay datos adicionales.</div>`;
+}
+
+async function copyToClipboard(text){
+  try{if(navigator.clipboard&&window.isSecureContext)await navigator.clipboard.writeText(text);else fallbackCopy(text);showToast("Comando copiado")}
+  catch(e){fallbackCopy(text);showToast("Comando copiado")}
+}
+function fallbackCopy(text){const a=document.createElement("textarea");a.value=text;a.style.cssText="position:fixed;left:-9999px";document.body.appendChild(a);a.select();document.execCommand("copy");a.remove()}
+let tt;function showToast(m){$("toast-msg").textContent=m;$("toast").classList.add("show");clearTimeout(tt);tt=setTimeout(()=>$("toast").classList.remove("show"),2200)}
+
+const debounce=(f,d)=>{let t;return()=>{clearTimeout(t);t=setTimeout(f,d)}};
+searchInput.addEventListener("input",debounce(executeSearch,180));
+searchBtn.addEventListener("click",executeSearch);
+searchInput.addEventListener("keydown",e=>{if(e.key==="Enter")executeSearch()});
+
+["dragenter","dragover","dragleave","drop"].forEach(n=>dropZone.addEventListener(n,e=>{e.preventDefault();e.stopPropagation()}));
+["dragenter","dragover"].forEach(n=>dropZone.addEventListener(n,()=>dropZone.classList.add("drag")));
+["dragleave","drop"].forEach(n=>dropZone.addEventListener(n,()=>dropZone.classList.remove("drag")));
+dropZone.addEventListener("drop",e=>{
+  const f=e.dataTransfer.files[0];if(!f)return;
+  if(!["xlsx","xls","csv"].includes(f.name.split(".").pop().toLowerCase())){showFileError("Formato no válido. Utiliza XLSX, XLS o CSV.");return}
+  const dt=new DataTransfer();dt.items.add(f);fileInput.files=dt.files;fileInput.dispatchEvent(new Event("change",{bubbles:true}));
+});
+
+function setView(v){
+  if(v!=="filter"&&!excelData.length){showToast("Carga primero un archivo Excel");return}
+  document.querySelectorAll(".rail button[data-v]").forEach(b=>b.classList.toggle("on",b.dataset.v===v));
+  
+  $("side").classList.toggle("hidden",v!=="filter");
+  $("view-filter").classList.toggle("hidden",v!=="filter");
+  
+  ["map","tech","antenna","maint","price"].forEach(x=>$("view-"+x).classList.toggle("hidden",v!==x));
+  
+  const lc = $("logo-container");
+  lc.className = "relative inline-block mt-2"; 
+  if (excelData.length > 0) {
+    lc.classList.add(`anim-${v}`);
+  }
+  
+  if(v==="map")renderMap();
+  if(v==="tech")renderTech();
+  if(v==="maint") renderMaintSetup();
+  if(v==="price")renderPrice();
+}
+
+function getSector(lat, lon) {
+    if(!isFinite(lat) || !isFinite(lon)) return "DESCONOCIDO";
+    if (lat > -11.2) return 'NORTE';
+    if (lat < -13.2) return 'SUR';
+    if (lon > -76.2) return 'ESTE';
+    return 'CENTRO'; 
+}
+
+function info(r){
+  const K=p=>findColumn(r,p),g=k=>k?r[k]:"";
+  const pk=K(["PUNTOS","PUNTO"]),tk=K(["TECNOLOGIA"]),ik=K(["IMEI RESETEADOR","IMEI"]),sk=K(["SIM RESETEADOR","SIM MODEM","SIM"]),lk=K(["LATITUD","LAT"]),gk=K(["LONGITUD","LON","LNG"]),yk=K(["TIPO"]),ok=K(["OBSERVACION"]);
+  const fwk=K(["FW","FIRMWARE","VERSION"]), ohmk=K(["OHM","POTENCIA"]);
+  const vk=K(["VISITADO","ESTADO","MANTTO","MANTENIMIENTO"]);
+  
+  const punto=g(pk),P=String(punto).toUpperCase(),tipo=String(g(yk)).toUpperCase(),ss=String(g(sk)).trim();
+  const lat=parseFloat(String(g(lk)).replace(",",".")),lon=parseFloat(String(g(gk)).replace(",","."));
+  const visitado=vk && /VISITADO|SI|OK|REALIZADO|HECHO|1/i.test(String(g(vk)));
+
+  return{
+    punto,
+    model:getEquipmentInfo(g(ik)).modelo,
+    tec:isEmpty(g(tk))?"SIN ESPECIFICAR":String(g(tk)).trim().toUpperCase(),
+    fw:isEmpty(g(fwk))?"NO ESPECIFICADO":String(g(fwk)).trim().toUpperCase(),
+    ohm:isEmpty(g(ohmk))?"NO ESPECIFICADO":String(g(ohmk)).trim().toUpperCase(),
+    op:ss.startsWith("893")?"Movistar":ss.startsWith("8951")?"Claro":"Otro / sin SIM",
+    movil:tipo.includes("RASTREO")||P.startsWith("R-")||P.includes("RASTREO"),
+    lat,lon,
+    ok:isFinite(lat)&&isFinite(lon)&&Math.abs(lat)<=90&&Math.abs(lon)<=180&&!(lat===0&&lon===0),
+    obs:!isEmpty(g(ok)),
+    visitado,
+    sector: getSector(lat, lon),
+    sl:SL.map(([n,c])=>{const k=Object.keys(r).find(x=>sq(x).includes(sq(c)));return[n,k?r[k]:""]})
+  };
+}
+
+const filtered=()=>{const q=normalizeText(searchInput.value);return q?excelData.filter(r=>Object.values(r).some(v=>normalizeText(v).includes(q))):excelData};
+const count=(a,f)=>{const c={};a.forEach(x=>{const k=f(x);c[k]=(c[k]||0)+1});return Object.entries(c).sort((a,b)=>b[1]-a[1])};
+const bars=(en,c="var(--primary)",fmt=n=>n.toLocaleString())=>{const mx=Math.max(...en.map(e=>e[1]),1);return en.map(([l,v])=>`<div class="flex items-center gap-3 mb-2 text-xs"><span class="w-32 shrink-0 truncate text-slate-300" title="${escapeHtml(l)}">${escapeHtml(l)}</span><div class="flex-1 h-2.5 rounded-full bg-white/5"><div class="h-full rounded-full" style="width:${Math.max(v/mx*100,1)}%;background:${c};box-shadow:0 0 10px ${c}88"></div></div><span class="w-24 text-right font-semibold">${fmt(v)}</span></div>`).join("")||'<p class="text-xs text-slate-500">Sin datos</p>'};
+const kpi=(i,l,v)=>`<div class="chip p-4"><i class="fa-solid ${i} text-sky-400 text-xs"></i><p class="text-2xl font-bold text-white mt-1">${v}</p><p class="text-[11px] text-slate-400">${l}</p></div>`;
+const box=(t,b)=>`<div class="chip p-4"><h4 class="text-sm font-semibold text-white mb-3">${t}</h4>${b}</div>`;
+const grid=(c,h)=>`<div class="grid grid-cols-2 ${c} gap-3">${h}</div>`;
+
+const sq=x=>normalizeText(x).replace(/[^a-z0-9]/g,"");
+const SL=[["MSK slot Tx","MSK SLOT TX"],["FSK1 Slot 1 Tx","FSK1 - Slot 1 Tx"],["FSK1 Subslot Tx","FSK1 - Subslot Tx"],["FSK2 Slot Tx","FSK2 - Slot Tx"]];
+
+function popupHtml(i){
+  const badgeVis = i.visitado ? `<span style="background:rgba(52,211,153,.15);color:#6ee7b7;padding:2px 8px;border-radius:8px;font-weight:600">Visitado</span>` : `<span style="background:rgba(239,68,68,.15);color:#fca5a5;padding:2px 8px;border-radius:8px;font-weight:600">Pendiente</span>`;
+  const rows=i.sl.map(([n,v])=>`<tr><td style="padding:3px 10px 3px 0;color:#94a3b8">${n}</td><td style="padding:3px 0;font-weight:700;color:${isEmpty(v)?"#475569":"#fbbf24"}">${isEmpty(v)?"—":escapeHtml(v)}</td></tr>`).join("");
+  return `<div style="min-width:230px"><b style="font-size:14px">${escapeHtml(i.punto)}</b>
+  <div style="margin:6px 0;font-size:12px; display:flex; gap:6px; flex-wrap:wrap">
+    <span style="background:rgba(59,155,255,.15);color:#7dd3fc;padding:2px 8px;border-radius:8px;font-weight:600">${escapeHtml(i.tec)}</span>
+    ${badgeVis}
+    <span style="color:#94a3b8">${escapeHtml(i.sector)}</span>
+  </div>
+  <div style="font-size:11px;color:#7dd3fc;font-weight:700;margin-top:8px">SLOTS</div>
+  <table style="font-size:12px;border-collapse:collapse">${rows}</table></div>`;
+}
+
+let map,layer;
+function renderMap(){
+  if(!map){
+    map=L.map("map-canvas");
+    L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png",{attribution:"© OpenStreetMap",maxZoom:19}).addTo(map);
+    layer=L.layerGroup();
+  }
+  setTimeout(()=>map.invalidateSize(),60);
+  
+  let src=$("map-mode").value==="filter"?filtered():excelData;
+
+  // 1. Filtrar primero el Tipo de Equipo
+  const typeFilter = $("map-type-filter") ? $("map-type-filter").value : "all";
+  if (typeFilter !== "all") {
+      src = src.filter(r => {
+          const i = info(r);
+          if (typeFilter === "fijos") return !i.movil && !i.tec.includes("LABORATORIO");
+          if (typeFilter === "moviles") return i.movil;
+          return true;
+      });
+  }
+
+  // 2. Agrupar Punto Único y Concatenar Tecnologías alfabéticamente
+  const isUnique = $("map-unique-filter") ? $("map-unique-filter").value === "unique" : true;
+  if(isUnique && excelData.length > 0) {
+      const P = findColumn(excelData[0], ["PUNTOS", "PUNTO"]);
+      const TK = findColumn(excelData[0], ["TECNOLOGIA"]);
+      const uniqueMap = new Map();
+      
+      src.forEach(r => {
+          let pName = P ? String(r[P]).trim() : "";
+          if (!pName) return;
+          pName = pName.replace(/\s*\(\s*PE\s*\)\s*/gi, '').trim();
+          const key = pName.toUpperCase();
+          
+          if (!uniqueMap.has(key)) {
+              uniqueMap.set(key, { ...r }); 
+              if(TK && r[TK]) {
+                  uniqueMap.get(key)[TK] = String(r[TK]).trim().toUpperCase();
+              }
+          } else if (TK) {
+              let existingTech = String(uniqueMap.get(key)[TK] || "").toUpperCase();
+              let newTech = String(r[TK] || "").trim().toUpperCase();
+              
+              if (newTech && newTech !== "SIN ESPECIFICAR") {
+                  let techSet = new Set(existingTech.split(" + ").filter(t => t && t !== "SIN ESPECIFICAR"));
+                  techSet.add(newTech);
+                  uniqueMap.get(key)[TK] = Array.from(techSet).sort().join(" + ");
+              }
+          }
+      });
+      src = Array.from(uniqueMap.values());
+  }
+
+  // 3. Extraer TODAS las combinaciones ACTUALES
+  const currentTechs = Array.from(new Set(src.map(r => info(r).tec))).sort();
+
+  // 4. Llenar el Dropdown con las combinaciones exactas
+  const techSelect = $("map-tech-filter");
+  const currentSelectedTech = techSelect.value;
+  const techsHash = currentTechs.join("|");
+  
+  if(techSelect.dataset.hash !== techsHash) {
+      techSelect.innerHTML = `<option value="all">Todas las tecnologías / combinaciones</option>` + 
+                             currentTechs.map(t => `<option value="${escapeHtml(t)}">${escapeHtml(t)}</option>`).join("");
+      techSelect.dataset.hash = techsHash;
+      
+      // Mantiene el filtro si la combinación aún existe, sino vuelve a "all"
+      if (currentTechs.includes(currentSelectedTech)) {
+          techSelect.value = currentSelectedTech;
+      } else {
+          techSelect.value = "all";
+      }
+  }
+
+  // 5. Aplicar los Filtros del Dropdown
+  if (techSelect.value !== "all") {
+      src = src.filter(r => info(r).tec === techSelect.value);
+  }
+  
+  if ($("map-sector-filter").value !== "all") {
+      src = src.filter(r => info(r).sector === $("map-sector-filter").value);
+  }
+
+  // 6. Colores consistentes y de alto contraste
+  const colorMode = $("map-color").value; 
+  const isRed = document.body.classList.contains("color-red");
+  const hexPrimary = isRed ? "#ef4444" : "#3b9bff";
+
+  const getTechColor = (t) => { 
+      // Calculamos sobre currentTechs para que los colores no varíen al filtrar
+      const idx = currentTechs.indexOf(t); 
+      if (idx === -1) return hexPrimary;
+      const hue = (idx * 137.5) % 360;
+      return `hsl(${hue}, 85%, 60%)`; 
+  };
+
+  const col = i => (colorMode === 'tec') ? getTechColor(i.tec) : (i.movil?"#818cf8":"#34d399");
+
+  if(map.hasLayer(layer)) map.removeLayer(layer);
+  layer.clearLayers();
+
+  const useCluster = $("map-mode").value === "cluster";
+  const pts=[]; let miss=0;
+  
+  let validPoints = src.map(info).filter(i => { if(!i.ok) miss++; return i.ok; });
+
+  if(useCluster && validPoints.length > 0) {
+    let unassigned = [...validPoints];
+    let groups = [];
+    const MAX_DIST_SQ = 1.0; 
+
+    while(unassigned.length > 0) {
+        let center = unassigned.shift();
+        let group = [center];
+        
+        unassigned.sort((a,b) => {
+            return (Math.pow(a.lat - center.lat, 2) + Math.pow(a.lon - center.lon, 2)) -
+                   (Math.pow(b.lat - center.lat, 2) + Math.pow(b.lon - center.lon, 2));
+        });
+        
+        let nextUnassigned = [];
+        let added = 0;
+        
+        for (let i = 0; i < unassigned.length; i++) {
+            let distSq = Math.pow(unassigned[i].lat - center.lat, 2) + Math.pow(unassigned[i].lon - center.lon, 2);
+            if (distSq < MAX_DIST_SQ && added < 3) { 
+                group.push(unassigned[i]);
+                added++;
+            } else {
+                nextUnassigned.push(unassigned[i]);
+            }
+        }
+        unassigned = nextUnassigned;
+        groups.push(group);
+    }
+
+    groups.forEach((g, gIdx) => {
+        let hull = [];
+        if (g.length > 2) {
+            let clat = g.reduce((s, p) => s + p.lat, 0) / g.length;
+            let clon = g.reduce((s, p) => s + p.lon, 0) / g.length;
+            let sorted = g.slice().sort((a,b) => Math.atan2(a.lon - clon, a.lat - clat) - Math.atan2(b.lon - clon, b.lat - clat));
+            hull = sorted.map(p => [p.lat, p.lon]);
+            L.polygon(hull, {color: "var(--primary)", weight: 1.5, fillOpacity: 0.05, className: 'zone-polygon'}).addTo(layer);
+        } else if (g.length === 2) {
+            hull = g.map(p => [p.lat, p.lon]);
+            L.polyline(hull, {color: "var(--primary)", weight: 1.5, className: 'zone-polygon'}).addTo(layer);
+        }
+
+        g.forEach(i => {
+            let m = L.circleMarker([i.lat,i.lon],{
+                radius: 7, color: col(i), fillColor: col(i), fillOpacity: 0.8, weight: 2,
+                className: i.visitado ? 'marker-fixed' : 'marker-blink'
+            }).bindPopup(popupHtml(i),{maxWidth:340});
+            layer.addLayer(m);
+            pts.push([i.lat, i.lon]);
+        });
+    });
+  } else {
+    validPoints.forEach(i => {
+      const marker = L.circleMarker([i.lat,i.lon],{
+          radius: 7, color: col(i), fillColor: col(i), fillOpacity: 0.8, weight: 2,
+          className: i.visitado ? 'marker-fixed' : 'marker-blink'
+      }).bindPopup(popupHtml(i),{maxWidth:340});
+      layer.addLayer(marker);
+      pts.push([i.lat,i.lon]);
+    });
+  }
+  
+  map.addLayer(layer);
+
+  $("map-info").textContent=`${pts.length} en el mapa · ${miss} sin coordenadas`;
+  const dot=(c,t)=>`<span class="chip px-2.5 py-1"><span class="inline-block w-2 h-2 rounded-full mr-1.5" style="background:${c}"></span>${escapeHtml(t)}</span>`;
+  
+  if(colorMode === 'tec') $("map-legend").innerHTML = currentTechs.map(t=>dot(getTechColor(t),t)).join("");
+  else $("map-legend").innerHTML = dot("#34d399","Torre / Fija")+dot("#818cf8","Móvil / Rastreo");
+  
+  if(pts.length) map.fitBounds(pts,{padding:[40,40],maxZoom:16});
+}
+
+function setTechGroup(grp) {
+  currentTechGroup = grp;
+  ["ALL","FIJOS","RASTREO","LAB"].forEach(id => {
+    const btn = $("tab-tech-"+id);
+    if(id === grp) btn.className = "px-4 py-1.5 text-xs font-bold rounded-lg bg-[var(--primary)] text-white shadow-md transition whitespace-nowrap";
+    else btn.className = "px-4 py-1.5 text-xs font-bold rounded-lg text-slate-400 hover:text-white transition whitespace-nowrap";
+  });
+  renderTech();
+}
+
+function renderTech(){
+  const P = findColumn(excelData[0], ["PUNTOS", "PUNTO"]);
+  const uniqueMap = new Map();
+  excelData.forEach(r => {
+    let pName = P ? String(r[P]).trim() : "";
+    if (!pName) return;
+    pName = pName.replace(/\s*\(\s*PE\s*\)\s*/gi, '').trim();
+    if (!uniqueMap.has(pName.toUpperCase())) uniqueMap.set(pName.toUpperCase(), r);
+  });
+  const dedupedData = Array.from(uniqueMap.values());
+  let R = dedupedData.map(info);
+
+  if (currentTechGroup === 'FIJOS') R = R.filter(i => !i.tec.includes("LABORATORIO") && !i.tec.includes("RASTREO") && !i.movil);
+  else if (currentTechGroup === 'RASTREO') R = R.filter(i => i.tec.includes("RASTREO") || i.movil);
+  else if (currentTechGroup === 'LAB') R = R.filter(i => i.tec.includes("LABORATORIO"));
+
+  currentTechRows = R; 
+  const n = R.length, pct = x => n === 0 ? "0.0%" : (x/n*100).toFixed(1)+"%";
+  const techs=count(R,i=>i.tec), models=count(R,i=>i.model), ops=count(R,i=>i.op);
+  let fws = count(R,i=>i.fw).filter(x => x[0] !== "NO ESPECIFICADO");
+  let ohms = count(R,i=>i.ohm).filter(x => x[0] !== "NO ESPECIFICADO");
+  const unk=R.filter(i=>i.model==="Desconocido").length, loc=R.filter(i=>i.ok).length, obs=R.filter(i=>i.obs).length;
+  const cross=count(R,i=>i.tec+" → "+i.model).slice(0,10);
+  const groupName = currentTechGroup === 'ALL' ? 'Global' : currentTechGroup === 'FIJOS' ? 'Red Fija' : currentTechGroup === 'RASTREO' ? 'Rastreo' : 'Laboratorio';
+
+  $("tech-body").innerHTML = 
+    `<div id="tech-dash-content" class="space-y-4">
+      <div class="p-4 rounded-2xl bg-black/20 border border-white/5 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+        <div class="flex items-center gap-4"><div class="flex items-center justify-center w-10 h-10 shrink-0 rounded-full bg-sky-500/10 border border-sky-500/30"><i class="fa-solid fa-filter-circle-xmark text-sky-400 text-lg"></i></div><div><h4 class="text-sm font-semibold text-white">Análisis: ${escapeHtml(groupName)}</h4><p class="text-[11px] text-slate-400 mt-1">Evaluando <b>${n.toLocaleString()}</b> puntos.</p></div></div>
+        <button onclick="showTechList()" class="btn px-4 py-2.5 text-xs font-bold text-white rounded-xl shadow-lg shrink-0 w-full md:w-auto hover:scale-[1.02] active:scale-95 transition"><i class="fa-solid fa-list-ul mr-2"></i>Explorar Puntos</button>
+      </div>`
+   +grid("lg:grid-cols-4", kpi("fa-location-dot","Puntos físicos",n.toLocaleString())+kpi("fa-tower-broadcast","Tecnologías evaluadas",techs.length)+kpi("fa-microchip","Modelos de equipo",models.filter(m=>m[0]!=="Desconocido").length)+kpi("fa-truck-fast","Móviles / Rastreo",pct(R.filter(i=>i.movil).length)))
+   +grid("lg:grid-cols-3", kpi("fa-circle-question","Sin modelo reconocido",`${unk} (${pct(unk)})`)+kpi("fa-map-pin","Con coordenadas válidas",`${loc} (${pct(loc)})`)+kpi("fa-triangle-exclamation","Con observación",`${obs} (${pct(obs)})`))
+   +`<div class="grid grid-cols-1 xl:grid-cols-2 gap-3">`+box("Tecnologías",bars(techs))+box("Modelos de Equipo",bars(models,"#34d399"))+box("Versiones FW",bars(fws,"#a3e635"))+box("Potencia",bars(ohms,"#f43f5e"))+box("Operador SIM",bars(ops,"#f59e0b"))+box("Combinaciones",bars(cross,"#22d3ee"))+`</div></div>`
+   +`<div id="tech-list-container" class="hidden flex-col gap-4"><div class="flex flex-wrap gap-3 items-center mb-2"><button onclick="hideTechList()" class="chip px-4 py-2.5 text-xs font-semibold hover:bg-white/10 hover:border-white/20 transition"><i class="fa-solid fa-arrow-left mr-2"></i>Volver al Dashboard</button><div class="relative flex-1 min-w-[250px]"><i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 text-sm"></i><input id="tech-search-input" oninput="filterTechList()" placeholder="Buscar un punto físico específico..." class="w-full py-2.5 pl-11 pr-4 text-sm rounded-xl bg-black/30 border border-white/10 outline-none focus:border-sky-400 placeholder-slate-500 transition"></div></div><div id="tech-list-grid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3 pb-8"></div></div>`
+   +`<div id="tech-detail-container" class="hidden flex-col gap-4 pb-8"></div>`;
+}
+
+function showTechList() { $("tech-dash-content").classList.add("hidden"); $("tech-detail-container").classList.add("hidden"); $("tech-detail-container").classList.remove("flex"); $("tech-list-container").classList.remove("hidden"); $("tech-list-container").classList.add("flex"); filterTechList(); }
+function hideTechList() { $("tech-list-container").classList.add("hidden"); $("tech-list-container").classList.remove("flex"); $("tech-detail-container").classList.add("hidden"); $("tech-detail-container").classList.remove("flex"); $("tech-dash-content").classList.remove("hidden"); }
+function filterTechList() {
+  const q = normalizeText($("tech-search-input").value), grid = $("tech-list-grid");
+  const matches = currentTechRows.filter(x => normalizeText(x.punto).includes(q));
+  if(!matches.length) { grid.innerHTML = `<div class="col-span-full p-6 text-center chip text-slate-500 text-sm border-dashed"><i class="fa-solid fa-ghost text-3xl mb-3 block text-slate-600"></i>No se encontraron puntos.</div>`; return; }
+  grid.innerHTML = matches.map(x => `<div class="chip p-4 cursor-pointer hover:border-[var(--primary)] hover:bg-black/20 hover:scale-[1.01] active:scale-95 transition flex flex-col gap-2 shadow-sm" onclick="showTechDetail(${currentTechRows.indexOf(x)})"><p class="font-bold text-[13px] text-white truncate">${escapeHtml(x.punto)}</p><div class="flex justify-between items-center text-[10px] text-slate-400 font-semibold uppercase tracking-wider"><span class="truncate pr-2"><i class="fa-solid fa-microchip mr-1"></i>${escapeHtml(x.model)}</span><span class="px-2 py-0.5 rounded bg-[var(--primary-bg)] text-[var(--primary-light)] border border-[var(--primary)]/30 shrink-0">${escapeHtml(x.tec)}</span></div></div>`).join("");
+}
+
+function showTechDetail(index) {
+  $("tech-list-container").classList.add("hidden"); $("tech-list-container").classList.remove("flex");
+  const container = $("tech-detail-container"); container.classList.remove("hidden"); container.classList.add("flex");
+  const x = currentTechRows[index];
+  const slotsHtml = x.sl.filter(([n,v]) => !isEmpty(v)).map(([n,v]) => `<div class="chip px-4 py-3 flex justify-between items-center gap-4 hover:border-amber-500/30 transition"><span class="text-[11px] text-slate-400 font-semibold uppercase tracking-wide">${escapeHtml(n)}</span><code class="text-xs font-bold text-amber-300 bg-amber-500/10 px-2.5 py-1 rounded border border-amber-500/20">${escapeHtml(v)}</code></div>`).join("");
+  container.innerHTML = `<div class="flex flex-wrap items-center justify-between gap-3 mb-2"><button onclick="showTechList()" class="chip px-4 py-2.5 text-xs font-semibold hover:bg-white/10 transition"><i class="fa-solid fa-arrow-left mr-2"></i>Volver a la lista</button><div class="px-3 py-1 rounded-full text-[10px] uppercase tracking-wider font-bold border ${x.movil ? 'bg-indigo-500/15 text-indigo-300 border-indigo-400/30' : 'bg-emerald-500/15 text-emerald-300 border-emerald-400/30'}"><i class="fa-solid ${x.movil ? 'fa-truck-fast' : 'fa-tower-cell'} mr-1"></i> ${x.movil ? 'Móvil / Rastreo' : 'Punto Fijo'}</div></div>
+    <div class="card p-6 border-[var(--primary)]/30 shadow-[0_10px_40px_rgba(0,0,0,0.3)] fade"><h2 class="text-3xl font-bold text-white mb-6 border-b border-white/5 pb-4 break-words"><i class="fa-solid fa-location-crosshairs text-[var(--primary)] mr-3"></i>${escapeHtml(x.punto)}</h2>
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6"><div class="chip p-4 border-l-[3px] border-[var(--primary)] hover:bg-white/5 transition"><p class="text-[10px] text-slate-400 uppercase tracking-wider font-semibold mb-1"><i class="fa-solid fa-tower-broadcast mr-1"></i>Tecnología</p><p class="text-sm font-bold text-white break-words">${escapeHtml(x.tec)}</p></div><div class="chip p-4 border-l-[3px] border-emerald-400 hover:bg-white/5 transition"><p class="text-[10px] text-slate-400 uppercase tracking-wider font-semibold mb-1"><i class="fa-solid fa-microchip mr-1"></i>Modelo</p><p class="text-sm font-bold text-white break-words">${escapeHtml(x.model)}</p></div><div class="chip p-4 border-l-[3px] border-amber-400 hover:bg-white/5 transition"><p class="text-[10px] text-slate-400 uppercase tracking-wider font-semibold mb-1"><i class="fa-solid fa-code mr-1"></i>Firmware</p><p class="text-sm font-bold text-white break-words">${escapeHtml(x.fw)}</p></div><div class="chip p-4 border-l-[3px] border-rose-400 hover:bg-white/5 transition"><p class="text-[10px] text-slate-400 uppercase tracking-wider font-semibold mb-1"><i class="fa-solid fa-bolt mr-1"></i>Potencia</p><p class="text-sm font-bold text-white break-words">${escapeHtml(x.ohm)}</p></div></div>
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6"><div><h3 class="text-xs font-bold text-slate-300 uppercase tracking-wider mb-3"><i class="fa-solid fa-network-wired text-sky-400 mr-2"></i>Slots y Configuración RF</h3><div class="flex flex-col gap-2">${slotsHtml || '<div class="chip p-4 text-xs text-slate-500 italic">No hay información de slots.</div>'}</div></div><div><h3 class="text-xs font-bold text-slate-300 uppercase tracking-wider mb-3"><i class="fa-solid fa-circle-info text-sky-400 mr-2"></i>Datos Generales</h3><div class="flex flex-col gap-2"><div class="chip px-4 py-3 flex justify-between items-center gap-4"><span class="text-xs text-slate-400 font-semibold uppercase tracking-wide">Operador SIM</span><span class="text-sm font-bold text-white">${escapeHtml(x.op)}</span></div>${x.ok ? `<div class="chip px-4 py-3 flex justify-between items-center gap-4"><span class="text-xs text-slate-400 font-semibold uppercase tracking-wide">Coordenadas</span><a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(x.lat)},${encodeURIComponent(x.lon)}" target="_blank" class="text-[11px] font-bold text-sky-400 hover:text-sky-300 hover:bg-sky-500/20 transition px-3 py-1.5 rounded-lg bg-sky-500/10 border border-sky-500/30"><i class="fa-solid fa-map-location-dot mr-1"></i>Mapa</a></div>` : ''}</div></div></div></div>`;
+}
+
+function renderMaintSetup() {
+    if (!maintSchedule) generateSchedule();
+    const scope = $("maint-scope").value;
+    const periodSelect = $("maint-period");
+    
+    if (scope === "global") {
+        periodSelect.innerHTML = `<option value="all">Resumen (Todos los Meses)</option>`;
+        periodSelect.disabled = true;
+    } else if (scope === "month") {
+        periodSelect.disabled = false;
+        periodSelect.innerHTML = maintSchedule.months.map(m => `<option value="${m.id}">${m.name}</option>`).join("");
+    } else if (scope === "week") {
+        periodSelect.disabled = false;
+        periodSelect.innerHTML = maintSchedule.months.map(m => 
+            m.weeks.map((w, wIdx) => `<option value="${m.id}-${wIdx}">${m.name} - Semana ${wIdx+1}</option>`).join("")
+        ).join("");
+    }
+    renderMaintContent();
+}
+
+function renderMaint() {
+    const scope = $("maint-scope").value;
+    const period = $("maint-period");
+    if(scope === "global" && !period.disabled) renderMaintSetup();
+    else if(scope === "month" && (!period.options.length || period.options[0].value.includes("-"))) renderMaintSetup();
+    else if(scope === "week" && (!period.options.length || !period.options[0].value.includes("-"))) renderMaintSetup();
+    else renderMaintContent();
+}
+
+function generateSchedule() {
+    const P = findColumn(excelData[0], ["PUNTOS", "PUNTO"]);
+    const uniqueMap = new Map();
+    excelData.forEach(r => {
+        let pName = P ? String(r[P]).trim() : "";
+        if (!pName) return;
+        pName = pName.replace(/\s*\(\s*PE\s*\)\s*/gi, '').trim();
+        if (!uniqueMap.has(pName.toUpperCase())) uniqueMap.set(pName.toUpperCase(), r);
+    });
+
+    let fixedPoints = Array.from(uniqueMap.values()).map(info).filter(i => !i.movil && i.ok);
+    
+    fixedPoints.sort((a,b) => b.lat - a.lat); // Ordenados de Norte a Sur
+    const total = fixedPoints.length;
+    
+    const POINTS_PER_MONTH = 4;
+    let mths = [];
+    
+    const monthNames = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+    let currentD = new Date();
+    let startYear = currentD.getFullYear();
+    let startMonthIndex = currentD.getMonth(); 
+
+    for (let i = 0; i < total; i += POINTS_PER_MONTH) {
+        let chunk = fixedPoints.slice(i, i + POINTS_PER_MONTH); 
+        let currentMonthName = monthNames[startMonthIndex] + " " + startYear;
+        let currentMonthId = `${startYear}-${startMonthIndex}`;
+        
+        let weeks = chunk.map(point => [point]); 
+        
+        mths.push({
+            id: currentMonthId,
+            name: currentMonthName,
+            points: chunk,
+            weeks: weeks
+        });
+
+        startMonthIndex++;
+        if (startMonthIndex > 11) {
+            startMonthIndex = 0;
+            startYear++;
+        }
+    }
+
+    maintSchedule = { total: total, months: mths };
+}
+
+function renderMaintContent() {
+    const scope = $("maint-scope").value;
+    const body = $("maint-body");
+
+    if (maintSchedule.total === 0) {
+        body.innerHTML = `<div class="text-center p-10 text-slate-500"><i class="fa-solid fa-ghost text-5xl mb-4 block"></i><p>No hay puntos fijos válidos con coordenadas para planificar mantenimiento.</p></div>`;
+        return;
+    }
+
+    if (scope === "global") {
+        body.innerHTML = `
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                ${maintSchedule.months.map(m => `
+                    <div class="card p-5 border-white/5 hover:border-[var(--primary)]/50 transition">
+                        <div class="flex justify-between items-start mb-4">
+                            <h4 class="font-bold text-white text-lg">${m.name}</h4>
+                            <span class="px-2 py-1 rounded-md bg-[var(--primary-bg)] text-[var(--primary-light)] font-bold text-xs">${m.points.length} puntos</span>
+                        </div>
+                        <div class="space-y-2 mb-4">
+                            ${m.weeks.map((w, idx) => `
+                                <div class="flex justify-between text-xs text-slate-300">
+                                    <span><i class="fa-solid fa-truck-fast mr-1 text-slate-500"></i>Semana ${idx+1}</span>
+                                    <b class="text-white">${w.length}</b>
+                                </div>
+                            `).join("")}
+                        </div>
+                    </div>
+                `).join("")}
+            </div>
+            <p class="text-xs text-slate-500 mt-4 text-center"><i class="fa-solid fa-circle-info mr-1"></i>Se planifican estrictamente 4 puntos por mes (1 por semana). Si hay más antenas, el cronograma se extenderá meses adicionales automáticamente.</p>
+        `;
+
+    } else if (scope === "month") {
+        const m = maintSchedule.months.find(x => x.id === $("maint-period").value);
+        if(!m) return;
+        
+        body.innerHTML = `
+            <div class="flex items-center gap-4 mb-4">
+               <div class="chip p-4 border-[var(--primary)]/30 bg-black/20 text-center"><p class="text-[10px] text-slate-400 uppercase font-bold">Total del Mes</p><p class="text-2xl font-bold text-white">${m.points.length}</p></div>
+               <p class="text-sm text-slate-400">Desglose operativo para <b>${m.name}</b>. Estás viendo un balance de 4 trabajos máximos por mes (1 por semana).</p>
+            </div>
+            <div class="grid grid-cols-1 xl:grid-cols-2 gap-4">
+                ${m.weeks.map((w, idx) => `
+                    <div class="card overflow-hidden border-white/5">
+                        <div class="bg-black/30 px-4 py-2 border-b border-white/5"><h4 class="font-bold text-white text-xs"><i class="fa-solid fa-calendar-week text-[var(--primary)] mr-2"></i>Semana ${idx+1} (${w.length} puntos)</h4></div>
+                        <div class="p-3 space-y-2">
+                            ${w.map(p => `
+                                <div class="chip p-2.5 flex justify-between items-center border-l-[3px] border-[var(--primary)] bg-black/20 hover:bg-white/5 transition">
+                                    <div class="min-w-0 pr-2">
+                                        <p class="text-sm font-bold text-white truncate">${escapeHtml(p.punto)}</p>
+                                        <p class="text-[10px] text-slate-400 uppercase mt-0.5">${escapeHtml(p.tec)} | ${escapeHtml(p.sector)}</p>
+                                    </div>
+                                    <a href="https://www.google.com/maps/dir/?api=1&destination=${p.lat},${p.lon}" target="_blank" class="btn shrink-0 w-7 h-7 rounded-full flex items-center justify-center text-white" title="Ruta"><i class="fa-solid fa-route text-[10px]"></i></a>
+                                </div>
+                            `).join('') || '<p class="text-xs text-slate-500 italic p-2">Sin asignación</p>'}
+                        </div>
+                    </div>
+                `).join("")}
+            </div>
+        `;
+
+    } else if (scope === "week") {
+        const [mId, wIdx] = $("maint-period").value.split("-");
+        const m = maintSchedule.months.find(x => x.id === mId);
+        const w = m.weeks[parseInt(wIdx)];
+        
+        body.innerHTML = `
+            <div class="flex items-center gap-4 mb-4">
+               <div class="chip p-4 border-[var(--primary)]/30 bg-[var(--primary-bg)]/20 text-center"><p class="text-[10px] text-slate-400 uppercase font-bold text-[var(--primary-light)]">Objetivo Semanal</p><p class="text-3xl font-bold text-white">${w.length}</p></div>
+               <p class="text-sm text-slate-400 flex-1">Trabajo focalizado para la <b>Semana ${parseInt(wIdx)+1} de ${m.name}</b>. Puedes abrir la ruta directamente en Google Maps.</p>
+               <button onclick="window.print()" class="btn px-4 py-2 text-xs font-bold text-white rounded-lg"><i class="fa-solid fa-print mr-1"></i>Imprimir</button>
+            </div>
+            <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-3">
+                ${w.map((p, i) => `
+                    <div class="card p-4 border-[var(--primary)]/20 hover:border-[var(--primary)] transition flex flex-col gap-3">
+                        <div class="flex justify-between items-start">
+                            <div class="min-w-0 pr-2">
+                                <span class="text-[10px] font-bold text-slate-500 bg-black/40 px-1.5 py-0.5 rounded mr-1">#${i+1}</span>
+                                <h4 class="font-bold text-white text-base truncate break-words mt-1">${escapeHtml(p.punto)}</h4>
+                            </div>
+                            <a href="https://www.google.com/maps/dir/?api=1&destination=${p.lat},${p.lon}" target="_blank" class="chip px-3 py-1.5 text-xs font-bold text-sky-400 bg-sky-500/10 border-sky-500/30 hover:bg-sky-500/20"><i class="fa-solid fa-location-arrow mr-1"></i>Ir</a>
+                        </div>
+                        <div class="grid grid-cols-2 gap-2 mt-auto">
+                            <div class="chip p-2 bg-black/30 border-none"><p class="text-[9px] text-slate-500 uppercase font-bold">Tecnología</p><p class="text-xs text-slate-200 font-semibold truncate">${escapeHtml(p.tec)}</p></div>
+                            <div class="chip p-2 bg-black/30 border-none"><p class="text-[9px] text-slate-500 uppercase font-bold">Sector Geográfico</p><p class="text-xs text-slate-200 font-semibold truncate">${escapeHtml(p.sector)}</p></div>
+                        </div>
+                    </div>
+                `).join('') || '<div class="col-span-full text-center p-6 chip border-dashed text-slate-500 text-sm">Sin tareas esta semana.</div>'}
+            </div>
+        `;
+    }
+}
+
+const num=v=>{let s=String(v??"").replace(/S\/\.?|US\$|USD|PEN|\$/gi,"");if(/[A-Za-z]/.test(s)||!/\d/.test(s))return NaN;s=s.replace(/[^\d.,-]/g,"");
+  if(s.includes(",")&&s.includes("."))s=s.replace(/,/g,"");else if(/,\d{1,2}$/.test(s))s=s.replace(",",".");else s=s.replace(/,/g,"");return parseFloat(s)};
+const money=n=>"S/ " + n.toLocaleString("es-PE",{minimumFractionDigits:2,maximumFractionDigits:2});
+
+function updateTotalUSD() {
+  const tc = parseFloat($("tc-input").value), display = $("total-usd-display");
+  if(tc > 0 && currentTotalSoles > 0) { display.textContent = "= $ " + (currentTotalSoles / tc).toLocaleString("en-US", {minimumFractionDigits:2, maximumFractionDigits:2}); display.classList.remove("hidden"); } else display.classList.add("hidden");
+}
+
+let priceSig="";
+function renderPrice(){
+  const cols=Object.keys(excelData[0]),body=$("price-body");
+  const numCols=cols.filter(c=>{if(/LAT|LON|IMEI|SIM|^ID|\bID$|TEL|CEL|SLOT|MODEM/.test(c))return false;const v=excelData.map(r=>r[c]).filter(x=>!isEmpty(x));return v.length&&v.filter(x=>isFinite(num(x))).length/v.length>.6});
+  if(!numCols.length){body.innerHTML=box("No se encontró una columna de precios","<p class='text-sm text-slate-400'>Agrega una columna numérica con nombre como PRECIO o COSTO.</p>");return}
+  const sig=cols.join("|");
+  if(sig!==priceSig){priceSig=sig;
+    const def=numCols.find(c=>/PRECIO|COSTO|TARIFA|MONTO|VALOR|RENTA|IMPORTE|PLAN/.test(c))||numCols[0];
+    $("price-col").innerHTML=numCols.map(c=>`<option ${c===def?"selected":""}>${escapeHtml(c)}</option>`).join("");
+    const gc=cols.filter(c=>{const d=new Set(excelData.map(r=>r[c]).filter(x=>!isEmpty(x)));return d.size>1&&d.size<=60&&!numCols.includes(c)});
+    const tk=findColumn(excelData[0],["TECNOLOGIA"]);
+    $("price-grp").innerHTML=gc.map(c=>`<option ${c===tk?"selected":""}>${escapeHtml(c)}</option>`).join("");
+  }
+  const pc=$("price-col").value, gcn=$("price-grp").value, P=findColumn(excelData[0],["PUNTOS","PUNTO"]), yk=findColumn(excelData[0],["TIPO"]);
+  const uniqueMap = new Map();
+  excelData.forEach(r => {
+    let pName = P ? String(r[P]).trim() : ""; if(!pName) return;
+    pName = pName.replace(/\s*\(\s*PE\s*\)\s*/gi, '').trim();
+    const tipo = yk && !isEmpty(r[yk]) ? String(r[yk]).toUpperCase() : "";
+    if(tipo.includes("RASTREO") || pName.toUpperCase().startsWith("R-") || pName.toUpperCase().includes("RASTREO")) return;
+    if(!uniqueMap.has(pName.toUpperCase())) uniqueMap.set(pName.toUpperCase(), { p: num(r[pc]), g: isEmpty(r[gcn]) ? "SIN DATO" : String(r[gcn]).trim().toUpperCase(), n: pName });
+  });
+  const rows = Array.from(uniqueMap.values()).filter(x => isFinite(x.p)); currentPriceRows = rows;
+  if(!rows.length){body.innerHTML="";return}
+  const tot=rows.reduce((a,x)=>a+x.p,0); currentTotalSoles = tot; 
+  const avg=tot/rows.length, sd=Math.sqrt(rows.reduce((a,x)=>a+(x.p-avg)**2,0)/rows.length);
+  const out = rows.filter(x => x.p > avg + 2*sd).sort((a,b)=>b.p - a.p);
+  const G={};rows.forEach(x=>{(G[x.g]=G[x.g]||[]).push(x.p)});
+  const sums=Object.entries(G).map(([k,v])=>[k,v.reduce((a,b)=>a+b,0)]).sort((a,b)=>b[1]-a[1]).slice(0,12);
+  const avgs=Object.entries(G).map(([k,v])=>[k,v.reduce((a,b)=>a+b,0)/v.length]).sort((a,b)=>b[1]-a[1]).slice(0,12);
+  const top=[...rows].sort((a,b)=>b.p-a.p).slice(0,10);
+  body.innerHTML = `<div class="flex items-center gap-3 mb-5 p-4 rounded-2xl bg-black/20 border border-white/5 w-full md:w-auto self-start shadow-sm"><div class="flex items-center justify-center w-10 h-10 rounded-full bg-emerald-500/10 border border-emerald-500/30"><i class="fa-solid fa-money-bill-transfer text-emerald-400 text-lg"></i></div><div><label class="text-[11px] font-semibold text-slate-400 uppercase tracking-wide block mb-1">Convertidor a Dólares (USD)</label><div class="flex items-center gap-3"><input type="number" id="tc-input" step="0.01" min="0" placeholder="Tipo de cambio" class="w-32 px-3 py-1.5 text-sm font-semibold rounded-lg bg-black/50 border border-white/10 text-white outline-none focus:border-emerald-400 transition" oninput="updateTotalUSD()"><span id="total-usd-display" class="text-lg font-bold text-emerald-400 hidden"></span></div></div></div>` + grid("lg:grid-cols-5", kpi("fa-coins","Suma Total",money(tot))+kpi("fa-scale-balanced","Alquiler promedio",money(avg))+kpi("fa-arrow-down","Mínimo",money(Math.min(...rows.map(x=>x.p))))+kpi("fa-arrow-up","Máximo",money(Math.max(...rows.map(x=>x.p))))+`<div class="chip p-4 cursor-pointer hover:border-red-400 transition" onclick="document.getElementById('outliers-list').classList.toggle('hidden')"><i class="fa-solid fa-circle-exclamation text-red-400 text-xs"></i><p class="text-2xl font-bold text-white mt-1">${out.length}</p><p class="text-[11px] text-slate-400">Atípicos altos <span class="text-red-400 ml-1 font-semibold">(Ver)</span></p></div>`) + (out.length ? `<div id="outliers-list" class="hidden mt-3 p-5 border border-red-500/30 bg-red-500/10 rounded-2xl col-span-full shadow-lg"><h4 class="text-sm font-semibold text-red-400 mb-3"><i class="fa-solid fa-triangle-exclamation mr-1"></i> Puntos con alquiler atípico</h4><div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">${out.map(x => `<div class="px-4 py-3 bg-black/40 border border-red-500/20 rounded-xl flex justify-between items-center text-xs text-white"><div class="min-w-0 pr-3"><p class="text-[10px] text-slate-400 truncate mb-0.5">${escapeHtml(x.g)}</p><p class="font-semibold truncate text-sm text-slate-200">${escapeHtml(x.n)}</p></div><b class="text-red-300 text-sm whitespace-nowrap">${money(x.p)}</b></div>`).join("")}</div></div>` : '') + `<div class="relative mb-5 max-w-xl mt-5"><i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 text-sm"></i><input id="price-search-input" oninput="doPriceSearch()" placeholder="Buscar costo específico..." class="w-full py-3.5 pl-11 pr-4 text-sm rounded-xl bg-black/30 border border-white/10 outline-none focus:border-sky-400 placeholder-slate-500 transition"></div><div id="price-search-results" class="hidden grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 mb-6"></div><div id="price-dash-content" class="space-y-4"><div class="grid grid-cols-1 xl:grid-cols-2 gap-3">${box(`Suma Total por ${escapeHtml(gcn)}`,bars(sums,"var(--primary)",money))}${box(`Promedio por ${escapeHtml(gcn)}`,bars(avgs,"#f59e0b",money))}</div>${box("Los 10 valores más altos (Por Punto Físico)",top.map(x=>`<div class="flex justify-between items-center gap-3 py-2.5 border-b border-white/5 text-xs"><div class="min-w-0 flex-1"><p class="text-slate-300 font-bold truncate text-sm">${escapeHtml(x.n)}</p><p class="text-slate-500 truncate text-[10px] mt-0.5">${escapeHtml(x.g)}</p></div><b class="text-white text-sm">${money(x.p)}</b></div>`).join(""))}</div>`;
+}
+function doPriceSearch(){
+  const q = normalizeText($("price-search-input").value), resContainer = $("price-search-results"), dashContainer = $("price-dash-content");
+  if(!q) { resContainer.innerHTML = ""; resContainer.classList.add("hidden"); dashContainer.classList.remove("hidden"); return; }
+  const matches = currentPriceRows.filter(x => normalizeText(x.n).includes(q));
+  dashContainer.classList.add("hidden"); resContainer.classList.remove("hidden");
+  if(!matches.length) { resContainer.innerHTML = `<div class="col-span-full p-6 text-center chip text-slate-500 text-sm border-dashed"><i class="fa-solid fa-face-frown-open text-3xl mb-3 block text-slate-600"></i>No se encontraron puntos fijos con ese nombre.</div>`; return; }
+  resContainer.innerHTML = matches.map(x => `<div class="chip p-4 flex justify-between items-center border-l-4 border-[var(--primary)] hover:bg-black/20 transition"><div class="min-w-0 pr-3"><p class="text-[10px] text-slate-400 font-semibold truncate uppercase tracking-wide">${escapeHtml(x.g)}</p><p class="text-sm font-bold text-white truncate mt-0.5">${escapeHtml(x.n)}</p></div><b class="text-[var(--primary)] text-lg whitespace-nowrap">${money(x.p)}</b></div>`).join("");
+}
+</script>
+</body>
+</html>
