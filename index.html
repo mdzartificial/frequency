@@ -114,6 +114,9 @@ body{font-family:Inter,ui-sans-serif,system-ui,sans-serif;color:var(--text-main)
 #map-canvas{background:#10141a; transition: filter 0.3s;}
 #map-canvas .leaflet-tile-pane{filter:invert(1) hue-rotate(200deg) brightness(.9) contrast(.9) saturate(.7)}
 
+/* Forzar ocultamiento de modales y elementos Dev hasta validar clave */
+.dev-hidden { display: none !important; }
+
 /* Estilos Tabla Editor Dev */
 .dev-table th { position: sticky; top: 0; background: #0f1318; z-index: 10; border-bottom: 1px solid var(--line); }
 .dev-cell-input { background: transparent; border: 1px solid transparent; border-radius: 6px; padding: 4px 6px; width: 100%; min-width: 110px; font-size: 12px; transition: 0.15s; }
@@ -138,7 +141,7 @@ body.theme-day .dev-table th { background: #e2e8f0; }
     <button data-v="price" onclick="setView('price')" title="Analizador de precios"><i class="fa-solid fa-coins"></i></button>
     
     <!-- Botón Exclusivo Modo Desarrollador: Editor Tabla -->
-    <button id="nav-dev-btn" class="hidden border border-amber-500/40 bg-amber-500/10" data-v="dev" onclick="setView('dev')" title="Editor Base Excel (Modo Dev)">
+    <button id="nav-dev-btn" class="dev-hidden border border-amber-500/40 bg-amber-500/10" data-v="dev" onclick="setView('dev')" title="Editor Base Excel (Modo Dev)">
       <i class="fa-solid fa-table-cells text-amber-400"></i>
     </button>
 
@@ -156,7 +159,7 @@ body.theme-day .dev-table th { background: #e2e8f0; }
       <div>
         <div class="flex items-center gap-2.5">
           <h1 class="text-2xl font-bold text-white">MDZ SKYNET</h1>
-          <span id="dev-badge" class="hidden px-2.5 py-0.5 rounded-full bg-amber-500/20 border border-amber-400/50 text-amber-300 text-[10px] font-bold uppercase tracking-wider">
+          <span id="dev-badge" class="dev-hidden px-2.5 py-0.5 rounded-full bg-amber-500/20 border border-amber-400/50 text-amber-300 text-[10px] font-bold uppercase tracking-wider">
             <i class="fa-solid fa-code mr-1"></i>Modo Dev Activo
           </span>
         </div>
@@ -165,8 +168,8 @@ body.theme-day .dev-table th { background: #e2e8f0; }
 
       <div class="flex items-center gap-2">
         <!-- Botones rápidos de Modo Dev (Exportar + Contador cambios) -->
-        <div id="dev-header-actions" class="hidden flex items-center gap-2">
-          <span id="dev-changes-badge" class="hidden px-3 py-1.5 rounded-full bg-amber-500/15 border border-amber-500/40 text-amber-300 text-xs font-semibold">
+        <div id="dev-header-actions" class="dev-hidden flex items-center gap-2">
+          <span id="dev-changes-badge" class="dev-hidden px-3 py-1.5 rounded-full bg-amber-500/15 border border-amber-500/40 text-amber-300 text-xs font-semibold">
             0 ediciones
           </span>
           <button onclick="exportModifiedExcel()" class="px-4 py-2 rounded-full bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold shadow-lg shadow-emerald-900/40 transition flex items-center gap-1.5 cursor-pointer">
@@ -217,7 +220,7 @@ body.theme-day .dev-table th { background: #e2e8f0; }
         <div class="flex items-center justify-between px-5 pt-4 pb-3 gap-3 flex-wrap">
           <h2 class="text-lg font-semibold text-white">Resultados</h2>
           <div class="flex items-center gap-2">
-            <button id="btn-add-record-filter" onclick="openAddRecordModal()" class="hidden px-3 py-1 rounded-full text-xs font-semibold bg-amber-500/15 text-amber-300 border border-amber-400/30 hover:bg-amber-500/25 transition">
+            <button id="btn-add-record-filter" onclick="openAddRecordModal()" class="dev-hidden px-3 py-1 rounded-full text-xs font-semibold bg-amber-500/15 text-amber-300 border border-amber-400/30 hover:bg-amber-500/25 transition">
               <i class="fa-solid fa-plus mr-1"></i>Nuevo Punto
             </button>
             <div id="results-count" class="hidden px-3 py-1 rounded-full text-xs font-semibold bg-sky-500/15 text-sky-300 border border-sky-400/30"></div>
@@ -372,7 +375,7 @@ body.theme-day .dev-table th { background: #e2e8f0; }
 </div>
 
 <!-- MODAL 1: ACCESO MODO DESARROLLADOR (CLAVE) -->
-<div id="dev-auth-modal" class="hidden fixed inset-0 z-[100] bg-black/75 backdrop-blur-sm flex items-center justify-center p-4">
+<div id="dev-auth-modal" class="dev-hidden fixed inset-0 z-[100] bg-black/75 backdrop-blur-sm flex items-center justify-center p-4">
   <div class="panel w-full max-w-sm p-6 border border-amber-500/40 shadow-2xl fade">
     <div class="flex items-center justify-between mb-4">
       <h3 class="text-lg font-bold text-white flex items-center gap-2">
@@ -382,7 +385,7 @@ body.theme-day .dev-table th { background: #e2e8f0; }
     </div>
     <p class="text-xs text-slate-400 mb-4">Ingresa la clave de acceso para habilitar la edición de registros, creación de puntos y exportación del Excel modificado.</p>
     <input type="password" id="dev-pass-input" placeholder="Clave de acceso..." onkeydown="if(event.key==='Enter') verifyDevPassword()" class="w-full px-3.5 py-2.5 text-sm rounded-xl bg-black/40 border border-white/15 outline-none focus:border-amber-400 mb-3">
-    <p id="dev-pass-error" class="hidden text-xs text-red-400 mb-3"><i class="fa-solid fa-circle-exclamation mr-1"></i>Clave incorrecta.</p>
+    <p id="dev-pass-error" class="dev-hidden text-xs text-red-400 mb-3"><i class="fa-solid fa-circle-exclamation mr-1"></i>Clave incorrecta.</p>
     <div class="flex justify-end gap-2">
       <button onclick="closeDevAuthModal()" class="chip px-4 py-2 text-xs font-semibold hover:bg-white/10">Cancelar</button>
       <button onclick="verifyDevPassword()" class="px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-bold transition">Desbloquear</button>
@@ -391,7 +394,7 @@ body.theme-day .dev-table th { background: #e2e8f0; }
 </div>
 
 <!-- MODAL 2: EDITAR / CREAR REGISTRO COMPLETO -->
-<div id="record-editor-modal" class="hidden fixed inset-0 z-[100] bg-black/75 backdrop-blur-sm flex items-center justify-center p-4">
+<div id="record-editor-modal" class="dev-hidden fixed inset-0 z-[100] bg-black/75 backdrop-blur-sm flex items-center justify-center p-4">
   <div class="panel w-full max-w-3xl max-h-[88vh] flex flex-col border border-amber-500/40 shadow-2xl fade">
     <div class="flex items-center justify-between px-6 py-4 border-b border-white/10">
       <div>
@@ -444,7 +447,6 @@ let maintSchedule = null;
 // ==========================================
 function toggleDevModal() {
   if (isDevMode) {
-    // Desactivar modo desarrollador
     isDevMode = false;
     updateDevUI();
     showToast("Modo Desarrollador desactivado");
@@ -453,13 +455,13 @@ function toggleDevModal() {
     return;
   }
   $("dev-pass-input").value = "";
-  $("dev-pass-error").classList.add("hidden");
-  $("dev-auth-modal").classList.remove("hidden");
+  $("dev-pass-error").classList.add("dev-hidden");
+  $("dev-auth-modal").classList.remove("dev-hidden");
   setTimeout(() => $("dev-pass-input").focus(), 50);
 }
 
 function closeDevAuthModal() {
-  $("dev-auth-modal").classList.add("hidden");
+  $("dev-auth-modal").classList.add("dev-hidden");
 }
 
 function verifyDevPassword() {
@@ -471,15 +473,15 @@ function verifyDevPassword() {
     showToast("Modo Desarrollador desbloqueado");
     refreshAllViews();
   } else {
-    $("dev-pass-error").classList.remove("hidden");
+    $("dev-pass-error").classList.remove("dev-hidden");
   }
 }
 
 function updateDevUI() {
-  $("dev-badge").classList.toggle("hidden", !isDevMode);
-  $("nav-dev-btn").classList.toggle("hidden", !isDevMode);
-  $("dev-header-actions").classList.toggle("hidden", !isDevMode || excelData.length === 0);
-  $("btn-add-record-filter").classList.toggle("hidden", !isDevMode || excelData.length === 0);
+  $("dev-badge").classList.toggle("dev-hidden", !isDevMode);
+  $("nav-dev-btn").classList.toggle("dev-hidden", !isDevMode);
+  $("dev-header-actions").classList.toggle("dev-hidden", !isDevMode || excelData.length === 0);
+  $("btn-add-record-filter").classList.toggle("dev-hidden", !isDevMode || excelData.length === 0);
 
   const lockIcon = $("dev-lock-icon");
   const lockBtn = $("dev-lock-btn");
@@ -497,9 +499,9 @@ function updateEditCounterBadge() {
   const badge = $("dev-changes-badge");
   if (devEditCount > 0 && isDevMode) {
     badge.textContent = `${devEditCount} ${devEditCount === 1 ? 'edición' : 'ediciones'}`;
-    badge.classList.remove("hidden");
+    badge.classList.remove("dev-hidden");
   } else {
-    badge.classList.add("hidden");
+    badge.classList.add("dev-hidden");
   }
 }
 
@@ -534,7 +536,7 @@ function openRecordEditor(rowIndex) {
   if (!row) return;
 
   $("editor-modal-title").textContent = `Editar Registro #${rowIndex + 1}`;
-  $("btn-delete-record").classList.remove("hidden");
+  $("btn-delete-record").classList.remove("dev-hidden");
 
   const keys = excelHeaders.length ? excelHeaders : Object.keys(row);
   $("editor-fields-container").innerHTML = keys.map(k => `
@@ -545,7 +547,7 @@ function openRecordEditor(rowIndex) {
     </div>
   `).join("");
 
-  $("record-editor-modal").classList.remove("hidden");
+  $("record-editor-modal").classList.remove("dev-hidden");
 }
 
 function openAddRecordModal() {
@@ -554,9 +556,9 @@ function openAddRecordModal() {
     showToast("Carga primero un archivo Excel base");
     return;
   }
-  editingRowIndex = -1; // Indica creación de nuevo registro
+  editingRowIndex = -1;
   $("editor-modal-title").textContent = "Agregar Nuevo Punto al Excel";
-  $("btn-delete-record").classList.add("hidden");
+  $("btn-delete-record").classList.add("dev-hidden");
 
   const keys = excelHeaders.length ? excelHeaders : Object.keys(excelData[0]);
   $("editor-fields-container").innerHTML = keys.map(k => `
@@ -567,15 +569,16 @@ function openAddRecordModal() {
     </div>
   `).join("");
 
-  $("record-editor-modal").classList.remove("hidden");
+  $("record-editor-modal").classList.remove("dev-hidden");
 }
 
 function closeRecordEditor() {
-  $("record-editor-modal").classList.add("hidden");
+  $("record-editor-modal").classList.add("dev-hidden");
   editingRowIndex = null;
 }
 
 function saveRecordChanges() {
+  if (!isDevMode) return;
   const inputs = document.querySelectorAll(".dev-modal-field");
   if (editingRowIndex === -1) {
     const newRow = {};
@@ -602,7 +605,7 @@ function saveRecordChanges() {
 }
 
 function deleteCurrentRecord() {
-  if (editingRowIndex === null || editingRowIndex < 0) return;
+  if (!isDevMode || editingRowIndex === null || editingRowIndex < 0) return;
   if (!confirm("¿Seguro que deseas eliminar este registro de la base?")) return;
   excelData.splice(editingRowIndex, 1);
   registerEdit();
@@ -615,6 +618,7 @@ function deleteCurrentRecord() {
 // VISTA TABLA EDITOR EXCEL (MODO DEV)
 // ==========================================
 function renderDevTable() {
+  if (!isDevMode) return;
   const wrapper = $("dev-table-wrapper");
   if (!excelData.length) {
     wrapper.innerHTML = msg("fa-table", "Sin datos cargados", "Sube un archivo Excel para editarlo.");
@@ -667,13 +671,14 @@ function renderDevTable() {
 }
 
 function updateCellDirect(rowIdx, colName, newVal) {
-  if (!excelData[rowIdx]) return;
+  if (!isDevMode || !excelData[rowIdx]) return;
   excelData[rowIdx][colName] = newVal;
   registerEdit();
   showToast("Celda actualizada");
 }
 
 function deleteRowFromTable(rowIdx) {
+  if (!isDevMode) return;
   if (!confirm("¿Eliminar esta fila del Excel?")) return;
   excelData.splice(rowIdx, 1);
   registerEdit();
@@ -685,6 +690,7 @@ function deleteRowFromTable(rowIdx) {
 // EXPORTACIÓN A EXCEL (.XLSX)
 // ==========================================
 function exportModifiedExcel() {
+  if (!isDevMode) return;
   if (!excelData.length) {
     showToast("No hay datos para exportar");
     return;
@@ -814,7 +820,6 @@ function executeSearch(){
   resultsCount.classList.add("hidden");techSummary.classList.add("hidden");
   if(!q){resultsContainer.innerHTML=msg("fa-database text-sky-400","Base SKYNET lista",`${excelData.length.toLocaleString()} registros cargados. Usa el buscador.`);return}
   
-  // Mantenemos el índice real de excelData para que el editor sepa qué fila exacta modificar
   const matchedWithIndex = excelData
     .map((row, realIdx) => ({ row, realIdx }))
     .filter(({ row }) => Object.values(row).some(v => normalizeText(v).includes(q)));
@@ -934,6 +939,7 @@ dropZone.addEventListener("drop",e=>{
 });
 
 function setView(v){
+  if(v==="dev" && !isDevMode){toggleDevModal();return}
   if(v!=="filter"&&!excelData.length){showToast("Carga primero un archivo Excel");return}
   document.querySelectorAll(".rail button[data-v]").forEach(b=>b.classList.toggle("on",b.dataset.v===v));
   
