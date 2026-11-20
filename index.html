@@ -28,7 +28,7 @@
   --bg-panel: #171b21;
   --text-main: #f1f5f9;
   --text-head: #ffffff;
-  --glass: rgba(15, 20, 28, 0.58);
+  --glass: rgba(15, 20, 28, 0.62);
   --line: rgba(255, 255, 255, 0.13);
   --map-grid: rgba(120,160,220,.05);
 }
@@ -64,7 +64,7 @@ body.color-red .border-sky-400 { border-color: var(--primary) !important; }
 body.theme-day {
   --bg-body-1: #cbd5e1; --bg-body-2: #e2e8f0; --bg-body-3: #f1f5f9;
   --bg-frame-1: #ffffff; --bg-frame-2: #f8fafc; --bg-rail: #e2e8f0; --bg-panel: #ffffff;
-  --text-main: #1e293b; --text-head: #0f172a; --glass: rgba(255, 255, 255, 0.82); --line: rgba(15, 23, 42, 0.14);
+  --text-main: #1e293b; --text-head: #0f172a; --glass: rgba(255, 255, 255, 0.85); --line: rgba(15, 23, 42, 0.14);
 }
 body.theme-day .text-white { color: var(--text-head) !important; }
 body.theme-day .text-slate-100, body.theme-day .text-slate-200, body.theme-day .text-slate-300 { color: #1e293b !important; }
@@ -72,12 +72,14 @@ body.theme-day .text-slate-400 { color: #475569 !important; }
 body.theme-day .text-slate-500 { color: #64748b !important; }
 body.theme-day .border-slate-500 { border-color: #cbd5e1 !important; }
 body.theme-day .bg-\[\#12161b\] { background-color: #f8fafc !important; border-color: #cbd5e1 !important; }
-body.theme-day .bg-black\/30, body.theme-day .bg-black\/40, body.theme-day .bg-black\/50, body.theme-day .bg-black\/20 { background-color: rgba(241, 245, 249, 0.85) !important; border-color: #cbd5e1 !important; color: #0f172a !important; }
-body.theme-day .bg-white\/5, body.theme-day .card { background: linear-gradient(145deg, rgba(255,255,255,0.92), rgba(248,250,252,0.85)) !important; border-color: rgba(0,0,0,0.12) !important; }
+body.theme-day .bg-black\/30, body.theme-day .bg-black\/40, body.theme-day .bg-black\/50, body.theme-day .bg-black\/20 { background-color: rgba(241, 245, 249, 0.88) !important; border-color: #cbd5e1 !important; color: #0f172a !important; }
+body.theme-day .bg-white\/5, body.theme-day .card { background: linear-gradient(145deg, rgba(255,255,255,0.94), rgba(248,250,252,0.88)) !important; border-color: rgba(0,0,0,0.12) !important; }
 body.theme-day .toast, body.theme-day .sel, body.theme-day .leaflet-popup-content-wrapper, body.theme-day .leaflet-popup-tip { background: #ffffff !important; border-color: #cbd5e1 !important; color: #0f172a !important; }
 body.theme-day #map-canvas { background: #e2e8f0 !important; }
 body.theme-day #map-canvas .leaflet-tile-pane { filter: none !important; }
 body.theme-day input, body.theme-day textarea { color: #0f172a !important; }
+body.theme-day .zone-reset { background: rgba(14, 165, 233, 0.06) !important; border-color: rgba(14, 165, 233, 0.25) !important; }
+body.theme-day .zone-tech { background: rgba(16, 185, 129, 0.06) !important; border-color: rgba(16, 185, 129, 0.25) !important; }
 
 html,body{height:100%}
 body{font-family:Inter,ui-sans-serif,system-ui,sans-serif;color:var(--text-main);margin:0;padding:18px;background:radial-gradient(circle at 20% 10%,var(--bg-body-1),var(--bg-body-2) 55%,var(--bg-body-3)); transition: background 0.3s, color 0.3s;}
@@ -128,16 +130,29 @@ body{font-family:Inter,ui-sans-serif,system-ui,sans-serif;color:var(--text-main)
 .btn{background:linear-gradient(135deg,var(--primary-light),var(--primary-dark));box-shadow:0 0 18px var(--primary-bg)}
 .btn:disabled{opacity:.4;box-shadow:none}
 
-/* Tarjeta con Blur profundo y mayor contraste para lectura nítida */
+/* Tarjeta con Blur profundo y mayor contraste */
 .card{
-  background: linear-gradient(145deg, rgba(22, 28, 38, 0.84), rgba(14, 18, 25, 0.78));
+  background: linear-gradient(145deg, rgba(20, 26, 36, 0.88), rgba(13, 17, 24, 0.84));
   border: 1px solid rgba(255, 255, 255, 0.14);
   border-radius: 20px;
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(22px);
+  -webkit-backdrop-filter: blur(22px);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.38);
 }
 .card:hover{border-color:var(--primary-bg)}
+
+/* Diferenciación visual de bloques: Reseteador vs Tecnología */
+.zone-reset {
+  background: linear-gradient(160deg, rgba(14, 165, 233, 0.08), rgba(15, 23, 42, 0.45));
+  border: 1px solid rgba(56, 189, 248, 0.25);
+  border-radius: 16px;
+}
+.zone-tech {
+  background: linear-gradient(160deg, rgba(16, 185, 129, 0.08), rgba(15, 23, 42, 0.45));
+  border: 1px solid rgba(52, 211, 153, 0.25);
+  border-radius: 16px;
+}
+
 .mono{font-family:"Cascadia Code",Consolas,monospace}
 .fade{animation:f .3s ease-out}@keyframes f{from{opacity:0;transform:translateY(8px)}}
 #drop-zone.drag{border-color:var(--primary)!important;background:var(--primary-bg)!important}
@@ -944,7 +959,6 @@ function executeSearch(keepFilter = false){
     return;
   }
 
-  // Si no se mantiene el filtro o la tecnología seleccionada ya no existe en los nuevos resultados, volver a ALL
   const availableTechs = new Set(lastMatchedItems.map(({ row }) => getRowTech(row)));
   if (!keepFilter || (activeSearchTechFilter !== "ALL" && !availableTechs.has(activeSearchTechFilter))) {
     activeSearchTechFilter = "ALL";
@@ -956,14 +970,13 @@ function executeSearch(keepFilter = false){
 }
 
 function renderResults(matchedItems){
-  // Si solo hay 1 resultado filtrado (ej: elegiste DETEKTOR EVAL), se despliega automáticamente para comodidad
   const autoExpand = matchedItems.length === 1;
 
   resultsContainer.innerHTML=matchedItems.map(({row, realIdx},index)=>{
     const K=p=>findColumn(row,p);
     const pk=K(["PUNTOS","PUNTO"]),tk=K(["TECNOLOGIA"]),ik=K(["IMEI RESETEADOR","IMEI"]),sk=K(["SIM RESETEADOR","SIM MODEM","SIM"]),
     ok=K(["OBSERVACION"]),lk=K(["LATITUD","LAT"]),gk=K(["LONGITUD","LON","LNG"]),yk=K(["TIPO"]);
-    const punto=pk?row[pk]:"Desconocido",tec=tk?row[tk]:"-",imei=ik?row[ik]:"-",sim=sk?row[sk]:"-",obs=ok?row[ok]:"",lat=lk?row[lk]:"",lon=gk?row[gk]:"";
+    const punto=pk?row[pk]:"Desconocido",tec=tk?String(row[tk]).trim().toUpperCase():"SIN ESPECIFICAR",imei=ik?row[ik]:"-",sim=sk?row[sk]:"-",obs=ok?row[ok]:"",lat=lk?row[lk]:"",lon=gk?row[gk]:"";
     const tipo=yk&&!isEmpty(row[yk])?String(row[yk]).toUpperCase():"";
     const P=String(punto).toUpperCase();
     const movil=tipo.includes("RASTREO")||P.startsWith("R-")||P.includes("RASTREO");
@@ -971,16 +984,16 @@ function renderResults(matchedItems){
     const hasLoc=!isEmpty(lat)&&!isNaN(Number(lat))&&!isEmpty(lon)&&!isNaN(Number(lon));
     
     const ss=String(sim).trim();let op="",oc="";
-    if(ss.startsWith("893")){op="Movistar";oc="bg-sky-500/15 text-sky-300 border-sky-400/30"}else if(ss.startsWith("8951")){op="Claro";oc="bg-red-500/15 text-red-300 border-red-400/30"}
+    if(ss.startsWith("893")){op="Movistar";oc="bg-cyan-500/15 text-cyan-300 border-cyan-400/30"}else if(ss.startsWith("8951")){op="Claro";oc="bg-red-500/15 text-red-300 border-red-400/30"}
     const cmds=eq.comandos.length?eq.comandos.map(c=>{
       const un=normalizeText(c.name).includes("desbloquear");
-      const col=un?"emerald":"sky";
+      const col=un?"emerald":"cyan";
       const safe=c.cmd.replace(/\\/g,"\\\\").replace(/'/g,"\\'");
-      return `<div class="chip overflow-hidden mb-2.5 flex flex-col md:flex-row">
+      return `<div class="chip overflow-hidden mb-2 flex flex-col md:flex-row">
         <div class="px-3.5 py-2.5 md:w-48 shrink-0 flex items-center gap-2 bg-${col}-500/15 text-${col}-300 text-xs font-semibold"><i class="fa-solid ${un?"fa-lock-open":"fa-lock"}"></i>${escapeHtml(c.name)}</div>
         <div class="flex-1 min-w-0 flex items-stretch">
           <code class="mono flex-1 min-w-0 px-3.5 py-2.5 text-xs font-medium text-slate-100 whitespace-nowrap overflow-x-auto scroll">${escapeHtml(c.cmd)}</code>
-          <button onclick="copyToClipboard('${safe}')" class="px-4 text-xs font-semibold text-white bg-${col}-500/85 hover:bg-${col}-500 active:scale-95 transition" title="Copiar comando"><i class="fa-regular fa-copy mr-1"></i>Copiar</button>
+          <button onclick="copyToClipboard('${safe}')" class="px-4 text-xs font-semibold text-white bg-${col}-600/85 hover:bg-${col}-500 active:scale-95 transition" title="Copiar comando"><i class="fa-regular fa-copy mr-1"></i>Copiar</button>
         </div></div>`}).join("")
       :`<div class="p-3.5 rounded-xl bg-amber-500/15 border border-amber-400/30 text-xs text-amber-100"><b>Comandos no registrados.</b> El prefijo del IMEI ${escapeHtml(imei)} no coincide con un equipo configurado.</div>`;
 
@@ -996,8 +1009,8 @@ function renderResults(matchedItems){
           </div>
           <h3 class="text-2xl font-bold text-white break-words tracking-tight">${escapeHtml(punto)}</h3>
           <div class="flex flex-wrap gap-2 mt-3 text-xs font-semibold">
-            <span class="chip px-3 py-1.5 text-sky-300"><i class="fa-solid fa-microchip mr-1.5"></i>${escapeHtml(eq.modelo)}</span>
-            <span class="chip px-3 py-1.5 text-emerald-300"><i class="fa-solid fa-tower-broadcast mr-1.5"></i>${escapeHtml(tec)}</span>
+            <span class="chip px-3 py-1.5 text-cyan-300 border-cyan-400/30"><i class="fa-solid fa-microchip mr-1.5"></i>Reseteador: ${escapeHtml(eq.modelo)}</span>
+            <span class="chip px-3 py-1.5 text-emerald-300 border-emerald-400/30"><i class="fa-solid fa-tower-broadcast mr-1.5"></i>Tecnología: ${escapeHtml(tec)}</span>
           </div>
         </div>
 
@@ -1012,43 +1025,82 @@ function renderResults(matchedItems){
 
       ${hasObs?`<div class="mx-5 mb-4 px-3.5 py-2.5 rounded-xl bg-red-500/15 border-l-[3px] border-red-400 flex gap-2.5"><i class="fa-solid fa-triangle-exclamation text-red-400 mt-0.5"></i><div><p class="text-[11px] font-bold text-red-300">Observación</p><p class="text-xs text-red-100 mt-0.5 break-words leading-relaxed">${escapeHtml(obs)}</p></div></div>`:""}
 
-      <!-- SECCIÓN DESPLEGABLE: Comandos + IMEI/SIM debajo a la izquierda, y Datos Adicionales arriba a la derecha -->
-      <div id="card-details-${index}" class="${autoExpand ? "" : "hidden"} border-t border-white/10">
-        <div class="grid grid-cols-1 xl:grid-cols-12">
-          <!-- COLUMNA IZQUIERDA -->
-          <div class="xl:col-span-7 flex flex-col justify-between border-b xl:border-b-0 xl:border-r border-white/10">
-            <div class="p-5">
-              <h4 class="text-sm font-bold text-white mb-3 flex items-center gap-2"><i class="fa-solid fa-terminal text-sky-400"></i>Comandos del equipo</h4>
-              ${cmds}
-
-              <!-- IMEI y SIM Reseteador debajo de los comandos -->
-              <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 mt-4 pt-4 border-t border-white/10">
-                <div class="chip px-3.5 py-2.5 flex justify-between gap-3 items-center">
-                  <span class="text-xs font-medium text-slate-300 shrink-0">IMEI reseteador</span>
-                  <span class="mono text-xs font-bold text-white truncate">${escapeHtml(imei)}</span>
+      <!-- SECCIÓN DESPLEGABLE CON SEPARACIÓN VISUAL CLARA -->
+      <div id="card-details-${index}" class="${autoExpand ? "" : "hidden"} border-t border-white/10 p-5 bg-black/15">
+        <div class="grid grid-cols-1 xl:grid-cols-12 gap-5 items-stretch">
+          
+          <!-- BLOQUE 1 (IZQUIERDA): EQUIPO RESETEADOR (COMANDOS + IMEI/SIM) -->
+          <div class="xl:col-span-7 zone-reset p-5 flex flex-col justify-between">
+            <div>
+              <div class="flex flex-wrap items-center justify-between gap-2 pb-3 mb-4 border-b border-cyan-400/20">
+                <div class="flex items-center gap-2.5">
+                  <span class="w-8 h-8 rounded-xl bg-cyan-500/20 border border-cyan-400/40 flex items-center justify-center text-cyan-300">
+                    <i class="fa-solid fa-microchip"></i>
+                  </span>
+                  <div>
+                    <h4 class="text-sm font-extrabold text-white tracking-wide uppercase">Equipo Reseteador (Control Remoto)</h4>
+                    <p class="text-[11px] text-cyan-300/80">Comandos AT y credenciales del dispositivo de reinicio</p>
+                  </div>
                 </div>
-                <div class="chip px-3.5 py-2.5 flex justify-between gap-3 items-center">
-                  <span class="text-xs font-medium text-slate-300 shrink-0">SIM reseteador ${op?`<span class="ml-1 px-2 py-0.5 rounded-md border text-[10px] font-bold ${oc}">${op}</span>`:""}</span>
-                  <span class="mono text-xs font-bold text-white truncate">${escapeHtml(sim)}</span>
+                <span class="px-2.5 py-1 rounded-lg bg-cyan-500/20 border border-cyan-400/40 text-cyan-200 text-xs font-bold">
+                  Modelo: ${escapeHtml(eq.modelo)}
+                </span>
+              </div>
+
+              <!-- Comandos AT -->
+              <div class="mb-4">
+                <p class="text-[11px] font-bold text-cyan-300 uppercase tracking-wider mb-2.5 flex items-center gap-1.5">
+                  <i class="fa-solid fa-terminal"></i> Comandos de Bloqueo / Desbloqueo
+                </p>
+                ${cmds}
+              </div>
+
+              <!-- Hardware del Reseteador (IMEI y SIM) -->
+              <div class="pt-3.5 border-t border-cyan-400/20">
+                <p class="text-[11px] font-bold text-cyan-300 uppercase tracking-wider mb-2.5 flex items-center gap-1.5">
+                  <i class="fa-solid fa-sim-card"></i> Identificación del Reseteador
+                </p>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                  <div class="chip px-3.5 py-2.5 border-cyan-400/25 flex justify-between gap-3 items-center">
+                    <span class="text-xs font-medium text-slate-300 shrink-0">IMEI Reseteador</span>
+                    <span class="mono text-xs font-bold text-white truncate">${escapeHtml(imei)}</span>
+                  </div>
+                  <div class="chip px-3.5 py-2.5 border-cyan-400/25 flex justify-between gap-3 items-center">
+                    <span class="text-xs font-medium text-slate-300 shrink-0">SIM Reseteador ${op?`<span class="ml-1 px-2 py-0.5 rounded-md border text-[10px] font-bold ${oc}">${op}</span>`:""}</span>
+                    <span class="mono text-xs font-bold text-white truncate">${escapeHtml(sim)}</span>
+                  </div>
                 </div>
               </div>
             </div>
 
-            ${hasLoc?`<div class="px-5 py-3 border-t border-white/10 bg-black/25 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-              <span class="text-xs font-medium text-slate-300"><i class="fa-solid fa-location-dot text-red-400 mr-1.5"></i>${escapeHtml(lat)}, ${escapeHtml(lon)}</span>
+            ${hasLoc?`<div class="mt-4 pt-3.5 border-t border-cyan-400/20 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+              <span class="text-xs font-medium text-slate-300"><i class="fa-solid fa-location-dot text-red-400 mr-1.5"></i>Coordenadas: ${escapeHtml(lat)}, ${escapeHtml(lon)}</span>
               <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(lat)},${encodeURIComponent(lon)}" target="_blank" rel="noopener noreferrer" class="btn text-white px-4 py-2 rounded-xl text-xs font-bold text-center transition hover:brightness-110"><i class="fa-solid fa-map-location-dot mr-1.5"></i>Ver ubicación</a>
             </div>`:""}
           </div>
 
-          <!-- COLUMNA DERECHA: Datos adicionales desde arriba -->
-          <div class="xl:col-span-5 p-5 bg-black/20 flex flex-col">
-            <h4 class="text-sm font-bold text-white mb-3.5 flex items-center gap-2">
-              <i class="fa-solid fa-list-ul text-sky-400"></i>Datos adicionales
-            </h4>
+          <!-- BLOQUE 2 (DERECHA): PARÁMETROS DE LA TECNOLOGÍA -->
+          <div class="xl:col-span-5 zone-tech p-5 flex flex-col">
+            <div class="flex flex-wrap items-center justify-between gap-2 pb-3 mb-4 border-b border-emerald-400/20">
+              <div class="flex items-center gap-2.5">
+                <span class="w-8 h-8 rounded-xl bg-emerald-500/20 border border-emerald-400/40 flex items-center justify-center text-emerald-300">
+                  <i class="fa-solid fa-tower-broadcast"></i>
+                </span>
+                <div>
+                  <h4 class="text-sm font-extrabold text-white tracking-wide uppercase">Datos de la Tecnología</h4>
+                  <p class="text-[11px] text-emerald-300/80">Parámetros RF, slots, módem y detalles del sitio</p>
+                </div>
+              </div>
+              <span class="px-2.5 py-1 rounded-lg bg-emerald-500/20 border border-emerald-400/40 text-emerald-200 text-xs font-bold">
+                ${escapeHtml(tec)}
+              </span>
+            </div>
+
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 overflow-y-auto scroll pr-1 max-h-[30rem]">
               ${renderAdditionalData(row,[pk,tk,ik,sk,ok,lk,gk])}
             </div>
           </div>
+
         </div>
       </div>
     </article>`}).join("");
@@ -1063,7 +1115,7 @@ function toggleCard(i){
 function renderAdditionalData(row,excluded){
   const ex=new Set(excluded.filter(Boolean).map(k=>String(k).toUpperCase()));
   const T={
-    modem:"bg-sky-500/15 border-sky-400 text-sky-300",
+    modem:"bg-emerald-500/15 border-emerald-400 text-emerald-300",
     slot:"bg-amber-500/15 border-amber-400 text-amber-300",
     rest:"bg-white/[0.06] border-slate-400/60 text-slate-300"
   };
@@ -1084,7 +1136,7 @@ function renderAdditionalData(row,excluded){
       <p class="text-sm font-bold text-white break-words mt-1 leading-snug">${escapeHtml(v)}</p>
     </div>`;
   });
-  return h||`<div class="col-span-full text-xs text-slate-400 italic p-3">No hay datos adicionales.</div>`;
+  return h||`<div class="col-span-full text-xs text-slate-400 italic p-3">No hay datos adicionales registrados para esta tecnología.</div>`;
 }
 
 async function copyToClipboard(text){
