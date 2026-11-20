@@ -26,10 +26,10 @@
   --bg-frame-1: #4a525d; --bg-frame-2: #2b3138;
   --bg-rail: #12161b;
   --bg-panel: #171b21;
-  --text-main: #e2e8f0;
+  --text-main: #f1f5f9;
   --text-head: #ffffff;
-  --glass: rgba(255,255,255,.045);
-  --line: rgba(255,255,255,.08);
+  --glass: rgba(15, 20, 28, 0.58);
+  --line: rgba(255, 255, 255, 0.13);
   --map-grid: rgba(120,160,220,.05);
 }
 
@@ -64,16 +64,16 @@ body.color-red .border-sky-400 { border-color: var(--primary) !important; }
 body.theme-day {
   --bg-body-1: #cbd5e1; --bg-body-2: #e2e8f0; --bg-body-3: #f1f5f9;
   --bg-frame-1: #ffffff; --bg-frame-2: #f8fafc; --bg-rail: #e2e8f0; --bg-panel: #ffffff;
-  --text-main: #334155; --text-head: #0f172a; --glass: rgba(0,0,0,.03); --line: rgba(0,0,0,.1);
+  --text-main: #1e293b; --text-head: #0f172a; --glass: rgba(255, 255, 255, 0.82); --line: rgba(15, 23, 42, 0.14);
 }
 body.theme-day .text-white { color: var(--text-head) !important; }
-body.theme-day .text-slate-100, body.theme-day .text-slate-200, body.theme-day .text-slate-300 { color: #334155 !important; }
-body.theme-day .text-slate-400 { color: #64748b !important; }
-body.theme-day .text-slate-500 { color: #94a3b8 !important; }
+body.theme-day .text-slate-100, body.theme-day .text-slate-200, body.theme-day .text-slate-300 { color: #1e293b !important; }
+body.theme-day .text-slate-400 { color: #475569 !important; }
+body.theme-day .text-slate-500 { color: #64748b !important; }
 body.theme-day .border-slate-500 { border-color: #cbd5e1 !important; }
 body.theme-day .bg-\[\#12161b\] { background-color: #f8fafc !important; border-color: #cbd5e1 !important; }
-body.theme-day .bg-black\/30, body.theme-day .bg-black\/40, body.theme-day .bg-black\/50, body.theme-day .bg-black\/20 { background-color: #f1f5f9 !important; border-color: #cbd5e1 !important; color: #0f172a !important; }
-body.theme-day .bg-white\/5, body.theme-day .card { background: linear-gradient(145deg,#ffffff,#f8fafc) !important; border-color: rgba(0,0,0,0.1) !important; }
+body.theme-day .bg-black\/30, body.theme-day .bg-black\/40, body.theme-day .bg-black\/50, body.theme-day .bg-black\/20 { background-color: rgba(241, 245, 249, 0.85) !important; border-color: #cbd5e1 !important; color: #0f172a !important; }
+body.theme-day .bg-white\/5, body.theme-day .card { background: linear-gradient(145deg, rgba(255,255,255,0.92), rgba(248,250,252,0.85)) !important; border-color: rgba(0,0,0,0.12) !important; }
 body.theme-day .toast, body.theme-day .sel, body.theme-day .leaflet-popup-content-wrapper, body.theme-day .leaflet-popup-tip { background: #ffffff !important; border-color: #cbd5e1 !important; color: #0f172a !important; }
 body.theme-day #map-canvas { background: #e2e8f0 !important; }
 body.theme-day #map-canvas .leaflet-tile-pane { filter: none !important; }
@@ -90,7 +90,15 @@ body{font-family:Inter,ui-sans-serif,system-ui,sans-serif;color:var(--text-main)
 .rail button.on i{color:#fff}
 .panel{background:var(--bg-panel);border-radius:22px;border:1px solid var(--line); transition: background 0.3s;}
 .map{background:radial-gradient(circle at 70% 30%,var(--primary-bg),transparent 45%),linear-gradient(var(--map-grid) 1px,transparent 1px) 0 0/38px 38px,linear-gradient(90deg,var(--map-grid) 1px,transparent 1px) 0 0/38px 38px,var(--bg-panel)}
-.chip{background:var(--glass);border:1px solid var(--line);border-radius:12px}
+
+/* Mayor Blur y Contraste para Legibilidad */
+.chip{
+  background: var(--glass);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
 .scroll::-webkit-scrollbar{width:6px;height:6px}.scroll::-webkit-scrollbar-thumb{background:#334155;border-radius:10px}
 .glow{animation:g 3s ease-in-out infinite}@keyframes g{50%{filter:drop-shadow(0 0 12px var(--primary-glow))}}
 
@@ -119,7 +127,16 @@ body{font-family:Inter,ui-sans-serif,system-ui,sans-serif;color:var(--text-main)
 
 .btn{background:linear-gradient(135deg,var(--primary-light),var(--primary-dark));box-shadow:0 0 18px var(--primary-bg)}
 .btn:disabled{opacity:.4;box-shadow:none}
-.card{background:linear-gradient(145deg,rgba(255,255,255,.06),rgba(255,255,255,.02));border:1px solid var(--line);border-radius:20px;backdrop-filter:blur(8px)}
+
+/* Tarjeta con Blur profundo y mayor contraste para lectura nítida */
+.card{
+  background: linear-gradient(145deg, rgba(22, 28, 38, 0.84), rgba(14, 18, 25, 0.78));
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 20px;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.35);
+}
 .card:hover{border-color:var(--primary-bg)}
 .mono{font-family:"Cascadia Code",Consolas,monospace}
 .fade{animation:f .3s ease-out}@keyframes f{from{opacity:0;transform:translateY(8px)}}
@@ -183,7 +200,7 @@ body.theme-day .dev-table th { background: #e2e8f0; }
             <i class="fa-solid fa-code mr-1"></i>Modo Dev Activo
           </span>
         </div>
-        <p class="text-xs text-slate-300/70">Gestión de puntos · Control RF / AVL</p>
+        <p class="text-xs text-slate-300/80">Gestión de puntos · Control RF / AVL</p>
       </div>
 
       <div class="flex items-center gap-2">
@@ -444,7 +461,7 @@ body.theme-day .dev-table th { background: #e2e8f0; }
 // ==========================================
 // CONFIGURACIÓN MODO DESARROLLADOR
 // ==========================================
-const DEV_PASSWORD = "REX"; // <-- Clave de acceso
+const DEV_PASSWORD = "SKYNET2026"; // <-- Clave de acceso
 let isDevMode = false;
 let devEditCount = 0;
 let loadedFileName = "MDZ_SKYNET_BASE.xlsx";
@@ -890,71 +907,105 @@ function renderResults(matchedItems){
       const un=normalizeText(c.name).includes("desbloquear");
       const col=un?"emerald":"sky";
       const safe=c.cmd.replace(/\\/g,"\\\\").replace(/'/g,"\\'");
-      return `<div class="chip overflow-hidden mb-2 flex flex-col md:flex-row">
-        <div class="px-3 py-2.5 md:w-48 shrink-0 flex items-center gap-2 bg-${col}-500/10 text-${col}-300 text-xs font-semibold"><i class="fa-solid ${un?"fa-lock-open":"fa-lock"}"></i>${escapeHtml(c.name)}</div>
+      return `<div class="chip overflow-hidden mb-2.5 flex flex-col md:flex-row">
+        <div class="px-3.5 py-2.5 md:w-48 shrink-0 flex items-center gap-2 bg-${col}-500/15 text-${col}-300 text-xs font-semibold"><i class="fa-solid ${un?"fa-lock-open":"fa-lock"}"></i>${escapeHtml(c.name)}</div>
         <div class="flex-1 min-w-0 flex items-stretch">
-          <code class="mono flex-1 min-w-0 px-3 py-2.5 text-xs text-slate-300 whitespace-nowrap overflow-x-auto scroll">${escapeHtml(c.cmd)}</code>
-          <button onclick="copyToClipboard('${safe}')" class="px-4 text-xs font-semibold text-white bg-${col}-500/80 hover:bg-${col}-500 active:scale-95 transition" title="Copiar comando"><i class="fa-regular fa-copy mr-1"></i>Copiar</button>
+          <code class="mono flex-1 min-w-0 px-3.5 py-2.5 text-xs font-medium text-slate-100 whitespace-nowrap overflow-x-auto scroll">${escapeHtml(c.cmd)}</code>
+          <button onclick="copyToClipboard('${safe}')" class="px-4 text-xs font-semibold text-white bg-${col}-500/85 hover:bg-${col}-500 active:scale-95 transition" title="Copiar comando"><i class="fa-regular fa-copy mr-1"></i>Copiar</button>
         </div></div>`}).join("")
-      :`<div class="p-3 rounded-xl bg-amber-500/10 border border-amber-400/30 text-xs text-amber-200"><b>Comandos no registrados.</b> El prefijo del IMEI ${escapeHtml(imei)} no coincide con un equipo configurado.</div>`;
+      :`<div class="p-3.5 rounded-xl bg-amber-500/15 border border-amber-400/30 text-xs text-amber-100"><b>Comandos no registrados.</b> El prefijo del IMEI ${escapeHtml(imei)} no coincide con un equipo configurado.</div>`;
 
     const devEditBtn = isDevMode ? `<button onclick="openRecordEditor(${realIdx})" class="px-3 py-1.5 rounded-xl bg-amber-500/20 border border-amber-400/40 text-amber-300 hover:bg-amber-500/30 text-xs font-bold transition mr-2"><i class="fa-solid fa-pen-to-square mr-1"></i>Editar Registro</button>` : "";
 
     return `<article class="card fade overflow-hidden">
-      <div class="p-5 flex flex-col xl:flex-row xl:justify-between gap-4">
-        <div class="min-w-0">
-          <div class="flex items-center gap-2 mb-2 text-[11px] font-semibold">
-            <span class="px-2 py-1 rounded-md border ${movil?"bg-indigo-500/15 text-indigo-300 border-indigo-400/30":"bg-emerald-500/15 text-emerald-300 border-emerald-400/30"}"><i class="fa-solid ${movil?"fa-truck-fast":"fa-tower-cell"} mr-1"></i>${movil?"Móvil / Rastreo":"Torre / Fija"}</span>
-            <span class="text-slate-500">#${index+1}</span>
-          </div>
-          <h3 class="text-2xl font-bold text-white break-words">${escapeHtml(punto)}</h3>
-          <div class="flex flex-wrap gap-2 mt-3 text-xs font-semibold">
-            <span class="chip px-3 py-1.5 text-sky-300"><i class="fa-solid fa-microchip mr-1"></i>${escapeHtml(eq.modelo)}</span>
-            <span class="chip px-3 py-1.5 text-emerald-300"><i class="fa-solid fa-tower-broadcast mr-1"></i>${escapeHtml(tec)}</span>
-          </div>
-        </div>
-        <div class="flex flex-col gap-2 xl:min-w-[320px]">
-          <div class="chip px-3 py-2.5 flex justify-between gap-4 items-center"><span class="text-[11px] text-slate-400 shrink-0">IMEI reseteador</span><span class="mono text-xs truncate">${escapeHtml(imei)}</span></div>
-          <div class="chip px-3 py-2.5 flex justify-between gap-4 items-center"><span class="text-[11px] text-slate-400 shrink-0">SIM reseteador ${op?`<span class="ml-1 px-1.5 py-0.5 rounded border text-[10px] ${oc}">${op}</span>`:""}</span><span class="mono text-xs truncate">${escapeHtml(sim)}</span></div>
-        </div>
-      </div>
-      ${hasObs?`<div class="mx-5 mb-4 px-3 py-2.5 rounded-lg bg-red-500/10 border-l-[3px] border-red-400 flex gap-2.5"><i class="fa-solid fa-triangle-exclamation text-red-400 mt-0.5"></i><div><p class="text-[11px] font-semibold text-red-300">Observación</p><p class="text-xs text-red-100 mt-0.5 break-words">${escapeHtml(obs)}</p></div></div>`:""}
-      <div class="px-5 py-3 flex justify-between items-center border-t border-white/5 bg-black/20">
-        <span class="text-xs text-slate-400">Detalles operativos</span>
-        <div class="flex items-center">
-          ${devEditBtn}
-          <button onclick="toggleCard(${index})" class="chip px-3 py-1.5 text-xs font-semibold hover:border-sky-400 transition"><span id="toggle-text-${index}">Desplegar</span> <i id="toggle-icon-${index}" class="fa-solid fa-chevron-down ml-1"></i></button>
-        </div>
-      </div>
-      <div id="card-details-${index}" class="hidden border-t border-white/5">
-        <div class="p-5 grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div class="lg:col-span-2"><h4 class="text-sm font-semibold text-white mb-3"><i class="fa-solid fa-terminal text-sky-400 mr-2"></i>Comandos del equipo</h4>${cmds}</div>
-          <div><h4 class="text-sm font-semibold text-white mb-3"><i class="fa-solid fa-list-ul text-sky-400 mr-2"></i>Datos adicionales</h4>
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2 gap-2 max-h-[24rem] overflow-y-auto scroll pr-1">${renderAdditionalData(row,[pk,tk,ik,sk,ok,lk,gk])}</div></div>
-        </div>
-        ${hasLoc?`<div class="px-5 py-3 border-t border-white/5 bg-black/20 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-          <span class="text-xs text-slate-400"><i class="fa-solid fa-location-dot text-red-400 mr-1"></i>${escapeHtml(lat)},${escapeHtml(lon)}</span>
-          <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(lat)},${encodeURIComponent(lon)}" target="_blank" rel="noopener noreferrer" class="btn text-white px-4 py-2 rounded-lg text-xs font-semibold text-center"><i class="fa-solid fa-map-location-dot mr-1"></i>Ver ubicación</a></div>`:""}
-      </div></article>`}).join("");
-}
+      <div class="grid grid-cols-1 xl:grid-cols-12">
+        <!-- COLUMNA IZQUIERDA: Encabezado, Comandos e IMEI/SIM debajo -->
+        <div class="xl:col-span-7 flex flex-col justify-between border-b xl:border-b-0 xl:border-r border-white/10">
+          <div>
+            <div class="p-5">
+              <div class="flex items-center justify-between gap-2 mb-2">
+                <div class="flex items-center gap-2 text-[11px] font-semibold">
+                  <span class="px-2.5 py-1 rounded-md border ${movil?"bg-indigo-500/20 text-indigo-200 border-indigo-400/40":"bg-emerald-500/20 text-emerald-200 border-emerald-400/40"}"><i class="fa-solid ${movil?"fa-truck-fast":"fa-tower-cell"} mr-1"></i>${movil?"Móvil / Rastreo":"Torre / Fija"}</span>
+                  <span class="text-slate-400">#${index+1}</span>
+                </div>
+                ${devEditBtn}
+              </div>
+              <h3 class="text-2xl font-bold text-white break-words tracking-tight">${escapeHtml(punto)}</h3>
+              <div class="flex flex-wrap gap-2 mt-3 text-xs font-semibold">
+                <span class="chip px-3 py-1.5 text-sky-300"><i class="fa-solid fa-microchip mr-1.5"></i>${escapeHtml(eq.modelo)}</span>
+                <span class="chip px-3 py-1.5 text-emerald-300"><i class="fa-solid fa-tower-broadcast mr-1.5"></i>${escapeHtml(tec)}</span>
+              </div>
+            </div>
 
-function toggleCard(i){
-  const d=$(`card-details-${i}`),t=$(`toggle-text-${i}`),ic=$(`toggle-icon-${i}`),h=d.classList.toggle("hidden");
-  t.textContent=h?"Desplegar":"Contraer";ic.className="fa-solid ml-1 "+(h?"fa-chevron-down":"fa-chevron-up");
+            ${hasObs?`<div class="mx-5 mb-4 px-3.5 py-2.5 rounded-xl bg-red-500/15 border-l-[3px] border-red-400 flex gap-2.5"><i class="fa-solid fa-triangle-exclamation text-red-400 mt-0.5"></i><div><p class="text-[11px] font-bold text-red-300">Observación</p><p class="text-xs text-red-100 mt-0.5 break-words leading-relaxed">${escapeHtml(obs)}</p></div></div>`:""}
+
+            <div class="px-5 py-2.5 border-y border-white/10 bg-black/25 flex items-center justify-between">
+              <span class="text-xs font-medium text-slate-300">Detalles operativos</span>
+              <span class="text-[11px] text-slate-400"><i class="fa-solid fa-terminal text-sky-400 mr-1"></i>Control RF</span>
+            </div>
+
+            <div class="p-5">
+              <h4 class="text-sm font-bold text-white mb-3 flex items-center gap-2"><i class="fa-solid fa-terminal text-sky-400"></i>Comandos del equipo</h4>
+              ${cmds}
+
+              <!-- IMEI y SIM Reseteador debajo de los comandos -->
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 mt-4 pt-4 border-t border-white/10">
+                <div class="chip px-3.5 py-2.5 flex justify-between gap-3 items-center">
+                  <span class="text-xs font-medium text-slate-300 shrink-0">IMEI reseteador</span>
+                  <span class="mono text-xs font-bold text-white truncate">${escapeHtml(imei)}</span>
+                </div>
+                <div class="chip px-3.5 py-2.5 flex justify-between gap-3 items-center">
+                  <span class="text-xs font-medium text-slate-300 shrink-0">SIM reseteador ${op?`<span class="ml-1 px-2 py-0.5 rounded-md border text-[10px] font-bold ${oc}">${op}</span>`:""}</span>
+                  <span class="mono text-xs font-bold text-white truncate">${escapeHtml(sim)}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          ${hasLoc?`<div class="px-5 py-3 border-t border-white/10 bg-black/25 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+            <span class="text-xs font-medium text-slate-300"><i class="fa-solid fa-location-dot text-red-400 mr-1.5"></i>${escapeHtml(lat)}, ${escapeHtml(lon)}</span>
+            <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(lat)},${encodeURIComponent(lon)}" target="_blank" rel="noopener noreferrer" class="btn text-white px-4 py-2 rounded-xl text-xs font-bold text-center transition hover:brightness-110"><i class="fa-solid fa-map-location-dot mr-1.5"></i>Ver ubicación</a>
+          </div>`:""}
+        </div>
+
+        <!-- COLUMNA DERECHA: Datos adicionales desde arriba -->
+        <div class="xl:col-span-5 p-5 bg-black/20 flex flex-col">
+          <h4 class="text-sm font-bold text-white mb-3.5 flex items-center gap-2">
+            <i class="fa-solid fa-list-ul text-sky-400"></i>Datos adicionales
+          </h4>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 overflow-y-auto scroll pr-1 max-h-[34rem]">
+            ${renderAdditionalData(row,[pk,tk,ik,sk,ok,lk,gk])}
+          </div>
+        </div>
+      </div>
+    </article>`}).join("");
 }
 
 function renderAdditionalData(row,excluded){
   const ex=new Set(excluded.filter(Boolean).map(k=>String(k).toUpperCase()));
-  const T={modem:"bg-sky-500/10 border-sky-400 text-sky-300",slot:"bg-amber-500/10 border-amber-400 text-amber-300",rest:"bg-white/5 border-slate-500 text-slate-400"};
+  const T={
+    modem:"bg-sky-500/15 border-sky-400 text-sky-300",
+    slot:"bg-amber-500/15 border-amber-400 text-amber-300",
+    rest:"bg-white/[0.06] border-slate-400/60 text-slate-300"
+  };
   let h="";
   Object.entries(row).forEach(([k,v])=>{
     if(ex.has(k.toUpperCase())||isEmpty(v))return;
     const n=normalizeText(k);
-    if(n==="vlu"){h+=`<div class="col-span-full p-3 rounded-xl bg-gradient-to-r from-amber-400/20 to-transparent border border-amber-400/30"><p class="text-[11px] font-semibold text-amber-300"><i class="fa-solid fa-key mr-1"></i>VLU</p><p class="text-base font-bold text-amber-100 break-words">${escapeHtml(v)}</p></div>`;return}
+    if(n==="vlu"){
+      h+=`<div class="col-span-full p-3.5 rounded-xl bg-gradient-to-r from-amber-500/25 via-amber-500/10 to-transparent border border-amber-400/40 backdrop-blur-md">
+        <p class="text-[11px] font-bold text-amber-300 uppercase tracking-wider"><i class="fa-solid fa-key mr-1.5"></i>VLU</p>
+        <p class="text-lg font-extrabold text-amber-100 break-words mt-0.5 tracking-wide">${escapeHtml(v)}</p>
+      </div>`;
+      return;
+    }
     const t=n.includes("modem")?T.modem:n.includes("slot")?T.slot:T.rest;
-    h+=`<div class="${t} border-l-[3px] rounded-md px-2.5 py-2"><p class="text-[10px] font-semibold truncate">${escapeHtml(k)}</p><p class="text-xs font-semibold text-slate-100 break-words mt-0.5">${escapeHtml(v)}</p></div>`;
+    h+=`<div class="${t} border-l-[3px] rounded-xl px-3 py-2.5 backdrop-blur-md">
+      <p class="text-[10px] font-bold uppercase tracking-wider opacity-90 truncate" title="${escapeHtml(k)}">${escapeHtml(k)}</p>
+      <p class="text-sm font-bold text-white break-words mt-1 leading-snug">${escapeHtml(v)}</p>
+    </div>`;
   });
-  return h||`<div class="col-span-full text-xs text-slate-500 italic p-3">No hay datos adicionales.</div>`;
+  return h||`<div class="col-span-full text-xs text-slate-400 italic p-3">No hay datos adicionales.</div>`;
 }
 
 async function copyToClipboard(text){
