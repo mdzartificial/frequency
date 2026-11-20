@@ -60,12 +60,12 @@ body.theme-day .bg-white\/5, body.theme-day .card { background: linear-gradient(
 body.theme-day .toast, body.theme-day .sel, body.theme-day .leaflet-popup-content-wrapper, body.theme-day .leaflet-popup-tip { background: #ffffff !important; border-color: #cbd5e1 !important; color: #0f172a !important; }
 body.theme-day #map-canvas { background: #e2e8f0 !important; }
 body.theme-day #map-canvas .leaflet-tile-pane { filter: none !important; }
-body.theme-day input { color: #0f172a !important; }
+body.theme-day input, body.theme-day textarea { color: #0f172a !important; }
 
 html,body{height:100%}
 body{font-family:Inter,ui-sans-serif,system-ui,sans-serif;color:var(--text-main);margin:0;padding:18px;background:radial-gradient(circle at 20% 10%,var(--bg-body-1),var(--bg-body-2) 55%,var(--bg-body-3)); transition: background 0.3s, color 0.3s;}
 .frame{height:calc(100vh - 36px);min-height:560px;display:flex;gap:14px;padding:10px;border-radius:28px;background:linear-gradient(160deg,var(--bg-frame-1),var(--bg-frame-2));border:2px solid var(--primary-bg);box-shadow:0 30px 80px rgba(0,0,0,.5); transition: background 0.3s, border-color 0.3s;}
-.rail{width:64px;border-radius:20px;background:var(--bg-rail);display:flex;flex-direction:column;align-items:center;gap:18px;padding:18px 0;flex-shrink:0; transition: background 0.3s; z-index: 50;}
+.rail{width:64px;border-radius:20px;background:var(--bg-rail);display:flex;flex-direction:column;align-items:center;gap:14px;padding:18px 0;flex-shrink:0; transition: background 0.3s; z-index: 50;}
 .rail i{color:#64748b;font-size:15px}
 .rail button{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;background:none;border:0;cursor:pointer;transition:.2s}
 .rail button:hover i{color:var(--text-head)}
@@ -81,19 +81,10 @@ body{font-family:Inter,ui-sans-serif,system-ui,sans-serif;color:var(--text-main)
   0%, 100% { stroke-opacity: 1; fill-opacity: 0.9; filter: drop-shadow(0 0 5px currentColor); }
   50% { stroke-opacity: 0.2; fill-opacity: 0.3; filter: none; }
 }
-.marker-blink {
-  animation: blink-alert 1.2s ease-in-out infinite;
-}
-.marker-fixed {
-  filter: drop-shadow(0 0 8px currentColor);
-}
-.zone-polygon {
-  stroke-dasharray: 8, 8;
-  animation: dash-flow 20s linear infinite;
-}
-@keyframes dash-flow {
-  to { stroke-dashoffset: -1000; }
-}
+.marker-blink { animation: blink-alert 1.2s ease-in-out infinite; }
+.marker-fixed { filter: drop-shadow(0 0 8px currentColor); }
+.zone-polygon { stroke-dasharray: 8, 8; animation: dash-flow 20s linear infinite; }
+@keyframes dash-flow { to { stroke-dashoffset: -1000; } }
 
 @keyframes swim-alive {0%, 100% { transform: translateY(0) scale(1, 1); filter: drop-shadow(0 0 12px var(--primary-glow)); } 25% { transform: translateY(-5px) scale(0.92, 1.08); filter: drop-shadow(0 15px 20px var(--primary-glow)); } 50% { transform: translateY(-8px) scale(1.05, 0.95); filter: drop-shadow(0 20px 25px var(--primary-glow)); } 75% { transform: translateY(-3px) scale(0.96, 1.04); filter: drop-shadow(0 10px 15px var(--primary-glow)); }}
 .anim-filter #main-logo { animation: swim-alive 2.2s ease-in-out infinite; transform-origin: bottom center; }
@@ -107,6 +98,7 @@ body{font-family:Inter,ui-sans-serif,system-ui,sans-serif;color:var(--text-main)
 .anim-maint #main-logo { animation: float-wrench 2s ease-in-out infinite; }
 @keyframes happy-shake {0%, 100% { transform: translateY(0) rotate(0); } 25% { transform: translateY(-4px) rotate(8deg); } 50% { transform: translateY(0) rotate(-8deg); } 75% { transform: translateY(-4px) rotate(8deg); }}
 .anim-price #main-logo { animation: happy-shake 1s ease-in-out infinite; }
+.anim-dev #main-logo { animation: spin-3d 4s linear infinite; }
 
 .btn{background:linear-gradient(135deg,var(--primary-light),var(--primary-dark));box-shadow:0 0 18px var(--primary-bg)}
 .btn:disabled{opacity:.4;box-shadow:none}
@@ -115,44 +107,76 @@ body{font-family:Inter,ui-sans-serif,system-ui,sans-serif;color:var(--text-main)
 .mono{font-family:"Cascadia Code",Consolas,monospace}
 .fade{animation:f .3s ease-out}@keyframes f{from{opacity:0;transform:translateY(8px)}}
 #drop-zone.drag{border-color:var(--primary)!important;background:var(--primary-bg)!important}
-.toast{position:fixed;left:50%;bottom:26px;transform:translate(-50%,100px);opacity:0;z-index:99;padding:12px 18px;border-radius:14px;background:#0b0e12;border:1px solid var(--line);transition:.3s;pointer-events:none}
+.toast{position:fixed;left:50%;bottom:26px;transform:translate(-50%,100px);opacity:0;z-index:999;padding:12px 18px;border-radius:14px;background:#0b0e12;border:1px solid var(--line);transition:.3s;pointer-events:none}
 .toast.show{transform:translate(-50%,0);opacity:1}
 .sel{background:#0b0e12;border:1px solid var(--line);border-radius:10px;padding:6px 10px;font-size:12px;color:var(--text-main);max-width:240px}
 .leaflet-popup-content-wrapper,.leaflet-popup-tip{background:#171b21;color:#e2e8f0}
 #map-canvas{background:#10141a; transition: filter 0.3s;}
 #map-canvas .leaflet-tile-pane{filter:invert(1) hue-rotate(200deg) brightness(.9) contrast(.9) saturate(.7)}
+
+/* Estilos Tabla Editor Dev */
+.dev-table th { position: sticky; top: 0; background: #0f1318; z-index: 10; border-bottom: 1px solid var(--line); }
+.dev-cell-input { background: transparent; border: 1px solid transparent; border-radius: 6px; padding: 4px 6px; width: 100%; min-width: 110px; font-size: 12px; transition: 0.15s; }
+.dev-cell-input:focus { background: rgba(245, 158, 11, 0.12); border-color: #f59e0b; outline: none; }
+body.theme-day .dev-table th { background: #e2e8f0; }
+
 @media(max-width:900px){body{padding:0}.frame{height:auto;border-radius:0;flex-direction:column}.rail{display:none}.cols{flex-direction:column}.side{width:100%!important}}
 </style>
 </head>
-<body>
 <body class="color-red">
 <div class="frame">
   <nav class="rail">
-    <div id="logo-container" class="relative inline-block mt-2">
+    <div id="logo-container" class="relative inline-block mt-1">
       <i id="main-logo" class="fa-brands fa-octopus-deploy text-[42px] glow transition-all" style="color:var(--primary)"></i>
     </div>
     
-    <button class="on mt-4" data-v="filter" onclick="setView('filter')" title="Filtrado"><i class="fa-solid fa-satellite-dish"></i></button>
+    <button class="on mt-2" data-v="filter" onclick="setView('filter')" title="Filtrado"><i class="fa-solid fa-satellite-dish"></i></button>
     <button data-v="map" onclick="setView('map')" title="Mapa y Distribución"><i class="fa-solid fa-location-dot"></i></button>
     <button data-v="tech" onclick="setView('tech')" title="Analizador de tecnologías"><i class="fa-solid fa-microchip"></i></button>
     <button data-v="antenna" onclick="setView('antenna')" title="Infraestructura y Antenas"><i class="fa-solid fa-tower-broadcast"></i></button>
     <button data-v="maint" onclick="setView('maint')" title="Plan Mantenimiento Lógico"><i class="fa-solid fa-screwdriver-wrench"></i></button>
     <button data-v="price" onclick="setView('price')" title="Analizador de precios"><i class="fa-solid fa-coins"></i></button>
+    
+    <!-- Botón Exclusivo Modo Desarrollador: Editor Tabla -->
+    <button id="nav-dev-btn" class="hidden border border-amber-500/40 bg-amber-500/10" data-v="dev" onclick="setView('dev')" title="Editor Base Excel (Modo Dev)">
+      <i class="fa-solid fa-table-cells text-amber-400"></i>
+    </button>
 
-    <div class="mt-auto flex flex-col gap-3 pb-2">
+    <div class="mt-auto flex flex-col gap-2 pb-2">
+      <button id="dev-lock-btn" onclick="toggleDevModal()" title="Modo Desarrollador (Bloqueado)">
+        <i id="dev-lock-icon" class="fa-solid fa-lock"></i>
+      </button>
       <button onclick="toggleColor()" title="Cambiar Color (Azul/Rojo)"><i class="fa-solid fa-palette"></i></button>
       <button onclick="toggleTheme()" title="Modo Día/Noche"><i id="theme-icon" class="fa-solid fa-moon"></i></button>
     </div>
   </nav>
 
   <div class="flex-1 flex flex-col gap-3 min-w-0">
-    <header class="flex items-center justify-between px-2 pt-1">
+    <header class="flex flex-wrap items-center justify-between gap-2 px-2 pt-1">
       <div>
-        <h1 class="text-2xl font-bold text-white">MDZ SKYNET</h1>
+        <div class="flex items-center gap-2.5">
+          <h1 class="text-2xl font-bold text-white">MDZ SKYNET</h1>
+          <span id="dev-badge" class="hidden px-2.5 py-0.5 rounded-full bg-amber-500/20 border border-amber-400/50 text-amber-300 text-[10px] font-bold uppercase tracking-wider">
+            <i class="fa-solid fa-code mr-1"></i>Modo Dev Activo
+          </span>
+        </div>
         <p class="text-xs text-slate-300/70">Gestión de puntos · Control RF / AVL</p>
       </div>
-      <div class="flex items-center gap-2 px-4 py-2 rounded-full bg-[#12161b] border border-white/10 text-xs font-semibold">
-        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> En línea
+
+      <div class="flex items-center gap-2">
+        <!-- Botones rápidos de Modo Dev (Exportar + Contador cambios) -->
+        <div id="dev-header-actions" class="hidden flex items-center gap-2">
+          <span id="dev-changes-badge" class="hidden px-3 py-1.5 rounded-full bg-amber-500/15 border border-amber-500/40 text-amber-300 text-xs font-semibold">
+            0 ediciones
+          </span>
+          <button onclick="exportModifiedExcel()" class="px-4 py-2 rounded-full bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold shadow-lg shadow-emerald-900/40 transition flex items-center gap-1.5 cursor-pointer">
+            <i class="fa-solid fa-file-excel"></i> Exportar Excel
+          </button>
+        </div>
+
+        <div class="flex items-center gap-2 px-4 py-2 rounded-full bg-[#12161b] border border-white/10 text-xs font-semibold">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> En línea
+        </div>
       </div>
     </header>
 
@@ -192,7 +216,12 @@ body{font-family:Inter,ui-sans-serif,system-ui,sans-serif;color:var(--text-main)
       <section id="view-filter" class="map panel flex-1 min-w-0 flex flex-col overflow-hidden">
         <div class="flex items-center justify-between px-5 pt-4 pb-3 gap-3 flex-wrap">
           <h2 class="text-lg font-semibold text-white">Resultados</h2>
-          <div id="results-count" class="hidden px-3 py-1 rounded-full text-xs font-semibold bg-sky-500/15 text-sky-300 border border-sky-400/30"></div>
+          <div class="flex items-center gap-2">
+            <button id="btn-add-record-filter" onclick="openAddRecordModal()" class="hidden px-3 py-1 rounded-full text-xs font-semibold bg-amber-500/15 text-amber-300 border border-amber-400/30 hover:bg-amber-500/25 transition">
+              <i class="fa-solid fa-plus mr-1"></i>Nuevo Punto
+            </button>
+            <div id="results-count" class="hidden px-3 py-1 rounded-full text-xs font-semibold bg-sky-500/15 text-sky-300 border border-sky-400/30"></div>
+          </div>
         </div>
         <div id="tech-summary-container" class="hidden px-5 pb-3"><div id="tech-badges-wrapper" class="flex flex-wrap gap-2"></div></div>
         <div id="results-container" class="flex-1 overflow-y-auto scroll px-5 pb-5 space-y-4">
@@ -220,7 +249,6 @@ body{font-family:Inter,ui-sans-serif,system-ui,sans-serif;color:var(--text-main)
              <option value="moviles">Solo Móviles (Rastreo)</option>
           </select>
 
-          <!-- Dropdown que se llenará con las combinaciones -->
           <select id="map-tech-filter" class="sel font-bold text-amber-300 border-amber-500/40" onchange="renderMap()">
              <option value="all">Todas las tecnologías combinadas</option>
           </select>
@@ -314,6 +342,75 @@ body{font-family:Inter,ui-sans-serif,system-ui,sans-serif;color:var(--text-main)
         <div class="flex flex-wrap items-center gap-3 px-5 pt-4 pb-3"><h2 class="text-lg font-semibold text-white mr-auto">Analizador de precios</h2><label class="text-xs text-slate-400">Precio <select id="price-col" class="sel" onchange="renderPrice()"></select></label><label class="text-xs text-slate-400">Agrupar por <select id="price-grp" class="sel" onchange="renderPrice()"></select></label></div>
         <div id="price-body" class="flex-1 overflow-y-auto scroll px-5 pb-5 space-y-4"></div>
       </section>
+
+      <!-- VISTA MODO DESARROLLADOR: EDITOR TABLA EXCEL -->
+      <section id="view-dev" class="view hidden map panel flex-1 min-w-0 flex flex-col overflow-hidden">
+        <div class="flex flex-wrap items-center justify-between gap-3 px-5 pt-4 pb-3 border-b border-white/5">
+          <div>
+            <h2 class="text-lg font-semibold text-white flex items-center gap-2">
+              <i class="fa-solid fa-table-cells text-amber-400"></i> Editor Directo de Base Excel
+            </h2>
+            <p class="text-xs text-slate-400">Edita cualquier celda en tiempo real y luego presiona <b>Exportar Excel</b> arriba.</p>
+          </div>
+          <div class="flex flex-wrap items-center gap-2">
+            <div class="relative">
+              <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 text-xs"></i>
+              <input id="dev-table-search" oninput="renderDevTable()" placeholder="Filtrar filas..." class="py-1.5 pl-8 pr-3 text-xs rounded-xl bg-black/40 border border-white/10 outline-none focus:border-amber-400">
+            </div>
+            <button onclick="openAddRecordModal()" class="px-3.5 py-1.5 rounded-xl bg-amber-500/20 border border-amber-400/40 text-amber-300 hover:bg-amber-500/30 text-xs font-bold transition">
+              <i class="fa-solid fa-plus mr-1"></i>Agregar Fila
+            </button>
+            <button onclick="exportModifiedExcel()" class="px-3.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold transition">
+              <i class="fa-solid fa-download mr-1"></i>Descargar .XLSX
+            </button>
+          </div>
+        </div>
+        <div id="dev-table-wrapper" class="flex-1 overflow-auto scroll px-5 py-4"></div>
+      </section>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL 1: ACCESO MODO DESARROLLADOR (CLAVE) -->
+<div id="dev-auth-modal" class="hidden fixed inset-0 z-[100] bg-black/75 backdrop-blur-sm flex items-center justify-center p-4">
+  <div class="panel w-full max-w-sm p-6 border border-amber-500/40 shadow-2xl fade">
+    <div class="flex items-center justify-between mb-4">
+      <h3 class="text-lg font-bold text-white flex items-center gap-2">
+        <i class="fa-solid fa-shield-halved text-amber-400"></i> Modo Desarrollador
+      </h3>
+      <button onclick="closeDevAuthModal()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <p class="text-xs text-slate-400 mb-4">Ingresa la clave de acceso para habilitar la edición de registros, creación de puntos y exportación del Excel modificado.</p>
+    <input type="password" id="dev-pass-input" placeholder="Clave de acceso..." onkeydown="if(event.key==='Enter') verifyDevPassword()" class="w-full px-3.5 py-2.5 text-sm rounded-xl bg-black/40 border border-white/15 outline-none focus:border-amber-400 mb-3">
+    <p id="dev-pass-error" class="hidden text-xs text-red-400 mb-3"><i class="fa-solid fa-circle-exclamation mr-1"></i>Clave incorrecta.</p>
+    <div class="flex justify-end gap-2">
+      <button onclick="closeDevAuthModal()" class="chip px-4 py-2 text-xs font-semibold hover:bg-white/10">Cancelar</button>
+      <button onclick="verifyDevPassword()" class="px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-bold transition">Desbloquear</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL 2: EDITAR / CREAR REGISTRO COMPLETO -->
+<div id="record-editor-modal" class="hidden fixed inset-0 z-[100] bg-black/75 backdrop-blur-sm flex items-center justify-center p-4">
+  <div class="panel w-full max-w-3xl max-h-[88vh] flex flex-col border border-amber-500/40 shadow-2xl fade">
+    <div class="flex items-center justify-between px-6 py-4 border-b border-white/10">
+      <div>
+        <h3 id="editor-modal-title" class="text-lg font-bold text-white">Editar Registro</h3>
+        <p class="text-xs text-slate-400">Los cambios actualizarán todas las vistas y se incluirán al exportar el Excel.</p>
+      </div>
+      <button onclick="closeRecordEditor()" class="text-slate-400 hover:text-white text-lg"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div id="editor-fields-container" class="flex-1 overflow-y-auto scroll p-6 grid grid-cols-1 sm:grid-cols-2 gap-4"></div>
+    <div class="px-6 py-4 border-t border-white/10 bg-black/20 flex flex-wrap items-center justify-between gap-2">
+      <button id="btn-delete-record" onclick="deleteCurrentRecord()" class="px-3.5 py-2 rounded-xl bg-red-500/15 border border-red-500/40 text-red-300 hover:bg-red-500/25 text-xs font-bold transition">
+        <i class="fa-solid fa-trash mr-1"></i>Eliminar fila
+      </button>
+      <div class="flex gap-2 ml-auto">
+        <button onclick="closeRecordEditor()" class="chip px-4 py-2 text-xs font-semibold hover:bg-white/10">Cancelar</button>
+        <button onclick="saveRecordChanges()" class="px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold shadow-lg transition">
+          <i class="fa-solid fa-floppy-disk mr-1"></i>Guardar Cambios
+        </button>
+      </div>
     </div>
   </div>
 </div>
@@ -321,6 +418,16 @@ body{font-family:Inter,ui-sans-serif,system-ui,sans-serif;color:var(--text-main)
 <div id="toast" class="toast flex items-center gap-2 text-sm"><i class="fa-solid fa-check text-emerald-400"></i><span id="toast-msg"></span></div>
 
 <script>
+// ==========================================
+// CONFIGURACIÓN MODO DESARROLLADOR
+// ==========================================
+const DEV_PASSWORD = "SKYNET2026"; // <-- Cambia aquí tu clave si deseas otra
+let isDevMode = false;
+let devEditCount = 0;
+let loadedFileName = "MDZ_SKYNET_BASE.xlsx";
+let excelHeaders = [];
+let editingRowIndex = null;
+
 let excelData=[];
 const $=id=>document.getElementById(id);
 const fileInput=$("file-upload"),dropZone=$("drop-zone"),searchInput=$("search-input"),searchBtn=$("search-btn"),
@@ -332,6 +439,283 @@ let currentTechRows = [];
 let currentTechGroup = 'ALL'; 
 let maintSchedule = null;
 
+// ==========================================
+// LÓGICA DE AUTENTICACIÓN MODO DEV
+// ==========================================
+function toggleDevModal() {
+  if (isDevMode) {
+    // Desactivar modo desarrollador
+    isDevMode = false;
+    updateDevUI();
+    showToast("Modo Desarrollador desactivado");
+    if (!$("view-dev").classList.contains("hidden")) setView("filter");
+    refreshAllViews();
+    return;
+  }
+  $("dev-pass-input").value = "";
+  $("dev-pass-error").classList.add("hidden");
+  $("dev-auth-modal").classList.remove("hidden");
+  setTimeout(() => $("dev-pass-input").focus(), 50);
+}
+
+function closeDevAuthModal() {
+  $("dev-auth-modal").classList.add("hidden");
+}
+
+function verifyDevPassword() {
+  const val = $("dev-pass-input").value.trim();
+  if (val === DEV_PASSWORD) {
+    isDevMode = true;
+    closeDevAuthModal();
+    updateDevUI();
+    showToast("Modo Desarrollador desbloqueado");
+    refreshAllViews();
+  } else {
+    $("dev-pass-error").classList.remove("hidden");
+  }
+}
+
+function updateDevUI() {
+  $("dev-badge").classList.toggle("hidden", !isDevMode);
+  $("nav-dev-btn").classList.toggle("hidden", !isDevMode);
+  $("dev-header-actions").classList.toggle("hidden", !isDevMode || excelData.length === 0);
+  $("btn-add-record-filter").classList.toggle("hidden", !isDevMode || excelData.length === 0);
+
+  const lockIcon = $("dev-lock-icon");
+  const lockBtn = $("dev-lock-btn");
+  if (isDevMode) {
+    lockIcon.className = "fa-solid fa-unlock text-amber-400";
+    lockBtn.title = "Desactivar Modo Desarrollador";
+  } else {
+    lockIcon.className = "fa-solid fa-lock";
+    lockBtn.title = "Modo Desarrollador (Bloqueado)";
+  }
+  updateEditCounterBadge();
+}
+
+function updateEditCounterBadge() {
+  const badge = $("dev-changes-badge");
+  if (devEditCount > 0 && isDevMode) {
+    badge.textContent = `${devEditCount} ${devEditCount === 1 ? 'edición' : 'ediciones'}`;
+    badge.classList.remove("hidden");
+  } else {
+    badge.classList.add("hidden");
+  }
+}
+
+function registerEdit() {
+  devEditCount++;
+  updateEditCounterBadge();
+  maintSchedule = null;
+  priceSig = "";
+  $("map-tech-filter").dataset.hash = "";
+  updateGlobalStats();
+}
+
+function refreshAllViews() {
+  if (!excelData.length) return;
+  if (!$("view-filter").classList.contains("hidden")) {
+    if (searchInput.value.trim()) executeSearch();
+  }
+  if (!$("view-map").classList.contains("hidden")) renderMap();
+  if (!$("view-tech").classList.contains("hidden")) renderTech();
+  if (!$("view-maint").classList.contains("hidden")) renderMaintSetup();
+  if (!$("view-price").classList.contains("hidden")) renderPrice();
+  if (!$("view-dev").classList.contains("hidden")) renderDevTable();
+}
+
+// ==========================================
+// MODAL DE EDICIÓN / CREACIÓN DE FILA
+// ==========================================
+function openRecordEditor(rowIndex) {
+  if (!isDevMode) return;
+  editingRowIndex = rowIndex;
+  const row = excelData[rowIndex];
+  if (!row) return;
+
+  $("editor-modal-title").textContent = `Editar Registro #${rowIndex + 1}`;
+  $("btn-delete-record").classList.remove("hidden");
+
+  const keys = excelHeaders.length ? excelHeaders : Object.keys(row);
+  $("editor-fields-container").innerHTML = keys.map(k => `
+    <div>
+      <label class="block text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">${escapeHtml(k)}</label>
+      <input type="text" data-col="${escapeHtml(k)}" value="${escapeHtml(row[k] ?? '')}"
+        class="dev-modal-field w-full px-3 py-2 text-xs rounded-xl bg-black/40 border border-white/10 text-white outline-none focus:border-amber-400 transition">
+    </div>
+  `).join("");
+
+  $("record-editor-modal").classList.remove("hidden");
+}
+
+function openAddRecordModal() {
+  if (!isDevMode) return;
+  if (!excelData.length) {
+    showToast("Carga primero un archivo Excel base");
+    return;
+  }
+  editingRowIndex = -1; // Indica creación de nuevo registro
+  $("editor-modal-title").textContent = "Agregar Nuevo Punto al Excel";
+  $("btn-delete-record").classList.add("hidden");
+
+  const keys = excelHeaders.length ? excelHeaders : Object.keys(excelData[0]);
+  $("editor-fields-container").innerHTML = keys.map(k => `
+    <div>
+      <label class="block text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">${escapeHtml(k)}</label>
+      <input type="text" data-col="${escapeHtml(k)}" value="" placeholder="Ingresar ${escapeHtml(k)}..."
+        class="dev-modal-field w-full px-3 py-2 text-xs rounded-xl bg-black/40 border border-white/10 text-white outline-none focus:border-amber-400 transition">
+    </div>
+  `).join("");
+
+  $("record-editor-modal").classList.remove("hidden");
+}
+
+function closeRecordEditor() {
+  $("record-editor-modal").classList.add("hidden");
+  editingRowIndex = null;
+}
+
+function saveRecordChanges() {
+  const inputs = document.querySelectorAll(".dev-modal-field");
+  if (editingRowIndex === -1) {
+    const newRow = {};
+    inputs.forEach(inp => { newRow[inp.dataset.col] = inp.value; });
+    const pk = findColumn(newRow, ["PUNTOS", "PUNTO"]);
+    if (pk && isEmpty(newRow[pk])) {
+      showToast("El campo PUNTOS es obligatorio");
+      return;
+    }
+    excelData.unshift(newRow);
+    registerEdit();
+    closeRecordEditor();
+    refreshAllViews();
+    showToast("Nuevo punto agregado a la base");
+  } else if (editingRowIndex !== null && excelData[editingRowIndex]) {
+    inputs.forEach(inp => {
+      excelData[editingRowIndex][inp.dataset.col] = inp.value;
+    });
+    registerEdit();
+    closeRecordEditor();
+    refreshAllViews();
+    showToast("Registro actualizado correctamente");
+  }
+}
+
+function deleteCurrentRecord() {
+  if (editingRowIndex === null || editingRowIndex < 0) return;
+  if (!confirm("¿Seguro que deseas eliminar este registro de la base?")) return;
+  excelData.splice(editingRowIndex, 1);
+  registerEdit();
+  closeRecordEditor();
+  refreshAllViews();
+  showToast("Registro eliminado");
+}
+
+// ==========================================
+// VISTA TABLA EDITOR EXCEL (MODO DEV)
+// ==========================================
+function renderDevTable() {
+  const wrapper = $("dev-table-wrapper");
+  if (!excelData.length) {
+    wrapper.innerHTML = msg("fa-table", "Sin datos cargados", "Sube un archivo Excel para editarlo.");
+    return;
+  }
+  const q = normalizeText($("dev-table-search").value);
+  const cols = excelHeaders.length ? excelHeaders : Object.keys(excelData[0]);
+
+  const rowsWithIdx = excelData
+    .map((r, idx) => ({ r, idx }))
+    .filter(({ r }) => !q || Object.values(r).some(v => normalizeText(v).includes(q)));
+
+  if (!rowsWithIdx.length) {
+    wrapper.innerHTML = msg("fa-magnifying-glass", "Sin coincidencias", "No hay filas que coincidan con el filtro.");
+    return;
+  }
+
+  wrapper.innerHTML = `
+    <div class="rounded-2xl border border-white/10 overflow-auto max-h-full scroll">
+      <table class="dev-table w-full text-left border-collapse text-xs">
+        <thead>
+          <tr>
+            <th class="p-2.5 text-slate-400 font-bold w-16 text-center">Acción</th>
+            ${cols.map(c => `<th class="p-2.5 text-slate-300 font-bold uppercase tracking-wider whitespace-nowrap">${escapeHtml(c)}</th>`).join("")}
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-white/5">
+          ${rowsWithIdx.map(({ r, idx }) => `
+            <tr class="hover:bg-white/[0.03] transition">
+              <td class="p-1.5 text-center whitespace-nowrap">
+                <button onclick="openRecordEditor(${idx})" class="px-2 py-1 rounded bg-amber-500/15 text-amber-300 hover:bg-amber-500/30 mr-1" title="Editar en ficha">
+                  <i class="fa-solid fa-pen"></i>
+                </button>
+                <button onclick="deleteRowFromTable(${idx})" class="px-2 py-1 rounded bg-red-500/15 text-red-300 hover:bg-red-500/30" title="Eliminar fila">
+                  <i class="fa-solid fa-trash"></i>
+                </button>
+              </td>
+              ${cols.map(c => `
+                <td class="p-1">
+                  <input class="dev-cell-input text-slate-200" value="${escapeHtml(r[c] ?? '')}"
+                    onchange="updateCellDirect(${idx}, '${c.replace(/\\/g, "\\\\").replace(/'/g, "\\'")}', this.value)">
+                </td>
+              `).join("")}
+            </tr>
+          `).join("")}
+        </tbody>
+      </table>
+    </div>
+  `;
+}
+
+function updateCellDirect(rowIdx, colName, newVal) {
+  if (!excelData[rowIdx]) return;
+  excelData[rowIdx][colName] = newVal;
+  registerEdit();
+  showToast("Celda actualizada");
+}
+
+function deleteRowFromTable(rowIdx) {
+  if (!confirm("¿Eliminar esta fila del Excel?")) return;
+  excelData.splice(rowIdx, 1);
+  registerEdit();
+  renderDevTable();
+  showToast("Fila eliminada");
+}
+
+// ==========================================
+// EXPORTACIÓN A EXCEL (.XLSX)
+// ==========================================
+function exportModifiedExcel() {
+  if (!excelData.length) {
+    showToast("No hay datos para exportar");
+    return;
+  }
+  try {
+    const cols = excelHeaders.length ? excelHeaders : Object.keys(excelData[0]);
+    const cleanRows = excelData.map(r => {
+      const obj = {};
+      cols.forEach(c => { obj[c] = r[c] !== undefined ? r[c] : ""; });
+      return obj;
+    });
+
+    const ws = XLSX.utils.json_to_sheet(cleanRows, { header: cols });
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "SKYNET_ACTUALIZADO");
+
+    const baseName = loadedFileName.replace(/\.(xlsx|xls|csv)$/i, "");
+    const dateStamp = new Date().toISOString().slice(0, 10);
+    const outName = `${baseName}_EDITADO_${dateStamp}.xlsx`;
+
+    XLSX.writeFile(wb, outName);
+    showToast(`Exportado: ${outName}`);
+  } catch (err) {
+    console.error(err);
+    showToast("Error al generar el archivo Excel");
+  }
+}
+
+// ==========================================
+// FUNCIONES ORIGINALES DE SKYNET
+// ==========================================
 function toggleColor() {
   document.body.classList.toggle("color-red");
   if(map && ($("map-color").value==="tec" || $("map-mode").value==="cluster")) renderMap();
@@ -355,10 +739,11 @@ const msg=(icon,title,sub)=>`<div class="text-center py-20 text-slate-500"><i cl
 fileInput.addEventListener("change",handleFile);
 function handleFile(e){
   const file=e.target.files[0];if(!file)return;
+  loadedFileName = file.name;
   ["file-status-container","file-error-container","global-stats-container"].forEach(i=>$(i).classList.add("hidden"));
   techSummary.classList.add("hidden");
   
-  $("logo-container").className = "relative inline-block mt-2"; 
+  $("logo-container").className = "relative inline-block mt-1"; 
   
   resultsContainer.innerHTML=msg("fa-circle-notch fa-spin text-sky-400","Procesando archivo...","Analizando registros y columnas.");
   const reader=new FileReader();
@@ -371,18 +756,21 @@ function handleFile(e){
       let hi=0,best=0;const kw=["PUNTOS","PUNTO","IMEI","ID","TECNOLOGIA","LATITUD","LONGITUD"];
       for(let i=0;i<Math.min(20,raw.length);i++){let s=0;(raw[i]||[]).forEach(c=>{const v=normalizeText(c);if(v)kw.forEach(k=>{if(v.includes(normalizeText(k)))s++})});if(s>best){best=s;hi=i}}
       const headers=raw[hi].map((h,i)=>(String(h||"").trim()||`COLUMNA_${i+1}`).toUpperCase());
+      excelHeaders = headers;
       excelData=raw.slice(hi+1).map(r=>{const o={};headers.forEach((h,i)=>o[h]=r[i]!==undefined?r[i]:"");return o})
         .filter(r=>{const k=findColumn(r,["PUNTOS","PUNTO"]);return k&&!isEmpty(r[k])});
       if(!excelData.length)throw new Error("No se encontraron registros válidos. Verifica que exista una columna PUNTOS.");
+      
+      devEditCount = 0;
+      updateDevUI();
+
       $("file-name").textContent=file.name;
       $("file-status-container").classList.remove("hidden");
-      
       $("logo-container").classList.add("anim-filter");
       
       searchInput.disabled=false;searchBtn.disabled=false;
       updateGlobalStats();
       $("map-tech-filter").dataset.hash = ""; 
-      
       maintSchedule = null;
 
       resultsContainer.innerHTML=msg("fa-database text-sky-400","Base SKYNET lista",`${excelData.length.toLocaleString()} registros cargados. Usa el buscador.`);
@@ -394,7 +782,7 @@ function handleFile(e){
 }
 function showFileError(m){
   $("file-error-msg").textContent=m;$("file-error-container").classList.remove("hidden");
-  $("logo-container").className = "relative inline-block mt-2";
+  $("logo-container").className = "relative inline-block mt-1";
   searchInput.disabled=true;searchBtn.disabled=true;
   resultsContainer.innerHTML=msg("fa-file-circle-xmark text-red-400","No se pudo cargar el archivo","Revisa el formato e inténtalo nuevamente.");
 }
@@ -425,17 +813,22 @@ function executeSearch(){
   const q=normalizeText(searchInput.value);
   resultsCount.classList.add("hidden");techSummary.classList.add("hidden");
   if(!q){resultsContainer.innerHTML=msg("fa-database text-sky-400","Base SKYNET lista",`${excelData.length.toLocaleString()} registros cargados. Usa el buscador.`);return}
-  const m=excelData.filter(r=>Object.values(r).some(v=>normalizeText(v).includes(q)));
-  if(!m.length){resultsContainer.innerHTML=msg("fa-face-frown-open","No hay resultados",`Sin coincidencias para "${escapeHtml(searchInput.value)}"`);return}
-  resultsCount.textContent=`${m.length.toLocaleString()} encontrado${m.length!==1?"s":""}`;resultsCount.classList.remove("hidden");
-  const c={};m.forEach(r=>{const k=findColumn(r,["TECNOLOGIA"]);const t=k&&!isEmpty(r[k])?String(r[k]).trim().toUpperCase():"SIN ESPECIFICAR";c[t]=(c[t]||0)+1});
+  
+  // Mantenemos el índice real de excelData para que el editor sepa qué fila exacta modificar
+  const matchedWithIndex = excelData
+    .map((row, realIdx) => ({ row, realIdx }))
+    .filter(({ row }) => Object.values(row).some(v => normalizeText(v).includes(q)));
+
+  if(!matchedWithIndex.length){resultsContainer.innerHTML=msg("fa-face-frown-open","No hay resultados",`Sin coincidencias para "${escapeHtml(searchInput.value)}"`);return}
+  resultsCount.textContent=`${matchedWithIndex.length.toLocaleString()} encontrado${matchedWithIndex.length!==1?"s":""}`;resultsCount.classList.remove("hidden");
+  const c={};matchedWithIndex.forEach(({row:r})=>{const k=findColumn(r,["TECNOLOGIA"]);const t=k&&!isEmpty(r[k])?String(r[k]).trim().toUpperCase():"SIN ESPECIFICAR";c[t]=(c[t]||0)+1});
   techBadges.innerHTML=Object.entries(c).sort((a,b)=>b[1]-a[1]).map(([t,n])=>`<span class="chip px-3 py-1.5 text-xs font-semibold"><i class="fa-solid fa-tower-broadcast text-sky-400 mr-1"></i>${escapeHtml(t)} <span class="text-sky-400 ml-1">${n}</span></span>`).join("");
   techSummary.classList.remove("hidden");
-  renderResults(m);
+  renderResults(matchedWithIndex);
 }
 
-function renderResults(matches){
-  resultsContainer.innerHTML=matches.map((row,index)=>{
+function renderResults(matchedItems){
+  resultsContainer.innerHTML=matchedItems.map(({row, realIdx},index)=>{
     const K=p=>findColumn(row,p);
     const pk=K(["PUNTOS","PUNTO"]),tk=K(["TECNOLOGIA"]),ik=K(["IMEI RESETEADOR","IMEI"]),sk=K(["SIM RESETEADOR","SIM MODEM","SIM"]),
     ok=K(["OBSERVACION"]),lk=K(["LATITUD","LAT"]),gk=K(["LONGITUD","LON","LNG"]),yk=K(["TIPO"]);
@@ -459,6 +852,9 @@ function renderResults(matches){
           <button onclick="copyToClipboard('${safe}')" class="px-4 text-xs font-semibold text-white bg-${col}-500/80 hover:bg-${col}-500 active:scale-95 transition" title="Copiar comando"><i class="fa-regular fa-copy mr-1"></i>Copiar</button>
         </div></div>`}).join("")
       :`<div class="p-3 rounded-xl bg-amber-500/10 border border-amber-400/30 text-xs text-amber-200"><b>Comandos no registrados.</b> El prefijo del IMEI ${escapeHtml(imei)} no coincide con un equipo configurado.</div>`;
+
+    const devEditBtn = isDevMode ? `<button onclick="openRecordEditor(${realIdx})" class="px-3 py-1.5 rounded-xl bg-amber-500/20 border border-amber-400/40 text-amber-300 hover:bg-amber-500/30 text-xs font-bold transition mr-2"><i class="fa-solid fa-pen-to-square mr-1"></i>Editar Registro</button>` : "";
+
     return `<article class="card fade overflow-hidden">
       <div class="p-5 flex flex-col xl:flex-row xl:justify-between gap-4">
         <div class="min-w-0">
@@ -480,7 +876,10 @@ function renderResults(matches){
       ${hasObs?`<div class="mx-5 mb-4 px-3 py-2.5 rounded-lg bg-red-500/10 border-l-[3px] border-red-400 flex gap-2.5"><i class="fa-solid fa-triangle-exclamation text-red-400 mt-0.5"></i><div><p class="text-[11px] font-semibold text-red-300">Observación</p><p class="text-xs text-red-100 mt-0.5 break-words">${escapeHtml(obs)}</p></div></div>`:""}
       <div class="px-5 py-3 flex justify-between items-center border-t border-white/5 bg-black/20">
         <span class="text-xs text-slate-400">Detalles operativos</span>
-        <button onclick="toggleCard(${index})" class="chip px-3 py-1.5 text-xs font-semibold hover:border-sky-400 transition"><span id="toggle-text-${index}">Desplegar</span> <i id="toggle-icon-${index}" class="fa-solid fa-chevron-down ml-1"></i></button>
+        <div class="flex items-center">
+          ${devEditBtn}
+          <button onclick="toggleCard(${index})" class="chip px-3 py-1.5 text-xs font-semibold hover:border-sky-400 transition"><span id="toggle-text-${index}">Desplegar</span> <i id="toggle-icon-${index}" class="fa-solid fa-chevron-down ml-1"></i></button>
+        </div>
       </div>
       <div id="card-details-${index}" class="hidden border-t border-white/5">
         <div class="p-5 grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -541,10 +940,10 @@ function setView(v){
   $("side").classList.toggle("hidden",v!=="filter");
   $("view-filter").classList.toggle("hidden",v!=="filter");
   
-  ["map","tech","antenna","maint","price"].forEach(x=>$("view-"+x).classList.toggle("hidden",v!==x));
+  ["map","tech","antenna","maint","price","dev"].forEach(x=>$("view-"+x).classList.toggle("hidden",v!==x));
   
   const lc = $("logo-container");
-  lc.className = "relative inline-block mt-2"; 
+  lc.className = "relative inline-block mt-1"; 
   if (excelData.length > 0) {
     lc.classList.add(`anim-${v}`);
   }
@@ -553,6 +952,7 @@ function setView(v){
   if(v==="tech")renderTech();
   if(v==="maint") renderMaintSetup();
   if(v==="price")renderPrice();
+  if(v==="dev")renderDevTable();
 }
 
 function getSector(lat, lon) {
@@ -624,7 +1024,6 @@ function renderMap(){
   
   let src=$("map-mode").value==="filter"?filtered():excelData;
 
-  // 1. Filtrar primero el Tipo de Equipo
   const typeFilter = $("map-type-filter") ? $("map-type-filter").value : "all";
   if (typeFilter !== "all") {
       src = src.filter(r => {
@@ -635,7 +1034,6 @@ function renderMap(){
       });
   }
 
-  // 2. Agrupar Punto Único y Concatenar Tecnologías alfabéticamente
   const isUnique = $("map-unique-filter") ? $("map-unique-filter").value === "unique" : true;
   if(isUnique && excelData.length > 0) {
       const P = findColumn(excelData[0], ["PUNTOS", "PUNTO"]);
@@ -667,10 +1065,7 @@ function renderMap(){
       src = Array.from(uniqueMap.values());
   }
 
-  // 3. Extraer TODAS las combinaciones ACTUALES
   const currentTechs = Array.from(new Set(src.map(r => info(r).tec))).sort();
-
-  // 4. Llenar el Dropdown con las combinaciones exactas
   const techSelect = $("map-tech-filter");
   const currentSelectedTech = techSelect.value;
   const techsHash = currentTechs.join("|");
@@ -679,8 +1074,6 @@ function renderMap(){
       techSelect.innerHTML = `<option value="all">Todas las tecnologías / combinaciones</option>` + 
                              currentTechs.map(t => `<option value="${escapeHtml(t)}">${escapeHtml(t)}</option>`).join("");
       techSelect.dataset.hash = techsHash;
-      
-      // Mantiene el filtro si la combinación aún existe, sino vuelve a "all"
       if (currentTechs.includes(currentSelectedTech)) {
           techSelect.value = currentSelectedTech;
       } else {
@@ -688,7 +1081,6 @@ function renderMap(){
       }
   }
 
-  // 5. Aplicar los Filtros del Dropdown
   if (techSelect.value !== "all") {
       src = src.filter(r => info(r).tec === techSelect.value);
   }
@@ -697,13 +1089,11 @@ function renderMap(){
       src = src.filter(r => info(r).sector === $("map-sector-filter").value);
   }
 
-  // 6. Colores consistentes y de alto contraste
   const colorMode = $("map-color").value; 
   const isRed = document.body.classList.contains("color-red");
   const hexPrimary = isRed ? "#ef4444" : "#3b9bff";
 
   const getTechColor = (t) => { 
-      // Calculamos sobre currentTechs para que los colores no varíen al filtrar
       const idx = currentTechs.indexOf(t); 
       if (idx === -1) return hexPrimary;
       const hue = (idx * 137.5) % 360;
@@ -750,7 +1140,7 @@ function renderMap(){
         groups.push(group);
     }
 
-    groups.forEach((g, gIdx) => {
+    groups.forEach((g) => {
         let hull = [];
         if (g.length > 2) {
             let clat = g.reduce((s, p) => s + p.lat, 0) / g.length;
@@ -902,8 +1292,7 @@ function generateSchedule() {
     });
 
     let fixedPoints = Array.from(uniqueMap.values()).map(info).filter(i => !i.movil && i.ok);
-    
-    fixedPoints.sort((a,b) => b.lat - a.lat); // Ordenados de Norte a Sur
+    fixedPoints.sort((a,b) => b.lat - a.lat);
     const total = fixedPoints.length;
     
     const POINTS_PER_MONTH = 4;
@@ -918,7 +1307,6 @@ function generateSchedule() {
         let chunk = fixedPoints.slice(i, i + POINTS_PER_MONTH); 
         let currentMonthName = monthNames[startMonthIndex] + " " + startYear;
         let currentMonthId = `${startYear}-${startMonthIndex}`;
-        
         let weeks = chunk.map(point => [point]); 
         
         mths.push({
