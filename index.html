@@ -468,6 +468,10 @@ let loadedFileName = "MDZ_SKYNET_BASE.xlsx";
 let excelHeaders = [];
 let editingRowIndex = null;
 
+// Filtro rápido por tecnología en resultados
+let activeSearchTechFilter = "ALL";
+let lastMatchedItems = [];
+
 let excelData=[];
 const $=id=>document.getElementById(id);
 const fileInput=$("file-upload"),dropZone=$("drop-zone"),searchInput=$("search-input"),searchBtn=$("search-btn"),
@@ -554,7 +558,7 @@ function registerEdit() {
 function refreshAllViews() {
   if (!excelData.length) return;
   if (!$("view-filter").classList.contains("hidden")) {
-    if (searchInput.value.trim()) executeSearch();
+    if (searchInput.value.trim()) executeSearch(true);
   }
   if (!$("view-map").classList.contains("hidden")) renderMap();
   if (!$("view-tech").classList.contains("hidden")) renderTech();
@@ -872,24 +876,89 @@ function getEquipmentInfo(imei){
   return{modelo:"Desconocido",comandos:[]};
 }
 
-function executeSearch(){
+// ==========================================
+// BÚSQUEDA + FILTRO POR TECNOLOGÍA + DESPLEGAR
+// ==========================================
+function getRowTech(r) {
+  const k = findColumn(r, ["TECNOLOGIA"]);
+  return k && !isEmpty(r[k]) ? String(r[k]).trim().toUpperCase() : "SIN ESPECIFICAR";
+}
+
+function setSearchTechFilter(tech) {
+  activeSearchTechFilter = tech;
+  renderTechFilterBadges();
+  applySearchTechFilter();
+}
+
+function renderTechFilterBadges() {
+  const c = {};
+  lastMatchedItems.forEach(({ row: r }) => {
+    const t = getRowTech(r);
+    c[t] = (c[t] || 0) + 1;
+  });
+
+  const entries = Object.entries(c).sort((a, b) => b[1] - a[1]);
+  const allActive = activeSearchTechFilter === "ALL";
+  const allBtn = `<button onclick="setSearchTechFilter('ALL')" class="px-3 py-1.5 rounded-xl text-xs font-bold border transition cursor-pointer ${allActive ? 'bg-[var(--primary)] text-white border-[var(--primary)] shadow-md' : 'chip text-slate-300 hover:border-[var(--primary)]'}">
+    Todos <span class="ml-1 opacity-80">${lastMatchedItems.length}</span>
+  </button>`;
+
+  const badgesHtml = entries.map(([t, n]) => {
+    const isAct = activeSearchTechFilter === t;
+    const safeT = t.replace(/\\/g, "\\\\").replace(/'/g, "\\'");
+    return `<button onclick="setSearchTechFilter('${safeT}')" class="px-3 py-1.5 rounded-xl text-xs font-bold border transition cursor-pointer ${isAct ? 'bg-[var(--primary)] text-white border-[var(--primary)] shadow-md' : 'chip text-slate-200 hover:border-[var(--primary)]'}">
+      <i class="fa-solid fa-tower-broadcast ${isAct ? 'text-white' : 'text-sky-400'} mr-1"></i>${escapeHtml(t)} <span class="${isAct ? 'text-white' : 'text-sky-400'} ml-1">${n}</span>
+    </button>`;
+  }).join("");
+
+  techBadges.innerHTML = (entries.length > 1 ? allBtn : "") + badgesHtml;
+}
+
+function applySearchTechFilter() {
+  const filteredItems = activeSearchTechFilter === "ALL"
+    ? lastMatchedItems
+    : lastMatchedItems.filter(({ row }) => getRowTech(row) === activeSearchTechFilter);
+
+  resultsCount.textContent = `${filteredItems.length.toLocaleString()} encontrado${filteredItems.length !== 1 ? "s" : ""}`;
+  resultsCount.classList.remove("hidden");
+  renderResults(filteredItems);
+}
+
+function executeSearch(keepFilter = false){
   const q=normalizeText(searchInput.value);
   resultsCount.classList.add("hidden");techSummary.classList.add("hidden");
-  if(!q){resultsContainer.innerHTML=msg("fa-database text-sky-400","Base SKYNET lista",`${excelData.length.toLocaleString()} registros cargados. Usa el buscador.`);return}
+  if(!q){
+    lastMatchedItems = [];
+    activeSearchTechFilter = "ALL";
+    resultsContainer.innerHTML=msg("fa-database text-sky-400","Base SKYNET lista",`${excelData.length.toLocaleString()} registros cargados. Usa el buscador.`);
+    return;
+  }
   
-  const matchedWithIndex = excelData
+  lastMatchedItems = excelData
     .map((row, realIdx) => ({ row, realIdx }))
     .filter(({ row }) => Object.values(row).some(v => normalizeText(v).includes(q)));
 
-  if(!matchedWithIndex.length){resultsContainer.innerHTML=msg("fa-face-frown-open","No hay resultados",`Sin coincidencias para "${escapeHtml(searchInput.value)}"`);return}
-  resultsCount.textContent=`${matchedWithIndex.length.toLocaleString()} encontrado${matchedWithIndex.length!==1?"s":""}`;resultsCount.classList.remove("hidden");
-  const c={};matchedWithIndex.forEach(({row:r})=>{const k=findColumn(r,["TECNOLOGIA"]);const t=k&&!isEmpty(r[k])?String(r[k]).trim().toUpperCase():"SIN ESPECIFICAR";c[t]=(c[t]||0)+1});
-  techBadges.innerHTML=Object.entries(c).sort((a,b)=>b[1]-a[1]).map(([t,n])=>`<span class="chip px-3 py-1.5 text-xs font-semibold"><i class="fa-solid fa-tower-broadcast text-sky-400 mr-1"></i>${escapeHtml(t)} <span class="text-sky-400 ml-1">${n}</span></span>`).join("");
+  if(!lastMatchedItems.length){
+    activeSearchTechFilter = "ALL";
+    resultsContainer.innerHTML=msg("fa-face-frown-open","No hay resultados",`Sin coincidencias para "${escapeHtml(searchInput.value)}"`);
+    return;
+  }
+
+  // Si no se mantiene el filtro o la tecnología seleccionada ya no existe en los nuevos resultados, volver a ALL
+  const availableTechs = new Set(lastMatchedItems.map(({ row }) => getRowTech(row)));
+  if (!keepFilter || (activeSearchTechFilter !== "ALL" && !availableTechs.has(activeSearchTechFilter))) {
+    activeSearchTechFilter = "ALL";
+  }
+
+  renderTechFilterBadges();
   techSummary.classList.remove("hidden");
-  renderResults(matchedWithIndex);
+  applySearchTechFilter();
 }
 
 function renderResults(matchedItems){
+  // Si solo hay 1 resultado filtrado (ej: elegiste DETEKTOR EVAL), se despliega automáticamente para comodidad
+  const autoExpand = matchedItems.length === 1;
+
   resultsContainer.innerHTML=matchedItems.map(({row, realIdx},index)=>{
     const K=p=>findColumn(row,p);
     const pk=K(["PUNTOS","PUNTO"]),tk=K(["TECNOLOGIA"]),ik=K(["IMEI RESETEADOR","IMEI"]),sk=K(["SIM RESETEADOR","SIM MODEM","SIM"]),
@@ -915,35 +984,39 @@ function renderResults(matchedItems){
         </div></div>`}).join("")
       :`<div class="p-3.5 rounded-xl bg-amber-500/15 border border-amber-400/30 text-xs text-amber-100"><b>Comandos no registrados.</b> El prefijo del IMEI ${escapeHtml(imei)} no coincide con un equipo configurado.</div>`;
 
-    const devEditBtn = isDevMode ? `<button onclick="openRecordEditor(${realIdx})" class="px-3 py-1.5 rounded-xl bg-amber-500/20 border border-amber-400/40 text-amber-300 hover:bg-amber-500/30 text-xs font-bold transition mr-2"><i class="fa-solid fa-pen-to-square mr-1"></i>Editar Registro</button>` : "";
+    const devEditBtn = isDevMode ? `<button onclick="openRecordEditor(${realIdx})" class="px-3 py-1.5 rounded-xl bg-amber-500/20 border border-amber-400/40 text-amber-300 hover:bg-amber-500/30 text-xs font-bold transition mr-2"><i class="fa-solid fa-pen-to-square mr-1"></i>Editar</button>` : "";
 
     return `<article class="card fade overflow-hidden">
-      <div class="grid grid-cols-1 xl:grid-cols-12">
-        <!-- COLUMNA IZQUIERDA: Encabezado, Comandos e IMEI/SIM debajo -->
-        <div class="xl:col-span-7 flex flex-col justify-between border-b xl:border-b-0 xl:border-r border-white/10">
-          <div>
-            <div class="p-5">
-              <div class="flex items-center justify-between gap-2 mb-2">
-                <div class="flex items-center gap-2 text-[11px] font-semibold">
-                  <span class="px-2.5 py-1 rounded-md border ${movil?"bg-indigo-500/20 text-indigo-200 border-indigo-400/40":"bg-emerald-500/20 text-emerald-200 border-emerald-400/40"}"><i class="fa-solid ${movil?"fa-truck-fast":"fa-tower-cell"} mr-1"></i>${movil?"Móvil / Rastreo":"Torre / Fija"}</span>
-                  <span class="text-slate-400">#${index+1}</span>
-                </div>
-                ${devEditBtn}
-              </div>
-              <h3 class="text-2xl font-bold text-white break-words tracking-tight">${escapeHtml(punto)}</h3>
-              <div class="flex flex-wrap gap-2 mt-3 text-xs font-semibold">
-                <span class="chip px-3 py-1.5 text-sky-300"><i class="fa-solid fa-microchip mr-1.5"></i>${escapeHtml(eq.modelo)}</span>
-                <span class="chip px-3 py-1.5 text-emerald-300"><i class="fa-solid fa-tower-broadcast mr-1.5"></i>${escapeHtml(tec)}</span>
-              </div>
-            </div>
+      <!-- CABECERA COMPACTA SIEMPRE VISIBLE + BOTÓN DESPLEGAR -->
+      <div class="p-5 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+        <div class="min-w-0">
+          <div class="flex items-center gap-2 mb-2 text-[11px] font-semibold">
+            <span class="px-2.5 py-1 rounded-md border ${movil?"bg-indigo-500/20 text-indigo-200 border-indigo-400/40":"bg-emerald-500/20 text-emerald-200 border-emerald-400/40"}"><i class="fa-solid ${movil?"fa-truck-fast":"fa-tower-cell"} mr-1"></i>${movil?"Móvil / Rastreo":"Torre / Fija"}</span>
+            <span class="text-slate-400">#${index+1}</span>
+          </div>
+          <h3 class="text-2xl font-bold text-white break-words tracking-tight">${escapeHtml(punto)}</h3>
+          <div class="flex flex-wrap gap-2 mt-3 text-xs font-semibold">
+            <span class="chip px-3 py-1.5 text-sky-300"><i class="fa-solid fa-microchip mr-1.5"></i>${escapeHtml(eq.modelo)}</span>
+            <span class="chip px-3 py-1.5 text-emerald-300"><i class="fa-solid fa-tower-broadcast mr-1.5"></i>${escapeHtml(tec)}</span>
+          </div>
+        </div>
 
-            ${hasObs?`<div class="mx-5 mb-4 px-3.5 py-2.5 rounded-xl bg-red-500/15 border-l-[3px] border-red-400 flex gap-2.5"><i class="fa-solid fa-triangle-exclamation text-red-400 mt-0.5"></i><div><p class="text-[11px] font-bold text-red-300">Observación</p><p class="text-xs text-red-100 mt-0.5 break-words leading-relaxed">${escapeHtml(obs)}</p></div></div>`:""}
+        <div class="flex items-center gap-2 self-start lg:self-center shrink-0">
+          ${devEditBtn}
+          <button onclick="toggleCard(${index})" class="chip px-4 py-2 text-xs font-bold text-white hover:border-[var(--primary)] transition cursor-pointer">
+            <span id="toggle-text-${index}">${autoExpand ? "Contraer" : "Desplegar"}</span>
+            <i id="toggle-icon-${index}" class="fa-solid ${autoExpand ? "fa-chevron-up" : "fa-chevron-down"} ml-1.5 text-sky-400"></i>
+          </button>
+        </div>
+      </div>
 
-            <div class="px-5 py-2.5 border-y border-white/10 bg-black/25 flex items-center justify-between">
-              <span class="text-xs font-medium text-slate-300">Detalles operativos</span>
-              <span class="text-[11px] text-slate-400"><i class="fa-solid fa-terminal text-sky-400 mr-1"></i>Control RF</span>
-            </div>
+      ${hasObs?`<div class="mx-5 mb-4 px-3.5 py-2.5 rounded-xl bg-red-500/15 border-l-[3px] border-red-400 flex gap-2.5"><i class="fa-solid fa-triangle-exclamation text-red-400 mt-0.5"></i><div><p class="text-[11px] font-bold text-red-300">Observación</p><p class="text-xs text-red-100 mt-0.5 break-words leading-relaxed">${escapeHtml(obs)}</p></div></div>`:""}
 
+      <!-- SECCIÓN DESPLEGABLE: Comandos + IMEI/SIM debajo a la izquierda, y Datos Adicionales arriba a la derecha -->
+      <div id="card-details-${index}" class="${autoExpand ? "" : "hidden"} border-t border-white/10">
+        <div class="grid grid-cols-1 xl:grid-cols-12">
+          <!-- COLUMNA IZQUIERDA -->
+          <div class="xl:col-span-7 flex flex-col justify-between border-b xl:border-b-0 xl:border-r border-white/10">
             <div class="p-5">
               <h4 class="text-sm font-bold text-white mb-3 flex items-center gap-2"><i class="fa-solid fa-terminal text-sky-400"></i>Comandos del equipo</h4>
               ${cmds}
@@ -960,25 +1033,31 @@ function renderResults(matchedItems){
                 </div>
               </div>
             </div>
+
+            ${hasLoc?`<div class="px-5 py-3 border-t border-white/10 bg-black/25 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+              <span class="text-xs font-medium text-slate-300"><i class="fa-solid fa-location-dot text-red-400 mr-1.5"></i>${escapeHtml(lat)}, ${escapeHtml(lon)}</span>
+              <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(lat)},${encodeURIComponent(lon)}" target="_blank" rel="noopener noreferrer" class="btn text-white px-4 py-2 rounded-xl text-xs font-bold text-center transition hover:brightness-110"><i class="fa-solid fa-map-location-dot mr-1.5"></i>Ver ubicación</a>
+            </div>`:""}
           </div>
 
-          ${hasLoc?`<div class="px-5 py-3 border-t border-white/10 bg-black/25 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-            <span class="text-xs font-medium text-slate-300"><i class="fa-solid fa-location-dot text-red-400 mr-1.5"></i>${escapeHtml(lat)}, ${escapeHtml(lon)}</span>
-            <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(lat)},${encodeURIComponent(lon)}" target="_blank" rel="noopener noreferrer" class="btn text-white px-4 py-2 rounded-xl text-xs font-bold text-center transition hover:brightness-110"><i class="fa-solid fa-map-location-dot mr-1.5"></i>Ver ubicación</a>
-          </div>`:""}
-        </div>
-
-        <!-- COLUMNA DERECHA: Datos adicionales desde arriba -->
-        <div class="xl:col-span-5 p-5 bg-black/20 flex flex-col">
-          <h4 class="text-sm font-bold text-white mb-3.5 flex items-center gap-2">
-            <i class="fa-solid fa-list-ul text-sky-400"></i>Datos adicionales
-          </h4>
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 overflow-y-auto scroll pr-1 max-h-[34rem]">
-            ${renderAdditionalData(row,[pk,tk,ik,sk,ok,lk,gk])}
+          <!-- COLUMNA DERECHA: Datos adicionales desde arriba -->
+          <div class="xl:col-span-5 p-5 bg-black/20 flex flex-col">
+            <h4 class="text-sm font-bold text-white mb-3.5 flex items-center gap-2">
+              <i class="fa-solid fa-list-ul text-sky-400"></i>Datos adicionales
+            </h4>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 overflow-y-auto scroll pr-1 max-h-[30rem]">
+              ${renderAdditionalData(row,[pk,tk,ik,sk,ok,lk,gk])}
+            </div>
           </div>
         </div>
       </div>
     </article>`}).join("");
+}
+
+function toggleCard(i){
+  const d=$(`card-details-${i}`),t=$(`toggle-text-${i}`),ic=$(`toggle-icon-${i}`),h=d.classList.toggle("hidden");
+  t.textContent=h?"Desplegar":"Contraer";
+  ic.className="fa-solid ml-1.5 text-sky-400 "+(h?"fa-chevron-down":"fa-chevron-up");
 }
 
 function renderAdditionalData(row,excluded){
@@ -1016,9 +1095,9 @@ function fallbackCopy(text){const a=document.createElement("textarea");a.value=t
 let tt;function showToast(m){$("toast-msg").textContent=m;$("toast").classList.add("show");clearTimeout(tt);tt=setTimeout(()=>$("toast").classList.remove("show"),2200)}
 
 const debounce=(f,d)=>{let t;return()=>{clearTimeout(t);t=setTimeout(f,d)}};
-searchInput.addEventListener("input",debounce(executeSearch,180));
-searchBtn.addEventListener("click",executeSearch);
-searchInput.addEventListener("keydown",e=>{if(e.key==="Enter")executeSearch()});
+searchInput.addEventListener("input",debounce(()=>executeSearch(false),180));
+searchBtn.addEventListener("click",()=>executeSearch(false));
+searchInput.addEventListener("keydown",e=>{if(e.key==="Enter")executeSearch(false)});
 
 ["dragenter","dragover","dragleave","drop"].forEach(n=>dropZone.addEventListener(n,e=>{e.preventDefault();e.stopPropagation()}));
 ["dragenter","dragover"].forEach(n=>dropZone.addEventListener(n,()=>dropZone.classList.add("drag")));
