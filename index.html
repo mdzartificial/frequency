@@ -235,8 +235,11 @@ body.theme-day .dev-table th { background: #e2e8f0; }
           <span id="dev-changes-badge" class="dev-hidden px-3 py-1.5 rounded-full bg-amber-500/15 border border-amber-500/40 text-amber-300 text-xs font-semibold">
             0 ediciones
           </span>
-          <button onclick="downloadUpdatedHtml()" class="px-4 py-2 rounded-full bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-extrabold shadow-lg transition flex items-center gap-1.5 cursor-pointer" title="Descarga este archivo HTML con todos tus cambios guardados adentro de forma permanente">
-            <i class="fa-solid fa-code"></i> Guardar HTML Embebido
+          <button onclick="copyUpdatedHtmlCode()" class="px-3.5 py-2 rounded-full bg-amber-500/20 border border-amber-400/50 hover:bg-amber-500/30 text-amber-300 text-xs font-bold transition flex items-center gap-1.5 cursor-pointer" title="Copia todo el código HTML actualizado para pegarlo directamente en GitHub o tu editor">
+            <i class="fa-regular fa-copy"></i> Copiar HTML
+          </button>
+          <button onclick="downloadUpdatedHtml()" class="px-4 py-2 rounded-full bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-extrabold shadow-lg transition flex items-center gap-1.5 cursor-pointer" title="Guarda o descarga el archivo index.html con todos tus cambios embebidos">
+            <i class="fa-solid fa-floppy-disk"></i> Guardar HTML
           </button>
         </div>
 
@@ -431,7 +434,7 @@ body.theme-day .dev-table th { background: #e2e8f0; }
             <h2 class="text-lg font-semibold text-white flex items-center gap-2">
               <i class="fa-solid fa-table-cells text-amber-400"></i> Editor Directo de Base Excel
             </h2>
-            <p class="text-xs text-slate-400">Cada cambio se guarda automáticamente aquí mismo. Usa <b>Guardar HTML Embebido</b> para actualizar el archivo fuente o <b>Exportar Excel</b>.</p>
+            <p class="text-xs text-slate-400">Cada cambio se guarda automáticamente aquí mismo. Usa <b>Guardar HTML</b> o <b>Copiar HTML</b> para actualizar tu archivo.</p>
           </div>
           <div class="flex flex-wrap items-center gap-2">
             <div class="relative">
@@ -441,8 +444,11 @@ body.theme-day .dev-table th { background: #e2e8f0; }
             <button onclick="openAddRecordModal()" class="px-3.5 py-1.5 rounded-xl bg-amber-500/20 border border-amber-400/40 text-amber-300 hover:bg-amber-500/30 text-xs font-bold transition cursor-pointer">
               <i class="fa-solid fa-plus mr-1"></i>Agregar Fila
             </button>
+            <button onclick="copyUpdatedHtmlCode()" class="px-3.5 py-1.5 rounded-xl bg-amber-500/20 border border-amber-400/40 text-amber-300 hover:bg-amber-500/30 text-xs font-bold transition cursor-pointer">
+              <i class="fa-regular fa-copy mr-1"></i>Copiar HTML
+            </button>
             <button onclick="downloadUpdatedHtml()" class="px-3.5 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-extrabold transition cursor-pointer">
-              <i class="fa-solid fa-code mr-1"></i>Guardar HTML Embebido
+              <i class="fa-solid fa-floppy-disk mr-1"></i>Guardar HTML
             </button>
             <button onclick="exportModifiedExcel()" class="px-3.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold transition cursor-pointer">
               <i class="fa-solid fa-download mr-1"></i>Exportar .XLSX
@@ -464,7 +470,7 @@ body.theme-day .dev-table th { background: #e2e8f0; }
       </h3>
       <button onclick="closeDevAuthModal()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
     </div>
-    <p class="text-xs text-slate-400 mb-4">Ingresa la clave de acceso para habilitar la edición directa en las tarjetas, agregar puntos manuales, guardar el HTML embebido y exportar Excel.</p>
+    <p class="text-xs text-slate-400 mb-4">Ingresa la clave de acceso para habilitar la edición directa en las tarjetas, agregar puntos manuales, guardar/copiar el HTML embebido y exportar Excel.</p>
     <input type="password" id="dev-pass-input" placeholder="Clave de acceso..." onkeydown="if(event.key==='Enter') verifyDevPassword()" class="w-full px-3.5 py-2.5 text-sm rounded-xl bg-black/40 border border-white/15 outline-none focus:border-amber-400 mb-3">
     <p id="dev-pass-error" class="dev-hidden text-xs text-red-400 mb-3"><i class="fa-solid fa-circle-exclamation mr-1"></i>Clave incorrecta.</p>
     <div class="flex justify-end gap-2">
@@ -555,7 +561,7 @@ function getEmbeddedPayload() {
 }
 
 // ==========================================
-// PERSISTENCIA AUTOMÁTICA SÍNCRONA + INDEXEDDB
+// PERSISTENCIA TRIPLE: window.name + localStorage + IndexedDB
 // ==========================================
 function openSkynetDB() {
   return new Promise((resolve, reject) => {
@@ -582,12 +588,21 @@ function saveToPersistentDB() {
     updatedAt: new Date().toLocaleString()
   };
 
+  const serialized = JSON.stringify(syncPayload);
+
+  // 1A. Guardado SÍNCRONO en window.name (funciona incluso en file:// o iframes donde localStorage falla)
   try {
-    localStorage.setItem(LS_KEY, JSON.stringify(syncPayload));
+    window.name = "SKYNET_STATE:" + serialized;
+  } catch (e) {}
+
+  // 1B. Guardado SÍNCRONO inmediato en localStorage
+  try {
+    localStorage.setItem(LS_KEY, serialized);
   } catch (e) {
-    console.warn("localStorage lleno, usando IndexedDB:", e);
+    console.warn("localStorage no disponible, usando window.name / IndexedDB:", e);
   }
 
+  // 2. Respaldo en IndexedDB
   try {
     openSkynetDB().then(db => {
       const tx = db.transaction(IDB_STORE, "readwrite");
@@ -644,8 +659,14 @@ async function initDatabase() {
     if (rawSync) {
       loadedFromSync = applySavedRecord(JSON.parse(rawSync));
     }
-  } catch (e) {
-    console.error("Error leyendo localStorage:", e);
+  } catch (e) {}
+
+  if (!loadedFromSync) {
+    try {
+      if (typeof window.name === "string" && window.name.startsWith("SKYNET_STATE:")) {
+        loadedFromSync = applySavedRecord(JSON.parse(window.name.slice("SKYNET_STATE:".length)));
+      }
+    } catch (e) {}
   }
 
   if (!loadedFromSync) {
@@ -682,6 +703,7 @@ async function initDatabase() {
 
 async function resetToEmbeddedDefault() {
   if (!confirm("¿Descartar los cambios locales y volver a los datos originales embebidos en el código?")) return;
+  try { window.name = ""; } catch (e) {}
   try { localStorage.removeItem(LS_KEY); } catch (e) {}
   try {
     const db = await openSkynetDB();
@@ -697,18 +719,39 @@ window.addEventListener("beforeunload", () => {
   }
 });
 
-function downloadUpdatedHtml() {
+const PRISTINE_OUTER_HTML = document.documentElement.outerHTML;
+
+function buildUpdatedHtmlString() {
+  const cols = excelHeaders.length ? excelHeaders : Object.keys(excelData[0]);
+  const compactRows = excelData.map(r => cols.map(c => r[c] !== undefined ? r[c] : ""));
+  const newPayloadStr = JSON.stringify({ h: cols, r: compactRows }).replace(/<\/script>/gi, "<\\/script>");
+  let fullHtml = "<!DOCTYPE html>\n" + PRISTINE_OUTER_HTML;
+  fullHtml = fullHtml.replace(
+    /(<script id="embedded-skynet-db" type="application\/json">)[\s\S]*?(<\/script>)/i,
+    () => `<script id="embedded-skynet-db" type="application/json">${newPayloadStr}<\/script>`
+  );
+  return fullHtml;
+}
+
+async function downloadUpdatedHtml() {
   if (!isDevMode) { toggleDevModal(); return; }
   try {
-    const cols = excelHeaders.length ? excelHeaders : Object.keys(excelData[0]);
-    const compactRows = excelData.map(r => cols.map(c => r[c] !== undefined ? r[c] : ""));
-    const newPayloadStr = JSON.stringify({ h: cols, r: compactRows }).replace(/<\/script>/gi, "<\\/script>");
-    let fullHtml = "<!DOCTYPE html>\n" + document.documentElement.outerHTML;
-    fullHtml = fullHtml.replace(
-      /(<script id="embedded-skynet-db" type="application\/json">)[\s\S]*?(<\/script>)/i,
-      `$1${newPayloadStr}$2`
-    );
-
+    const fullHtml = buildUpdatedHtmlString();
+    if (window.showSaveFilePicker) {
+      try {
+        const handle = await window.showSaveFilePicker({
+          suggestedName: "index.html",
+          types: [{ description: "Archivo HTML", accept: { "text/html": [".html"] } }]
+        });
+        const writable = await handle.createWritable();
+        await writable.write(fullHtml);
+        await writable.close();
+        showToast("Archivo index.html sobrescrito con tus cambios");
+        return;
+      } catch (pickerErr) {
+        if (pickerErr.name === "AbortError") return;
+      }
+    }
     const blob = new Blob([fullHtml], { type: "text/html;charset=utf-8" });
     const a = document.createElement("a");
     a.href = URL.createObjectURL(blob);
@@ -721,6 +764,18 @@ function downloadUpdatedHtml() {
   } catch (err) {
     console.error(err);
     showToast("Error al generar el HTML actualizado");
+  }
+}
+
+async function copyUpdatedHtmlCode() {
+  if (!isDevMode) { toggleDevModal(); return; }
+  try {
+    const fullHtml = buildUpdatedHtmlString();
+    await copyToClipboard(fullHtml);
+    showToast("Código HTML completo copiado al portapapeles (listo para pegar en GitHub)");
+  } catch (err) {
+    console.error(err);
+    showToast("Error al copiar el código HTML");
   }
 }
 
