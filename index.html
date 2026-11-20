@@ -7,6 +7,8 @@
 <script src="https://cdn.tailwindcss.com"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
 
 <!-- Leaflet -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
@@ -124,6 +126,8 @@ body{font-family:Inter,ui-sans-serif,system-ui,sans-serif;color:var(--text-main)
 @keyframes happy-shake {0%, 100% { transform: translateY(0) rotate(0); } 25% { transform: translateY(-4px) rotate(8deg); } 50% { transform: translateY(0) rotate(-8deg); } 75% { transform: translateY(-4px) rotate(8deg); }}
 .anim-price #main-logo { animation: happy-shake 1s ease-in-out infinite; }
 .anim-dev #main-logo { animation: spin-3d 4s linear infinite; }
+.anim-noc #main-logo { animation: radar-pulse 1.8s ease-in-out infinite; }
+.anim-skynet-matrix #main-logo { animation: bounce-float 2.2s ease-in-out infinite; }
 
 .btn{background:linear-gradient(135deg,var(--primary-light),var(--primary-dark));box-shadow:0 0 18px var(--primary-bg)}
 .btn:disabled{opacity:.4;box-shadow:none}
@@ -261,7 +265,8 @@ body.theme-day .dev-table th { background: #e2e8f0; }
 
 @media(max-width:900px){body{padding:0}.frame{height:auto;border-radius:0;flex-direction:column}.rail{display:none}.cols{flex-direction:column}.side{width:100%!important}}
 </style>
-<style>*, ::before, ::after{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgb(59 130 246 / 0.5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: ;--tw-contain-size: ;--tw-contain-layout: ;--tw-contain-paint: ;--tw-contain-style: }::backdrop{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgb(59 130 246 / 0.5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: ;--tw-contain-size: ;--tw-contain-layout: ;--tw-contain-paint: ;--tw-contain-style: }/* ! tailwindcss v3.4.17 | MIT License | https://tailwindcss.com */*,::after,::before{box-sizing:border-box;border-width:0;border-style:solid;border-color:#e5e7eb}::after,::before{--tw-content:''}:host,html{line-height:1.5;-webkit-text-size-adjust:100%;-moz-tab-size:4;tab-size:4;font-family:ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";font-feature-settings:normal;font-variation-settings:normal;-webkit-tap-highlight-color:transparent}body{margin:0;line-height:inherit}hr{height:0;color:inherit;border-top-width:1px}abbr:where([title]){-webkit-text-decoration:underline dotted;text-decoration:underline dotted}h1,h2,h3,h4,h5,h6{font-size:inherit;font-weight:inherit}a{color:inherit;text-decoration:inherit}b,strong{font-weight:bolder}code,kbd,pre,samp{font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;font-feature-settings:normal;font-variation-settings:normal;font-size:1em}small{font-size:80%}sub,sup{font-size:75%;line-height:0;position:relative;vertical-align:baseline}sub{bottom:-.25em}sup{top:-.5em}table{text-indent:0;border-color:inherit;border-collapse:collapse}button,input,optgroup,select,textarea{font-family:inherit;font-feature-settings:inherit;font-variation-settings:inherit;font-size:100%;font-weight:inherit;line-height:inherit;letter-spacing:inherit;color:inherit;margin:0;padding:0}button,select{text-transform:none}button,input:where([type=button]),input:where([type=reset]),input:where([type=submit]){-webkit-appearance:button;background-color:transparent;background-image:none}:-moz-focusring{outline:auto}:-moz-ui-invalid{box-shadow:none}progress{vertical-align:baseline}::-webkit-inner-spin-button,::-webkit-outer-spin-button{height:auto}[type=search]{-webkit-appearance:textfield;outline-offset:-2px}::-webkit-search-decoration{-webkit-appearance:none}::-webkit-file-upload-button{-webkit-appearance:button;font:inherit}summary{display:list-item}blockquote,dd,dl,figure,h1,h2,h3,h4,h5,h6,hr,p,pre{margin:0}fieldset{margin:0;padding:0}legend{padding:0}menu,ol,ul{list-style:none;margin:0;padding:0}dialog{padding:0}textarea{resize:vertical}input::placeholder,textarea::placeholder{opacity:1;color:#9ca3af}[role=button],button{cursor:pointer}:disabled{cursor:default}audio,canvas,embed,iframe,img,object,svg,video{display:block;vertical-align:middle}img,video{max-width:100%;height:auto}[hidden]:where(:not([hidden=until-found])){display:none}.fixed{position:fixed}.absolute{position:absolute}.relative{position:relative}.inset-0{inset:0px}.-bottom-16{bottom:-4rem}.-left-16{left:-4rem}.-right-16{right:-4rem}.-top-16{top:-4rem}.left-3{left:0.75rem}.left-3\.5{left:0.875rem}.top-1\/2{top:50%}.z-10{z-index:10}.z-\[100\]{z-index:100}.mx-5{margin-left:1.25rem;margin-right:1.25rem}.mb-1{margin-bottom:0.25rem}.mb-2{margin-bottom:0.5rem}.mb-3{margin-bottom:0.75rem}.mb-4{margin-bottom:1rem}.mb-5{margin-bottom:1.25rem}.mb-6{margin-bottom:1.5rem}.mb-8{margin-bottom:2rem}.ml-auto{margin-left:auto}.mr-1{margin-right:0.25rem}.mr-1\.5{margin-right:0.375rem}.mr-2{margin-right:0.5rem}.mr-auto{margin-right:auto}.mt-0\.5{margin-top:0.125rem}.mt-1{margin-top:0.25rem}.mt-2{margin-top:0.5rem}.mt-3{margin-top:0.75rem}.mt-5{margin-top:1.25rem}.mt-6{margin-top:1.5rem}.mt-8{margin-top:2rem}.mt-auto{margin-top:auto}.block{display:block}.inline-block{display:inline-block}.flex{display:flex}.inline-flex{display:inline-flex}.grid{display:grid}.hidden{display:none}.h-2{height:0.5rem}.h-24{height:6rem}.h-48{height:12rem}.h-full{height:100%}.max-h-\[88vh\]{max-height:88vh}.min-h-0{min-height:0px}.w-1\/2{width:50%}.w-2{width:0.5rem}.w-24{width:6rem}.w-3\/4{width:75%}.w-48{width:12rem}.w-\[340px\]{width:340px}.w-full{width:100%}.min-w-0{min-width:0px}.max-w-3xl{max-width:48rem}.max-w-\[550px\]{max-width:550px}.max-w-md{max-width:28rem}.max-w-sm{max-width:24rem}.flex-1{flex:1 1 0%}.shrink-0{flex-shrink:0}.-translate-y-1\/2{--tw-translate-y:-50%;transform:translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))}@keyframes pulse{50%{opacity:.5}}.animate-pulse{animation:pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite}@keyframes spin{to{transform:rotate(360deg)}}.animate-spin{animation:spin 1s linear infinite}.cursor-pointer{cursor:pointer}.select-none{-webkit-user-select:none;user-select:none}.grid-cols-1{grid-template-columns:repeat(1, minmax(0, 1fr))}.grid-cols-2{grid-template-columns:repeat(2, minmax(0, 1fr))}.flex-col{flex-direction:column}.flex-wrap{flex-wrap:wrap}.items-center{align-items:center}.justify-end{justify-content:flex-end}.justify-center{justify-content:center}.justify-between{justify-content:space-between}.gap-1\.5{gap:0.375rem}.gap-2{gap:0.5rem}.gap-2\.5{gap:0.625rem}.gap-3{gap:0.75rem}.gap-4{gap:1rem}.space-y-3 > :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(0.75rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(0.75rem * var(--tw-space-y-reverse))}.space-y-4 > :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(1rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(1rem * var(--tw-space-y-reverse))}.space-y-6 > :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(1.5rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(1.5rem * var(--tw-space-y-reverse))}.overflow-auto{overflow:auto}.overflow-hidden{overflow:hidden}.overflow-x-auto{overflow-x:auto}.overflow-y-auto{overflow-y:auto}.truncate{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.whitespace-nowrap{white-space:nowrap}.rounded-2xl{border-radius:1rem}.rounded-full{border-radius:9999px}.rounded-lg{border-radius:0.5rem}.rounded-xl{border-radius:0.75rem}.border{border-width:1px}.border-2{border-width:2px}.border-b{border-bottom-width:1px}.border-l-\[3px\]{border-left-width:3px}.border-t{border-top-width:1px}.border-dashed{border-style:dashed}.border-amber-400\/30{border-color:rgb(251 191 36 / 0.3)}.border-amber-400\/40{border-color:rgb(251 191 36 / 0.4)}.border-amber-400\/50{border-color:rgb(251 191 36 / 0.5)}.border-amber-500\/40{border-color:rgb(245 158 11 / 0.4)}.border-emerald-500\/40{border-color:rgb(16 185 129 / 0.4)}.border-emerald-500\/50{border-color:rgb(16 185 129 / 0.5)}.border-red-500\/30{border-color:rgb(239 68 68 / 0.3)}.border-red-500\/40{border-color:rgb(239 68 68 / 0.4)}.border-sky-400\/30{border-color:rgb(56 189 248 / 0.3)}.border-sky-400\/40{border-color:rgb(56 189 248 / 0.4)}.border-sky-400\/50{border-color:rgb(56 189 248 / 0.5)}.border-sky-500\/40{border-color:rgb(14 165 233 / 0.4)}.border-white\/10{border-color:rgb(255 255 255 / 0.1)}.border-white\/15{border-color:rgb(255 255 255 / 0.15)}.border-white\/5{border-color:rgb(255 255 255 / 0.05)}.bg-\[\#12161b\]{--tw-bg-opacity:1;background-color:rgb(18 22 27 / var(--tw-bg-opacity, 1))}.bg-\[var\(--primary\)\]{background-color:var(--primary)}.bg-amber-500{--tw-bg-opacity:1;background-color:rgb(245 158 11 / var(--tw-bg-opacity, 1))}.bg-amber-500\/10{background-color:rgb(245 158 11 / 0.1)}.bg-amber-500\/15{background-color:rgb(245 158 11 / 0.15)}.bg-amber-500\/20{background-color:rgb(245 158 11 / 0.2)}.bg-black\/20{background-color:rgb(0 0 0 / 0.2)}.bg-black\/30{background-color:rgb(0 0 0 / 0.3)}.bg-black\/40{background-color:rgb(0 0 0 / 0.4)}.bg-black\/75{background-color:rgb(0 0 0 / 0.75)}.bg-emerald-400{--tw-bg-opacity:1;background-color:rgb(52 211 153 / var(--tw-bg-opacity, 1))}.bg-emerald-500\/50{background-color:rgb(16 185 129 / 0.5)}.bg-emerald-600{--tw-bg-opacity:1;background-color:rgb(5 150 105 / var(--tw-bg-opacity, 1))}.bg-red-500\/10{background-color:rgb(239 68 68 / 0.1)}.bg-red-500\/15{background-color:rgb(239 68 68 / 0.15)}.bg-sky-500\/15{background-color:rgb(14 165 233 / 0.15)}.bg-sky-500\/20{background-color:rgb(14 165 233 / 0.2)}.bg-white\/5{background-color:rgb(255 255 255 / 0.05)}.p-1\.5{padding:0.375rem}.p-3{padding:0.75rem}.p-4{padding:1rem}.p-6{padding:1.5rem}.p-8{padding:2rem}.px-2{padding-left:0.5rem;padding-right:0.5rem}.px-2\.5{padding-left:0.625rem;padding-right:0.625rem}.px-3{padding-left:0.75rem;padding-right:0.75rem}.px-3\.5{padding-left:0.875rem;padding-right:0.875rem}.px-4{padding-left:1rem;padding-right:1rem}.px-5{padding-left:1.25rem;padding-right:1.25rem}.px-6{padding-left:1.5rem;padding-right:1.5rem}.py-0\.5{padding-top:0.125rem;padding-bottom:0.125rem}.py-1{padding-top:0.25rem;padding-bottom:0.25rem}.py-1\.5{padding-top:0.375rem;padding-bottom:0.375rem}.py-2{padding-top:0.5rem;padding-bottom:0.5rem}.py-2\.5{padding-top:0.625rem;padding-bottom:0.625rem}.py-3{padding-top:0.75rem;padding-bottom:0.75rem}.py-4{padding-top:1rem;padding-bottom:1rem}.py-5{padding-top:1.25rem;padding-bottom:1.25rem}.pb-2{padding-bottom:0.5rem}.pb-3{padding-bottom:0.75rem}.pb-5{padding-bottom:1.25rem}.pl-8{padding-left:2rem}.pl-9{padding-left:2.25rem}.pr-3{padding-right:0.75rem}.pt-1{padding-top:0.25rem}.pt-4{padding-top:1rem}.pt-5{padding-top:1.25rem}.text-left{text-align:left}.text-center{text-align:center}.text-2xl{font-size:1.5rem;line-height:2rem}.text-4xl{font-size:2.25rem;line-height:2.5rem}.text-\[10px\]{font-size:10px}.text-\[11px\]{font-size:11px}.text-\[42px\]{font-size:42px}.text-lg{font-size:1.125rem;line-height:1.75rem}.text-sm{font-size:0.875rem;line-height:1.25rem}.text-xl{font-size:1.25rem;line-height:1.75rem}.text-xs{font-size:0.75rem;line-height:1rem}.font-bold{font-weight:700}.font-extrabold{font-weight:800}.font-semibold{font-weight:600}.uppercase{text-transform:uppercase}.tracking-wider{letter-spacing:0.05em}.tracking-widest{letter-spacing:0.1em}.text-\[var\(--primary\)\]{color:var(--primary)}.text-\[var\(--primary-light\)\]{color:var(--primary-light)}.text-amber-300{--tw-text-opacity:1;color:rgb(252 211 77 / var(--tw-text-opacity, 1))}.text-amber-400{--tw-text-opacity:1;color:rgb(251 191 36 / var(--tw-text-opacity, 1))}.text-emerald-300{--tw-text-opacity:1;color:rgb(110 231 183 / var(--tw-text-opacity, 1))}.text-emerald-400{--tw-text-opacity:1;color:rgb(52 211 153 / var(--tw-text-opacity, 1))}.text-red-300{--tw-text-opacity:1;color:rgb(252 165 165 / var(--tw-text-opacity, 1))}.text-red-400{--tw-text-opacity:1;color:rgb(248 113 113 / var(--tw-text-opacity, 1))}.text-sky-200{--tw-text-opacity:1;color:rgb(186 230 253 / var(--tw-text-opacity, 1))}.text-sky-300{--tw-text-opacity:1;color:rgb(125 211 252 / var(--tw-text-opacity, 1))}.text-sky-400{--tw-text-opacity:1;color:rgb(56 189 248 / var(--tw-text-opacity, 1))}.text-slate-300{--tw-text-opacity:1;color:rgb(203 213 225 / var(--tw-text-opacity, 1))}.text-slate-300\/80{color:rgb(203 213 225 / 0.8)}.text-slate-400{--tw-text-opacity:1;color:rgb(148 163 184 / var(--tw-text-opacity, 1))}.text-slate-500{--tw-text-opacity:1;color:rgb(100 116 139 / var(--tw-text-opacity, 1))}.text-slate-950{--tw-text-opacity:1;color:rgb(2 6 23 / var(--tw-text-opacity, 1))}.text-white{--tw-text-opacity:1;color:rgb(255 255 255 / var(--tw-text-opacity, 1))}.placeholder-slate-600::placeholder{--tw-placeholder-opacity:1;color:rgb(71 85 105 / var(--tw-placeholder-opacity, 1))}.opacity-0{opacity:0}.shadow-2xl{--tw-shadow:0 25px 50px -12px rgb(0 0 0 / 0.25);--tw-shadow-colored:0 25px 50px -12px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.shadow-\[0_0_30px_var\(--primary-bg\)\]{--tw-shadow:0 0 30px var(--primary-bg);--tw-shadow-colored:0 0 30px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.shadow-lg{--tw-shadow:0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);--tw-shadow-colored:0 10px 15px -3px var(--tw-shadow-color), 0 4px 6px -4px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.shadow-md{--tw-shadow:0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);--tw-shadow-colored:0 4px 6px -1px var(--tw-shadow-color), 0 2px 4px -2px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.shadow-emerald-900\/40{--tw-shadow-color:rgb(6 78 59 / 0.4);--tw-shadow:var(--tw-shadow-colored)}.outline-none{outline:2px solid transparent;outline-offset:2px}.blur-3xl{--tw-blur:blur(64px);filter:var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow)}.backdrop-blur-sm{--tw-backdrop-blur:blur(4px);-webkit-backdrop-filter:var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia);backdrop-filter:var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia)}.transition{transition-property:color, background-color, border-color, fill, stroke, opacity, box-shadow, transform, filter, -webkit-text-decoration-color, -webkit-backdrop-filter;transition-property:color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter;transition-property:color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter, -webkit-text-decoration-color, -webkit-backdrop-filter;transition-timing-function:cubic-bezier(0.4, 0, 0.2, 1);transition-duration:150ms}.transition-all{transition-property:all;transition-timing-function:cubic-bezier(0.4, 0, 0.2, 1);transition-duration:150ms}.hover\:bg-amber-400:hover{--tw-bg-opacity:1;background-color:rgb(251 191 36 / var(--tw-bg-opacity, 1))}.hover\:bg-amber-500\/25:hover{background-color:rgb(245 158 11 / 0.25)}.hover\:bg-amber-500\/30:hover{background-color:rgb(245 158 11 / 0.3)}.hover\:bg-emerald-500:hover{--tw-bg-opacity:1;background-color:rgb(16 185 129 / var(--tw-bg-opacity, 1))}.hover\:bg-red-500\/25:hover{background-color:rgb(239 68 68 / 0.25)}.hover\:bg-sky-500\/30:hover{background-color:rgb(14 165 233 / 0.3)}.hover\:bg-white\/10:hover{background-color:rgb(255 255 255 / 0.1)}.hover\:text-amber-300:hover{--tw-text-opacity:1;color:rgb(252 211 77 / var(--tw-text-opacity, 1))}.hover\:text-white:hover{--tw-text-opacity:1;color:rgb(255 255 255 / var(--tw-text-opacity, 1))}.focus\:border-amber-400:focus{--tw-border-opacity:1;border-color:rgb(251 191 36 / var(--tw-border-opacity, 1))}.focus\:border-sky-400:focus{--tw-border-opacity:1;border-color:rgb(56 189 248 / var(--tw-border-opacity, 1))}@media (min-width: 640px){.sm\:grid-cols-2{grid-template-columns:repeat(2, minmax(0, 1fr))}}@media (min-width: 768px){.md\:w-auto{width:auto}.md\:flex-row{flex-direction:row}}@media (min-width: 1280px){.xl\:w-auto{width:auto}.xl\:flex-row{flex-direction:row}.xl\:items-center{align-items:center}}</style></head>
+<style>*, ::before, ::after{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pin-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgb(59 130 246 / 0.5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: ;--tw-contain-size: ;--tw-contain-layout: ;--tw-contain-paint: ;--tw-contain-style: }::backdrop{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pin-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgb(59 130 246 / 0.5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: ;--tw-contain-size: ;--tw-contain-layout: ;--tw-contain-paint: ;--tw-contain-style: }/* ! tailwindcss v3.4.17 | MIT License | https://tailwindcss.com */*,::after,::before{box-sizing:border-box;border-width:0;border-style:solid;border-color:#e5e7eb}::after,::before{--tw-content:''}:host,html{line-height:1.5;-webkit-text-size-adjust:100%;-moz-tab-size:4;tab-size:4;font-family:ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";font-feature-settings:normal;font-variation-settings:normal;-webkit-tap-highlight-color:transparent}body{margin:0;line-height:inherit}hr{height:0;color:inherit;border-top-width:1px}abbr:where([title]){-webkit-text-decoration:underline dotted;text-decoration:underline dotted}h1,h2,h3,h4,h5,h6{font-size:inherit;font-weight:inherit}a{color:inherit;text-decoration:inherit}b,strong{font-weight:bolder}code,kbd,pre,samp{font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;font-feature-settings:normal;font-variation-settings:normal;font-size:1em}small{font-size:80%}sub,sup{font-size:75%;line-height:0;position:relative;vertical-align:baseline}sub{bottom:-.25em}sup{top:-.5em}table{text-indent:0;border-color:inherit;border-collapse:collapse}button,input,optgroup,select,textarea{font-family:inherit;font-feature-settings:inherit;font-variation-settings:inherit;font-size:100%;font-weight:inherit;line-height:inherit;letter-spacing:inherit;color:inherit;margin:0;padding:0}button,select{text-transform:none}button,input:where([type=button]),input:where([type=reset]),input:where([type=submit]){-webkit-appearance:button;background-color:transparent;background-image:none}:-moz-focusring{outline:auto}:-moz-ui-invalid{box-shadow:none}progress{vertical-align:baseline}::-webkit-inner-spin-button,::-webkit-outer-spin-button{height:auto}[type=search]{-webkit-appearance:textfield;outline-offset:-2px}::-webkit-search-decoration{-webkit-appearance:none}::-webkit-file-upload-button{-webkit-appearance:button;font:inherit}summary{display:list-item}blockquote,dd,dl,figure,h1,h2,h3,h4,h5,h6,hr,p,pre{margin:0}fieldset{margin:0;padding:0}legend{padding:0}menu,ol,ul{list-style:none;margin:0;padding:0}dialog{padding:0}textarea{resize:vertical}input::placeholder,textarea::placeholder{opacity:1;color:#9ca3af}[role=button],button{cursor:pointer}:disabled{cursor:default}audio,canvas,embed,iframe,img,object,svg,video{display:block;vertical-align:middle}img,video{max-width:100%;height:auto}[hidden]:where(:not([hidden=until-found])){display:none}.fixed{position:fixed}.absolute{position:absolute}.relative{position:relative}.inset-0{inset:0px}.-bottom-16{bottom:-4rem}.-left-16{left:-4rem}.-right-16{right:-4rem}.-top-16{top:-4rem}.left-3{left:0.75rem}.left-3\.5{left:0.875rem}.top-1\/2{top:50%}.z-10{z-index:10}.z-\[100\]{z-index:100}.mx-5{margin-left:1.25rem;margin-right:1.25rem}.mb-1{margin-bottom:0.25rem}.mb-2{margin-bottom:0.5rem}.mb-3{margin-bottom:0.75rem}.mb-4{margin-bottom:1rem}.mb-5{margin-bottom:1.25rem}.mb-6{margin-bottom:1.5rem}.mb-8{margin-bottom:2rem}.ml-auto{margin-left:auto}.mr-1{margin-right:0.25rem}.mr-1\.5{margin-right:0.375rem}.mr-2{margin-right:0.5rem}.mr-auto{margin-right:auto}.mt-0\.5{margin-top:0.125rem}.mt-1{margin-top:0.25rem}.mt-2{margin-top:0.5rem}.mt-3{margin-top:0.75rem}.mt-5{margin-top:1.25rem}.mt-6{margin-top:1.5rem}.mt-8{margin-top:2rem}.mt-auto{margin-top:auto}.block{display:block}.inline-block{display:inline-block}.flex{display:flex}.inline-flex{display:inline-flex}.grid{display:grid}.hidden{display:none}.h-2{height:0.5rem}.h-24{height:6rem}.h-48{height:12rem}.h-full{height:100%}.max-h-\[88vh\]{max-height:88vh}.min-h-0{min-height:0px}.w-1\/2{width:50%}.w-2{width:0.5rem}.w-24{width:6rem}.w-3\/4{width:75%}.w-48{width:12rem}.w-\[340px\]{width:340px}.w-full{width:100%}.min-w-0{min-width:0px}.max-w-3xl{max-width:48rem}.max-w-\[550px\]{max-width:550px}.max-w-md{max-width:28rem}.max-w-sm{max-width:24rem}.flex-1{flex:1 1 0%}.shrink-0{flex-shrink:0}.-translate-y-1\/2{--tw-translate-y:-50%;transform:translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))}@keyframes pulse{50%{opacity:.5}}.animate-pulse{animation:pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite}@keyframes spin{to{transform:rotate(360deg)}}.animate-spin{animation:spin 1s linear infinite}.cursor-pointer{cursor:pointer}.select-none{-webkit-user-select:none;user-select:none}.grid-cols-1{grid-template-columns:repeat(1, minmax(0, 1fr))}.grid-cols-2{grid-template-columns:repeat(2, minmax(0, 1fr))}.flex-col{flex-direction:column}.flex-wrap{flex-wrap:wrap}.items-center{align-items:center}.justify-end{justify-content:flex-end}.justify-center{justify-content:center}.justify-between{justify-content:space-between}.gap-1\.5{gap:0.375rem}.gap-2{gap:0.5rem}.gap-2\.5{gap:0.625rem}.gap-3{gap:0.75rem}.gap-4{gap:1rem}.space-y-3 > :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(0.75rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(0.75rem * calc(1 - var(--tw-space-y-reverse))}.space-y-4 > :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(1rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(1rem * calc(1 - var(--tw-space-y-reverse))}.space-y-6 > :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(1.5rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(1.5rem * calc(1 - var(--tw-space-y-reverse))}.overflow-auto{overflow:auto}.overflow-hidden{overflow:hidden}.overflow-x-auto{overflow-x:auto}.overflow-y-auto{overflow-y:auto}.truncate{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.whitespace-nowrap{white-space:nowrap}.rounded-2xl{border-radius:1rem}.rounded-full{border-radius:9999px}.rounded-lg{border-radius:0.5rem}.rounded-xl{border-radius:0.75rem}.border{border-width:1px}.border-2{border-width:2px}.border-b{border-bottom-width:1px}.border-l-\[3px\]{border-left-width:3px}.border-t{border-top-width:1px}.border-dashed{border-style:dashed}.border-amber-400\/30{border-color:rgb(251 191 36 / 0.3)}.border-amber-400\/40{border-color:rgb(251 191 36 / 0.4)}.border-amber-400\/50{border-color:rgb(251 191 36 / 0.5)}.border-amber-500\/40{border-color:rgb(245 158 11 / 0.4)}.border-emerald-500\/40{border-color:rgb(16 185 129 / 0.4)}.border-emerald-500\/50{border-color:rgb(16 185 129 / 0.5)}.border-red-500\/30{border-color:rgb(239 68 68 / 0.3)}.border-red-500\/40{border-color:rgb(239 68 68 / 0.4)}.border-sky-400\/30{border-color:rgb(56 189 248 / 0.3)}.border-sky-400\/40{border-color:rgb(56 189 248 / 0.4)}.border-sky-400\/50{border-color:rgb(56 189 248 / 0.5)}.border-sky-500\/40{border-color:rgb(14 165 233 / 0.4)}.border-white\/10{border-color:rgb(255 255 255 / 0.1)}.border-white\/15{border-color:rgb(255 255 255 / 0.15)}.border-white\/5{border-color:rgb(255 255 255 / 0.05)}.bg-\[\#12161b\]{--tw-bg-opacity:1;background-color:rgb(18 22 27 / var(--tw-bg-opacity, 1))}.bg-\[var\(--primary\)\]{background-color:var(--primary)}.bg-amber-500{--tw-bg-opacity:1;background-color:rgb(245 158 11 / var(--tw-bg-opacity, 1))}.bg-amber-500\/10{background-color:rgb(245 158 11 / 0.1)}.bg-amber-500\/15{background-color:rgb(245 158 11 / 0.15)}.bg-amber-500\/20{background-color:rgb(245 158 11 / 0.2)}.bg-black\/20{background-color:rgb(0 0 0 / 0.2)}.bg-black\/30{background-color:rgb(0 0 0 / 0.3)}.bg-black\/40{background-color:rgb(0 0 0 / 0.4)}.bg-black\/75{background-color:rgb(0 0 0 / 0.75)}.bg-emerald-400{--tw-bg-opacity:1;background-color:rgb(52 211 153 / var(--tw-bg-opacity, 1))}.bg-emerald-500\/50{background-color:rgb(16 185 129 / 0.5)}.bg-emerald-600{--tw-bg-opacity:1;background-color:rgb(5 150 105 / var(--tw-bg-opacity, 1))}.bg-red-500\/10{background-color:rgb(239 68 68 / 0.1)}.bg-red-500\/15{background-color:rgb(239 68 68 / 0.15)}.bg-sky-500\/15{background-color:rgb(14 165 233 / 0.15)}.bg-sky-500\/20{background-color:rgb(14 165 233 / 0.2)}.bg-white\/5{background-color:rgb(255 255 255 / 0.05)}.p-1\.5{padding:0.375rem}.p-3{padding:0.75rem}.p-4{padding:1rem}.p-6{padding:1.5rem}.p-8{padding:2rem}.px-2{padding-left:0.5rem;padding-right:0.5rem}.px-2\.5{padding-left:0.625rem;padding-right:0.625rem}.px-3{padding-left:0.75rem;padding-right:0.75rem}.px-3\.5{padding-left:0.875rem;padding-right:0.875rem}.px-4{padding-left:1rem;padding-right:1rem}.px-5{padding-left:1.25rem;padding-right:1.25rem}.px-6{padding-left:1.5rem;padding-right:1.5rem}.py-0\.5{padding-top:0.125rem;padding-bottom:0.125rem}.py-1{padding-top:0.25rem;padding-bottom:0.25rem}.py-1\.5{padding-top:0.375rem;padding-bottom:0.375rem}.py-2{padding-top:0.5rem;padding-bottom:0.5rem}.py-2\.5{padding-top:0.625rem;padding-bottom:0.625rem}.py-3{padding-top:0.75rem;padding-bottom:0.75rem}.py-4{padding-top:1rem;padding-bottom:1rem}.py-5{padding-top:1.25rem;padding-bottom:1.25rem}.pb-2{padding-bottom:0.5rem}.pb-3{padding-bottom:0.75rem}.pb-5{padding-bottom:1.25rem}.pl-8{padding-left:2rem}.pl-9{padding-left:2.25rem}.pr-3{padding-right:0.75rem}.pt-1{padding-top:0.25rem}.pt-4{padding-top:1rem}.pt-5{padding-top:1.25rem}.text-left{text-align:left}.text-center{text-align:center}.text-2xl{font-size:1.5rem;line-height:2rem}.text-4xl{font-size:2.25rem;line-height:2.5rem}.text-\[10px\]{font-size:10px}.text-\[11px\]{font-size:11px}.text-\[42px\]{font-size:42px}.text-lg{font-size:1.125rem;line-height:1.75rem}.text-sm{font-size:0.875rem;line-height:1.25rem}.text-xl{font-size:1.25rem;line-height:1.75rem}.text-xs{font-size:0.75rem;line-height:1rem}.font-bold{font-weight:700}.font-extrabold{font-weight:800}.font-semibold{font-weight:600}.uppercase{text-transform:uppercase}.tracking-wider{letter-spacing:0.05em}.tracking-widest{letter-spacing:0.1em}.text-\[var\(--primary\)\]{color:var(--primary)}.text-\[var\(--primary-light\)\]{color:var(--primary-light)}.text-amber-300{--tw-text-opacity:1;color:rgb(252 211 77 / var(--tw-text-opacity, 1))}.text-amber-400{--tw-text-opacity:1;color:rgb(251 191 36 / var(--tw-text-opacity, 1))}.text-emerald-300{--tw-text-opacity:1;color:rgb(110 231 183 / var(--tw-text-opacity, 1))}.text-emerald-400{--tw-text-opacity:1;color:rgb(52 211 153 / var(--tw-text-opacity, 1))}.text-red-300{--tw-text-opacity:1;color:rgb(252 165 165 / var(--tw-text-opacity, 1))}.text-red-400{--tw-text-opacity:1;color:rgb(248 113 113 / var(--tw-text-opacity, 1))}.text-sky-200{--tw-text-opacity:1;color:rgb(186 230 253 / var(--tw-text-opacity, 1))}.text-sky-300{--tw-text-opacity:1;color:rgb(125 211 252 / var(--tw-text-opacity, 1))}.text-sky-400{--tw-text-opacity:1;color:rgb(56 189 248 / var(--tw-text-opacity, 1))}.text-slate-300{--tw-text-opacity:1;color:rgb(203 213 225 / var(--tw-text-opacity, 1))}.text-slate-300\/80{color:rgb(203 213 225 / 0.8)}.text-slate-400{--tw-text-opacity:1;color:rgb(148 163 184 / var(--tw-text-opacity, 1))}.text-slate-500{--tw-text-opacity:1;color:rgb(100 116 139 / var(--tw-text-opacity, 1))}.text-slate-950{--tw-text-opacity:1;color:rgb(2 6 23 / var(--tw-text-opacity, 1))}.text-white{--tw-text-opacity:1;color:rgb(255 255 255 / var(--tw-text-opacity, 1))}.placeholder-slate-600::placeholder{--tw-placeholder-opacity:1;color:rgb(71 85 105 / var(--tw-placeholder-opacity, 1))}.opacity-0{opacity:0}.shadow-2xl{--tw-shadow:0 25px 50px -12px rgb(0 0 0 / 0.25);--tw-shadow-colored:0 25px 50px -12px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.shadow-\[0_0_30px_var\(--primary-bg\)\]{--tw-shadow:0 0 30px var(--primary-bg);--tw-shadow-colored:0 0 30px var(--primary-bg);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.shadow-lg{--tw-shadow:0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);--tw-shadow-colored:0 10px 15px -3px var(--tw-shadow-color), 0 4px 6px -4px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.shadow-md{--tw-shadow:0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);--tw-shadow-colored:0 4px 6px -1px var(--tw-shadow-color), 0 2px 4px -2px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.shadow-emerald-900\/40{--tw-shadow-color:rgb(6 78 59 / 0.4);--tw-shadow:var(--tw-shadow-colored)}.outline-none{outline:2px solid transparent;outline-offset:2px}.blur-3xl{--tw-blur:blur(64px);filter:var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow)}.backdrop-blur-sm{--tw-backdrop-blur:blur(4px);-webkit-backdrop-filter:var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia);backdrop-filter:var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia)}.transition{transition-property:color, background-color, border-color, fill, stroke, opacity, box-shadow, transform, filter, -webkit-text-decoration-color, -webkit-backdrop-filter;transition-property:color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter;transition-property:color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter, -webkit-text-decoration-color, -webkit-backdrop-filter;transition-timing-function:cubic-bezier(0.4, 0, 0.2, 1);transition-duration:150ms}.transition-all{transition-property:all;transition-timing-function:cubic-bezier(0.4, 0, 0.2, 1);transition-duration:150ms}.hover\:bg-amber-400:hover{--tw-bg-opacity:1;background-color:rgb(251 191 36 / var(--tw-bg-opacity, 1))}.hover\:bg-amber-500\/25:hover{background-color:rgb(245 158 11 / 0.25)}.hover\:bg-amber-500\/30:hover{background-color:rgb(245 158 11 / 0.3)}.hover\:bg-emerald-500:hover{--tw-bg-opacity:1;background-color:rgb(16 185 129 / var(--tw-bg-opacity, 1))}.hover\:bg-red-500\/25:hover{background-color:rgb(239 68 68 / 0.25)}.hover\:bg-sky-500\/30:hover{background-color:rgb(14 165 233 / 0.3)}.hover\:bg-white\/10:hover{background-color:rgb(255 255 255 / 0.1)}.hover\:text-amber-300:hover{--tw-text-opacity:1;color:rgb(252 211 77 / var(--tw-text-opacity, 1))}.hover\:text-white:hover{--tw-text-opacity:1;color:rgb(255 255 255 / var(--tw-text-opacity, 1))}.focus\:border-amber-400:focus{--tw-border-opacity:1;border-color:rgb(251 191 36 / var(--tw-border-opacity, 1))}.focus\:border-sky-400:focus{--tw-border-opacity:1;border-color:rgb(56 189 248 / var(--tw-border-opacity, 1))}@media (min-width: 640px){.sm\:grid-cols-2{grid-template-columns:repeat(2, minmax(0, 1fr))}}@media (min-width: 768px){.md\:w-auto{width:auto}.md\:flex-row{flex-direction:row}}@media (min-width: 1280px){.xl\:w-auto{width:auto}.xl\:flex-row{flex-direction:row}.xl\:items-center{align-items:center}}
+</style></head>
 <body class="color-green">
 <div class="frame">
   <nav class="rail">
@@ -276,6 +281,16 @@ body.theme-day .dev-table th { background: #e2e8f0; }
     <button data-v="maint" onclick="setView('maint')" title="Plan Mantenimiento Lógico"><i class="fa-solid fa-screwdriver-wrench"></i></button>
     <button id="nav-price-btn" class="dev-hidden" data-v="price" onclick="setView('price')" title="Analizador de precios"><i class="fa-solid fa-coins"></i></button>
     
+    <!-- Módulo 1: Tabla de Disponibilidad & Consola NOC (Solo Modo Desarrollador) -->
+    <button id="nav-noc-btn" class="dev-hidden border border-sky-400/40 bg-sky-500/10" data-v="noc" onclick="setView('noc')" title="Tabla de Disponibilidad (Modo Dev)">
+      <i class="fa-solid fa-table-list text-sky-400"></i>
+    </button>
+
+    <!-- Módulo 2: Matriz Embebida MDZ SKYNET (Solo Modo Desarrollador) -->
+    <button id="nav-matrix-btn" class="dev-hidden border border-emerald-400/40 bg-emerald-500/10" data-v="skynet-matrix" onclick="setView('skynet-matrix')" title="Matriz MDZ SKYNET Embebida (Modo Dev)">
+      <i class="fa-solid fa-border-all text-emerald-400"></i>
+    </button>
+
     <button id="nav-dev-btn" class="dev-hidden border border-amber-500/40 bg-amber-500/10" data-v="dev" onclick="setView('dev')" title="Editor Tabla Excel (Modo Dev)">
       <i class="fa-solid fa-table-cells text-amber-400"></i>
     </button>
@@ -304,6 +319,12 @@ body.theme-day .dev-table th { background: #e2e8f0; }
       <div class="flex items-center gap-2 flex-wrap">
         <!-- Botones exclusivos Modo Dev -->
         <div id="dev-header-actions" class="dev-hidden flex items-center gap-2 flex-wrap">
+          <button onclick="setView('noc')" class="px-3.5 py-2 rounded-full bg-sky-500/20 border border-sky-400/50 hover:bg-sky-500/30 text-sky-200 text-xs font-bold transition flex items-center gap-1.5 cursor-pointer" title="Abrir Tabla de Disponibilidad & Consola NOC">
+            <i class="fa-solid fa-table-list"></i> Tabla de Disponibilidad
+          </button>
+          <button onclick="setView('skynet-matrix')" class="px-3.5 py-2 rounded-full bg-emerald-500/20 border border-emerald-400/50 hover:bg-emerald-500/30 text-emerald-200 text-xs font-bold transition flex items-center gap-1.5 cursor-pointer" title="Abrir Matriz MDZ SKYNET Embebida">
+            <i class="fa-solid fa-border-all"></i> Matriz SKYNET
+          </button>
           <span id="dev-changes-badge" class="dev-hidden px-3 py-1.5 rounded-full bg-amber-500/15 border border-amber-500/40 text-amber-300 text-xs font-semibold">
             0 ediciones
           </span>
@@ -502,6 +523,267 @@ body.theme-day .dev-table th { background: #e2e8f0; }
         <div id="price-body" class="flex-1 overflow-y-auto scroll px-5 pb-5 space-y-4"></div>
       </section>
 
+      <!-- =================================================================== -->
+      <!-- MÓDULO 1 (SOLO DEV): CONSOLA NOC & GENERADOR EXCEL EJECUTIVO        -->
+      <!-- =================================================================== -->
+      <section id="view-noc" class="view hidden map panel flex-1 min-w-0 flex flex-col overflow-hidden">
+        <div class="flex flex-wrap items-center justify-between gap-3 px-5 pt-4 pb-3 border-b border-white/10">
+          <div>
+            <h2 class="text-lg font-bold text-white flex items-center gap-2">
+              <i class="fa-solid fa-chart-line text-sky-400"></i>
+              Consola NOC &amp; Generador de Dashboard Ejecutivo (.XLSX)
+            </h2>
+            <p class="text-xs text-slate-400">Consolidación automática: DETEKTOR • REPOTENCIADOS • LOJACK · <span id="nocBannerCorte" class="text-sky-300 font-semibold">Esperando reportes...</span></p>
+          </div>
+          <div class="flex items-center gap-2 flex-wrap">
+            <button type="button" onclick="nocLoadDemoData()" class="px-3 py-1.5 rounded-xl bg-amber-500/15 border border-amber-400/40 hover:bg-amber-500/25 text-amber-300 text-xs font-bold transition cursor-pointer">
+              <i class="fa-solid fa-sparkles mr-1"></i>Datos Demo
+            </button>
+            <button type="button" onclick="nocClearAll()" class="px-3 py-1.5 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 text-slate-300 text-xs font-semibold transition cursor-pointer">
+              <i class="fa-solid fa-rotate-left mr-1"></i>Limpiar
+            </button>
+            <button id="btnNocExportExcel" type="button" disabled onclick="nocExportExcelEjecutivo()" class="btn px-4 py-1.5 rounded-xl text-white text-xs font-bold transition cursor-pointer">
+              <i class="fa-solid fa-file-excel mr-1"></i>Generar Excel Ejecutivo
+            </button>
+          </div>
+        </div>
+
+        <div id="nocLockedGuard" class="flex-1 overflow-y-auto scroll px-5 py-10 flex items-center justify-center">
+          <div class="card p-8 text-center max-w-md border-amber-400/40">
+            <i class="fa-solid fa-lock text-4xl text-amber-400 mb-3 block"></i>
+            <h3 class="text-lg font-bold text-white mb-1">Módulo NOC Protegido</h3>
+            <p class="text-xs text-slate-400 mb-4">Ingresa la clave de desarrollador para activar la consola NOC y exportación Excel ejecutiva.</p>
+            <button type="button" onclick="toggleDevModal()" class="px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-extrabold transition cursor-pointer">Desbloquear Modo Dev</button>
+          </div>
+        </div>
+
+        <div id="nocUnlockedBody" class="hidden flex-1 overflow-y-auto scroll px-5 py-4 space-y-5">
+          <!-- Carga de 3 Reportes + Parámetros SLA -->
+          <div class="card p-4 space-y-4">
+            <div class="flex flex-wrap items-center justify-between gap-2">
+              <span class="text-xs font-bold uppercase tracking-wider text-sky-300"><i class="fa-solid fa-folder-open mr-1.5"></i>Reportes de Entrada &amp; Umbrales SLA</span>
+              <span id="nocStatusText" class="text-xs font-semibold text-sky-400">Listo para procesar. Cargue los 3 reportes del sistema.</span>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+              <div class="chip p-3">
+                <div class="flex items-center justify-between text-xs font-bold text-white mb-1.5">
+                  <span>1. DETEKTOR (.xls/.xlsx)</span>
+                  <span id="nocBadgeDet" class="text-[11px] text-slate-400">Pendiente</span>
+                </div>
+                <input id="nocFileDet" type="file" accept=".xls,.xlsx,.xlsm" class="w-full text-xs text-slate-300 file:mr-2 file:py-1 file:px-2.5 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-sky-500/20 file:text-sky-300 hover:file:bg-sky-500/30 cursor-pointer">
+              </div>
+
+              <div class="chip p-3">
+                <div class="flex items-center justify-between text-xs font-bold text-white mb-1.5">
+                  <span>2. REPOTENCIADOS (.xls/.xlsx)</span>
+                  <span id="nocBadgeRep" class="text-[11px] text-slate-400">Pendiente</span>
+                </div>
+                <input id="nocFileRep" type="file" accept=".xls,.xlsx,.xlsm" class="w-full text-xs text-slate-300 file:mr-2 file:py-1 file:px-2.5 file:rounded-lg file:border-0 file:text-xs font-bold file:bg-sky-500/20 file:text-sky-300 hover:file:bg-sky-500/30 cursor-pointer">
+              </div>
+
+              <div class="chip p-3">
+                <div class="flex items-center justify-between text-xs font-bold text-white mb-1.5">
+                  <span>3. Puntos LOJACK (.xlsx)</span>
+                  <span id="nocBadgeLoj" class="text-[11px] text-slate-400">Pendiente</span>
+                </div>
+                <input id="nocFileLoj" type="file" accept=".xls,.xlsx,.xlsm" class="w-full text-xs text-slate-300 file:mr-2 file:py-1 file:px-2.5 file:rounded-lg file:border-0 file:text-xs font-bold file:bg-sky-500/20 file:text-sky-300 hover:file:bg-sky-500/30 cursor-pointer">
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 pt-2 border-t border-white/10 text-xs">
+              <div>
+                <label class="block text-[10px] font-bold uppercase text-slate-400 mb-1">Fecha de Corte</label>
+                <input id="nocParamCorte" type="datetime-local" step="1" onchange="nocRecalculate()" class="w-full px-2.5 py-1.5 rounded-lg bg-black/40 border border-white/15 text-sky-300 font-semibold outline-none focus:border-sky-400">
+              </div>
+              <div>
+                <label class="block text-[10px] font-bold uppercase text-slate-400 mb-1">Meta SLA (%)</label>
+                <input id="nocParamSla" type="number" step="0.1" min="0" max="100" value="95.0" oninput="nocRecalculate()" class="w-full px-2.5 py-1.5 rounded-lg bg-black/40 border border-white/15 text-sky-300 font-bold outline-none focus:border-sky-400">
+              </div>
+              <div>
+                <label class="block text-[10px] font-bold uppercase text-slate-400 mb-1">Umbral Verde (&lt;h)</label>
+                <input id="nocParamVerde" type="number" step="1" min="1" value="24" oninput="nocRecalculate()" class="w-full px-2.5 py-1.5 rounded-lg bg-black/40 border border-white/15 text-emerald-400 font-bold outline-none focus:border-emerald-400">
+              </div>
+              <div>
+                <label class="block text-[10px] font-bold uppercase text-slate-400 mb-1">Umbral Amarillo (&le;h)</label>
+                <input id="nocParamAmarillo" type="number" step="1" min="1" value="48" oninput="nocRecalculate()" class="w-full px-2.5 py-1.5 rounded-lg bg-black/40 border border-white/15 text-amber-400 font-bold outline-none focus:border-amber-400">
+              </div>
+            </div>
+          </div>
+
+          <div id="nocAlertBox" class="hidden p-3.5 rounded-xl border text-xs"></div>
+
+          <!-- KPIs NOC -->
+          <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+            <div class="chip p-3 text-center">
+              <p class="text-[10px] font-bold uppercase text-slate-400">Disp. Global</p>
+              <p id="nocKpiGlobal" class="text-xl font-extrabold text-sky-400 mt-1">0.00%</p>
+            </div>
+            <div class="chip p-3 text-center">
+              <p class="text-[10px] font-bold uppercase text-slate-400">Disp. Ponderada</p>
+              <p id="nocKpiPond" class="text-xl font-extrabold text-white mt-1">0.00%</p>
+            </div>
+            <div class="chip p-3 text-center">
+              <p class="text-[10px] font-bold uppercase text-slate-400">Planta Operativa</p>
+              <p id="nocKpiPlanta" class="text-xl font-extrabold text-white mt-1">0</p>
+            </div>
+            <div class="chip p-3 text-center border-emerald-500/40">
+              <p class="text-[10px] font-bold uppercase text-emerald-400">Verde (OK)</p>
+              <p id="nocKpiVerde" class="text-xl font-extrabold text-emerald-400 mt-1">0</p>
+            </div>
+            <div class="chip p-3 text-center border-amber-500/40">
+              <p class="text-[10px] font-bold uppercase text-amber-400">Amarillo (Alerta)</p>
+              <p id="nocKpiAmarillo" class="text-xl font-extrabold text-amber-400 mt-1">0</p>
+            </div>
+            <div class="chip p-3 text-center border-red-500/40">
+              <p class="text-[10px] font-bold uppercase text-red-400">Rojo (Caído)</p>
+              <p id="nocKpiRojo" class="text-xl font-extrabold text-red-400 mt-1">0</p>
+            </div>
+          </div>
+
+          <!-- Matriz por Tecnología -->
+          <div class="card p-4">
+            <h3 class="text-xs font-bold uppercase tracking-wider text-white mb-3">1. Desempeño y Disponibilidad por Tecnología</h3>
+            <div class="overflow-x-auto rounded-xl border border-white/10">
+              <table class="w-full text-left border-collapse text-xs">
+                <thead>
+                  <tr class="bg-black/40 text-slate-300 text-[10px] font-bold uppercase border-b border-white/10">
+                    <th class="py-2.5 px-3">Tecnología / Grupo</th>
+                    <th class="py-2.5 px-2 text-center">Total</th>
+                    <th class="py-2.5 px-2 text-center">Bajas</th>
+                    <th class="py-2.5 px-2 text-center">Activa</th>
+                    <th class="py-2.5 px-2 text-center text-emerald-400">Verde</th>
+                    <th class="py-2.5 px-2 text-center text-amber-400">Amarillo</th>
+                    <th class="py-2.5 px-2 text-center text-red-400">Rojo</th>
+                    <th class="py-2.5 px-2 text-center">% Salud</th>
+                    <th class="py-2.5 px-2 text-center">% Estricta</th>
+                    <th class="py-2.5 px-2 text-center">% Ponderada</th>
+                    <th class="py-2.5 px-2 text-center">Brecha</th>
+                    <th class="py-2.5 px-3 text-center">Estado SLA</th>
+                  </tr>
+                </thead>
+                <tbody id="nocTbodyMatriz" class="divide-y divide-white/5"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- 3 Gráficos NOC -->
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+            <div class="card p-3.5">
+              <p class="text-xs font-bold text-white text-center mb-2">Composición Operativa (%)</p>
+              <div class="relative h-56"><canvas id="nocChartComp"></canvas></div>
+            </div>
+            <div class="card p-3.5">
+              <p class="text-xs font-bold text-white text-center mb-2">% Disp. Estricta vs. Ponderada</p>
+              <div class="relative h-56"><canvas id="nocChartBar"></canvas></div>
+            </div>
+            <div class="card p-3.5">
+              <p class="text-xs font-bold text-white text-center mb-2">Distribución Global Planta Activa</p>
+              <div class="relative h-56"><canvas id="nocChartDonut"></canvas></div>
+            </div>
+          </div>
+
+          <!-- Panel de Incidencias NOC -->
+          <div class="card p-4">
+            <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+              <h3 class="text-xs font-bold uppercase tracking-wider text-white">
+                2. Atención Prioritaria (<span id="nocIncCount" class="text-red-400">0 INCIDENCIAS</span>)
+              </h3>
+              <div class="flex gap-2">
+                <input id="nocIncSearch" oninput="nocRenderIncidencias()" placeholder="Buscar punto o ID..." class="px-3 py-1.5 text-xs rounded-lg bg-black/40 border border-white/15 outline-none focus:border-sky-400">
+                <select id="nocIncSev" onchange="nocRenderIncidencias()" class="sel text-xs py-1.5">
+                  <option value="ALL">Todas</option>
+                  <option value="ROJO">Crítico (ROJO)</option>
+                  <option value="AMARILLO">Alerta (AMARILLO)</option>
+                </select>
+              </div>
+            </div>
+            <div class="overflow-x-auto rounded-xl border border-white/10 max-h-64 overflow-y-auto scroll">
+              <table class="w-full text-left border-collapse text-xs">
+                <thead>
+                  <tr class="bg-black/40 text-slate-300 text-[10px] font-bold uppercase border-b border-white/10">
+                    <th class="py-2 px-2 text-center">#</th>
+                    <th class="py-2 px-2 text-center">Grupo</th>
+                    <th class="py-2 px-2 text-center">ID</th>
+                    <th class="py-2 px-3">Punto / Antena</th>
+                    <th class="py-2 px-2 text-center">Último Reporte</th>
+                    <th class="py-2 px-2 text-center">Días</th>
+                    <th class="py-2 px-2 text-center">Severidad</th>
+                    <th class="py-2 px-3">Acción Requerida</th>
+                  </tr>
+                </thead>
+                <tbody id="nocTbodyInc" class="divide-y divide-white/5"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- =================================================================== -->
+      <!-- MÓDULO 2 (SOLO DEV): MATRIZ EMBEBIDA MDZ SKYNET                     -->
+      <!-- =================================================================== -->
+      <section id="view-skynet-matrix" class="view hidden map panel flex-1 min-w-0 flex flex-col overflow-hidden">
+        <div class="flex flex-wrap items-center justify-between gap-3 px-5 pt-4 pb-3 border-b border-white/10">
+          <div>
+            <h2 class="text-lg font-bold text-white flex items-center gap-2">
+              <i class="fa-solid fa-border-all text-emerald-400"></i>
+              Matriz MDZ SKYNET Embebida
+            </h2>
+            <p class="text-xs text-slate-400">Sub-módulo embebido de matriz operativa (Punto, ID, Tecnología, Reseteador, IMEI, SIM, Ubicación y Estado)</p>
+          </div>
+          <div class="flex items-center gap-2 flex-wrap">
+            <input id="matrixSearchInput" oninput="renderEmbeddedSkynetMatrix()" placeholder="Filtrar matriz por punto, IMEI, SIM o tecnología..." class="px-3 py-1.5 text-xs rounded-xl bg-black/40 border border-white/15 outline-none focus:border-emerald-400 w-64">
+            <select id="matrixTechFilter" onchange="renderEmbeddedSkynetMatrix()" class="sel text-xs py-1.5">
+              <option value="ALL">Todas las tecnologías</option>
+            </select>
+            <button type="button" onclick="setView('filter')" class="chip px-3 py-1.5 text-xs font-bold text-slate-200 hover:border-emerald-400 transition cursor-pointer">
+              <i class="fa-solid fa-arrow-up-right-from-square mr-1 text-emerald-400"></i>Vista Filtrado
+            </button>
+            <button type="button" onclick="setView('dev')" class="chip px-3 py-1.5 text-xs font-bold text-amber-300 hover:border-amber-400 transition cursor-pointer">
+              <i class="fa-solid fa-table-cells mr-1"></i>Editor Tabla
+            </button>
+          </div>
+        </div>
+
+        <div id="matrixLockedGuard" class="flex-1 overflow-y-auto scroll px-5 py-10 flex items-center justify-center">
+          <div class="card p-8 text-center max-w-md border-amber-400/40">
+            <i class="fa-solid fa-lock text-4xl text-amber-400 mb-3 block"></i>
+            <h3 class="text-lg font-bold text-white mb-1">Matriz Embebida Protegida</h3>
+            <p class="text-xs text-slate-400 mb-4">Este sub-módulo embebido solo se activa al ingresar la contraseña de desarrollador.</p>
+            <button type="button" onclick="toggleDevModal()" class="px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-extrabold transition cursor-pointer">Desbloquear Modo Dev</button>
+          </div>
+        </div>
+
+        <div id="matrixUnlockedBody" class="hidden flex-1 overflow-y-auto scroll px-5 py-4 space-y-4">
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-3" id="matrixSummaryCards"></div>
+          <div class="overflow-auto rounded-2xl border border-white/10 max-h-[calc(100vh-260px)] scroll">
+            <table class="dev-table w-full text-left border-collapse text-xs">
+              <thead>
+                <tr class="bg-black/40 text-slate-300 text-[10px] font-bold uppercase border-b border-white/10">
+                  <th class="py-2.5 px-3 text-center">#</th>
+                  <th class="py-2.5 px-3">ID</th>
+                  <th class="py-2.5 px-3">Punto</th>
+                  <th class="py-2.5 px-3">Tipo</th>
+                  <th class="py-2.5 px-3">Tecnología</th>
+                  <th class="py-2.5 px-3">Modelo Reseteador</th>
+                  <th class="py-2.5 px-3">IMEI Reseteador</th>
+                  <th class="py-2.5 px-3">SIM Reseteador</th>
+                  <th class="py-2.5 px-3 text-center">Estado / Obs</th>
+                  <th class="py-2.5 px-3 text-center">Acción</th>
+                </tr>
+              </thead>
+              <tbody id="matrixTbody" class="divide-y divide-white/5"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+      
+      <!-- ANALIZADOR DE PRECIOS -->
+      <section id="view-price" class="view hidden map panel flex-1 min-w-0 flex flex-col overflow-hidden">
+        <div class="flex flex-wrap items-center gap-3 px-5 pt-4 pb-3"><h2 class="text-lg font-semibold text-white mr-auto">Analizador de precios</h2><label class="text-xs text-slate-400">Precio <select id="price-col" class="sel" onchange="renderPrice()"></select></label><label class="text-xs text-slate-400">Agrupar por <select id="price-grp" class="sel" onchange="renderPrice()"></select></label></div>
+        <div id="price-body" class="flex-1 overflow-y-auto scroll px-5 pb-5 space-y-4"></div>
+      </section>
+
       <!-- VISTA MODO DESARROLLADOR: EDITOR TABLA EXCEL -->
       <section id="view-dev" class="view hidden map panel flex-1 min-w-0 flex flex-col overflow-hidden">
         <div class="flex flex-wrap items-center justify-between gap-3 px-5 pt-4 pb-3 border-b border-white/5">
@@ -542,7 +824,7 @@ body.theme-day .dev-table th { background: #e2e8f0; }
       </h3>
       <button onclick="closeDevAuthModal()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
     </div>
-    <p class="text-xs text-slate-400 mb-4">Ingresa la clave de acceso para habilitar la edición directa en las tarjetas, agregar puntos manuales, guardar el HTML embebido y exportar Excel.</p>
+    <p class="text-xs text-slate-400 mb-4">Ingresa la clave de acceso para habilitar la edición directa, Consola NOC, Matriz SKYNET embebida, guardar el HTML embebido y exportar Excel.</p>
     <input type="password" id="dev-pass-input" placeholder="Clave de acceso..." onkeydown="if(event.key==='Enter') verifyDevPassword()" class="w-full px-3.5 py-2.5 text-sm rounded-xl bg-black/40 border border-white/15 outline-none focus:border-amber-400 mb-3">
     <p id="dev-pass-error" class="dev-hidden text-xs text-red-400 mb-3"><i class="fa-solid fa-circle-exclamation mr-1"></i>Clave incorrecta.</p>
     <div class="flex justify-end gap-2">
@@ -1037,7 +1319,9 @@ function toggleDevModal() {
     if (
       !$("view-dev").classList.contains("hidden") ||
       !$("view-map").classList.contains("hidden") ||
-      !$("view-price").classList.contains("hidden")
+      !$("view-price").classList.contains("hidden") ||
+      !$("view-noc").classList.contains("hidden") ||
+      !$("view-skynet-matrix").classList.contains("hidden")
     ) setView("filter");
     refreshAllViews();
     return;
@@ -1059,7 +1343,8 @@ async function verifyDevPassword() {
     isDevMode = true;
     closeDevAuthModal();
     updateDevUI();
-    showToast("Modo Desarrollador desbloqueado: Mapa y Analizador de precios habilitados");
+    showToast("Modo Desarrollador desbloqueado: Tabla de Disponibilidad activa");
+    setView("noc");
     refreshAllViews();
   } else {
     $("dev-pass-error").classList.remove("dev-hidden");
@@ -1069,10 +1354,17 @@ async function verifyDevPassword() {
 function updateDevUI() {
   $("dev-badge").classList.toggle("dev-hidden", !isDevMode);
   $("nav-dev-btn").classList.toggle("dev-hidden", !isDevMode);
+  if ($("nav-noc-btn")) $("nav-noc-btn").classList.toggle("dev-hidden", !isDevMode);
+  if ($("nav-matrix-btn")) $("nav-matrix-btn").classList.toggle("dev-hidden", !isDevMode);
   if ($("nav-map-btn")) $("nav-map-btn").classList.toggle("dev-hidden", !isDevMode);
   if ($("nav-price-btn")) $("nav-price-btn").classList.toggle("dev-hidden", !isDevMode);
   $("dev-header-actions").classList.toggle("dev-hidden", !isDevMode);
   $("btn-add-record-filter").classList.toggle("dev-hidden", !isDevMode);
+
+  if ($("nocLockedGuard")) $("nocLockedGuard").classList.toggle("hidden", isDevMode);
+  if ($("nocUnlockedBody")) $("nocUnlockedBody").classList.toggle("hidden", !isDevMode);
+  if ($("matrixLockedGuard")) $("matrixLockedGuard").classList.toggle("hidden", isDevMode);
+  if ($("matrixUnlockedBody")) $("matrixUnlockedBody").classList.toggle("hidden", !isDevMode);
 
   const lockIcon = $("dev-lock-icon");
   const lockBtn = $("dev-lock-btn");
@@ -1118,6 +1410,8 @@ function refreshAllViews() {
   if (!$("view-maint").classList.contains("hidden")) renderMaintSetup();
   if (!$("view-price").classList.contains("hidden")) renderPrice();
   if (!$("view-dev").classList.contains("hidden")) renderDevTable();
+  if (!$("view-noc").classList.contains("hidden") && isDevMode) nocRecalculate();
+  if (!$("view-skynet-matrix").classList.contains("hidden") && isDevMode) renderEmbeddedSkynetMatrix();
 }
 
 // ==========================================
@@ -1394,6 +1688,7 @@ function toggleColor() {
   if(!$("view-tech").classList.contains("hidden")) renderTech();
   if(!$("view-price").classList.contains("hidden")) renderPrice();
   if(!$("view-maint").classList.contains("hidden")) renderMaint();
+  if(!$("view-noc").classList.contains("hidden") && isDevMode) nocRecalculate();
 }
 
 function toggleTheme() {
@@ -1824,18 +2119,21 @@ dropZone.addEventListener("drop",e=>{
 });
 
 function setView(v){
-  if((v==="dev" || v==="map" || v==="price") && !isDevMode){toggleDevModal();return}
-  if(v!=="filter"&&!excelData.length){showToast("No hay datos cargados");return}
+  if((v==="dev" || v==="map" || v==="price" || v==="noc" || v==="skynet-matrix") && !isDevMode){toggleDevModal();return}
+  if(v!=="filter" && v!=="noc" && !excelData.length){showToast("No hay datos cargados");return}
   document.querySelectorAll(".rail button[data-v]").forEach(b=>b.classList.toggle("on",b.dataset.v===v));
   
   $("side").classList.toggle("hidden",v!=="filter");
   $("view-filter").classList.toggle("hidden",v!=="filter");
   
-  ["map","tech","antenna","maint","price","dev"].forEach(x=>$("view-"+x).classList.toggle("hidden",v!==x));
+  ["map","tech","antenna","maint","price","dev","noc","skynet-matrix"].forEach(x=>{
+    const el = $("view-"+x);
+    if(el) el.classList.toggle("hidden",v!==x);
+  });
   
   const lc = $("logo-container");
   lc.className = "relative inline-block mt-1"; 
-  if (excelData.length > 0) {
+  if (excelData.length > 0 || v === "noc") {
     lc.classList.add(`anim-${v}`);
   }
   
@@ -1844,6 +2142,8 @@ function setView(v){
   if(v==="maint") renderMaintSetup();
   if(v==="price")renderPrice();
   if(v==="dev")renderDevTable();
+  if(v==="noc")nocRecalculate();
+  if(v==="skynet-matrix")renderEmbeddedSkynetMatrix();
 }
 
 function getSector(lat, lon) {
@@ -2359,5 +2659,731 @@ function doPriceSearch(){
   dashContainer.classList.add("hidden"); resContainer.classList.remove("hidden");
   if(!matches.length) { resContainer.innerHTML = `<div class="col-span-full p-6 text-center chip text-slate-500 text-sm border-dashed"><i class="fa-solid fa-face-frown-open text-3xl mb-3 block text-slate-600"></i>No se encontraron puntos fijos con ese nombre.</div>`; return; }
   resContainer.innerHTML = matches.map(x => `<div class="chip p-4 flex justify-between items-center border-l-4 border-[var(--primary)] hover:bg-black/20 transition"><div class="min-w-0 pr-3"><p class="text-[10px] text-slate-400 font-semibold truncate uppercase tracking-wide">${escapeHtml(x.g)}</p><p class="text-sm font-bold text-white truncate mt-0.5">${escapeHtml(x.n)}</p></div><b class="text-[var(--primary)] text-lg whitespace-nowrap">${money(x.p)}</b></div>`).join("");
+}
+
+// =========================================================================
+// MÓDULO 1 (SOLO DEV): CONSOLA NOC & GENERADOR EXCEL EJECUTIVO
+// =========================================================================
+if (typeof Chart !== "undefined" && typeof ChartDataLabels !== "undefined") {
+  Chart.register(ChartDataLabels);
+}
+
+const nocState = {
+  rawDet: null,
+  rawRep: null,
+  rawLoj: null,
+  dfTotal: [],
+  dfEval: [],
+  incidencias: [],
+  resumenGrupos: [],
+  resumenTotal: null,
+  fechaCorte: null,
+  charts: { comp: null, bar: null, donut: null }
+};
+
+function nocParseDate(val) {
+  if (val === null || val === undefined || val === "") return null;
+  if (val instanceof Date && !isNaN(val.getTime())) return val;
+  if (typeof val === "number" && !isNaN(val)) {
+    const utcDays = Math.floor(val - 25569);
+    const base = new Date(utcDays * 86400 * 1000);
+    const frac = val - Math.floor(val) + 0.0000001;
+    let totalSec = Math.floor(86400 * frac);
+    const sec = totalSec % 60;
+    totalSec -= sec;
+    const hr = Math.floor(totalSec / 3600);
+    const min = Math.floor(totalSec / 60) % 60;
+    return new Date(base.getUTCFullYear(), base.getUTCMonth(), base.getUTCDate(), hr, min, sec);
+  }
+  const s = String(val).trim();
+  if (!s || ["nan", "nat", "null", "-", "none"].includes(s.toLowerCase())) return null;
+  const direct = new Date(s);
+  if (!isNaN(direct.getTime())) return direct;
+  const m = s.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{2,4})(?:\s+(\d{1,2}):(\d{1,2})(?::(\d{1,2}))?)?/);
+  if (m) {
+    let yr = parseInt(m[3], 10);
+    if (yr < 100) yr += 2000;
+    return new Date(yr, parseInt(m[2], 10) - 1, parseInt(m[1], 10), m[4] ? parseInt(m[4], 10) : 0, m[5] ? parseInt(m[5], 10) : 0, m[6] ? parseInt(m[6], 10) : 0);
+  }
+  return null;
+}
+
+function nocCombinarFechaHora(fechaVal, horaVal) {
+  const f = nocParseDate(fechaVal);
+  if (!f) return null;
+  if (horaVal !== null && horaVal !== undefined && String(horaVal).trim() !== "") {
+    if (typeof horaVal === "number") {
+      const frac = horaVal - Math.floor(horaVal);
+      let totalSec = Math.round(frac * 86400);
+      const sec = totalSec % 60;
+      totalSec -= sec;
+      const hr = Math.floor(totalSec / 3600);
+      const min = Math.floor(totalSec / 60) % 60;
+      return new Date(f.getFullYear(), f.getMonth(), f.getDate(), hr, min, sec);
+    }
+    const hStr = String(horaVal).trim();
+    if (!["nan", "nat", ""].includes(hStr.toLowerCase())) {
+      const tm = hStr.match(/(\d{1,2}):(\d{1,2})(?::(\d{1,2}))?/);
+      if (tm) {
+        return new Date(f.getFullYear(), f.getMonth(), f.getDate(), parseInt(tm[1], 10), parseInt(tm[2], 10), tm[3] ? parseInt(tm[3], 10) : 0);
+      }
+      const td = nocParseDate(hStr);
+      if (td) return new Date(f.getFullYear(), f.getMonth(), f.getDate(), td.getHours(), td.getMinutes(), td.getSeconds());
+    }
+  }
+  return f;
+}
+
+function nocFmtDt(dt) {
+  if (!dt || !(dt instanceof Date) || isNaN(dt.getTime())) return "-";
+  const p = n => String(n).padStart(2, "0");
+  return `${dt.getFullYear()}-${p(dt.getMonth() + 1)}-${p(dt.getDate())} ${p(dt.getHours())}:${p(dt.getMinutes())}:${p(dt.getSeconds())}`;
+}
+
+function nocFmtBanner(dt) {
+  if (!dt || !(dt instanceof Date) || isNaN(dt.getTime())) return "-";
+  const p = n => String(n).padStart(2, "0");
+  return `${p(dt.getDate())}/${p(dt.getMonth() + 1)}/${dt.getFullYear()} ${p(dt.getHours())}:${p(dt.getMinutes())}:${p(dt.getSeconds())}`;
+}
+
+function nocToInputDt(dt) {
+  if (!dt || !(dt instanceof Date) || isNaN(dt.getTime())) return "";
+  const p = n => String(n).padStart(2, "0");
+  return `${dt.getFullYear()}-${p(dt.getMonth() + 1)}-${p(dt.getDate())}T${p(dt.getHours())}:${p(dt.getMinutes())}:${p(dt.getSeconds())}`;
+}
+
+function nocReadWb(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = e => {
+      try {
+        resolve(XLSX.read(new Uint8Array(e.target.result), { type: "array", cellDates: false }));
+      } catch (err) { reject(err); }
+    };
+    reader.onerror = () => reject(new Error("Error al leer el archivo."));
+    reader.readAsArrayBuffer(file);
+  });
+}
+
+function nocParseDr(wb, grupo) {
+  const ws = wb.Sheets[wb.SheetNames[0]];
+  const rows = XLSX.utils.sheet_to_json(ws, { defval: null });
+  if (!rows.length) throw new Error(`El reporte ${grupo} no tiene filas.`);
+  return rows.map(raw => {
+    const row = {};
+    Object.keys(raw).forEach(k => { row[String(k).trim()] = raw[k]; });
+    let disp = null;
+    if (row["% DISPONIBILIDAD"] !== undefined && row["% DISPONIBILIDAD"] !== null && String(row["% DISPONIBILIDAD"]).trim() !== "") {
+      const n = parseFloat(String(row["% DISPONIBILIDAD"]).replace("%", "").trim());
+      if (!isNaN(n)) disp = n;
+    }
+    return {
+      GRUPO: grupo,
+      ID: row["Id"] !== undefined && row["Id"] !== null ? String(row["Id"]).trim() : (row["ID"] !== undefined && row["ID"] !== null ? String(row["ID"]).trim() : "-"),
+      NOMBRE: row["NOMBRE"] !== undefined && row["NOMBRE"] !== null ? String(row["NOMBRE"]).trim() : "-",
+      CONECTIVIDAD_DT: nocParseDate(row["CONECTIVIDAD"]),
+      RADIO_RX_DT: nocParseDate(row["RADIO RX"]),
+      COMANDO_RX: row["COMANDO RX"] !== undefined && row["COMANDO RX"] !== null && String(row["COMANDO RX"]).trim() !== "" ? String(row["COMANDO RX"]).trim() : "-",
+      DISP_SISTEMA: disp,
+      OBS_ORIG: ""
+    };
+  });
+}
+
+function nocParseLojack(wb) {
+  const ws = wb.Sheets[wb.SheetNames[0]];
+  const matrix = XLSX.utils.sheet_to_json(ws, { header: 1, defval: null });
+  let headerIdx = -1;
+  for (let i = 0; i < matrix.length; i++) {
+    const row = matrix[i] || [];
+    const vals = row.filter(v => v !== null && v !== undefined).map(v => String(v).trim().toUpperCase());
+    if (vals.includes("ANTENAS") && vals.includes("FECHA")) {
+      headerIdx = i;
+      break;
+    }
+  }
+  if (headerIdx === -1) throw new Error("No se encontraron las columnas 'ANTENAS' y 'FECHA' en LOJACK.");
+  const headers = matrix[headerIdx].map(c => (c !== null && c !== undefined ? String(c).trim().toUpperCase() : ""));
+  const idxAnt = headers.indexOf("ANTENAS");
+  const idxFec = headers.indexOf("FECHA");
+  const idxHor = headers.findIndex(c => c.startsWith("HORA"));
+  const idxObs = headers.findIndex(c => c.includes("OBSERV"));
+
+  const out = [];
+  for (let r = headerIdx + 1; r < matrix.length; r++) {
+    const row = matrix[r];
+    if (!row) continue;
+    const rawAnt = row[idxAnt];
+    if (rawAnt === null || rawAnt === undefined) continue;
+    const antStr = String(rawAnt).trim();
+    if (!antStr || antStr.toUpperCase() === "ANTENAS") continue;
+
+    let idLj = "-";
+    const firstVal = row[0];
+    if (firstVal !== null && firstVal !== undefined && String(firstVal).trim() !== "") {
+      const numV = Number(firstVal);
+      if (!isNaN(numV) && isFinite(numV)) {
+        idLj = `LJ-${String(Math.trunc(numV)).padStart(3, "0")}`;
+      }
+    }
+    const conDt = nocCombinarFechaHora(idxFec !== -1 ? row[idxFec] : null, idxHor !== -1 ? row[idxHor] : null);
+    const obsClean = idxObs !== -1 && row[idxObs] !== null && row[idxObs] !== undefined ? String(row[idxObs]).trim() : "";
+
+    out.push({
+      GRUPO: "LOJACK",
+      ID: idLj,
+      NOMBRE: antStr,
+      CONECTIVIDAD_DT: conDt,
+      RADIO_RX_DT: null,
+      COMANDO_RX: "-",
+      DISP_SISTEMA: null,
+      OBS_ORIG: obsClean
+    });
+  }
+  if (!out.length) throw new Error("No se encontraron puntos válidos en LOJACK.");
+  return out;
+}
+
+function nocShowAlert(msgText, type = "error") {
+  const boxEl = $("nocAlertBox");
+  boxEl.classList.remove("hidden", "bg-red-500/15", "border-red-500/40", "text-red-200", "bg-emerald-500/15", "border-emerald-500/40", "text-emerald-200");
+  if (type === "error") {
+    boxEl.classList.add("bg-red-500/15", "border-red-500/40", "text-red-200");
+  } else {
+    boxEl.classList.add("bg-emerald-500/15", "border-emerald-500/40", "text-emerald-200");
+  }
+  boxEl.textContent = msgText;
+}
+
+async function nocHandleFile(inputEl, tipo) {
+  if (!isDevMode) { toggleDevModal(); return; }
+  const file = inputEl.files[0];
+  if (!file) return;
+  $("nocAlertBox").classList.add("hidden");
+  try {
+    const wb = await nocReadWb(file);
+    if (tipo === "DET") {
+      nocState.rawDet = nocParseDr(wb, "DETEKTOR");
+      $("nocBadgeDet").textContent = `${nocState.rawDet.length} pts`;
+      $("nocBadgeDet").className = "text-[11px] font-bold text-emerald-400";
+    } else if (tipo === "REP") {
+      nocState.rawRep = nocParseDr(wb, "REPOTENCIADOS");
+      $("nocBadgeRep").textContent = `${nocState.rawRep.length} pts`;
+      $("nocBadgeRep").className = "text-[11px] font-bold text-emerald-400";
+    } else if (tipo === "LOJ") {
+      nocState.rawLoj = nocParseLojack(wb);
+      $("nocBadgeLoj").textContent = `${nocState.rawLoj.length} pts`;
+      $("nocBadgeLoj").className = "text-[11px] font-bold text-emerald-400";
+    }
+    nocCheckReady();
+  } catch (err) {
+    nocShowAlert(`Error en ${tipo}: ${err.message}`, "error");
+    inputEl.value = "";
+  }
+}
+
+function nocCheckReady() {
+  const countLoaded = [nocState.rawDet, nocState.rawRep, nocState.rawLoj].filter(Boolean).length;
+  $("nocStatusText").textContent = `Reportes cargados: ${countLoaded} de 3.`;
+  if (countLoaded === 3) {
+    nocState.dfTotal = [...nocState.rawDet, ...nocState.rawRep, ...nocState.rawLoj];
+    let maxT = -Infinity;
+    nocState.dfTotal.forEach(r => {
+      if (r.CONECTIVIDAD_DT instanceof Date && !isNaN(r.CONECTIVIDAD_DT.getTime())) {
+        if (r.CONECTIVIDAD_DT.getTime() > maxT) maxT = r.CONECTIVIDAD_DT.getTime();
+      }
+    });
+    nocState.fechaCorte = maxT > -Infinity ? new Date(maxT) : new Date();
+    $("nocParamCorte").value = nocToInputDt(nocState.fechaCorte);
+    $("btnNocExportExcel").disabled = false;
+    $("nocStatusText").textContent = `Consolidado listo: ${nocState.dfTotal.length} puntos.`;
+    nocRecalculate();
+  }
+}
+
+function nocLoadDemoData() {
+  if (!isDevMode) { toggleDevModal(); return; }
+  $("nocAlertBox").classList.add("hidden");
+  const now = new Date();
+  const hAgo = h => new Date(now.getTime() - h * 3600000);
+
+  nocState.rawDet = [
+    { GRUPO: "DETEKTOR", ID: "DT-01", NOMBRE: "NODO CENTRAL LIMA", CONECTIVIDAD_DT: hAgo(1.5), RADIO_RX_DT: hAgo(1.4), COMANDO_RX: "OK", DISP_SISTEMA: 99.6, OBS_ORIG: "" },
+    { GRUPO: "DETEKTOR", ID: "DT-02", NOMBRE: "ESTACIÓN CALLAO", CONECTIVIDAD_DT: hAgo(27.0), RADIO_RX_DT: hAgo(27.0), COMANDO_RX: "TIMEOUT", DISP_SISTEMA: 85.0, OBS_ORIG: "" },
+    { GRUPO: "DETEKTOR", ID: "DT-03", NOMBRE: "TORRE COMAS NORTE", CONECTIVIDAD_DT: hAgo(56.0), RADIO_RX_DT: hAgo(56.2), COMANDO_RX: "NO_RESP", DISP_SISTEMA: 40.0, OBS_ORIG: "" }
+  ];
+  nocState.rawRep = [
+    { GRUPO: "REPOTENCIADOS", ID: "RP-01", NOMBRE: "REPETIDOR TRUJILLO", CONECTIVIDAD_DT: hAgo(0.8), RADIO_RX_DT: hAgo(0.8), COMANDO_RX: "OK", DISP_SISTEMA: 99.8, OBS_ORIG: "" },
+    { GRUPO: "REPOTENCIADOS", ID: "RP-02", NOMBRE: "ANTENA AREQUIPA", CONECTIVIDAD_DT: hAgo(30.5), RADIO_RX_DT: hAgo(30.5), COMANDO_RX: "WARN", DISP_SISTEMA: 82.0, OBS_ORIG: "" }
+  ];
+  nocState.rawLoj = [
+    { GRUPO: "LOJACK", ID: "LJ-001", NOMBRE: "PUNTO LOJACK SUR KM 25", CONECTIVIDAD_DT: hAgo(0.3), RADIO_RX_DT: null, COMANDO_RX: "-", DISP_SISTEMA: null, OBS_ORIG: "OPERATIVO" },
+    { GRUPO: "LOJACK", ID: "LJ-002", NOMBRE: "PUNTO LOJACK NORTE", CONECTIVIDAD_DT: hAgo(4.0), RADIO_RX_DT: null, COMANDO_RX: "-", DISP_SISTEMA: null, OBS_ORIG: "INACTIVO" },
+    { GRUPO: "LOJACK", ID: "LJ-003", NOMBRE: "PUNTO LOJACK ANTIGUO", CONECTIVIDAD_DT: hAgo(300.0), RADIO_RX_DT: null, COMANDO_RX: "-", DISP_SISTEMA: null, OBS_ORIG: "DESINSTALADO" }
+  ];
+
+  $("nocBadgeDet").textContent = "3 pts (Demo)";
+  $("nocBadgeRep").textContent = "2 pts (Demo)";
+  $("nocBadgeLoj").textContent = "3 pts (Demo)";
+  nocCheckReady();
+}
+
+function nocClearAll() {
+  nocState.rawDet = null;
+  nocState.rawRep = null;
+  nocState.rawLoj = null;
+  nocState.dfTotal = [];
+  nocState.dfEval = [];
+  nocState.incidencias = [];
+  $("nocFileDet").value = "";
+  $("nocFileRep").value = "";
+  $("nocFileLoj").value = "";
+  $("nocBadgeDet").textContent = "Pendiente";
+  $("nocBadgeRep").textContent = "Pendiente";
+  $("nocBadgeLoj").textContent = "Pendiente";
+  $("nocParamCorte").value = "";
+  $("nocBannerCorte").textContent = "Esperando reportes...";
+  $("nocStatusText").textContent = "Listo para procesar. Cargue los 3 reportes del sistema.";
+  $("btnNocExportExcel").disabled = true;
+  $("nocAlertBox").classList.add("hidden");
+  nocRecalculate();
+}
+
+function nocRecalculate() {
+  if (!isDevMode) return;
+  if (!nocState.dfTotal.length) {
+    $("nocKpiGlobal").textContent = "0.00%";
+    $("nocKpiPond").textContent = "0.00%";
+    $("nocKpiPlanta").textContent = "0";
+    $("nocKpiVerde").textContent = "0";
+    $("nocKpiAmarillo").textContent = "0";
+    $("nocKpiRojo").textContent = "0";
+    $("nocTbodyMatriz").innerHTML = `<tr><td colspan="12" class="py-6 text-center text-slate-500">Cargue los 3 reportes o pulse Datos Demo para visualizar la matriz.</td></tr>`;
+    $("nocTbodyInc").innerHTML = `<tr><td colspan="8" class="py-4 text-center text-slate-500">Sin incidencias cargadas.</td></tr>`;
+    $("nocIncCount").textContent = "0 INCIDENCIAS";
+    return;
+  }
+
+  const corteVal = $("nocParamCorte").value;
+  if (corteVal) {
+    const d = new Date(corteVal);
+    if (!isNaN(d.getTime())) nocState.fechaCorte = d;
+  }
+  const metaSla = (parseFloat($("nocParamSla").value) || 95.0) / 100.0;
+  const uVerde = parseFloat($("nocParamVerde").value) || 24;
+  const uAmarillo = parseFloat($("nocParamAmarillo").value) || 48;
+
+  $("nocBannerCorte").textContent = `Corte de Datos: ${nocFmtBanner(nocState.fechaCorte)}`;
+
+  nocState.dfEval = nocState.dfTotal.map(r => {
+    let horas = null;
+    if (r.CONECTIVIDAD_DT instanceof Date && !isNaN(r.CONECTIVIDAD_DT.getTime())) {
+      horas = Math.round(((nocState.fechaCorte.getTime() - r.CONECTIVIDAD_DT.getTime()) / 3600000) * 100) / 100;
+    }
+    const obsU = String(r.OBS_ORIG || "").trim().toUpperCase();
+    let estado = "VERDE";
+    if (obsU.includes("DESINSTALADO")) estado = "DESINSTALADO";
+    else if (horas !== null && horas > uAmarillo) estado = "ROJO";
+    else if (obsU === "INACTIVO" || (horas !== null && horas >= uVerde)) estado = "AMARILLO";
+
+    const dias = horas !== null ? Math.round((horas / 24.0) * 10) / 10 : 0;
+    let diagnostico = "Operativo en línea";
+    if (estado === "DESINSTALADO") diagnostico = `Excluido: ${r.OBS_ORIG}`;
+    else if (estado === "VERDE") diagnostico = r.OBS_ORIG ? `Operativo (${r.OBS_ORIG})` : "Operativo en línea";
+    else if (estado === "AMARILLO") diagnostico = `Alerta reciente (${horas !== null ? horas.toFixed(1) : "0.0"}h sin reportar)`;
+    else diagnostico = `Crítico: ${dias.toFixed(1)} días sin reportar`;
+
+    return { ...r, HORAS: horas, DIAS: dias, ESTADO: estado, DIAGNOSTICO: diagnostico };
+  });
+
+  nocState.incidencias = nocState.dfEval
+    .filter(r => r.ESTADO === "ROJO" || r.ESTADO === "AMARILLO")
+    .map(r => ({ ...r, PRIORIDAD: r.ESTADO === "ROJO" ? 1 : 2 }))
+    .sort((a, b) => a.PRIORIDAD !== b.PRIORIDAD ? a.PRIORIDAD - b.PRIORIDAD : (b.HORAS || 0) - (a.HORAS || 0));
+
+  const grupos = ["DETEKTOR", "REPOTENCIADOS", "LOJACK"];
+  nocState.resumenGrupos = grupos.map(grp => {
+    const items = nocState.dfEval.filter(r => r.GRUPO === grp);
+    const total = items.length;
+    const bajas = items.filter(r => r.ESTADO === "DESINSTALADO").length;
+    const activa = total - bajas;
+    const verde = items.filter(r => r.ESTADO === "VERDE").length;
+    const amarillo = items.filter(r => r.ESTADO === "AMARILLO").length;
+    const rojo = items.filter(r => r.ESTADO === "ROJO").length;
+    const saludRed = activa > 0 ? verde / activa : 0;
+    const dispEstricta = activa > 0 ? verde / activa : 0;
+    const dispPonderada = activa > 0 ? (verde + 0.5 * amarillo) / activa : 0;
+    return { grupo: grp, total, bajas, activa, verde, amarillo, rojo, saludRed, dispEstricta, dispPonderada, brechaSLA: dispEstricta - metaSla, cumpleSLA: dispEstricta >= metaSla };
+  });
+
+  const tTot = nocState.resumenGrupos.reduce((a, g) => a + g.total, 0);
+  const tBaj = nocState.resumenGrupos.reduce((a, g) => a + g.bajas, 0);
+  const tAct = nocState.resumenGrupos.reduce((a, g) => a + g.activa, 0);
+  const tVer = nocState.resumenGrupos.reduce((a, g) => a + g.verde, 0);
+  const tAma = nocState.resumenGrupos.reduce((a, g) => a + g.amarillo, 0);
+  const tRoj = nocState.resumenGrupos.reduce((a, g) => a + g.rojo, 0);
+  const tEst = tAct > 0 ? tVer / tAct : 0;
+  const tPond = tAct > 0 ? (tVer + 0.5 * tAma) / tAct : 0;
+
+  nocState.resumenTotal = {
+    grupo: "TOTAL CONSOLIDADO RED",
+    total: tTot, bajas: tBaj, activa: tAct, verde: tVer, amarillo: tAma, rojo: tRoj,
+    saludRed: tEst, dispEstricta: tEst, dispPonderada: tPond,
+    brechaSLA: tEst - metaSla, cumpleSLA: tEst >= metaSla
+  };
+
+  $("nocKpiGlobal").textContent = `${(tEst * 100).toFixed(2)}%`;
+  $("nocKpiPond").textContent = `${(tPond * 100).toFixed(2)}%`;
+  $("nocKpiPlanta").textContent = tAct.toLocaleString();
+  $("nocKpiVerde").textContent = tVer.toLocaleString();
+  $("nocKpiAmarillo").textContent = tAma.toLocaleString();
+  $("nocKpiRojo").textContent = tRoj.toLocaleString();
+
+  const allRows = [...nocState.resumenGrupos, nocState.resumenTotal];
+  $("nocTbodyMatriz").innerHTML = allRows.map((f, idx) => {
+    const isTotal = idx === allRows.length - 1;
+    const brechaVal = (f.brechaSLA * 100).toFixed(2);
+    const brechaTxt = f.brechaSLA > 0 ? `+${brechaVal}%` : `${brechaVal}%`;
+    return `<tr class="${isTotal ? "bg-white/10 font-bold text-white" : "text-slate-200"}">
+      <td class="py-2 px-3 font-bold">${escapeHtml(f.grupo)}</td>
+      <td class="py-2 px-2 text-center">${f.total}</td>
+      <td class="py-2 px-2 text-center text-slate-400">${f.bajas}</td>
+      <td class="py-2 px-2 text-center">${f.activa}</td>
+      <td class="py-2 px-2 text-center font-bold text-emerald-400">${f.verde}</td>
+      <td class="py-2 px-2 text-center font-bold text-amber-400">${f.amarillo}</td>
+      <td class="py-2 px-2 text-center font-bold text-red-400">${f.rojo}</td>
+      <td class="py-2 px-2 text-center">${(f.saludRed * 100).toFixed(2)}%</td>
+      <td class="py-2 px-2 text-center font-bold">${(f.dispEstricta * 100).toFixed(2)}%</td>
+      <td class="py-2 px-2 text-center font-bold text-sky-300">${(f.dispPonderada * 100).toFixed(2)}%</td>
+      <td class="py-2 px-2 text-center font-bold ${f.brechaSLA >= 0 ? "text-emerald-400" : "text-red-400"}">${brechaTxt}</td>
+      <td class="py-2 px-3 text-center"><span class="px-2 py-0.5 rounded text-[10px] font-extrabold ${f.cumpleSLA ? "bg-emerald-500/20 text-emerald-300" : "bg-red-500/20 text-red-300"}">${f.cumpleSLA ? "CUMPLE SLA" : "BAJO META"}</span></td>
+    </tr>`;
+  }).join("");
+
+  nocRenderCharts();
+  nocRenderIncidencias();
+}
+
+function nocRenderCharts() {
+  if (typeof Chart === "undefined") return;
+  const labels = nocState.resumenGrupos.map(g => g.grupo);
+  const pVer = nocState.resumenGrupos.map(g => g.activa > 0 ? (g.verde / g.activa) * 100 : 0);
+  const pAma = nocState.resumenGrupos.map(g => g.activa > 0 ? (g.amarillo / g.activa) * 100 : 0);
+  const pRoj = nocState.resumenGrupos.map(g => g.activa > 0 ? (g.rojo / g.activa) * 100 : 0);
+
+  if (nocState.charts.comp) nocState.charts.comp.destroy();
+  nocState.charts.comp = new Chart($("nocChartComp").getContext("2d"), {
+    type: "bar",
+    data: {
+      labels,
+      datasets: [
+        { label: "Verde", data: pVer, backgroundColor: "#16A34A" },
+        { label: "Amarillo", data: pAma, backgroundColor: "#EAB308" },
+        { label: "Rojo", data: pRoj, backgroundColor: "#DC2626" }
+      ]
+    },
+    options: {
+      indexAxis: "y",
+      responsive: true,
+      maintainAspectRatio: false,
+      scales: {
+        x: { stacked: true, max: 100, ticks: { color: "#94A3B8", callback: v => v + "%" } },
+        y: { stacked: true, ticks: { color: "#E2E8F0" } }
+      },
+      plugins: {
+        legend: { position: "bottom", labels: { color: "#CBD5E1", boxWidth: 10, font: { size: 10 } } },
+        datalabels: { color: "#fff", font: { size: 9, weight: "bold" }, formatter: v => v >= 8 ? v.toFixed(0) + "%" : "" }
+      }
+    }
+  });
+
+  const compGroups = [...nocState.resumenGrupos, { ...nocState.resumenTotal, grupo: "TOTAL" }];
+  if (nocState.charts.bar) nocState.charts.bar.destroy();
+  nocState.charts.bar = new Chart($("nocChartBar").getContext("2d"), {
+    type: "bar",
+    data: {
+      labels: compGroups.map(g => g.grupo),
+      datasets: [
+        { label: "Estricta", data: compGroups.map(g => Number((g.dispEstricta * 100).toFixed(1))), backgroundColor: "#334155" },
+        { label: "Ponderada", data: compGroups.map(g => Number((g.dispPonderada * 100).toFixed(1))), backgroundColor: "#3B82F6" }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      scales: {
+        y: { min: 0, max: 100, ticks: { color: "#94A3B8", callback: v => v + "%" } },
+        x: { ticks: { color: "#E2E8F0", font: { size: 10 } } }
+      },
+      plugins: {
+        legend: { position: "bottom", labels: { color: "#CBD5E1", boxWidth: 10, font: { size: 10 } } },
+        datalabels: { color: "#fff", anchor: "end", align: "top", font: { size: 9, weight: "bold" }, formatter: v => v.toFixed(0) + "%" }
+      }
+    }
+  });
+
+  if (nocState.charts.donut) nocState.charts.donut.destroy();
+  nocState.charts.donut = new Chart($("nocChartDonut").getContext("2d"), {
+    type: "doughnut",
+    data: {
+      labels: ["Verde", "Amarillo", "Rojo"],
+      datasets: [{
+        data: [nocState.resumenTotal.verde, nocState.resumenTotal.amarillo, nocState.resumenTotal.rojo],
+        backgroundColor: ["#16A34A", "#EAB308", "#DC2626"],
+        borderColor: "#171b21",
+        borderWidth: 2
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      cutout: "55%",
+      plugins: {
+        legend: { position: "bottom", labels: { color: "#CBD5E1", boxWidth: 10, font: { size: 10 } } },
+        datalabels: { color: "#fff", font: { size: 10, weight: "bold" }, formatter: (v, ctx) => {
+          const s = ctx.dataset.data.reduce((a, b) => a + b, 0);
+          return s > 0 && v > 0 ? ((v / s) * 100).toFixed(0) + "%" : "";
+        }}
+      }
+    }
+  });
+}
+
+function nocRenderIncidencias() {
+  const q = normalizeText($("nocIncSearch").value);
+  const sev = $("nocIncSev").value;
+  const list = nocState.incidencias.filter(inc => {
+    if (sev !== "ALL" && inc.ESTADO !== sev) return false;
+    if (q && !normalizeText(`${inc.GRUPO} ${inc.ID} ${inc.NOMBRE}`).includes(q)) return false;
+    return true;
+  });
+  $("nocIncCount").textContent = `${nocState.incidencias.length} INCIDENCIAS`;
+  if (!list.length) {
+    $("nocTbodyInc").innerHTML = `<tr><td colspan="8" class="py-4 text-center text-slate-500">Sin incidencias para el filtro seleccionado.</td></tr>`;
+    return;
+  }
+  $("nocTbodyInc").innerHTML = list.map((inc, idx) => {
+    const isRojo = inc.ESTADO === "ROJO";
+    const acc = isRojo ? `Revisar enlace / energía (${inc.DIAS.toFixed(1)} días fuera)` : `Monitorear reconexión (${inc.HORAS !== null ? inc.HORAS.toFixed(2) : "0.00"}h sin reporte)`;
+    return `<tr class="text-slate-200">
+      <td class="py-2 px-2 text-center text-slate-400">${idx + 1}</td>
+      <td class="py-2 px-2 text-center font-bold">${escapeHtml(inc.GRUPO)}</td>
+      <td class="py-2 px-2 text-center font-mono text-sky-300">${escapeHtml(inc.ID)}</td>
+      <td class="py-2 px-3 font-semibold text-white">${escapeHtml(inc.NOMBRE)}</td>
+      <td class="py-2 px-2 text-center font-mono text-[11px]">${nocFmtDt(inc.CONECTIVIDAD_DT)}</td>
+      <td class="py-2 px-2 text-center font-bold ${isRojo ? "text-red-400" : "text-amber-400"}">${inc.DIAS.toFixed(1)}</td>
+      <td class="py-2 px-2 text-center"><span class="px-2 py-0.5 rounded text-[10px] font-extrabold ${isRojo ? "bg-red-500/20 text-red-300" : "bg-amber-500/20 text-amber-300"}">${isRojo ? "CRÍTICO" : "ALERTA"}</span></td>
+      <td class="py-2 px-3 text-slate-300">${escapeHtml(acc)}</td>
+    </tr>`;
+  }).join("");
+}
+
+function nocExportExcelEjecutivo() {
+  if (!isDevMode) { toggleDevModal(); return; }
+  if (!nocState.dfEval.length) {
+    nocShowAlert("Primero cargue los 3 reportes o Datos Demo.", "error");
+    return;
+  }
+  const wb = XLSX.utils.book_new();
+  const metaSla = (parseFloat($("nocParamSla").value) || 95.0) / 100.0;
+  const uVerde = parseFloat($("nocParamVerde").value) || 24;
+  const uAmarillo = parseFloat($("nocParamAmarillo").value) || 48;
+  const lastDbRow = nocState.dfEval.length + 1;
+
+  const wsDashData = [
+    [],
+    ["", "TABLERO EJECUTIVO DE DISPONIBILIDAD DE RED — TELECOMUNICACIONES"],
+    ["", `Consolidado Operativo: DETEKTOR • REPOTENCIADOS • LOJACK   |   Corte de Datos: ${nocFmtBanner(nocState.fechaCorte)}`],
+    [],
+    ["", "FECHA DE CORTE:", nocState.fechaCorte, "", "META SLA (%):", metaSla, "", "UMBRAL VERDE (<h):", uVerde, "", "UMBRAL AMARILLO (<=h):", uAmarillo],
+    [],
+    ["", "DISPONIBILIDAD GLOBAL", "", "DISP. PONDERADA", "", "PLANTA OPERATIVA", "", "ANTENAS ACTIVAS (VERDE)", "", "ALERTAS RECIENTES (AMARILLO)", "", "CAÍDAS CRÍTICAS (ROJO)"],
+    ["", { t: "n", f: "J16", z: "0.00%" }, "", { t: "n", f: "K16", z: "0.00%" }, "", { t: "n", f: "E16", z: "#,##0" }, "", { t: "n", f: "F16", z: "#,##0" }, "", { t: "n", f: "G16", z: "#,##0" }, "", { t: "n", f: "H16", z: "#,##0" }],
+    ["", `Meta SLA: ${(metaSla * 100).toFixed(1)}%`, "", "Incluye alertas al 50%", "", "Excluye desinstalados", "", `Operando en línea (<${uVerde}h)`, "", `Inactivo / Retraso ${uVerde}-${uAmarillo}h`, "", `Sin reporte > ${uAmarillo} horas`],
+    [],
+    ["", "1. DESEMPEÑO Y DISPONIBILIDAD POR TECNOLOGÍA"],
+    ["", "Tecnología / Grupo", "Total Puntos", "Bajas / Desinst.", "Planta Activa", "Verde (OK)", "Amarillo (Alerta)", "Rojo (Caído)", "% Salud Red", "% Disp. Estricta", "% Disp. Ponderada", "Brecha vs SLA", "Estado SLA"]
+  ];
+
+  ["DETEKTOR", "REPOTENCIADOS", "LOJACK"].forEach((grp, idx) => {
+    const r = 13 + idx;
+    wsDashData.push([
+      "",
+      grp,
+      { t: "n", f: `COUNTIF('Base de Datos'!$A$2:$A$${lastDbRow}, B${r})`, z: "#,##0" },
+      { t: "n", f: `COUNTIFS('Base de Datos'!$A$2:$A$${lastDbRow}, B${r}, 'Base de Datos'!$J$2:$J$${lastDbRow}, "DESINSTALADO")`, z: "#,##0" },
+      { t: "n", f: `C${r}-D${r}`, z: "#,##0" },
+      { t: "n", f: `COUNTIFS('Base de Datos'!$A$2:$A$${lastDbRow}, B${r}, 'Base de Datos'!$J$2:$J$${lastDbRow}, "VERDE")`, z: "#,##0" },
+      { t: "n", f: `COUNTIFS('Base de Datos'!$A$2:$A$${lastDbRow}, B${r}, 'Base de Datos'!$J$2:$J$${lastDbRow}, "AMARILLO")`, z: "#,##0" },
+      { t: "n", f: `COUNTIFS('Base de Datos'!$A$2:$A$${lastDbRow}, B${r}, 'Base de Datos'!$J$2:$J$${lastDbRow}, "ROJO")`, z: "#,##0" },
+      { t: "n", f: `IF(E${r}>0, F${r}/E${r}, 0)`, z: "0.00%" },
+      { t: "n", f: `IF(E${r}>0, F${r}/E${r}, 0)`, z: "0.00%" },
+      { t: "n", f: `IF(E${r}>0, (F${r}+0.5*G${r})/E${r}, 0)`, z: "0.00%" },
+      { t: "n", f: `J${r}-$F$5`, z: "+0.00%;-0.00%;0.00%" },
+      { t: "s", f: `IF(J${r}>=$F$5, "CUMPLE SLA", "BAJO META")` }
+    ]);
+  });
+
+  wsDashData.push([
+    "",
+    "TOTAL CONSOLIDADO RED",
+    { t: "n", f: "SUM(C13:C15)", z: "#,##0" },
+    { t: "n", f: "SUM(D13:D15)", z: "#,##0" },
+    { t: "n", f: "SUM(E13:E15)", z: "#,##0" },
+    { t: "n", f: "SUM(F13:F15)", z: "#,##0" },
+    { t: "n", f: "SUM(G13:G15)", z: "#,##0" },
+    { t: "n", f: "SUM(H13:H15)", z: "#,##0" },
+    { t: "n", f: "IF(E16>0, F16/E16, 0)", z: "0.00%" },
+    { t: "n", f: "IF(E16>0, F16/E16, 0)", z: "0.00%" },
+    { t: "n", f: "IF(E16>0, (F16+0.5*G16)/E16, 0)", z: "0.00%" },
+    { t: "n", f: "J16-$F$5", z: "+0.00%;-0.00%;0.00%" },
+    { t: "s", f: `IF(J16>=$F$5, "CUMPLE SLA", "BAJO META")` }
+  ]);
+
+  wsDashData.push([]);
+  wsDashData.push(["", `2. PANEL DE ATENCIÓN PRIORITARIA — PUNTOS CON FALLA O ALERTA (${nocState.incidencias.length} INCIDENCIAS)`]);
+  wsDashData.push(["", "#", "Tecnología", "ID", "Nombre del Punto / Antena", "", "", "Último Reporte", "", "Días Caído", "Severidad", "Diagnóstico / Acción Requerida"]);
+
+  nocState.incidencias.forEach((inc, idx) => {
+    const isRojo = inc.ESTADO === "ROJO";
+    const acc = isRojo ? `Revisar enlace / energía (${inc.DIAS.toFixed(1)} días fuera)` : `Monitorear reconexión (${inc.HORAS !== null ? inc.HORAS.toFixed(2) : "0.00"}h sin reporte)`;
+    wsDashData.push(["", idx + 1, inc.GRUPO, inc.ID, inc.NOMBRE, "", "", inc.CONECTIVIDAD_DT || "", "", inc.DIAS, isRojo ? "CRÍTICO" : "ALERTA", acc]);
+  });
+
+  const wsDash = XLSX.utils.aoa_to_sheet(wsDashData);
+  if (wsDash["C5"]) wsDash["C5"].z = "yyyy-mm-dd hh:mm:ss";
+  if (wsDash["F5"]) wsDash["F5"].z = "0.0%";
+  XLSX.utils.book_append_sheet(wb, wsDash, "Dashboard Ejecutivo");
+
+  const wsDbData = [[
+    "Tecnología / Grupo", "ID", "Nombre / Punto", "Último Reporte (Fecha/Hora)",
+    "Radio RX", "Comando RX", "% Disp. Sistema", "Observación Reporte",
+    "Horas sin Reportar", "Estado Semáforo", "Diagnóstico Automático"
+  ]];
+
+  nocState.dfEval.forEach((row, idx) => {
+    const r = idx + 2;
+    wsDbData.push([
+      row.GRUPO,
+      row.ID,
+      row.NOMBRE,
+      row.CONECTIVIDAD_DT || "",
+      row.RADIO_RX_DT || "-",
+      row.COMANDO_RX || "-",
+      row.DISP_SISTEMA !== null ? row.DISP_SISTEMA : "",
+      row.OBS_ORIG || "",
+      { t: "n", f: `ROUND(('Dashboard Ejecutivo'!$C$5 - D${r})*24, 2)`, z: "0.00" },
+      { t: "s", f: `IF(ISNUMBER(SEARCH("DESINSTALADO", H${r})), "DESINSTALADO", IF(I${r}>'Dashboard Ejecutivo'!$L$5, "ROJO", IF(OR(UPPER(TRIM(H${r}))="INACTIVO", I${r}>='Dashboard Ejecutivo'!$I$5), "AMARILLO", "VERDE")))` },
+      { t: "s", f: `IF(J${r}="DESINSTALADO", "Excluido: " & H${r}, IF(J${r}="VERDE", IF(H${r}<>"", "Operativo (" & H${r} & ")", "Operativo en línea"), IF(J${r}="AMARILLO", "Alerta reciente (" & ROUND(I${r}, 1) & "h sin reportar)", "Crítico: " & ROUND(I${r}/24, 1) & " días sin reportar")))` }
+    ]);
+  });
+
+  const wsDb = XLSX.utils.aoa_to_sheet(wsDbData);
+  XLSX.utils.book_append_sheet(wb, wsDb, "Base de Datos");
+
+  const now = new Date();
+  const p = n => String(n).padStart(2, "0");
+  const stamp = `${now.getFullYear()}${p(now.getMonth() + 1)}${p(now.getDate())}_${p(now.getHours())}${p(now.getMinutes())}`;
+  const outName = `Dashboard_Ejecutivo_Disponibilidad_${stamp}.xlsx`;
+  XLSX.writeFile(wb, outName);
+  nocShowAlert(`Excel generado: ${outName}`, "success");
+}
+
+$("nocFileDet").addEventListener("change", e => nocHandleFile(e.target, "DET"));
+$("nocFileRep").addEventListener("change", e => nocHandleFile(e.target, "REP"));
+$("nocFileLoj").addEventListener("change", e => nocHandleFile(e.target, "LOJ"));
+
+// =========================================================================
+// MÓDULO 2 (SOLO DEV): MATRIZ EMBEBIDA MDZ SKYNET
+// =========================================================================
+function renderEmbeddedSkynetMatrix() {
+  if (!isDevMode) return;
+  const q = normalizeText($("matrixSearchInput") ? $("matrixSearchInput").value : "");
+  const techSel = $("matrixTechFilter");
+
+  if (techSel && excelData.length > 0) {
+    const prevVal = techSel.value || "ALL";
+    const techs = Array.from(new Set(excelData.map(r => getRowTech(r)))).sort();
+    const newHtml = `<option value="ALL">Todas las tecnologías</option>` + techs.map(t => `<option value="${escapeHtml(t)}">${escapeHtml(t)}</option>`).join("");
+    if (techSel.innerHTML !== newHtml) {
+      techSel.innerHTML = newHtml;
+      if (techs.includes(prevVal)) techSel.value = prevVal;
+    }
+  }
+
+  const activeTech = techSel ? techSel.value : "ALL";
+  const mapped = excelData.map((row, realIdx) => {
+    const K = p => findColumn(row, p);
+    const idCol = K(["ID"]);
+    const pCol = K(["PUNTOS", "PUNTO"]);
+    const tCol = K(["TECNOLOGIA"]);
+    const iCol = K(["IMEI RESETEADOR", "IMEI"]);
+    const sCol = K(["SIM RESETEADOR", "SIM MODEM", "SIM"]);
+    const oCol = K(["OBSERVACION"]);
+    const yCol = K(["TIPO"]);
+
+    const idVal = idCol && !isEmpty(row[idCol]) ? String(row[idCol]).trim() : "-";
+    const puntoVal = pCol && !isEmpty(row[pCol]) ? String(row[pCol]).trim() : "Desconocido";
+    const tecVal = getRowTech(row);
+    const imeiVal = iCol && !isEmpty(row[iCol]) ? String(row[iCol]).trim() : "-";
+    const simVal = sCol && !isEmpty(row[sCol]) ? String(row[sCol]).trim() : "-";
+    const obsVal = oCol && !isEmpty(row[oCol]) ? String(row[oCol]).trim() : "";
+    const tipoRaw = yCol && !isEmpty(row[yCol]) ? String(row[yCol]).toUpperCase() : "";
+    const isMovil = tipoRaw.includes("RASTREO") || puntoVal.toUpperCase().startsWith("R-") || puntoVal.toUpperCase().includes("RASTREO");
+    const eq = getEquipmentInfo(imeiVal);
+
+    return { realIdx, idVal, puntoVal, tecVal, imeiVal, simVal, obsVal, isMovil, modelo: eq.modelo };
+  }).filter(item => {
+    if (activeTech !== "ALL" && item.tecVal !== activeTech) return false;
+    if (q) {
+      const hay = `${item.idVal} ${item.puntoVal} ${item.tecVal} ${item.imeiVal} ${item.simVal} ${item.obsVal} ${item.modelo}`.toLowerCase();
+      if (!normalizeText(hay).includes(q)) return false;
+    }
+    return true;
+  });
+
+  const movilesCount = excelData.filter(r => {
+    const K = p => findColumn(r, p);
+    const pCol = K(["PUNTOS", "PUNTO"]);
+    const yCol = K(["TIPO"]);
+    const pStr = pCol ? String(r[pCol] || "").toUpperCase() : "";
+    const yStr = yCol ? String(r[yCol] || "").toUpperCase() : "";
+    return yStr.includes("RASTREO") || pStr.startsWith("R-") || pStr.includes("RASTREO");
+  }).length;
+
+  const obsCount = excelData.filter(r => {
+    const oCol = findColumn(r, ["OBSERVACION"]);
+    return oCol && !isEmpty(r[oCol]);
+  }).length;
+
+  $("matrixSummaryCards").innerHTML =
+    kpi("fa-border-all", "Filas en Matriz", mapped.length.toLocaleString()) +
+    kpi("fa-tower-cell", "Puntos Fijos", (excelData.length - movilesCount).toLocaleString()) +
+    kpi("fa-truck-fast", "Móviles / Rastreo", movilesCount.toLocaleString()) +
+    kpi("fa-triangle-exclamation", "Con Observación", obsCount.toLocaleString());
+
+  if (!mapped.length) {
+    $("matrixTbody").innerHTML = `<tr><td colspan="10" class="py-8 text-center text-slate-400">No hay registros en la matriz para este filtro.</td></tr>`;
+    return;
+  }
+
+  $("matrixTbody").innerHTML = mapped.map((m, i) => `
+    <tr class="hover:bg-white/[0.04] transition text-slate-200">
+      <td class="py-2 px-3 text-center text-slate-500">${i + 1}</td>
+      <td class="py-2 px-3 font-mono text-sky-300">${escapeHtml(m.idVal)}</td>
+      <td class="py-2 px-3 font-bold text-white">${escapeHtml(m.puntoVal)}</td>
+      <td class="py-2 px-3"><span class="px-2 py-0.5 rounded text-[10px] font-bold ${m.isMovil ? "bg-indigo-500/20 text-indigo-300" : "bg-emerald-500/20 text-emerald-300"}">${m.isMovil ? "Móvil" : "Fijo"}</span></td>
+      <td class="py-2 px-3 font-semibold text-emerald-300">${escapeHtml(m.tecVal)}</td>
+      <td class="py-2 px-3 font-semibold text-cyan-300">${escapeHtml(m.modelo)}</td>
+      <td class="py-2 px-3 mono text-[11px]">${escapeHtml(m.imeiVal)}</td>
+      <td class="py-2 px-3 mono text-[11px]">${escapeHtml(m.simVal)}</td>
+      <td class="py-2 px-3 text-center">${m.obsVal ? `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-red-500/20 text-red-300" title="${escapeHtml(m.obsVal)}">Obs</span>` : `<span class="text-slate-600">—</span>`}</td>
+      <td class="py-2 px-3 text-center">
+        <button type="button" onclick="openRecordEditor(${m.realIdx})" class="px-2.5 py-1 rounded-lg bg-amber-500/15 hover:bg-amber-500/30 text-amber-300 text-[11px] font-bold transition cursor-pointer" title="Editar fila">
+          <i class="fa-solid fa-pen"></i>
+        </button>
+      </td>
+    </tr>
+  `).join("");
 }
 </script></body></html>
