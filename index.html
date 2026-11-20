@@ -114,8 +114,11 @@ body{font-family:Inter,ui-sans-serif,system-ui,sans-serif;color:var(--text-main)
 #map-canvas{background:#10141a; transition: filter 0.3s;}
 #map-canvas .leaflet-tile-pane{filter:invert(1) hue-rotate(200deg) brightness(.9) contrast(.9) saturate(.7)}
 
-/* Forzar ocultamiento de modales y elementos Dev hasta validar clave */
-.dev-hidden { display: none !important; }
+/* BLOQUEO ESTRICTO MODO DESARROLLADOR (Incluye especificidad para .rail button) */
+.dev-hidden,
+.rail button.dev-hidden {
+  display: none !important;
+}
 
 /* Estilos Tabla Editor Dev */
 .dev-table th { position: sticky; top: 0; background: #0f1318; z-index: 10; border-bottom: 1px solid var(--line); }
@@ -140,7 +143,7 @@ body.theme-day .dev-table th { background: #e2e8f0; }
     <button data-v="maint" onclick="setView('maint')" title="Plan Mantenimiento Lógico"><i class="fa-solid fa-screwdriver-wrench"></i></button>
     <button data-v="price" onclick="setView('price')" title="Analizador de precios"><i class="fa-solid fa-coins"></i></button>
     
-    <!-- Botón Exclusivo Modo Desarrollador: Editor Tabla -->
+    <!-- Botón Exclusivo Modo Desarrollador: Oculto por defecto con .rail button.dev-hidden -->
     <button id="nav-dev-btn" class="dev-hidden border border-amber-500/40 bg-amber-500/10" data-v="dev" onclick="setView('dev')" title="Editor Base Excel (Modo Dev)">
       <i class="fa-solid fa-table-cells text-amber-400"></i>
     </button>
@@ -424,7 +427,7 @@ body.theme-day .dev-table th { background: #e2e8f0; }
 // ==========================================
 // CONFIGURACIÓN MODO DESARROLLADOR
 // ==========================================
-const DEV_PASSWORD = "SKYNET2026"; // <-- Cambia aquí tu clave si deseas otra
+const DEV_PASSWORD = "SKYNET2026"; // <-- Clave de acceso
 let isDevMode = false;
 let devEditCount = 0;
 let loadedFileName = "MDZ_SKYNET_BASE.xlsx";
@@ -530,7 +533,7 @@ function refreshAllViews() {
 // MODAL DE EDICIÓN / CREACIÓN DE FILA
 // ==========================================
 function openRecordEditor(rowIndex) {
-  if (!isDevMode) return;
+  if (!isDevMode) { toggleDevModal(); return; }
   editingRowIndex = rowIndex;
   const row = excelData[rowIndex];
   if (!row) return;
@@ -551,7 +554,7 @@ function openRecordEditor(rowIndex) {
 }
 
 function openAddRecordModal() {
-  if (!isDevMode) return;
+  if (!isDevMode) { toggleDevModal(); return; }
   if (!excelData.length) {
     showToast("Carga primero un archivo Excel base");
     return;
@@ -618,8 +621,17 @@ function deleteCurrentRecord() {
 // VISTA TABLA EDITOR EXCEL (MODO DEV)
 // ==========================================
 function renderDevTable() {
-  if (!isDevMode) return;
   const wrapper = $("dev-table-wrapper");
+  if (!isDevMode) {
+    wrapper.innerHTML = `
+      <div class="text-center py-20 text-slate-500">
+        <i class="fa-solid fa-lock text-5xl text-amber-400 mb-4 block"></i>
+        <p class="text-lg font-semibold text-slate-300">Acceso Restringido</p>
+        <p class="text-sm mt-1 mb-4">Debes desbloquear el Modo Desarrollador con tu clave para editar la base.</p>
+        <button onclick="toggleDevModal()" class="px-5 py-2.5 rounded-xl bg-amber-500 text-slate-950 text-xs font-bold">Ingresar Clave</button>
+      </div>`;
+    return;
+  }
   if (!excelData.length) {
     wrapper.innerHTML = msg("fa-table", "Sin datos cargados", "Sube un archivo Excel para editarlo.");
     return;
@@ -690,7 +702,7 @@ function deleteRowFromTable(rowIdx) {
 // EXPORTACIÓN A EXCEL (.XLSX)
 // ==========================================
 function exportModifiedExcel() {
-  if (!isDevMode) return;
+  if (!isDevMode) { toggleDevModal(); return; }
   if (!excelData.length) {
     showToast("No hay datos para exportar");
     return;
