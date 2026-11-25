@@ -7,6 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700&family=Orbitron:wght@500;700;800;900&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+  <script src="https://kam.software/plugins/holo-orb.cdn.js" defer></script>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
@@ -134,11 +135,24 @@
       z-index: 1;
     }
 
+    #canvas-container { isolation: isolate; background: radial-gradient(900px 700px at 50% 50%, #160d06 0%, #040404 66%); }
+    #holo-orb-layer {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      overflow: visible;
+    }
+    #holo-orb-layer canvas { display: block; width: 100%; height: 100%; }
     #canvas-container canvas {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
       display: block;
       width: 100%;
       height: 100%;
       touch-action: none;
+      background: transparent;
     }
 
     .glass-panel {
@@ -153,8 +167,8 @@
         0 0 38px rgba(var(--accent-a), 0.16),
         inset 0 1px 0 rgba(255, 255, 255, 0.24),
         inset 0 -1px 18px rgba(var(--accent-b), 0.14);
-      backdrop-filter: blur(22px) saturate(165%);
-      -webkit-backdrop-filter: blur(22px) saturate(165%);
+      backdrop-filter: blur(12px) saturate(175%);
+      -webkit-backdrop-filter: blur(12px) saturate(175%);
       transition: border-color 700ms ease, box-shadow 700ms ease, background 900ms ease;
     }
 
@@ -778,6 +792,17 @@
   }
   @keyframes orbSpin { to { transform: rotate(360deg); } }
 
+
+  /* EMBLEMA ABISAL + REVELADO DE LLAVE AL COMPLETAR EL TOKEN */
+  .login-kraken-mark { overflow: visible; filter: drop-shadow(0 0 7px rgba(42,226,165,.42)); animation: krakenMarkBreathe 4.8s ease-in-out infinite; }
+  @keyframes krakenMarkBreathe { 0%,100% { transform:scale(1); filter:drop-shadow(0 0 5px rgba(42,226,165,.30)); } 50% { transform:scale(1.045); filter:drop-shadow(0 0 11px rgba(42,226,165,.65)); } }
+  .totp-key-reveal { display:flex; align-items:center; justify-content:center; gap:8px; height:0; opacity:0; overflow:hidden; transform:translateY(-8px) scale(.92); transition:height .42s ease, opacity .35s ease, transform .45s cubic-bezier(.2,.8,.2,1), margin .35s ease; margin-top:0; pointer-events:none; }
+  .totp-key-reveal svg { width:148px; max-width:48%; height:42px; overflow:visible; }
+  .totp-key-reveal span { color:#f3d58c; font:700 8px/1.35 'Cascadia Code',monospace; letter-spacing:.14em; text-shadow:0 0 9px rgba(245,194,91,.65); }
+  #sb-totp-input.has-access-key + #totp-key-reveal { height:45px; opacity:1; transform:translateY(0) scale(1); margin-top:5px; }
+  #totp-key-reveal svg { animation: antiqueKeyTurn .85s cubic-bezier(.16,1,.3,1) both; }
+  @keyframes antiqueKeyTurn { 0% { transform:translateX(-24px) rotate(-22deg) scale(.55); filter:blur(3px); } 65% { transform:translateX(3px) rotate(5deg) scale(1.08); filter:blur(0); } 100% { transform:translateX(0) rotate(0) scale(1); } }
+
   /* LOGIN HD: cristal definido y tipografía estable durante el zoom */
   body.hunter-preauth #login-floating-card {
     -webkit-font-smoothing: antialiased;
@@ -1112,7 +1137,12 @@ body:not(.theme-day) .bg-\[\#0d121c\] {
   body:not(.theme-day) .scroll::-webkit-scrollbar-thumb { border-radius:8px; background:rgba(255,85,115,.34); }
   @media(max-width:900px) { body:not(.theme-day) .panel,body:not(.theme-day) .card { backdrop-filter:blur(7px) !important; } }
 
-  </style>
+  
+/* Emblema HUNTER: rojo plasma y microdatos binarios */
+.login-kraken-mark { filter: drop-shadow(0 0 4px rgba(255, 20, 55, .42)); }
+.login-kraken-mark .kraken-bits { animation: binaryPulse 3.4s ease-in-out infinite alternate; }
+@keyframes binaryPulse { from { opacity: .58; } to { opacity: 1; } }
+</style>
 </head>
 <body class="hunter-preauth">
   <!-- =========================================================
@@ -1160,17 +1190,29 @@ body:not(.theme-day) .bg-\[\#0d121c\] {
       <div class="flex items-center justify-between mb-3.5">
         <div class="flex items-center gap-2.5">
           <div class="w-10 h-10 rounded-xl bg-black/55 border border-rose-500/45 flex items-center justify-center shadow-[0_0_16px_rgba(24,224,108,0.28)]">
-            <svg viewBox="0 0 100 100" class="w-7 h-7" xmlns="http://www.w3.org/2000/svg">
-              <circle cx="50" cy="47" r="42" fill="#0e0308" stroke="#ff2850" stroke-width="4.2"/>
-              <path d="M30 61 Q21 71 27 77 M41 64 Q37 75 43 79 M59 64 Q63 75 57 79 M70 61 Q79 71 73 77" fill="none" stroke="#18e06c" stroke-width="6.5" stroke-linecap="round"/>
-              <ellipse cx="50" cy="45" rx="22" ry="20" fill="#18e06c"/>
-              <ellipse cx="42" cy="35" rx="6.5" ry="4" fill="#80ffb6" opacity="0.65"/>
-              <circle cx="42" cy="49" r="4.9" fill="#ffffff"/>
-              <circle cx="58" cy="49" r="4.9" fill="#ffffff"/>
-              <circle cx="43" cy="49" r="2.7" fill="#06120a"/>
-              <circle cx="59" cy="49" r="2.7" fill="#06120a"/>
-              <path d="M24 29 A34 34 0 0 1 58 14" fill="none" stroke="#ffffff" stroke-width="3.4" stroke-linecap="round" opacity="0.58"/>
-              <rect x="24" y="81" width="52" height="11" rx="5.5" fill="#1c1f29" stroke="#ff2850" stroke-width="2.2"/>
+            <svg viewBox="0 0 100 100" class="w-8 h-8 login-kraken-mark" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Pulpo abisal HUNTER">
+              <defs>
+                <radialGradient id="krakenHead" cx="34%" cy="22%" r="78%"><stop offset="0" stop-color="#d5fff0"/><stop offset=".18" stop-color="#55d7a5"/><stop offset=".55" stop-color="#087c62"/><stop offset="1" stop-color="#031e25"/></radialGradient>
+                <linearGradient id="krakenArm" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#8af0c4"/><stop offset=".35" stop-color="#168b70"/><stop offset="1" stop-color="#032a35"/></linearGradient>
+                <radialGradient id="krakenEye"><stop stop-color="#fff"/><stop offset=".45" stop-color="#b9fff0"/><stop offset="1" stop-color="#174e50"/></radialGradient>
+                <filter id="krakenGlow"><feGaussianBlur stdDeviation="2.1" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+              </defs>
+              <circle cx="50" cy="50" r="47" fill="#050608" stroke="#ff173d" stroke-width="3.8" style="filter:drop-shadow(0 0 3px #ff173d) drop-shadow(0 0 8px rgba(255,20,55,.9))"/>
+              <circle cx="50" cy="50" r="43.5" fill="none" stroke="#ff5369" stroke-width=".65" stroke-dasharray="1 2.4" opacity=".9"/>
+              <g class="kraken-bits" fill="#ff4565" font-family="monospace" font-size="5.2" font-weight="700" opacity=".95"><text x="12" y="20">0101</text><text x="69" y="18">101</text><text x="8" y="62">110</text><text x="76" y="61">011</text><text x="27" y="91">1010</text><text x="65" y="86">010</text><circle cx="17" cy="34" r="1"/><circle cx="83" cy="35" r="1"/><circle cx="18" cy="79" r=".8"/><circle cx="84" cy="76" r=".8"/></g>
+              <g fill="none" stroke="url(#krakenArm)" stroke-width="7" stroke-linecap="round" filter="url(#krakenGlow)">
+                <path d="M34 57 C20 62 13 54 17 43 C20 36 27 36 28 43"/><path d="M42 64 C35 77 22 83 16 75 C11 68 18 62 25 66"/>
+                <path d="M57 64 C64 78 78 83 84 73 C88 65 80 61 74 66"/><path d="M66 56 C81 62 89 53 84 42 C81 35 73 37 72 44"/>
+                <path d="M29 51 C17 46 14 33 22 28"/><path d="M71 51 C83 45 86 33 78 27"/>
+                <path d="M43 66 C42 79 48 88 55 85"/><path d="M58 66 C60 78 68 82 73 77"/>
+              </g>
+              <path d="M28 48 C27 31 37 17 51 15 C67 14 76 29 73 47 C71 61 62 68 50 68 C37 68 29 60 28 48Z" fill="url(#krakenHead)" stroke="#8fffd0" stroke-opacity=".65" stroke-width="1.2"/>
+              <path d="M35 29 Q43 18 57 21" fill="none" stroke="#e4fff5" stroke-opacity=".65" stroke-width="3" stroke-linecap="round"/>
+              <ellipse cx="40" cy="47" rx="7" ry="9" fill="url(#krakenEye)"/><ellipse cx="60" cy="47" rx="7" ry="9" fill="url(#krakenEye)"/>
+              <ellipse cx="42" cy="48" rx="2.7" ry="5" fill="#06151a"/><ellipse cx="62" cy="48" rx="2.7" ry="5" fill="#06151a"/>
+              <circle cx="41" cy="44" r="1.8" fill="#fff"/><circle cx="61" cy="44" r="1.8" fill="#fff"/>
+              <g fill="#b8ffe1" opacity=".8"><circle cx="22" cy="48" r="1.4"/><circle cx="26" cy="71" r="1.3"/><circle cx="76" cy="70" r="1.4"/><circle cx="79" cy="47" r="1.2"/></g>
+              <path d="M34 58 Q50 72 66 58" fill="none" stroke="#062c2d" stroke-width="2"/>
             </svg>
           </div>
           <div>
@@ -1199,6 +1241,17 @@ body:not(.theme-day) .bg-\[\#0d121c\] {
             <span id="totp-timer-label" class="mono" style="color: rgb(var(--accent-a));">30s</span>
           </div>
           <input type="text" id="sb-totp-input" maxlength="6" inputmode="numeric" placeholder="0 0 0 0 0 0" class="w-full py-1.5 rounded-lg bg-black/35 border border-white/10 text-white mono text-center tracking-[0.38em] text-sm outline-none">
+          <div id="totp-key-reveal" class="totp-key-reveal" aria-hidden="true">
+            <svg viewBox="0 0 240 58" xmlns="http://www.w3.org/2000/svg">
+              <defs><linearGradient id="antiqueGold" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#fff2b2"/><stop offset=".28" stop-color="#d7a94e"/><stop offset=".58" stop-color="#80501d"/><stop offset=".82" stop-color="#f5d987"/><stop offset="1" stop-color="#8b5a20"/></linearGradient><filter id="keyGlow"><feGaussianBlur stdDeviation="2.5" result="g"/><feMerge><feMergeNode in="g"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
+              <g fill="none" stroke="url(#antiqueGold)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" filter="url(#keyGlow)">
+                <circle cx="28" cy="29" r="16"/><circle cx="28" cy="29" r="8" stroke-width="2"/><path d="M43 29 H205 L216 18 L227 29 L216 40 L205 29 M183 29 V39 M169 29 V36"/>
+                <path d="M28 13 V6 M28 45 V52 M12 29 H5 M44 29 H51" stroke-width="2"/><path d="M28 13 L34 19 M28 45 L22 39" stroke-width="2"/>
+              </g>
+              <path d="M68 29 H155" stroke="#fff1bb" stroke-opacity=".55" stroke-width="1" stroke-dasharray="2 5"/>
+            </svg>
+            <span>LLAVE DE ACCESO DESBLOQUEADA</span>
+          </div>
           <div class="h-1 w-full bg-white/10 rounded-full mt-2 overflow-hidden">
             <div id="totp-timer-bar" class="h-full transition-all duration-1000" style="width:100%; background: linear-gradient(90deg, rgb(var(--accent-a)), rgb(var(--accent-b)));"></div>
           </div>
@@ -2862,12 +2915,40 @@ const compact = matchMedia('(max-width: 760px)').matches;
 const R = 2.38, TAU = Math.PI * 2;
 
 // ---------- Renderer y Post-Procesado limpio (LEDs nítidos, sin neblina blanca) ----------
-const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
+// HoloOrb: mismo motor/preset del ejemplo KAM.SOFTWARE, integrado en este HTML.
+const holoOrbLayer = document.createElement('div');
+holoOrbLayer.id = 'holo-orb-layer';
+container.appendChild(holoOrbLayer);
+let holoOrb = null;
+if (typeof HoloOrb !== 'undefined') {
+  holoOrb = new HoloOrb({
+    container: '#holo-orb-layer',
+    preset: 'jarvis',
+    density: compact ? 0.92 : 1.12,
+    glow: 0.52,
+    speed: reduce ? 0.28 : 0.82,
+    seed: 7,
+    color: '#ff183f',
+    hot: '#ffe0e5',
+    coreColor: '#e50935',
+    layers: { core: true, iris: true, inner: true, shell: true, caps: true, band: true, streak: true, arcs: true },
+    brightness: 1.12,
+    coreRadius: 0.95,
+    interactive: true,
+    autoRotate: true,
+    maxDpr: 2
+  });
+  if (!holoOrb.ok) console.error('HoloOrb: WebGL2 no está disponible en este navegador.');
+} else {
+  console.error('HoloOrb no pudo cargarse desde kam.software.');
+}
+
+const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: 'high-performance' });
 // Resolución adaptativa: conserva detalle al ampliar y al cambiar el zoom del navegador.
 const getRenderDpr = () => Math.min(window.devicePixelRatio || 1, compact ? 1.8 : 2.35);
 renderer.setPixelRatio(getRenderDpr());
 renderer.setSize(innerWidth, innerHeight);
-renderer.setClearColor(0x040103, 1);
+renderer.setClearColor(0x040103, 0);
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
 renderer.toneMappingExposure = 1.05;
 container.appendChild(renderer.domElement);
@@ -2893,7 +2974,7 @@ scene.add(frontFill);
 const composer = new EffectComposer(renderer);
 composer.setPixelRatio(getRenderDpr());
 composer.addPass(new RenderPass(scene, camera));
-const bloomPass = new UnrealBloomPass(new THREE.Vector2(innerWidth, innerHeight), 0.42, 0.36, 0.30);
+const bloomPass = new UnrealBloomPass(new THREE.Vector2(innerWidth, innerHeight), 0.08, 0.08, 0.72);
 composer.addPass(bloomPass);
 composer.addPass(new OutputPass());
 
@@ -3036,13 +3117,13 @@ scene.add(distantSunGroup);
 {
   distantSunGroup.add(new THREE.Mesh(
     new THREE.SphereGeometry(1.1, 32, 32),
-    new THREE.MeshBasicMaterial({ color: 0xc26832 })
+    new THREE.MeshBasicMaterial({ color: 0xff2448 })
   ));
   const coronaTex = makeRadialTex([
-    [0, 'rgba(255, 186, 120, 0.42)'],
-    [0.24, 'rgba(255, 112, 48, 0.24)'],
-    [0.52, 'rgba(210, 32, 46, 0.10)'],
-    [0.8, 'rgba(120, 10, 30, 0.02)'],
+    [0, 'rgba(255, 170, 190, 0.46)'],
+    [0.24, 'rgba(255, 35, 78, 0.30)'],
+    [0.52, 'rgba(190, 8, 48, 0.14)'],
+    [0.8, 'rgba(90, 4, 28, 0.025)'],
     [1, 'rgba(0, 0, 0, 0)']
   ]);
   const corona = new THREE.Sprite(new THREE.SpriteMaterial({
@@ -3051,9 +3132,24 @@ scene.add(distantSunGroup);
   corona.scale.set(10.8, 10.8, 1);
   distantSunGroup.add(corona);
   distantSunGroup.userData.corona = corona;
+  // Halo orbital y arcos solares para una estrella más viva y cinematográfica.
+  const solarHalo = new THREE.Mesh(
+    new THREE.TorusGeometry(2.05, 0.035, 8, 96),
+    new THREE.MeshBasicMaterial({ color: 0xff3158, transparent: true, opacity: 0.72, blending: THREE.AdditiveBlending })
+  );
+  solarHalo.rotation.set(0.72, 0.28, -0.35);
+  distantSunGroup.add(solarHalo);
+  distantSunGroup.userData.solarHalo = solarHalo;
+  const solarHalo2 = new THREE.Mesh(
+    new THREE.TorusGeometry(2.42, 0.018, 6, 96),
+    new THREE.MeshBasicMaterial({ color: 0xff123f, transparent: true, opacity: 0.52, blending: THREE.AdditiveBlending })
+  );
+  solarHalo2.rotation.set(-0.5, 0.8, 0.2);
+  distantSunGroup.add(solarHalo2);
+  distantSunGroup.userData.solarHalo2 = solarHalo2;
 
   const flare = new THREE.Sprite(new THREE.SpriteMaterial({
-    map: coronaTex, color: 0xff5434, transparent: true, opacity: 0.23, blending: THREE.AdditiveBlending, depthWrite: false
+    map: coronaTex, color: 0xff1748, transparent: true, opacity: 0.23, blending: THREE.AdditiveBlending, depthWrite: false
   }));
   flare.scale.set(15.5, 1.05, 1);
   distantSunGroup.add(flare);
@@ -3067,7 +3163,7 @@ scene.add(ringedPlanet);
 {
   const giantMesh = new THREE.Mesh(
     new THREE.SphereGeometry(3.2, 40, 32),
-    new THREE.MeshStandardMaterial({ map: makeGasGiantTex(), roughness: 0.82, metalness: 0.06 })
+    new THREE.MeshStandardMaterial({ map: makeGasGiantTex(), color: 0x68d99a, emissive: 0x082b18, emissiveIntensity: 0.16, roughness: 0.78, metalness: 0.08 })
   );
   ringedPlanet.add(giantMesh);
   ringedPlanet.userData.body = giantMesh;
@@ -3141,105 +3237,8 @@ const ll = (lat, lon, r = R) => {
   return new THREE.Vector3(-r * Math.sin(p) * Math.cos(t), r * Math.cos(p), r * Math.sin(p) * Math.sin(t));
 };
 
-// Núcleo oscuro obsidiana (oculta los LEDs traseros para que los del frente se lean súper nítidos)
-globe.add(new THREE.Mesh(
-  new THREE.SphereGeometry(R * 0.988, 128, 96),
-  new THREE.MeshBasicMaterial({ color: 0x070104 })
-));
-
-// Matriz ordenada de partículas LED (filas de latitud x longitud con shader de ondas fluidas)
-const ledUniforms = {
-  uTime: { value: 0 },
-  uPixelRatio: { value: renderer.getPixelRatio() }
-};
-{
-  const latRows = compact ? 68 : 112;
-  const positions = [];
-  const phases = [];
-  for (let i = 1; i < latRows; i++) {
-    const phi = (i / latRows) * Math.PI;
-    const sinPhi = Math.sin(phi), cosPhi = Math.cos(phi);
-    const lonCols = Math.max(8, Math.round(sinPhi * (compact ? 148 : 232)));
-    for (let j = 0; j < lonCols; j++) {
-      const theta = (j / lonCols) * TAU;
-      const x = sinPhi * Math.cos(theta);
-      const y = cosPhi;
-      const z = sinPhi * Math.sin(theta);
-      positions.push(x * R, y * R, z * R);
-      phases.push(Math.random());
-    }
-  }
-  const ledGeo = new THREE.BufferGeometry();
-  ledGeo.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
-  ledGeo.setAttribute('aPhase', new THREE.Float32BufferAttribute(phases, 1));
-
-  const ledMat = new THREE.ShaderMaterial({
-    uniforms: ledUniforms,
-    vertexShader: `
-      uniform float uTime;
-      uniform float uPixelRatio;
-      attribute float aPhase;
-      varying float vWave;
-      varying float vRim;
-      varying float vSpark;
-      void main() {
-        vec3 n = normalize(position);
-        // Ondas topográficas tipo LED recorriendo la esfera
-        float w1 = sin(n.y * 7.5 + n.x * 4.2 - uTime * 1.35);
-        float w2 = cos(n.z * 6.8 - n.y * 5.2 + uTime * 0.95);
-        float w3 = sin((n.x * n.z) * 10.0 + uTime * 0.7);
-        float w4 = cos((n.x * 11.0 + n.y * 8.0 - n.z * 9.0) - uTime * 1.15);
-        float scan = sin((n.y * 19.0 + n.x * 7.0 + n.z * 5.0) - uTime * 2.1);
-        float wave = smoothstep(-0.30, 0.90, (w1 * 0.36 + w2 * 0.27 + w3 * 0.20 + w4 * 0.17));
-        vWave = clamp(wave * 0.88 + smoothstep(0.72, 1.0, scan) * 0.22, 0.0, 1.0);
-        vSpark = pow(max(0.0, sin(uTime * 2.4 + aPhase * 28.0)), 10.0);
-
-        // Ligero relieve en las crestas de las ondas LED
-        vec3 displaced = position * (1.0 + wave * 0.014);
-        vec4 mvPos = modelViewMatrix * vec4(displaced, 1.0);
-        vec3 viewN = normalize(normalMatrix * n);
-        vec3 viewDir = normalize(-mvPos.xyz);
-        vRim = pow(1.0 - max(0.0, dot(viewN, viewDir)), 2.2);
-
-        float baseSize = (19.5 + vWave * 15.5 + vRim * 12.0 + vSpark * 10.0) * uPixelRatio;
-        gl_PointSize = clamp(baseSize / -mvPos.z, 1.7, 8.5);
-        gl_Position = projectionMatrix * mvPos;
-      }
-    `,
-    fragmentShader: `
-      varying float vWave;
-      varying float vRim;
-      varying float vSpark;
-      void main() {
-        float d = length(gl_PointCoord - vec2(0.5));
-        if (d > 0.5) discard;
-        // Punto LED redondo con centro brillante y borde definido
-        float core = smoothstep(0.5, 0.08, d);
-        vec3 deepCrimson = vec3(0.42, 0.02, 0.09);
-        vec3 vividRed    = vec3(1.00, 0.11, 0.29);
-        vec3 hotCoral    = vec3(1.00, 0.48, 0.30);
-        vec3 iceWhite    = vec3(1.00, 0.82, 0.78);
-        vec3 col = mix(deepCrimson, vividRed, clamp(vWave * 0.92 + vRim * 0.72, 0.0, 1.0));
-        col = mix(col, hotCoral, clamp(vSpark * 0.82 + vRim * vWave * 0.52, 0.0, 1.0));
-        col = mix(col, iceWhite, clamp(vSpark * 0.36, 0.0, 0.55));
-        float alpha = core * (0.30 + vWave * 0.66 + vRim * 0.58);
-        gl_FragColor = vec4(col * (0.96 + vWave * 0.62 + vSpark * 0.72), clamp(alpha, 0.0, 0.99));
-      }
-    `,
-    transparent: true,
-    blending: THREE.AdditiveBlending,
-    depthWrite: false
-  });
-  globe.add(new THREE.Points(ledGeo, ledMat));
-}
-
-// Borde Fresnel delgado y nítido (sin saturar el centro)
-scene.add(new THREE.Mesh(new THREE.SphereGeometry(R * 1.032, 128, 96), new THREE.ShaderMaterial({
-  vertexShader: 'varying vec3 vN,vV;void main(){vN=normalize(normalMatrix*normal);vec4 mv=modelViewMatrix*vec4(position,1.);vV=normalize(-mv.xyz);gl_Position=projectionMatrix*mv;}',
-  fragmentShader: 'varying vec3 vN,vV;void main(){float f=pow(1.-abs(dot(vN,vV)),4.2);gl_FragColor=vec4(1.0,0.12,0.30,1.0)*f*1.15;}',
-  transparent: true, blending: THREE.AdditiveBlending, depthWrite: false
-})));
-
+// El volumen principal lo dibuja HoloOrb (preset JARVIS) en su propia capa.
+// Este grupo queda como ancla 3D para ciudades, conexiones, satélites y pulsos de Lima.
 // ---------- Ciudades y Conexiones (Hub: Lima) ----------
 const LIMA = [-12.05, -77.04];
 const CITIES = [[40.7, -74], [34, -118], [51.5, -0.1], [40.4, -3.7], [-23.5, -46.6], [30, 31.2], [25.2, 55.3], [19, 73], [35.7, 139.7], [-33.9, 151.2], [55.7, 37.6], [-26.2, 28], [6.5, 3.4]];
@@ -3629,7 +3628,6 @@ addEventListener('resize', () => {
   renderer.setSize(innerWidth, innerHeight);
   composer.setPixelRatio(nextDpr);
   composer.setSize(innerWidth, innerHeight);
-  ledUniforms.uPixelRatio.value = renderer.getPixelRatio();
   syncLoginCardToPlanet();
 }, { passive: true });
 
@@ -3644,8 +3642,14 @@ function animate() {
   const dt = Math.min(clock.getDelta(), 0.04), t = clock.elapsedTime, k = reduce ? 0.3 : 1;
 
   // Ondas LED + rotación del planeta
-  ledUniforms.uTime.value = t * k;
   globe.rotation.y += dt * 0.055 * k;
+  // Micro-rotación de las órbitas para dar sensación de energía y profundidad.
+  globe.children.forEach(child => {
+    if (child.userData && child.userData.orbitIndex !== undefined) {
+      const direction = child.userData.orbitIndex === 1 ? -1 : 1;
+      child.rotation.z += dt * 0.018 * direction * k;
+    }
+  });
   globe.updateMatrixWorld(true);
 
   const pulseCycle = (t * 0.78) % 1;
@@ -3655,6 +3659,8 @@ function animate() {
 
   const sunPulse = 10.7 + Math.sin(t * 1.1) * 0.38;
   distantSunGroup.userData.corona.scale.set(sunPulse, sunPulse, 1);
+  if (distantSunGroup.userData.solarHalo) distantSunGroup.userData.solarHalo.rotation.z += dt * 0.12 * k;
+  if (distantSunGroup.userData.solarHalo2) distantSunGroup.userData.solarHalo2.rotation.x -= dt * 0.08 * k;
   ringedPlanet.userData.body.rotation.y += dt * 0.04 * k;
   crimsonMoon.rotation.y += dt * 0.06 * k;
 
@@ -3761,6 +3767,19 @@ function animate() {
   if (isPreauth) syncLoginCardToPlanet();
   composer.render();
 }
+// Efecto visual: al completar los seis dígitos aparece la llave ornamental.
+const hunterTotpInput = document.getElementById('sb-totp-input');
+if (hunterTotpInput) {
+  const updateAccessKey = () => {
+    const complete = /^\d{6}$/.test(hunterTotpInput.value.trim());
+    hunterTotpInput.classList.toggle('has-access-key', complete);
+    const reveal = document.getElementById('totp-key-reveal');
+    if (reveal) reveal.setAttribute('aria-hidden', complete ? 'false' : 'true');
+  };
+  hunterTotpInput.addEventListener('input', updateAccessKey);
+  updateAccessKey();
+}
+
 syncLoginCardToPlanet();
 animate();
 </script>
