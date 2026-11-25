@@ -79,10 +79,16 @@ body.theme-day #map-canvas { background: #e2e8f0 !important; }
 body.theme-day #map-canvas .leaflet-tile-pane { filter: none !important; }
 body.theme-day input, body.theme-day textarea { color: #0f172a !important; }
 body.theme-day .zone-reset { background: rgba(14, 165, 233, 0.06) !important; border-color: rgba(14, 165, 233, 0.25) !important; }
-body.theme-day .zone-tech { background: rgba(16, 185, 129, 0.06) !important; border-color: rgba(52, 211, 153, 0.25) !important; }
+body.theme-day .zone-tech { background: rgba(16, 185, 129, 0.06) !important; border-color: rgba(16, 185, 129, 0.25) !important; }
 
 html,body{height:100%}
 body{font-family:Inter,ui-sans-serif,system-ui,sans-serif;color:var(--text-main);margin:0;padding:18px;background:radial-gradient(circle at 20% 10%,var(--bg-body-1),var(--bg-body-2) 55%,var(--bg-body-3)); transition: background 0.3s, color 0.3s;}
+
+body.hunter-preauth .frame { display: none !important; }
+#hunter-auth-modal:not(.dev-hidden) {
+  background: radial-gradient(circle at 20% 10%, #0b241b 0%, #050a08 65%);
+}
+
 .frame{height:calc(100vh - 36px);min-height:560px;display:flex;gap:14px;padding:10px;border-radius:28px;background:linear-gradient(160deg,var(--bg-frame-1),var(--bg-frame-2));border:2px solid var(--primary-bg);box-shadow:0 30px 80px rgba(0,0,0,.5); transition: background 0.3s, border-color 0.3s;}
 .rail{width:64px;border-radius:20px;background:var(--bg-rail);display:flex;flex-direction:column;align-items:center;gap:14px;padding:18px 0;flex-shrink:0; transition: background 0.3s; z-index: 50;}
 .rail i{color:#64748b;font-size:15px}
@@ -213,7 +219,6 @@ body{font-family:Inter,ui-sans-serif,system-ui,sans-serif;color:var(--text-main)
 
 .mono{font-family:"Cascadia Code",Consolas,monospace}
 .fade{animation:f .3s ease-out}@keyframes f{from{opacity:0;transform:translateY(8px)}}
-#drop-zone.drag{border-color:var(--primary)!important;background:var(--primary-bg)!important}
 .toast{position:fixed;left:50%;bottom:26px;transform:translate(-50%,100px);opacity:0;z-index:999;padding:12px 18px;border-radius:14px;background:#0b0e12;border:1px solid var(--line);transition:.3s;pointer-events:none}
 .toast.show{transform:translate(-50%,0);opacity:1}
 .sel{background:#0b0e12;border:1px solid var(--line);border-radius:10px;padding:6px 10px;font-size:12px;color:var(--text-main);max-width:240px}
@@ -232,7 +237,7 @@ body.theme-day .dev-table th { background: #e2e8f0; }
 @media(max-width:900px){body{padding:0}.frame{height:auto;border-radius:0;flex-direction:column}.rail{display:none}.cols{flex-direction:column}.side{width:100%!important}}
 </style>
 </head>
-<body class="color-green">
+<body class="color-green hunter-preauth">
 <div class="frame">
   <nav class="rail">
     <div id="logo-container" class="relative inline-block mt-1 anim-filter">
@@ -240,28 +245,25 @@ body.theme-day .dev-table th { background: #e2e8f0; }
     </div>
     
     <button class="on mt-2" data-v="filter" onclick="setView('filter')" title="Filtrado"><i class="fa-solid fa-satellite-dish"></i></button>
-    <button id="nav-map-btn" class="dev-hidden" data-v="map" onclick="setView('map')" title="Mapa y Distribución"><i class="fa-solid fa-location-dot"></i></button>
+    <button id="nav-map-btn" data-v="map" onclick="setView('map')" title="Mapa y Distribución"><i class="fa-solid fa-location-dot"></i></button>
     <button data-v="tech" onclick="setView('tech')" title="Analizador de tecnologías"><i class="fa-solid fa-microchip"></i></button>
     <button data-v="antenna" onclick="setView('antenna')" title="Infraestructura y Antenas"><i class="fa-solid fa-tower-broadcast"></i></button>
     <button data-v="maint" onclick="setView('maint')" title="Plan Mantenimiento Lógico"><i class="fa-solid fa-screwdriver-wrench"></i></button>
-    <button id="nav-price-btn" class="dev-hidden" data-v="price" onclick="setView('price')" title="Analizador de precios"><i class="fa-solid fa-coins"></i></button>
+    <button id="nav-price-btn" data-v="price" onclick="setView('price')" title="Analizador de precios"><i class="fa-solid fa-coins"></i></button>
     
-    <button id="nav-noc-btn" class="dev-hidden border border-sky-400/40 bg-sky-500/10" data-v="noc" onclick="setView('noc')" title="Tabla de Disponibilidad (Modo Dev)">
+    <button id="nav-noc-btn" class="border border-sky-400/40 bg-sky-500/10" data-v="noc" onclick="setView('noc')" title="Tabla de Disponibilidad">
       <i class="fa-solid fa-table-list text-sky-400"></i>
     </button>
 
-    <button id="nav-matrix-btn" class="dev-hidden border border-emerald-400/40 bg-emerald-500/10" data-v="skynet-matrix" onclick="setView('skynet-matrix')" title="Matriz MDZ SKYNET Embebida (Modo Dev)">
+    <button id="nav-matrix-btn" class="border border-emerald-400/40 bg-emerald-500/10" data-v="skynet-matrix" onclick="setView('skynet-matrix')" title="Matriz MDZ SKYNET Embebida">
       <i class="fa-solid fa-border-all text-emerald-400"></i>
     </button>
 
-    <button id="nav-dev-btn" class="dev-hidden border border-amber-500/40 bg-amber-500/10" data-v="dev" onclick="setView('dev')" title="Editor Tabla Excel (Modo Dev)">
+    <button id="nav-dev-btn" class="border border-amber-500/40 bg-amber-500/10" data-v="dev" onclick="setView('dev')" title="Editor Tabla">
       <i class="fa-solid fa-table-cells text-amber-400"></i>
     </button>
 
     <div class="mt-auto flex flex-col gap-2 pb-2">
-      <button id="dev-lock-btn" onclick="toggleDevModal()" title="Modo Desarrollador (Bloqueado)">
-        <i id="dev-lock-icon" class="fa-solid fa-lock"></i>
-      </button>
       <button onclick="toggleColor()" title="Cambiar Color (Verde / Rojo / Azul)"><i class="fa-solid fa-palette"></i></button>
       <button onclick="toggleTheme()" title="Modo Día/Noche"><i id="theme-icon" class="fa-solid fa-moon"></i></button>
     </div>
@@ -273,7 +275,7 @@ body.theme-day .dev-table th { background: #e2e8f0; }
         <div class="flex items-center gap-2.5">
           <h1 class="text-2xl font-bold text-white">MDZ SKYNET</h1>
           <span id="dev-badge" class="dev-hidden px-2.5 py-0.5 rounded-full bg-amber-500/20 border border-amber-400/50 text-amber-300 text-[10px] font-bold uppercase tracking-wider">
-            <i class="fa-solid fa-code mr-1"></i>Modo Dev: Edición Directa Activa
+            <i class="fa-solid fa-code mr-1"></i>Modo Edición Activo
           </span>
         </div>
         <p class="text-xs text-slate-300/80">Gestión de puntos · Control RF / AVL · Supabase mdzhunter</p>
@@ -290,13 +292,13 @@ body.theme-day .dev-table th { background: #e2e8f0; }
           <span id="dev-changes-badge" class="dev-hidden px-3 py-1.5 rounded-full bg-amber-500/15 border border-amber-500/40 text-amber-300 text-xs font-semibold">
             0 ediciones
           </span>
-          <button onclick="openGithubSyncModal()" class="px-3.5 py-2 rounded-full bg-sky-500/20 border border-sky-400/50 hover:bg-sky-500/30 text-sky-200 text-xs font-bold transition flex items-center gap-1.5 cursor-pointer" title="Publica directamente tu index.html actualizado a GitHub Pages vía GitHub API">
+          <button onclick="openGithubSyncModal()" class="px-3.5 py-2 rounded-full bg-sky-500/20 border border-sky-400/50 hover:bg-sky-500/30 text-sky-200 text-xs font-bold transition flex items-center gap-1.5 cursor-pointer" title="Publica directamente tu archivo actualizado a GitHub Pages vía GitHub API">
             <i class="fa-brands fa-github"></i> Subir a GitHub
           </button>
           <button onclick="copyUpdatedHtmlCode()" class="px-3.5 py-2 rounded-full bg-amber-500/20 border border-amber-400/50 hover:bg-amber-500/30 text-amber-300 text-xs font-bold transition flex items-center gap-1.5 cursor-pointer" title="Copia todo el código HTML actualizado para pegarlo directamente en GitHub o tu editor">
             <i class="fa-regular fa-copy"></i> Copiar HTML
           </button>
-          <button onclick="downloadUpdatedHtml()" class="px-4 py-2 rounded-full bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-extrabold shadow-lg transition flex items-center gap-1.5 cursor-pointer" title="Guarda o descarga el archivo index.html con todos tus cambios embebidos">
+          <button onclick="downloadUpdatedHtml()" class="px-4 py-2 rounded-full bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-extrabold shadow-lg transition flex items-center gap-1.5 cursor-pointer" title="Guarda o descarga el archivo HTML con todos tus cambios embebidos">
             <i class="fa-solid fa-floppy-disk"></i> Guardar HTML
           </button>
         </div>
@@ -309,14 +311,14 @@ body.theme-day .dev-table th { background: #e2e8f0; }
           <i class="fa-solid fa-file-excel"></i> Exportar Excel
         </button>
 
-        <button id="hunter-auth-btn" onclick="handleHunterAuthButton()" class="px-3.5 py-2 rounded-full bg-[#12161b] border border-white/15 hover:border-sky-400 text-xs font-bold text-slate-200 transition flex items-center gap-1.5 cursor-pointer" title="Iniciar o cerrar sesión en Supabase mdzhunter">
-          <i class="fa-solid fa-user-shield text-sky-400"></i>
-          <span id="hunter-auth-label">Login Supabase</span>
+        <button id="hunter-auth-btn" onclick="handleHunterAuthButton()" class="px-3.5 py-2 rounded-full bg-red-500/15 border border-red-400/40 hover:bg-red-500/25 text-xs font-bold text-red-200 transition flex items-center gap-1.5 cursor-pointer" title="Cerrar sesión en Supabase mdzhunter">
+          <i class="fa-solid fa-lock text-red-400"></i>
+          <span id="hunter-auth-label">Cerrar Sesión</span>
         </button>
 
         <div class="flex items-center gap-2 px-3.5 py-2 rounded-full bg-[#12161b] border border-white/10 text-xs font-semibold">
-          <span id="sb-status-dot" class="w-2 h-2 rounded-full bg-amber-400"></span>
-          <span id="sb-status-label">Local / Sin sesión</span>
+          <span id="sb-status-dot" class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+          <span id="sb-status-label">mdzhunter</span>
         </div>
       </div>
     </header>
@@ -344,26 +346,12 @@ body.theme-day .dev-table th { background: #e2e8f0; }
               <i class="fa-solid fa-rotate-left mr-1"></i>Restaurar
             </button>
           </div>
-          <div class="chip p-3 flex items-center gap-3 mb-3">
+          <div class="chip p-3 flex items-center gap-3">
             <i class="fa-solid fa-database text-emerald-400"></i>
             <div class="min-w-0 flex-1">
-              <p id="file-status-label" class="text-[11px] text-emerald-400 font-semibold">Datos cargados en sistema</p>
+              <p id="file-status-label" class="text-[11px] text-emerald-400 font-semibold">Conectado a mdzhunter</p>
               <p id="file-name" class="text-xs text-slate-300 truncate">mdz_hunter_inventario</p>
             </div>
-          </div>
-
-          <details class="text-xs text-slate-400">
-            <summary class="cursor-pointer hover:text-white font-semibold py-1 select-none">
-              <i class="fa-solid fa-file-import mr-1.5 text-sky-400"></i>Importar Excel / CSV a vista o Supabase
-            </summary>
-            <div id="drop-zone" class="mt-2 relative cursor-pointer border-2 border-dashed border-white/15 rounded-xl p-4 text-center chip transition">
-              <input type="file" id="file-upload" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" accept=".xlsx,.xls,.csv">
-              <i class="fa-solid fa-cloud-arrow-up text-xl text-sky-400 mb-1"></i>
-              <p class="text-xs text-slate-300"><b class="text-sky-400">Subir nuevo archivo</b> (.xlsx / .csv)</p>
-            </div>
-          </details>
-          <div id="file-error-container" class="hidden mt-3 p-3 rounded-xl bg-red-500/10 border border-red-500/30 flex gap-3">
-            <i class="fa-solid fa-triangle-exclamation text-red-400 mt-0.5"></i><p id="file-error-msg" class="text-xs text-red-300"></p>
           </div>
         </div>
       </aside>
@@ -373,7 +361,7 @@ body.theme-day .dev-table th { background: #e2e8f0; }
         <div class="flex items-center justify-between px-5 pt-4 pb-3 gap-3 flex-wrap">
           <h2 class="text-lg font-semibold text-white">Resultados</h2>
           <div class="flex items-center gap-2">
-            <button id="btn-add-record-filter" onclick="openAddRecordModal()" class="dev-hidden px-3 py-1 rounded-full text-xs font-semibold bg-amber-500/15 text-amber-300 border border-amber-400/30 hover:bg-amber-500/25 transition cursor-pointer">
+            <button id="btn-add-record-filter" onclick="openAddRecordModal()" class="px-3 py-1 rounded-full text-xs font-semibold bg-amber-500/15 text-amber-300 border border-amber-400/30 hover:bg-amber-500/25 transition cursor-pointer">
               <i class="fa-solid fa-plus mr-1"></i>Agregar Punto Manual
             </button>
             <div id="results-count" class="hidden px-3 py-1 rounded-full text-xs font-semibold bg-sky-500/15 text-sky-300 border border-sky-400/30"></div>
@@ -493,7 +481,7 @@ body.theme-day .dev-table th { background: #e2e8f0; }
         <div id="price-body" class="flex-1 overflow-y-auto scroll px-5 pb-5 space-y-4"></div>
       </section>
 
-      <!-- MÓDULO 1 (SOLO DEV): CONSOLA NOC & GENERADOR EXCEL EJECUTIVO -->
+      <!-- MÓDULO 1: CONSOLA NOC & GENERADOR EXCEL EJECUTIVO -->
       <section id="view-noc" class="view hidden map panel flex-1 min-w-0 flex flex-col overflow-hidden">
         <div class="flex flex-wrap items-center justify-between gap-3 px-5 pt-4 pb-3 border-b border-white/10">
           <div>
@@ -516,16 +504,7 @@ body.theme-day .dev-table th { background: #e2e8f0; }
           </div>
         </div>
 
-        <div id="nocLockedGuard" class="flex-1 overflow-y-auto scroll px-5 py-10 flex items-center justify-center">
-          <div class="card p-8 text-center max-w-md border-amber-400/40">
-            <i class="fa-solid fa-lock text-4xl text-amber-400 mb-3 block"></i>
-            <h3 class="text-lg font-bold text-white mb-1">Módulo NOC Protegido</h3>
-            <p class="text-xs text-slate-400 mb-4">Inicia sesión en Supabase (rol dev) o ingresa la clave de desarrollador para activar la consola NOC.</p>
-            <button type="button" onclick="toggleDevModal()" class="px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-extrabold transition cursor-pointer">Desbloquear Modo Dev</button>
-          </div>
-        </div>
-
-        <div id="nocUnlockedBody" class="hidden flex-1 overflow-y-auto scroll px-5 py-4 space-y-5">
+        <div id="nocUnlockedBody" class="flex-1 overflow-y-auto scroll px-5 py-4 space-y-5">
           <div class="card p-4 space-y-4">
             <div class="flex flex-wrap items-center justify-between gap-2">
               <span class="text-xs font-bold uppercase tracking-wider text-sky-300"><i class="fa-solid fa-folder-open mr-1.5"></i>Reportes de Entrada &amp; Umbrales SLA</span>
@@ -682,7 +661,7 @@ body.theme-day .dev-table th { background: #e2e8f0; }
         </div>
       </section>
 
-      <!-- MÓDULO 2 (SOLO DEV): MATRIZ EMBEBIDA MDZ SKYNET -->
+      <!-- MÓDULO 2: MATRIZ EMBEBIDA MDZ SKYNET -->
       <section id="view-skynet-matrix" class="view hidden map panel flex-1 min-w-0 flex flex-col overflow-hidden">
         <div class="flex flex-wrap items-center justify-between gap-3 px-5 pt-4 pb-3 border-b border-white/10">
           <div>
@@ -706,16 +685,7 @@ body.theme-day .dev-table th { background: #e2e8f0; }
           </div>
         </div>
 
-        <div id="matrixLockedGuard" class="flex-1 overflow-y-auto scroll px-5 py-10 flex items-center justify-center">
-          <div class="card p-8 text-center max-w-md border-amber-400/40">
-            <i class="fa-solid fa-lock text-4xl text-amber-400 mb-3 block"></i>
-            <h3 class="text-lg font-bold text-white mb-1">Matriz Embebida Protegida</h3>
-            <p class="text-xs text-slate-400 mb-4">Este sub-módulo embebido solo se activa al ingresar la contraseña de desarrollador.</p>
-            <button type="button" onclick="toggleDevModal()" class="px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-extrabold transition cursor-pointer">Desbloquear Modo Dev</button>
-          </div>
-        </div>
-
-        <div id="matrixUnlockedBody" class="hidden flex-1 overflow-y-auto scroll px-5 py-4 space-y-4">
+        <div id="matrixUnlockedBody" class="flex-1 overflow-y-auto scroll px-5 py-4 space-y-4">
           <div class="grid grid-cols-2 sm:grid-cols-4 gap-3" id="matrixSummaryCards"></div>
           <div class="overflow-auto rounded-2xl border border-white/10 max-h-[calc(100vh-260px)] scroll">
             <table class="dev-table w-full text-left border-collapse text-xs">
@@ -739,14 +709,14 @@ body.theme-day .dev-table th { background: #e2e8f0; }
         </div>
       </section>
 
-      <!-- VISTA MODO DESARROLLADOR: EDITOR TABLA EXCEL -->
+      <!-- VISTA EDITOR TABLA -->
       <section id="view-dev" class="view hidden map panel flex-1 min-w-0 flex flex-col overflow-hidden">
         <div class="flex flex-wrap items-center justify-between gap-3 px-5 pt-4 pb-3 border-b border-white/5">
           <div>
             <h2 class="text-lg font-semibold text-white flex items-center gap-2">
-              <i class="fa-solid fa-table-cells text-amber-400"></i> Editor Directo de Base Excel / Supabase
+              <i class="fa-solid fa-table-cells text-amber-400"></i> Editor Directo de Base Supabase
             </h2>
-            <p class="text-xs text-slate-400">Cada cambio se guarda en Supabase (si tienes sesión dev) y en caché local. Usa <b>Guardar HTML Embebido</b> o <b>Exportar Excel</b>.</p>
+            <p class="text-xs text-slate-400">Cada cambio se guarda en <b>mdz_hunter_inventario</b> y en caché local. Usa <b>Guardar HTML Embebido</b> o <b>Exportar Excel</b>.</p>
           </div>
           <div class="flex flex-wrap items-center gap-2">
             <div class="relative">
@@ -770,65 +740,44 @@ body.theme-day .dev-table th { background: #e2e8f0; }
   </div>
 </div>
 
-<!-- MODAL LOGIN SUPABASE (mdzhunter) -->
-<div id="hunter-auth-modal" class="dev-hidden fixed inset-0 z-[100] bg-black/75 backdrop-blur-sm flex items-center justify-center p-4">
-  <div class="panel w-full max-w-sm p-6 border border-sky-400/40 shadow-2xl fade">
+<!-- MODAL LOGIN INICIAL OBLIGATORIO (mdzhunter) -->
+<div id="hunter-auth-modal" class="dev-hidden fixed inset-0 z-[100] flex items-center justify-center p-4">
+  <div class="panel w-full max-w-sm p-6 border border-emerald-400/40 shadow-2xl fade">
     <div class="flex items-center justify-between mb-3">
       <h3 class="text-lg font-bold text-white flex items-center gap-2">
-        <i class="fa-solid fa-database text-sky-400"></i> Sesión Supabase (mdzhunter)
+        <i class="fa-solid fa-shield-halved text-emerald-400"></i> MDZ SKYNET · mdzhunter
       </h3>
-      <button onclick="closeHunterAuthModal()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
     </div>
-    <p class="text-xs text-slate-400 mb-3">Ingresa tus credenciales del proyecto <b>mdzhunter</b> y código 2FA (si tu cuenta ya tiene TOTP activo).</p>
+    <p class="text-xs text-slate-400 mb-3">Inicia sesión con tu usuario y código 2FA para acceder a todos los módulos y datos.</p>
     <form onsubmit="submitHunterSupabaseLogin(event)" class="space-y-3 text-xs">
       <div>
         <label class="block text-[11px] font-bold text-slate-300 uppercase mb-1">Usuario o Correo</label>
-        <input type="text" id="sb-user-input" required placeholder="usuario@mdz.local o MDZ" class="w-full px-3 py-2 rounded-xl bg-black/40 border border-white/15 text-white outline-none focus:border-sky-400">
+        <input type="text" id="sb-user-input" required placeholder="mdz@mdz.local" class="w-full px-3 py-2 rounded-xl bg-black/40 border border-white/15 text-white outline-none focus:border-emerald-400">
       </div>
       <div>
         <label class="block text-[11px] font-bold text-slate-300 uppercase mb-1">Contraseña</label>
-        <input type="password" id="sb-pass-input" required placeholder="••••••••" class="w-full px-3 py-2 rounded-xl bg-black/40 border border-white/15 text-white outline-none focus:border-sky-400">
+        <input type="password" id="sb-pass-input" required placeholder="••••••••" class="w-full px-3 py-2 rounded-xl bg-black/40 border border-white/15 text-white outline-none focus:border-emerald-400">
       </div>
       <div>
         <label class="block text-[11px] font-bold text-slate-300 uppercase mb-1">Código 2FA (6 dígitos)</label>
-        <input type="text" id="sb-totp-input" maxlength="6" inputmode="numeric" placeholder="000000" class="w-full px-3 py-2 rounded-xl bg-black/40 border border-white/15 text-white font-mono text-center tracking-widest outline-none focus:border-sky-400">
+        <input type="text" id="sb-totp-input" maxlength="6" inputmode="numeric" placeholder="000000" class="w-full px-3 py-2 rounded-xl bg-black/40 border border-white/15 text-white font-mono text-center tracking-widest outline-none focus:border-emerald-400">
       </div>
       <div id="sb-forced-mfa" class="hidden p-3 rounded-xl bg-black/40 border border-emerald-400/30 text-center space-y-2"></div>
       <p id="sb-auth-error" class="hidden text-xs text-red-400"></p>
       <div class="flex justify-end gap-2 pt-2">
-        <button type="button" onclick="closeHunterAuthModal()" class="chip px-4 py-2 text-xs font-semibold hover:bg-white/10">Cancelar</button>
-        <button type="submit" id="sb-login-submit-btn" class="btn px-4 py-2 rounded-xl text-xs font-bold text-white transition cursor-pointer">Ingresar</button>
+        <button type="submit" id="sb-login-submit-btn" class="btn w-full py-2.5 rounded-xl text-xs font-bold text-white transition cursor-pointer">Ingresar</button>
       </div>
     </form>
   </div>
 </div>
 
-<!-- MODAL 1: ACCESO MODO DESARROLLADOR (CLAVE) -->
-<div id="dev-auth-modal" class="dev-hidden fixed inset-0 z-[100] bg-black/75 backdrop-blur-sm flex items-center justify-center p-4">
-  <div class="panel w-full max-w-sm p-6 border border-amber-500/40 shadow-2xl fade">
-    <div class="flex items-center justify-between mb-4">
-      <h3 class="text-lg font-bold text-white flex items-center gap-2">
-        <i class="fa-solid fa-shield-halved text-amber-400"></i> Modo Desarrollador
-      </h3>
-      <button onclick="closeDevAuthModal()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
-    </div>
-    <p class="text-xs text-slate-400 mb-4">Ingresa la clave de acceso para habilitar la edición directa, Consola NOC, Matriz SKYNET embebida, guardar el HTML embebido y exportar Excel.</p>
-    <input type="password" id="dev-pass-input" placeholder="Clave de acceso..." onkeydown="if(event.key==='Enter') verifyDevPassword()" class="w-full px-3.5 py-2.5 text-sm rounded-xl bg-black/40 border border-white/15 outline-none focus:border-amber-400 mb-3">
-    <p id="dev-pass-error" class="dev-hidden text-xs text-red-400 mb-3"><i class="fa-solid fa-circle-exclamation mr-1"></i>Clave incorrecta.</p>
-    <div class="flex justify-end gap-2">
-      <button onclick="closeDevAuthModal()" class="chip px-4 py-2 text-xs font-semibold hover:bg-white/10">Cancelar</button>
-      <button onclick="verifyDevPassword()" class="px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-bold transition">Desbloquear</button>
-    </div>
-  </div>
-</div>
-
-<!-- MODAL 2: EDITAR / CREAR REGISTRO COMPLETO -->
+<!-- MODAL EDITAR / CREAR REGISTRO COMPLETO -->
 <div id="record-editor-modal" class="dev-hidden fixed inset-0 z-[100] bg-black/75 backdrop-blur-sm flex items-center justify-center p-4">
   <div class="panel w-full max-w-3xl max-h-[88vh] flex flex-col border border-amber-500/40 shadow-2xl fade">
     <div class="flex items-center justify-between px-6 py-4 border-b border-white/10">
       <div>
         <h3 id="editor-modal-title" class="text-lg font-bold text-white">Editar Registro</h3>
-        <p class="text-xs text-slate-400">Los cambios se guardan en Supabase mdzhunter (si tienes sesión dev) y localmente.</p>
+        <p class="text-xs text-slate-400">Los cambios se guardan en Supabase mdzhunter y localmente.</p>
       </div>
       <button onclick="closeRecordEditor()" class="text-slate-400 hover:text-white text-lg"><i class="fa-solid fa-xmark"></i></button>
     </div>
@@ -849,7 +798,7 @@ body.theme-day .dev-table th { background: #e2e8f0; }
 
 <div id="toast" class="toast flex items-center gap-2 text-sm"><i class="fa-solid fa-check text-emerald-400"></i><span id="toast-msg"></span></div>
 
-<!-- MODAL 3: PUBLICAR DIRECTO A GITHUB PAGES -->
+<!-- MODAL PUBLICAR DIRECTO A GITHUB PAGES -->
 <div id="github-sync-modal" class="dev-hidden fixed inset-0 z-[100] bg-black/75 backdrop-blur-sm flex items-center justify-center p-4">
   <div class="panel w-full max-w-md p-6 border border-sky-400/40 shadow-2xl fade">
     <div class="flex items-center justify-between mb-3">
@@ -893,54 +842,17 @@ body.theme-day .dev-table th { background: #e2e8f0; }
 <script id="embedded-skynet-db" type="application/json">{"h":["ID","CP","STATUS","PUNTOS","MSK SLOT TX","FSK1 - SLOT 1 TX","FSK1 - SUBSLOT TX","FSK2 - SLOT TX","POTENCIA","TIPO DE ANTENA","ALTURA ANTENA","ALTURA COMPLETA MSNM","TECNOLOGIA","MODEM QUECLINK","MODEM IP","MODEM NUMERO","MODEM SIM","FW-IP","VLU","IMEI RESETEADOR","SIM RESETEADOR","RADIO","TARJETA","TRIMMER (OHM)","MODO DE RADIO","TIPO","LATITUD","LONGITUD","PRECIO DE ALQUILER MENSUAL","PRECIO DE EQUIPOS","OBSERVACION"],"r":[["PL001","3334","VISITADO","LIMA-BASE","1","2","1","1","25-30W","","","","DETEKTOR EVAL","MP04615D7000340","","","8951101132087454752","","","","","751IZW4306","CALIMA 3","","DEM300_BSC3","SLD-AR/AS","-12.1109345","-77.0105818","0","","25-30W-RADIO OK-MODEM1502-MercuriO2K26*-FA Jeffrey-1D4BBA -doble sim"]]}</script>
 
 <script>
-// ==========================================
-// CONFIGURACIÓN SUPABASE (PROYECTO mdzhunter)
-// Reemplaza HUNTER_SUPABASE_URL y HUNTER_SUPABASE_KEY por los de tu proyecto mdzhunter
-// ==========================================
 const HUNTER_SUPABASE_URL = "https://uswtlvzyrujjjmbsbnmj.supabase.co";
 const HUNTER_SUPABASE_KEY = "sb_publishable_MD0NYx_qwX9YRFiQEjRBnw_0zsOaUkN";
 const HUNTER_TABLE = "mdz_hunter_inventario";
 
-const hunterSbClient = (
-  window.supabase &&
-  HUNTER_SUPABASE_URL.startsWith("https://") &&
-  !HUNTER_SUPABASE_KEY.startsWith("PEGA_AQUI")
-) ? window.supabase.createClient(HUNTER_SUPABASE_URL, HUNTER_SUPABASE_KEY) : null;
+const hunterSbClient = (window.supabase && HUNTER_SUPABASE_URL.startsWith("https://"))
+  ? window.supabase.createClient(HUNTER_SUPABASE_URL, HUNTER_SUPABASE_KEY)
+  : null;
 
 let hunterSession = null;
-let hunterRole = null; // "dev" o "viewer"
+let hunterRole = null;
 let hunterPendingMfaId = null;
-
-// ==========================================
-// CONFIGURACIÓN MODO DESARROLLADOR Y BASE EMBEBIDA
-// ==========================================
-const _RF_CFG_SIG = "2a7c019f";
-const _RF_CHK_HEX = "b515914b511dbcfc32ee10d23ccf4a303ae2d16c1952b2265657873c06344848";
-
-function _fnv32(str) {
-  let acc = 0x811c9dc5;
-  const enc = new TextEncoder().encode(str);
-  for (let i = 0; i < enc.length; i++) {
-    acc ^= enc[i];
-    acc = Math.imul(acc, 0x01000193) >>> 0;
-  }
-  return acc.toString(16).padStart(8, "0");
-}
-
-async function _sha256Hex(str) {
-  const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(str));
-  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, "0")).join("");
-}
-
-async function _isValidDevKey(candidate) {
-  if (!candidate) return false;
-  if (_fnv32(candidate) !== _RF_CFG_SIG) return false;
-  if (crypto && crypto.subtle) {
-    const digest = await _sha256Hex(candidate);
-    return digest === _RF_CHK_HEX;
-  }
-  return true;
-}
 
 const IDB_NAME = "MDZ_HUNTER_SKYNET_DB";
 const IDB_STORE = "state";
@@ -958,7 +870,7 @@ let lastMatchedItems = [];
 let excelData = [];
 
 const $=id=>document.getElementById(id);
-const fileInput=$("file-upload"),dropZone=$("drop-zone"),searchInput=$("search-input"),searchBtn=$("search-btn"),
+const searchInput=$("search-input"),searchBtn=$("search-btn"),
 resultsContainer=$("results-container"),resultsCount=$("results-count"),techSummary=$("tech-summary-container"),techBadges=$("tech-badges-wrapper");
 
 let currentPriceRows = []; 
@@ -1042,9 +954,7 @@ function mapSkynetRowToDbPayload(rowObj, numFallback = 1) {
 
   const extras = {};
   Object.entries(rowObj).forEach(([k, v]) => {
-    if (!k.startsWith("_") && !SKYNET_CANONICAL_HEADERS.includes(k)) {
-      extras[k] = v;
-    }
+    if (!k.startsWith("_") && !SKYNET_CANONICAL_HEADERS.includes(k)) extras[k] = v;
   });
 
   return {
@@ -1087,37 +997,25 @@ function mapSkynetRowToDbPayload(rowObj, numFallback = 1) {
   };
 }
 
+function canEditHunterData() {
+  return Boolean(hunterSession && hunterRole === "dev");
+}
+
 function updateSupabaseBadge() {
   const dot = $("sb-status-dot");
   const lbl = $("sb-status-label");
-  const authLbl = $("hunter-auth-label");
-  if (!hunterSbClient) {
-    if (dot) dot.className = "w-2 h-2 rounded-full bg-amber-400";
-    if (lbl) lbl.textContent = "Configura URL/Key";
-    if (authLbl) authLbl.textContent = "Configurar DB";
+  if (!hunterSession) {
+    if (dot) dot.className = "w-2 h-2 rounded-full bg-red-400";
+    if (lbl) lbl.textContent = "Bloqueado";
     return;
   }
-  if (hunterSession) {
-    if (dot) dot.className = "w-2 h-2 rounded-full bg-emerald-400 animate-pulse";
-    if (lbl) lbl.textContent = `mdzhunter (${hunterRole || "user"})`;
-    if (authLbl) authLbl.textContent = "Cerrar Sesión DB";
-  } else {
-    if (dot) dot.className = "w-2 h-2 rounded-full bg-sky-400";
-    if (lbl) lbl.textContent = "mdzhunter (Sin sesión)";
-    if (authLbl) authLbl.textContent = "Login Supabase";
-  }
+  if (dot) dot.className = "w-2 h-2 rounded-full bg-emerald-400 animate-pulse";
+  if (lbl) lbl.textContent = `mdzhunter (${hunterRole || "admin"})`;
 }
 
 function handleHunterAuthButton() {
-  if (!hunterSbClient) {
-    showToast("Completa HUNTER_SUPABASE_URL y HUNTER_SUPABASE_KEY en el código");
-    return;
-  }
-  if (hunterSession) {
-    signOutHunterSupabase();
-  } else {
-    openHunterAuthModal();
-  }
+  if (hunterSession) signOutHunterSupabase();
+  else openHunterAuthModal();
 }
 
 function openHunterAuthModal() {
@@ -1129,6 +1027,7 @@ function openHunterAuthModal() {
 }
 
 function closeHunterAuthModal() {
+  if (!hunterSession) return;
   $("hunter-auth-modal").classList.add("dev-hidden");
 }
 
@@ -1193,7 +1092,7 @@ async function submitHunterSupabaseLogin(e) {
 
   const { data: { session } } = await hunterSbClient.auth.getSession();
   await applyHunterSession(session || authData.session);
-  closeHunterAuthModal();
+  $("hunter-auth-modal").classList.add("dev-hidden");
   await syncFromSupabaseNow();
 }
 
@@ -1214,17 +1113,16 @@ async function confirmHunterForcedMfa() {
   hunterPendingMfaId = null;
   const { data: { session } } = await hunterSbClient.auth.getSession();
   await applyHunterSession(session);
-  closeHunterAuthModal();
+  $("hunter-auth-modal").classList.add("dev-hidden");
   await syncFromSupabaseNow();
 }
 
 async function applyHunterSession(session) {
   hunterSession = session || null;
-  hunterRole = session?.user?.app_metadata?.role || (session ? "viewer" : null);
-  if (hunterSession && hunterRole === "dev" && !isDevMode) {
-    isDevMode = true;
-    updateDevUI();
-  }
+  hunterRole = session?.user?.app_metadata?.role || (session ? "dev" : null);
+  isDevMode = Boolean(hunterSession);
+  document.body.classList.remove("hunter-preauth");
+  updateDevUI();
   updateSupabaseBadge();
 }
 
@@ -1232,17 +1130,22 @@ async function signOutHunterSupabase() {
   if (hunterSbClient) await hunterSbClient.auth.signOut();
   hunterSession = null;
   hunterRole = null;
+  isDevMode = false;
+  excelData = [];
+  lastMatchedItems = [];
+  document.body.classList.add("hunter-preauth");
+  updateDevUI();
   updateSupabaseBadge();
-  showToast("Sesión de Supabase cerrada");
+  openHunterAuthModal();
+  showToast("Sesión cerrada");
 }
 
 async function syncFromSupabaseNow() {
-  if (!hunterSbClient) {
-    showToast("Configura primero URL y Key de mdzhunter");
-    return;
-  }
+  if (!hunterSbClient) return;
   const { data: { session } } = await hunterSbClient.auth.getSession();
-  if (!session) {
+  const { data: aalData } = await hunterSbClient.auth.mfa.getAuthenticatorAssuranceLevel();
+  if (!session || !aalData || aalData.currentLevel !== "aal2") {
+    document.body.classList.add("hunter-preauth");
     openHunterAuthModal();
     return;
   }
@@ -1264,7 +1167,7 @@ async function syncFromSupabaseNow() {
   if (mapped.length) {
     excelData = mapped;
     excelHeaders = SKYNET_CANONICAL_HEADERS.slice();
-    loadedFileName = "mdz_hunter_inventario (Supabase)";
+    loadedFileName = "mdz_hunter_inventario";
     $("file-name").textContent = `${loadedFileName} (${excelData.length} filas)`;
     $("file-status-label").textContent = "Conectado a mdzhunter";
     saveToPersistentDB();
@@ -1277,7 +1180,7 @@ async function syncFromSupabaseNow() {
 }
 
 async function persistRowToSupabase(rowObj, isNew = false) {
-  if (!hunterSbClient || !hunterSession || hunterRole !== "dev") return;
+  if (!hunterSbClient || !hunterSession || !canEditHunterData()) return;
   const payload = mapSkynetRowToDbPayload(rowObj, (excelData.indexOf(rowObj) + 1) || 1);
   if (isNew || !rowObj._dbId) {
     const { data, error } = await hunterSbClient.from(HUNTER_TABLE).insert(payload).select("id").single();
@@ -1290,7 +1193,7 @@ async function persistRowToSupabase(rowObj, isNew = false) {
 }
 
 async function deleteRowFromSupabase(rowObj) {
-  if (!hunterSbClient || !hunterSession || hunterRole !== "dev" || !rowObj?._dbId) return;
+  if (!hunterSbClient || !hunterSession || !canEditHunterData() || !rowObj?._dbId) return;
   const { error } = await hunterSbClient.from(HUNTER_TABLE).delete().eq("id", rowObj._dbId);
   if (error) { console.error("Delete Supabase error:", error); showToast(`Error al borrar en DB: ${error.message}`); }
 }
@@ -1320,9 +1223,7 @@ function openSkynetDB() {
     const req = indexedDB.open(IDB_NAME, 1);
     req.onupgradeneeded = e => {
       const db = e.target.result;
-      if (!db.objectStoreNames.contains(IDB_STORE)) {
-        db.createObjectStore(IDB_STORE);
-      }
+      if (!db.objectStoreNames.contains(IDB_STORE)) db.createObjectStore(IDB_STORE);
     };
     req.onsuccess = e => resolve(e.target.result);
     req.onerror = e => reject(e.target.error);
@@ -1380,7 +1281,7 @@ function applySavedRecord(record) {
   devEditCount = record.editCount || 0;
 
   $("file-name").textContent = `${loadedFileName}`;
-  $("file-status-label").textContent = "Base local activa";
+  $("file-status-label").textContent = "Conectado a mdzhunter";
   if (devEditCount > 0) $("reset-embedded-btn").classList.remove("hidden");
 
   updateGlobalStats();
@@ -1388,13 +1289,31 @@ function applySavedRecord(record) {
   resultsContainer.innerHTML = msg(
     "fa-database text-sky-400",
     "Base SKYNET lista",
-    `${excelData.length.toLocaleString()} registros cargados. Usa el buscador o sincroniza con Supabase.`
+    `${excelData.length.toLocaleString()} registros cargados desde mdzhunter. Usa el buscador.`
   );
   return true;
 }
 
 async function initDatabase() {
   updateSupabaseBadge();
+
+  if (!hunterSbClient) {
+    document.body.classList.remove("hunter-preauth");
+    openHunterAuthModal();
+    return;
+  }
+
+  const { data: { session } } = await hunterSbClient.auth.getSession();
+  const { data: aalData } = await hunterSbClient.auth.mfa.getAuthenticatorAssuranceLevel();
+
+  if (!session || !aalData || aalData.currentLevel !== "aal2") {
+    if (session) await hunterSbClient.auth.signOut();
+    document.body.classList.add("hunter-preauth");
+    openHunterAuthModal();
+    return;
+  }
+
+  await applyHunterSession(session);
 
   let loadedFromSync = false;
   try {
@@ -1415,39 +1334,12 @@ async function initDatabase() {
     if (embedded && Array.isArray(embedded.data) && embedded.data.length) {
       excelHeaders = embedded.headers || Object.keys(embedded.data[0]);
       excelData = embedded.data.map(r => ({ ...r }));
-      $("file-name").textContent = "MDZ™ INDUSTRIES (Respaldo)";
-      $("file-status-label").textContent = "Base de respaldo lista";
       updateGlobalStats();
       updateDevUI();
-      resultsContainer.innerHTML = msg(
-        "fa-database text-sky-400",
-        "Base SKYNET de respaldo lista",
-        `${excelData.length.toLocaleString()} registros cargados. Inicia sesión en Supabase para sincronizar mdz_hunter_inventario.`
-      );
     }
   }
 
-  try {
-    const db = await openSkynetDB();
-    const tx = db.transaction(IDB_STORE, "readonly");
-    const req = tx.objectStore(IDB_STORE).get(IDB_KEY);
-    req.onsuccess = () => {
-      const record = req.result;
-      if (!record) return;
-      if (!loadedFromSync || (record.editCount || 0) > devEditCount) {
-        applySavedRecord(record);
-        refreshAllViews();
-      }
-    };
-  } catch (e) {}
-
-  if (hunterSbClient) {
-    const { data: { session } } = await hunterSbClient.auth.getSession();
-    if (session) {
-      await applyHunterSession(session);
-      await syncFromSupabaseNow();
-    }
-  }
+  await syncFromSupabaseNow();
 }
 
 async function resetToEmbeddedDefault() {
@@ -1481,7 +1373,7 @@ function buildUpdatedHtmlString() {
 }
 
 async function downloadUpdatedHtml() {
-  if (!isDevMode) { toggleDevModal(); return; }
+  if (!isDevMode) return;
   try {
     const fullHtml = buildUpdatedHtmlString();
     if (window.showSaveFilePicker) {
@@ -1515,7 +1407,7 @@ async function downloadUpdatedHtml() {
 }
 
 async function copyUpdatedHtmlCode() {
-  if (!isDevMode) { toggleDevModal(); return; }
+  if (!isDevMode) return;
   try {
     const fullHtml = buildUpdatedHtmlString();
     await copyToClipboard(fullHtml);
@@ -1529,7 +1421,7 @@ async function copyUpdatedHtmlCode() {
 const GH_CFG_KEY = "MDZ_HUNTER_GH_CFG_V1";
 
 function openGithubSyncModal() {
-  if (!isDevMode) { toggleDevModal(); return; }
+  if (!isDevMode) return;
   try {
     const saved = JSON.parse(localStorage.getItem(GH_CFG_KEY) || "{}");
     $("gh-repo-input").value = saved.repo || "";
@@ -1618,68 +1510,16 @@ async function publishToGitHubPages() {
 
 initDatabase();
 
-function toggleDevModal() {
-  if (isDevMode) {
-    isDevMode = false;
-    updateDevUI();
-    showToast("Modo Desarrollador desactivado");
-    if (
-      !$("view-dev").classList.contains("hidden") ||
-      !$("view-map").classList.contains("hidden") ||
-      !$("view-price").classList.contains("hidden") ||
-      !$("view-noc").classList.contains("hidden") ||
-      !$("view-skynet-matrix").classList.contains("hidden")
-    ) setView("filter");
-    refreshAllViews();
-    return;
-  }
-  $("dev-pass-input").value = "";
-  $("dev-pass-error").classList.add("dev-hidden");
-  $("dev-auth-modal").classList.remove("dev-hidden");
-  setTimeout(() => $("dev-pass-input").focus(), 50);
-}
-
-function closeDevAuthModal() { $("dev-auth-modal").classList.add("dev-hidden"); }
-
-async function verifyDevPassword() {
-  const val = $("dev-pass-input").value.trim();
-  const ok = await _isValidDevKey(val);
-  if (ok) {
-    isDevMode = true;
-    closeDevAuthModal();
-    updateDevUI();
-    showToast("Modo Desarrollador desbloqueado");
-    setView("noc");
-    refreshAllViews();
-  } else {
-    $("dev-pass-error").classList.remove("dev-hidden");
-  }
-}
-
 function updateDevUI() {
-  $("dev-badge").classList.toggle("dev-hidden", !isDevMode);
-  $("nav-dev-btn").classList.toggle("dev-hidden", !isDevMode);
-  if ($("nav-noc-btn")) $("nav-noc-btn").classList.toggle("dev-hidden", !isDevMode);
-  if ($("nav-matrix-btn")) $("nav-matrix-btn").classList.toggle("dev-hidden", !isDevMode);
-  if ($("nav-map-btn")) $("nav-map-btn").classList.toggle("dev-hidden", !isDevMode);
-  if ($("nav-price-btn")) $("nav-price-btn").classList.toggle("dev-hidden", !isDevMode);
-  $("dev-header-actions").classList.toggle("dev-hidden", !isDevMode);
-  $("btn-add-record-filter").classList.toggle("dev-hidden", !isDevMode);
-
-  if ($("nocLockedGuard")) $("nocLockedGuard").classList.toggle("hidden", isDevMode);
-  if ($("nocUnlockedBody")) $("nocUnlockedBody").classList.toggle("hidden", !isDevMode);
-  if ($("matrixLockedGuard")) $("matrixLockedGuard").classList.toggle("hidden", isDevMode);
-  if ($("matrixUnlockedBody")) $("matrixUnlockedBody").classList.toggle("hidden", !isDevMode);
-
-  const lockIcon = $("dev-lock-icon");
-  const lockBtn = $("dev-lock-btn");
-  if (isDevMode) {
-    lockIcon.className = "fa-solid fa-unlock text-amber-400";
-    lockBtn.title = "Desactivar Modo Desarrollador";
-  } else {
-    lockIcon.className = "fa-solid fa-lock";
-    lockBtn.title = "Modo Desarrollador (Bloqueado)";
-  }
+  const showAll = isDevMode;
+  $("dev-badge").classList.toggle("dev-hidden", !showAll);
+  $("nav-dev-btn").classList.toggle("dev-hidden", !showAll);
+  if ($("nav-noc-btn")) $("nav-noc-btn").classList.toggle("dev-hidden", !showAll);
+  if ($("nav-matrix-btn")) $("nav-matrix-btn").classList.toggle("dev-hidden", !showAll);
+  if ($("nav-map-btn")) $("nav-map-btn").classList.toggle("dev-hidden", !showAll);
+  if ($("nav-price-btn")) $("nav-price-btn").classList.toggle("dev-hidden", !showAll);
+  $("dev-header-actions").classList.toggle("dev-hidden", !showAll);
+  $("btn-add-record-filter").classList.toggle("dev-hidden", !showAll);
   updateEditCounterBadge();
 }
 
@@ -1700,7 +1540,7 @@ function registerEdit() {
   priceSig = "";
   $("map-tech-filter").dataset.hash = "";
   $("file-name").textContent = `${loadedFileName} (${devEditCount} ediciones)`;
-  $("file-status-label").textContent = "Base con cambios activa";
+  $("file-status-label").textContent = "Conectado a mdzhunter";
   updateGlobalStats();
   saveToPersistentDB();
 }
@@ -1770,7 +1610,7 @@ function addObservationInline(realIdx) {
 }
 
 function openRecordEditor(rowIndex) {
-  if (!isDevMode) { toggleDevModal(); return; }
+  if (!isDevMode) return;
   editingRowIndex = rowIndex;
   const row = excelData[rowIndex];
   if (!row) return;
@@ -1791,7 +1631,7 @@ function openRecordEditor(rowIndex) {
 }
 
 function openAddRecordModal() {
-  if (!isDevMode) { toggleDevModal(); return; }
+  if (!isDevMode) return;
   editingRowIndex = -1;
   $("editor-modal-title").textContent = "Agregar Nuevo Punto Manualmente";
   $("btn-delete-record").classList.add("dev-hidden");
@@ -1851,18 +1691,8 @@ async function deleteCurrentRecord() {
 
 function renderDevTable() {
   const wrapper = $("dev-table-wrapper");
-  if (!isDevMode) {
-    wrapper.innerHTML = `
-      <div class="text-center py-20 text-slate-500">
-        <i class="fa-solid fa-lock text-5xl text-amber-400 mb-4 block"></i>
-        <p class="text-lg font-semibold text-slate-300">Acceso Restringido</p>
-        <p class="text-sm mt-1 mb-4">Debes desbloquear el Modo Desarrollador con tu clave para editar la base.</p>
-        <button onclick="toggleDevModal()" class="px-5 py-2.5 rounded-xl bg-amber-500 text-slate-950 text-xs font-bold">Ingresar Clave</button>
-      </div>`;
-    return;
-  }
   if (!excelData.length) {
-    wrapper.innerHTML = msg("fa-table", "Sin datos cargados", "Agrega puntos manualmente o sube un archivo.");
+    wrapper.innerHTML = msg("fa-table", "Sin datos cargados", "No hay registros disponibles en la tabla.");
     return;
   }
   const q = normalizeText($("dev-table-search").value);
@@ -1976,50 +1806,6 @@ function findColumn(row,patterns){const keys=Object.keys(row).filter(k=>!k.start
 
 const msg=(icon,title,sub)=>`<div class="text-center py-20 text-slate-500"><i class="fa-solid ${icon} text-5xl mb-4 block"></i><p class="text-lg font-semibold text-slate-300">${title}</p><p class="text-sm mt-1">${sub}</p></div>`;
 
-fileInput.addEventListener("change",handleFile);
-function handleFile(e){
-  const file=e.target.files[0];if(!file)return;
-  loadedFileName = file.name;
-  $("file-error-container").classList.add("hidden");
-  techSummary.classList.add("hidden");
-  
-  resultsContainer.innerHTML=msg("fa-circle-notch fa-spin text-sky-400","Procesando archivo...","Analizando registros y columnas.");
-  const reader=new FileReader();
-  reader.onload=ev=>{
-    try{
-      const wb=XLSX.read(new Uint8Array(ev.target.result),{type:"array",cellDates:true});
-      if(!wb.SheetNames.length)throw new Error("El archivo no contiene hojas.");
-      const raw=XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]],{header:1,defval:"",raw:false});
-      if(!raw.length)throw new Error("La hoja está vacía.");
-      let hi=0,best=0;const kw=["PUNTOS","PUNTO","IMEI","ID","TECNOLOGIA","LATITUD","LONGITUD"];
-      for(let i=0;i<Math.min(20,raw.length);i++){let s=0;(raw[i]||[]).forEach(c=>{const v=normalizeText(c);if(v)kw.forEach(k=>{if(v.includes(normalizeText(k)))s++})});if(s>best){best=s;hi=i}}
-      const headers=raw[hi].map((h,i)=>(String(h||"").trim()||`COLUMNA_${i+1}`).toUpperCase());
-      excelHeaders = headers;
-      excelData=raw.slice(hi+1).map(r=>{const o={};headers.forEach((h,i)=>o[h]=r[i]!==undefined?r[i]:"");return o})
-        .filter(r=>{const k=findColumn(r,["PUNTOS","PUNTO"]);return k&&!isEmpty(r[k])});
-      if(!excelData.length)throw new Error("No se encontraron registros válidos. Verifica que exista una columna PUNTOS.");
-      
-      devEditCount = 0;
-      saveToPersistentDB();
-      updateDevUI();
-
-      $("file-name").textContent=file.name;
-      $("file-status-label").textContent="Base importada activa";
-      updateGlobalStats();
-      $("map-tech-filter").dataset.hash = ""; 
-      maintSchedule = null;
-
-      resultsContainer.innerHTML=msg("fa-database text-sky-400","Nueva base cargada",`${excelData.length.toLocaleString()} registros listos. Usa el buscador.`);
-      searchInput.focus();if(searchInput.value.trim())executeSearch();
-    }catch(err){showFileError(err.message||"Error al procesar el archivo.")}
-  };
-  reader.onerror=()=>showFileError("No fue posible leer el archivo.");
-  reader.readAsArrayBuffer(file);
-}
-function showFileError(m){
-  $("file-error-msg").textContent=m;$("file-error-container").classList.remove("hidden");
-  resultsContainer.innerHTML=msg("fa-file-circle-xmark text-red-400","No se pudo cargar el archivo","Revisa el formato e inténtalo nuevamente.");
-}
 function updateGlobalStats(){
   const pts=new Set(),tc={};
   excelData.forEach(r=>{
@@ -2375,18 +2161,8 @@ searchInput.addEventListener("input",debounce(()=>executeSearch(false),180));
 searchBtn.addEventListener("click",()=>executeSearch(false));
 searchInput.addEventListener("keydown",e=>{if(e.key==="Enter")executeSearch(false)});
 
-["dragenter","dragover","dragleave","drop"].forEach(n=>dropZone.addEventListener(n,e=>{e.preventDefault();e.stopPropagation()}));
-["dragenter","dragover"].forEach(n=>dropZone.addEventListener(n,()=>dropZone.classList.add("drag")));
-["dragleave","drop"].forEach(n=>dropZone.addEventListener(n,()=>dropZone.classList.remove("drag")));
-dropZone.addEventListener("drop",e=>{
-  const f=e.dataTransfer.files[0];if(!f)return;
-  if(!["xlsx","xls","csv"].includes(f.name.split(".").pop().toLowerCase())){showFileError("Formato no válido. Utiliza XLSX, XLS o CSV.");return}
-  const dt=new DataTransfer();dt.items.add(f);fileInput.files=dt.files;fileInput.dispatchEvent(new Event("change",{bubbles:true}));
-});
-
 function setView(v){
-  if((v==="dev" || v==="map" || v==="price" || v==="noc" || v==="skynet-matrix") && !isDevMode){toggleDevModal();return}
-  if(v!=="filter" && v!=="noc" && !excelData.length){showToast("No hay datos cargados");return}
+  if(!excelData.length){showToast("No hay datos cargados");return}
   document.querySelectorAll(".rail button[data-v]").forEach(b=>b.classList.toggle("on",b.dataset.v===v));
   
   $("side").classList.toggle("hidden",v!=="filter");
@@ -2933,7 +2709,7 @@ function nocShowAlert(msgText, type = "error") {
 }
 
 async function nocHandleFile(inputEl, tipo) {
-  if (!isDevMode) { toggleDevModal(); return; }
+  if (!isDevMode) return;
   const file = inputEl.files[0]; if (!file) return;
   $("nocAlertBox").classList.add("hidden");
   try {
@@ -2961,7 +2737,7 @@ function nocCheckReady() {
 }
 
 function nocLoadDemoData() {
-  if (!isDevMode) { toggleDevModal(); return; }
+  if (!isDevMode) return;
   $("nocAlertBox").classList.add("hidden");
   const now = new Date(); const hAgo = h => new Date(now.getTime() - h * 3600000);
   nocState.rawDet = [
@@ -3114,7 +2890,7 @@ function nocRenderIncidencias() {
 }
 
 function nocExportExcelEjecutivo() {
-  if (!isDevMode) { toggleDevModal(); return; }
+  if (!isDevMode) return;
   if (!nocState.dfEval.length) { nocShowAlert("Primero cargue los 3 reportes o Datos Demo.", "error"); return; }
   const wb = XLSX.utils.book_new();
   const metaSla = (parseFloat($("nocParamSla").value) || 95.0) / 100.0;
@@ -3142,7 +2918,7 @@ function nocExportExcelEjecutivo() {
     wsDashData.push(["", grp, { t: "n", f: `COUNTIF('Base de Datos'!$A$2:$A$${lastDbRow}, B${r})`, z: "#,##0" }, { t: "n", f: `COUNTIFS('Base de Datos'!$A$2:$A$${lastDbRow}, B${r}, 'Base de Datos'!$J$2:$J$${lastDbRow}, "DESINSTALADO")`, z: "#,##0" }, { t: "n", f: `C${r}-D${r}`, z: "#,##0" }, { t: "n", f: `COUNTIFS('Base de Datos'!$A$2:$A$${lastDbRow}, B${r}, 'Base de Datos'!$J$2:$J$${lastDbRow}, "VERDE")`, z: "#,##0" }, { t: "n", f: `COUNTIFS('Base de Datos'!$A$2:$A$${lastDbRow}, B${r}, 'Base de Datos'!$J$2:$J$${lastDbRow}, "AMARILLO")`, z: "#,##0" }, { t: "n", f: `COUNTIFS('Base de Datos'!$A$2:$A$${lastDbRow}, B${r}, 'Base de Datos'!$J$2:$J$${lastDbRow}, "ROJO")`, z: "#,##0" }, { t: "n", f: `IF(E${r}>0, F${r}/E${r}, 0)`, z: "0.00%" }, { t: "n", f: `IF(E${r}>0, F${r}/E${r}, 0)`, z: "0.00%" }, { t: "n", f: `IF(E${r}>0, (F${r}+0.5*G${r})/E${r}, 0)`, z: "0.00%" }, { t: "n", f: `J${r}-$F$5`, z: "+0.00%;-0.00%;0.00%" }, { t: "s", f: `IF(J${r}>=$F$5, "CUMPLE SLA", "BAJO META")` }]);
   });
 
-  wsDashData.push(["", "TOTAL CONSOLIDADO RED", { t: "n", f: "SUM(C13:C15)", z: "#,##0" }, { t: "n", f: "SUM(D13:D15)", z: "#,##0" }, { t: "n", f: "SUM(E13:E15)", z: "#,##0" }, { t: "n", f: "SUM(F13:F15)", z: "#,##0" }, { t: "n", f: "SUM(G13:G15)", z: "#,##0" }, { t: "n", f: "SUM(H13:H15)", z: "#,##0" }, { t: "n", f: "IF(E16>0, F16/E16, 0)", z: "0.00%" }, { t: "n", f: "IF(E16>0, F16/E16, 0)", z: "0.00%" }, { t: "n", f: "IF(E16>0, (F16+0.5*G16)/E16, 0)", z: "0.00%" }, { t: "n", f: "J16-$F$5", z: "+0.00%;-0.00%;0.00%" }, { t: "s", f: `IF(J16>=$F$5, "CUMPLE SLA", "BAJO META")` }]);
+  wsDashData.push(["", "TOTAL CONSOLIDADO RED", { t: "n", f: "SUM(C13:C15)", z: "#,##0" }, { t: "n", f: "SUM(D13:D15)", z: "#,##0" }, { t: "n", f: "SUM(E13:E15)", z: "#,##0" }, { t: "n", f: "SUM(F13:F15)", z: "#,##0" }, { t: "n", f: "SUM(G13:G15)", z: "#,##0" }, { t: "n", f: "SUM(H13:H15)", z: "#,##0" }, { t: "n", f: `IF(E16>0, F16/E16, 0)`, z: "0.00%" }, { t: "n", f: `IF(E16>0, F16/E16, 0)`, z: "0.00%" }, { t: "n", f: `IF(E16>0, (F16+0.5*G16)/E16, 0)`, z: "0.00%" }, { t: "n", f: "J16-$F$5", z: "+0.00%;-0.00%;0.00%" }, { t: "s", f: `IF(J16>=$F$5, "CUMPLE SLA", "BAJO META")` }]);
   wsDashData.push([]);
   wsDashData.push(["", `2. PANEL DE ATENCIÓN PRIORITARIA — PUNTOS CON FALLA O ALERTA (${nocState.incidencias.length} INCIDENCIAS)`]);
   wsDashData.push(["", "#", "Tecnología", "ID", "Nombre del Punto / Antena", "", "", "Último Reporte", "", "Días Caído", "Severidad", "Diagnóstico / Acción Requerida"]);
