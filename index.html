@@ -7,6 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700&family=Orbitron:wght@500;700;800;900&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=Exo+2:wght@500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
   <script src="https://kam.software/plugins/holo-orb.cdn.js" defer></script>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -135,7 +136,7 @@
       z-index: 1;
     }
 
-    #canvas-container { isolation: isolate; background: radial-gradient(900px 700px at 50% 50%, #160d06 0%, #040404 66%); }
+    #canvas-container { isolation: isolate; background: radial-gradient(900px 700px at 50% 50%, #0b1030 0%, #02030a 66%); }
     #holo-orb-layer {
       position: absolute;
       inset: 0;
@@ -1142,6 +1143,267 @@ body:not(.theme-day) .bg-\[\#0d121c\] {
 .login-kraken-mark { filter: drop-shadow(0 0 4px rgba(255, 20, 55, .42)); }
 .login-kraken-mark .kraken-bits { animation: binaryPulse 3.4s ease-in-out infinite alternate; }
 @keyframes binaryPulse { from { opacity: .58; } to { opacity: 1; } }
+
+/* =========================================================
+   HUNTER CORE · UNIFIED RED 3D EXPERIENCE
+   One continuous page scroll, shared depth and brighter detail.
+   ========================================================= */
+:root {
+  --accent-a: 255, 42, 78;
+  --accent-b: 255, 112, 74;
+  --accent: #f52d50;
+  --accent-soft: rgba(245, 45, 80, .18);
+  --accent-glow: rgba(245, 45, 80, .30);
+  --bg-body: #21151b;
+  --bg-frame: rgba(38, 25, 32, .88);
+  --bg-rail: rgba(55, 31, 40, .90);
+  --bg-panel: rgba(52, 34, 43, .88);
+  --glass: rgba(69, 43, 53, .76);
+  --line: rgba(255, 130, 148, .24);
+  --map-grid: rgba(255, 86, 112, .07);
+  --scene-depth: 0px;
+}
+html { min-height: 100%; scroll-behavior: smooth; }
+body {
+  min-height: 100%;
+  height: auto !important;
+  background:
+    radial-gradient(ellipse at 14% 4%, rgba(255, 76, 104, .20), transparent 36%),
+    radial-gradient(ellipse at 88% 80%, rgba(160, 42, 65, .20), transparent 40%),
+    linear-gradient(135deg, #2b1c24 0%, #1c171d 48%, #34202a 100%) !important;
+  color: #fff1f3;
+}
+body.hunter-preauth {
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+  min-height: 100svh;
+  height: auto !important;
+  background: #261820 !important;
+}
+body.hunter-preauth::before {
+  position: fixed;
+  background:
+    radial-gradient(circle at 50% 38%, rgba(255, 92, 122, .18), transparent 42%),
+    radial-gradient(circle at 15% 82%, rgba(255, 132, 96, .13), transparent 34%),
+    linear-gradient(145deg, rgba(43, 21, 31, .12), rgba(25, 20, 26, .24)) !important;
+}
+#hunter-auth-modal {
+  position: relative !important;
+  inset: auto !important;
+  min-height: 100svh;
+  height: auto !important;
+  width: 100%;
+  display: grid;
+  place-items: center;
+  padding: 88px 22px 54px;
+  overflow: visible !important;
+  perspective: 1400px;
+}
+#canvas-container {
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: 0 !important;
+  background:
+    radial-gradient(ellipse at 50% 48%, rgba(255, 73, 105, .15), transparent 56%),
+    linear-gradient(135deg, #39202b, #201a21 62%, #43232d) !important;
+}
+body.hunter-preauth #canvas-container {
+  filter: brightness(.96) contrast(1.03) saturate(1.12) !important;
+}
+body:not(.hunter-preauth) #canvas-container {
+  filter: brightness(.76) contrast(1.04) saturate(1.10) !important;
+}
+body.hunter-preauth #login-floating-card,
+.liquid-card-3d.glass-panel {
+  position: relative !important;
+  top: auto !important;
+  left: auto !important;
+  z-index: 6 !important;
+  width: min(720px, calc(100vw - 36px)) !important;
+  max-width: 100%;
+  min-height: 0;
+  aspect-ratio: auto !important;
+  margin: auto;
+  padding: clamp(24px, 4vw, 42px) !important;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  border-radius: 30px !important;
+  border: 1px solid rgba(255, 126, 148, .64) !important;
+  background:
+    radial-gradient(circle at 12% 0%, rgba(255, 112, 135, .24), transparent 44%),
+    radial-gradient(circle at 100% 100%, rgba(255, 112, 74, .18), transparent 42%),
+    linear-gradient(145deg, rgba(91, 53, 67, .88), rgba(40, 29, 38, .91) 56%, rgba(69, 37, 49, .90)) !important;
+  box-shadow:
+    0 30px 90px rgba(8, 2, 7, .42),
+    0 0 44px rgba(255, 42, 78, .18),
+    inset 0 1px 0 rgba(255, 226, 232, .34),
+    inset 0 -18px 42px rgba(255, 74, 104, .08) !important;
+  backdrop-filter: blur(16px) saturate(145%) !important;
+  -webkit-backdrop-filter: blur(16px) saturate(145%) !important;
+  transform: perspective(1400px) rotateX(var(--login-tilt-x, 0deg)) rotateY(var(--login-tilt-y, 0deg)) !important;
+  transform-style: preserve-3d !important;
+  transition: transform .28s ease, box-shadow .35s ease, border-color .35s ease !important;
+}
+.liquid-card-3d::before {
+  inset: 0 !important;
+  border-radius: inherit !important;
+  background:
+    linear-gradient(115deg, transparent 20%, rgba(255,255,255,.07) 48%, transparent 72%),
+    radial-gradient(circle at 50% 100%, rgba(255, 72, 105, .18), transparent 58%) !important;
+}
+.liquid-card-3d::after { border-radius: inherit !important; }
+.liquid-card-3d > .orb-ring { inset: -12px !important; opacity: .45; }
+.liquid-card-3d > .orb-ring.rev { inset: -20px !important; opacity: .28; }
+#login-floating-card > * { transform: translateZ(12px); }
+#login-floating-card .liquid-input {
+  background: rgba(35, 20, 28, .78) !important;
+  border-color: rgba(255, 135, 154, .46) !important;
+  color: #fff7f8 !important;
+  box-shadow: inset 0 1px 6px rgba(0,0,0,.22), 0 0 12px rgba(255, 56, 88, .08) !important;
+}
+#login-floating-card input::placeholder { color: rgba(255, 224, 230, .68) !important; }
+#login-floating-card label { color: #ffe2e7 !important; }
+#login-floating-card .text-slate-300,
+#login-floating-card .text-slate-200 { color: #f6dce1 !important; }
+#login-floating-card .bg-black\/55,
+#login-floating-card .bg-black\/35,
+#login-floating-card .bg-black\/60 { background-color: rgba(43, 24, 34, .78) !important; }
+#brand { position: absolute !important; top: 22px !important; left: 26px !important; z-index: 8 !important; }
+#brand-title { color: #fff4f6 !important; }
+#brand-subtitle { color: rgba(255, 218, 226, .76) !important; }
+
+/* El dashboard pasa a ser una sola superficie larga: el scroll pertenece a la página. */
+body:not(.hunter-preauth) {
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+  padding: 18px !important;
+  background:
+    radial-gradient(ellipse at 12% 0%, rgba(255, 80, 110, .22), transparent 34%),
+    radial-gradient(ellipse at 90% 75%, rgba(190, 62, 82, .18), transparent 38%),
+    linear-gradient(135deg, #2c1c25, #1d1a20 55%, #38212b) !important;
+}
+body:not(.hunter-preauth)::before {
+  position: fixed;
+  background: radial-gradient(circle at 50% 42%, rgba(255, 94, 122, .08), rgba(24, 15, 21, .10) 100%) !important;
+}
+body:not(.hunter-preauth) .frame {
+  position: relative;
+  z-index: 10;
+  width: 100%;
+  height: auto !important;
+  min-height: calc(100svh - 36px);
+  align-items: stretch;
+  padding: 14px !important;
+  gap: 14px !important;
+  border-radius: 28px !important;
+  background:
+    linear-gradient(145deg, rgba(91, 58, 72, .80), rgba(40, 30, 39, .88) 48%, rgba(67, 39, 51, .86)) !important;
+  border: 1px solid rgba(255, 142, 160, .38) !important;
+  box-shadow: 0 28px 80px rgba(8, 2, 7, .38), inset 0 1px 0 rgba(255, 226, 232, .30) !important;
+  backdrop-filter: blur(16px) saturate(135%) !important;
+  -webkit-backdrop-filter: blur(16px) saturate(135%) !important;
+  transform: perspective(1800px) rotateX(var(--app-tilt-x, 0deg)) rotateY(var(--app-tilt-y, 0deg));
+  transform-style: preserve-3d;
+  transition: transform .32s ease, box-shadow .32s ease;
+}
+body:not(.hunter-preauth) .rail {
+  background: linear-gradient(180deg, rgba(105, 54, 72, .90), rgba(52, 34, 44, .94)) !important;
+  border-color: rgba(255, 143, 160, .34) !important;
+  box-shadow: 0 12px 30px rgba(15, 4, 11, .22), inset 0 1px 0 rgba(255,255,255,.24) !important;
+}
+body:not(.hunter-preauth) .panel {
+  background: linear-gradient(145deg, rgba(105, 69, 83, .84), rgba(52, 39, 49, .91)) !important;
+  border: 1px solid rgba(255, 151, 168, .30) !important;
+  box-shadow: 0 12px 30px rgba(12, 3, 9, .20), inset 0 1px 0 rgba(255,255,255,.20) !important;
+  backdrop-filter: blur(12px) saturate(135%) !important;
+  -webkit-backdrop-filter: blur(12px) saturate(135%) !important;
+}
+body:not(.hunter-preauth) .card {
+  background: linear-gradient(145deg, rgba(119, 73, 88, .70), rgba(58, 40, 51, .88)) !important;
+  border: 1px solid rgba(255, 155, 170, .28) !important;
+  box-shadow: 0 8px 22px rgba(15, 4, 11, .18), inset 0 1px 0 rgba(255,255,255,.18) !important;
+}
+body:not(.hunter-preauth) .chip {
+  background: linear-gradient(145deg, rgba(132, 82, 97, .44), rgba(61, 41, 52, .76)) !important;
+  border-color: rgba(255, 164, 178, .28) !important;
+}
+body:not(.hunter-preauth) .zone-reset,
+body:not(.hunter-preauth) .zone-tech {
+  background: rgba(54, 36, 47, .72) !important;
+  border-color: rgba(255, 145, 164, .28) !important;
+}
+body:not(.hunter-preauth) .sel,
+body:not(.hunter-preauth) #search-input,
+body:not(.hunter-preauth) input:not([type="checkbox"]),
+body:not(.hunter-preauth) textarea,
+body:not(.hunter-preauth) select {
+  background-color: rgba(43, 29, 38, .82) !important;
+  border-color: rgba(255, 150, 168, .34) !important;
+  color: #fff4f6 !important;
+}
+body:not(.hunter-preauth) .text-slate-400 { color: #f0d1d9 !important; }
+body:not(.hunter-preauth) .text-slate-500 { color: #d7b7c0 !important; }
+body:not(.hunter-preauth) .text-slate-300,
+body:not(.hunter-preauth) .text-slate-200 { color: #f9e7eb !important; }
+body:not(.hunter-preauth) .btn,
+#sb-login-submit-btn {
+  background: linear-gradient(115deg, #d71943 0%, #fa3d61 48%, #ff805e 100%) !important;
+  border: 1px solid rgba(255, 220, 226, .44) !important;
+  box-shadow: 0 7px 22px rgba(238, 35, 78, .30), inset 0 1px 0 rgba(255,255,255,.32) !important;
+}
+body:not(.hunter-preauth) .side {
+  overflow: visible !important;
+  max-height: none !important;
+}
+body:not(.hunter-preauth) .cols {
+  flex: initial !important;
+  min-height: min(78vh, 900px) !important;
+  align-items: stretch;
+}
+body:not(.hunter-preauth) .frame > .flex-1.flex.flex-col {
+  min-height: 78vh;
+}
+body:not(.hunter-preauth) .frame .panel,
+body:not(.hunter-preauth) .frame .card,
+body:not(.hunter-preauth) .frame .chip {
+  transform-style: preserve-3d;
+  transition: transform .25s ease, border-color .25s ease, box-shadow .25s ease, background .25s ease;
+}
+body:not(.hunter-preauth) .frame .card:hover {
+  transform: translateZ(7px) translateY(-2px);
+  border-color: rgba(255, 170, 184, .58) !important;
+  box-shadow: 0 16px 30px rgba(18, 4, 12, .24), 0 0 18px rgba(255, 54, 91, .12) !important;
+}
+body:not(.hunter-preauth) .rail button.on {
+  background: linear-gradient(135deg, rgba(255, 47, 87, .38), rgba(255, 126, 91, .22)) !important;
+  border-color: rgba(255, 174, 187, .70) !important;
+}
+body:not(.hunter-preauth) .scroll::-webkit-scrollbar-thumb { background: rgba(255, 151, 170, .58) !important; }
+body:not(.hunter-preauth) #map-canvas { background: #4a303a !important; }
+@media (max-width: 900px) {
+  body:not(.hunter-preauth) { padding: 0 !important; }
+  body:not(.hunter-preauth) .frame {
+    min-height: 100svh;
+    padding: 12px !important;
+    border-radius: 0 !important;
+    transform: none !important;
+  }
+  body:not(.hunter-preauth) .cols { min-height: 0 !important; }
+  body:not(.hunter-preauth) .frame > .flex-1.flex.flex-col { min-height: 0; }
+  body.hunter-preauth #hunter-auth-modal { padding: 86px 14px 38px; }
+  body.hunter-preauth #login-floating-card { width: min(640px, calc(100vw - 28px)) !important; }
+}
+@media (max-width: 540px) {
+  #login-floating-card { padding: 22px 18px !important; border-radius: 24px !important; }
+  #login-floating-card form .grid.grid-cols-2 { grid-template-columns: 1fr !important; }
+  #brand { left: 16px !important; top: 16px !important; }
+}
+@media (prefers-reduced-motion: reduce) {
+  body:not(.hunter-preauth) .frame,
+  #login-floating-card { transition: none !important; }
+}
+
 </style>
 </head>
 <body class="hunter-preauth">
@@ -1151,10 +1413,20 @@ body:not(.theme-day) .bg-\[\#0d121c\] {
   <div id="hunter-auth-modal">
     <div id="canvas-container" aria-hidden="true"></div>
 
+    <!-- Selector de diseño de color -->
+    <div id="hunter-theme-picker" role="group" aria-label="Diseño de color">
+      <button type="button" data-theme="nebula" title="Nebulosa" aria-pressed="true"></button>
+      <button type="button" data-theme="aurora" title="Aurora" aria-pressed="false"></button>
+      <button type="button" data-theme="marte" title="Marte" aria-pressed="false"></button>
+      <button type="button" data-theme="neon" title="Neón" aria-pressed="false"></button>
+      <button type="button" data-auto="1" title="Cambio automático cada 5 s" aria-pressed="true" class="is-active"></button>
+    </div>
+
     <div id="brand">
       <span id="brand-mark"></span>
       <div id="brand-copy">
-       <span id="brand-title">HUNTER™ CORE · ORBITAL TELEMETRY</span>
+       <span id="brand-title">HUNTER™ CORE</span>
+        <span id="hunter-top-supabase-status" class="hunter-top-sb-status" aria-live="polite"><i id="hunter-top-sb-dot"></i><span id="hunter-top-sb-label">ORBITADO</span></span>
         <span id="brand-subtitle">RF / SAT / ORBITAL NETWORK · MDZHUNTER</span>
       </div>
     </div>
@@ -1189,33 +1461,7 @@ body:not(.theme-day) .bg-\[\#0d121c\] {
       </svg></div>
       <div class="flex items-center justify-between mb-3.5">
         <div class="flex items-center gap-2.5">
-          <div class="w-10 h-10 rounded-xl bg-black/55 border border-rose-500/45 flex items-center justify-center shadow-[0_0_16px_rgba(24,224,108,0.28)]">
-            <svg viewBox="0 0 100 100" class="w-8 h-8 login-kraken-mark" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Pulpo abisal HUNTER">
-              <defs>
-                <radialGradient id="krakenHead" cx="34%" cy="22%" r="78%"><stop offset="0" stop-color="#d5fff0"/><stop offset=".18" stop-color="#55d7a5"/><stop offset=".55" stop-color="#087c62"/><stop offset="1" stop-color="#031e25"/></radialGradient>
-                <linearGradient id="krakenArm" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#8af0c4"/><stop offset=".35" stop-color="#168b70"/><stop offset="1" stop-color="#032a35"/></linearGradient>
-                <radialGradient id="krakenEye"><stop stop-color="#fff"/><stop offset=".45" stop-color="#b9fff0"/><stop offset="1" stop-color="#174e50"/></radialGradient>
-                <filter id="krakenGlow"><feGaussianBlur stdDeviation="2.1" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
-              </defs>
-              <circle cx="50" cy="50" r="47" fill="#050608" stroke="#ff173d" stroke-width="3.8" style="filter:drop-shadow(0 0 3px #ff173d) drop-shadow(0 0 8px rgba(255,20,55,.9))"/>
-              <circle cx="50" cy="50" r="43.5" fill="none" stroke="#ff5369" stroke-width=".65" stroke-dasharray="1 2.4" opacity=".9"/>
-              <g class="kraken-bits" fill="#ff4565" font-family="monospace" font-size="5.2" font-weight="700" opacity=".95"><text x="12" y="20">0101</text><text x="69" y="18">101</text><text x="8" y="62">110</text><text x="76" y="61">011</text><text x="27" y="91">1010</text><text x="65" y="86">010</text><circle cx="17" cy="34" r="1"/><circle cx="83" cy="35" r="1"/><circle cx="18" cy="79" r=".8"/><circle cx="84" cy="76" r=".8"/></g>
-              <g fill="none" stroke="url(#krakenArm)" stroke-width="7" stroke-linecap="round" filter="url(#krakenGlow)">
-                <path d="M34 57 C20 62 13 54 17 43 C20 36 27 36 28 43"/><path d="M42 64 C35 77 22 83 16 75 C11 68 18 62 25 66"/>
-                <path d="M57 64 C64 78 78 83 84 73 C88 65 80 61 74 66"/><path d="M66 56 C81 62 89 53 84 42 C81 35 73 37 72 44"/>
-                <path d="M29 51 C17 46 14 33 22 28"/><path d="M71 51 C83 45 86 33 78 27"/>
-                <path d="M43 66 C42 79 48 88 55 85"/><path d="M58 66 C60 78 68 82 73 77"/>
-              </g>
-              <path d="M28 48 C27 31 37 17 51 15 C67 14 76 29 73 47 C71 61 62 68 50 68 C37 68 29 60 28 48Z" fill="url(#krakenHead)" stroke="#8fffd0" stroke-opacity=".65" stroke-width="1.2"/>
-              <path d="M35 29 Q43 18 57 21" fill="none" stroke="#e4fff5" stroke-opacity=".65" stroke-width="3" stroke-linecap="round"/>
-              <ellipse cx="40" cy="47" rx="7" ry="9" fill="url(#krakenEye)"/><ellipse cx="60" cy="47" rx="7" ry="9" fill="url(#krakenEye)"/>
-              <ellipse cx="42" cy="48" rx="2.7" ry="5" fill="#06151a"/><ellipse cx="62" cy="48" rx="2.7" ry="5" fill="#06151a"/>
-              <circle cx="41" cy="44" r="1.8" fill="#fff"/><circle cx="61" cy="44" r="1.8" fill="#fff"/>
-              <g fill="#b8ffe1" opacity=".8"><circle cx="22" cy="48" r="1.4"/><circle cx="26" cy="71" r="1.3"/><circle cx="76" cy="70" r="1.4"/><circle cx="79" cy="47" r="1.2"/></g>
-              <path d="M34 58 Q50 72 66 58" fill="none" stroke="#062c2d" stroke-width="2"/>
-            </svg>
-          </div>
-          <div>
+                    <div>
             <h3 class="text-sm font-extrabold text-white tracking-wide">HUNTER<sup class="text-[9px] text-rose-300">™</sup> CORE</h3>
             <p class="text-[10px] text-slate-300/80">Acceso al sistema · mdzhunter</p>
           </div>
@@ -1241,17 +1487,6 @@ body:not(.theme-day) .bg-\[\#0d121c\] {
             <span id="totp-timer-label" class="mono" style="color: rgb(var(--accent-a));">30s</span>
           </div>
           <input type="text" id="sb-totp-input" maxlength="6" inputmode="numeric" placeholder="0 0 0 0 0 0" class="w-full py-1.5 rounded-lg bg-black/35 border border-white/10 text-white mono text-center tracking-[0.38em] text-sm outline-none">
-          <div id="totp-key-reveal" class="totp-key-reveal" aria-hidden="true">
-            <svg viewBox="0 0 240 58" xmlns="http://www.w3.org/2000/svg">
-              <defs><linearGradient id="antiqueGold" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#fff2b2"/><stop offset=".28" stop-color="#d7a94e"/><stop offset=".58" stop-color="#80501d"/><stop offset=".82" stop-color="#f5d987"/><stop offset="1" stop-color="#8b5a20"/></linearGradient><filter id="keyGlow"><feGaussianBlur stdDeviation="2.5" result="g"/><feMerge><feMergeNode in="g"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
-              <g fill="none" stroke="url(#antiqueGold)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" filter="url(#keyGlow)">
-                <circle cx="28" cy="29" r="16"/><circle cx="28" cy="29" r="8" stroke-width="2"/><path d="M43 29 H205 L216 18 L227 29 L216 40 L205 29 M183 29 V39 M169 29 V36"/>
-                <path d="M28 13 V6 M28 45 V52 M12 29 H5 M44 29 H51" stroke-width="2"/><path d="M28 13 L34 19 M28 45 L22 39" stroke-width="2"/>
-              </g>
-              <path d="M68 29 H155" stroke="#fff1bb" stroke-opacity=".55" stroke-width="1" stroke-dasharray="2 5"/>
-            </svg>
-            <span>LLAVE DE ACCESO DESBLOQUEADA</span>
-          </div>
           <div class="h-1 w-full bg-white/10 rounded-full mt-2 overflow-hidden">
             <div id="totp-timer-bar" class="h-full transition-all duration-1000" style="width:100%; background: linear-gradient(90deg, rgb(var(--accent-a)), rgb(var(--accent-b)));"></div>
           </div>
@@ -1770,6 +2005,10 @@ body:not(.theme-day) .bg-\[\#0d121c\] {
     }
 
     function setConnectionStatus(connected) {
+      const topDot = document.getElementById("hunter-top-sb-dot");
+      const topLabel = document.getElementById("hunter-top-sb-label");
+      if (topDot) topDot.classList.toggle("is-connected", !!connected);
+      if (topLabel) topLabel.textContent = "ORBITADO";
       const dot = $("sb-conn-dot");
       const txt = $("sb-conn-text");
       if (!dot || !txt) return;
@@ -2900,7 +3139,7 @@ body:not(.theme-day) .bg-\[\#0d121c\] {
        THREE.JS: PLANETAS + SATÉLITES CON ANTENA + METEORITOS
        ========================================================= -->
 <script type="module">
-// ===== HUNTER™ CORE · ESCENA ESPACIAL V5 (ESFERA DE PARTÍCULAS LED + PULPO VERDE 3D) =====
+// ===== HUNTER™ CORE · ESCENA ESPACIAL V5 (ESFERA DE PARTÍCULAS LED + NÚCLEO SENSORIAL 3D) =====
 import * as THREE from 'three';
 import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
@@ -2928,9 +3167,9 @@ if (typeof HoloOrb !== 'undefined') {
     glow: 0.52,
     speed: reduce ? 0.28 : 0.82,
     seed: 7,
-    color: '#ff183f',
-    hot: '#ffe0e5',
-    coreColor: '#e50935',
+    color: '#5f7bff',
+    hot: '#e4efff',
+    coreColor: '#6a35e8',
     layers: { core: true, iris: true, inner: true, shell: true, caps: true, band: true, streak: true, arcs: true },
     brightness: 1.12,
     coreRadius: 0.95,
@@ -2959,15 +3198,15 @@ let targetCamZ = defaultCamZ();
 const camera = new THREE.PerspectiveCamera(40, innerWidth / innerHeight, 0.1, 280);
 camera.position.set(0, 0.35, targetCamZ);
 
-scene.add(new THREE.AmbientLight(0x4a1622, 1.05));
-scene.add(new THREE.HemisphereLight(0xdfa8a2, 0x1a0309, 0.55));
+scene.add(new THREE.AmbientLight(0x1c2756, 1.05));
+scene.add(new THREE.HemisphereLight(0xa8c0ff, 0x050a1a, 0.55));
 const sunLight = new THREE.DirectionalLight(0xffdfc8, 2.0);
 sunLight.position.set(-28, 13, 18);
 scene.add(sunLight);
-const rimRed = new THREE.PointLight(0xff1440, 42, 34);
+const rimRed = new THREE.PointLight(0x6a5cff, 42, 34);
 rimRed.position.set(5.2, -2.2, -4.2);
 scene.add(rimRed);
-const frontFill = new THREE.PointLight(0xff3028, 10, 20);
+const frontFill = new THREE.PointLight(0x22c8d8, 10, 20);
 frontFill.position.set(-4.2, 2.0, 6.8);
 scene.add(frontFill);
 
@@ -3081,14 +3320,14 @@ function makeCraterMoonTex() {
 // ---------- Nebulosa Carmesí Sutil + Estrellas ----------
 {
   const nebTex = makeRadialTex([
-    [0, 'rgba(220, 18, 56, 0.16)'],
-    [0.35, 'rgba(140, 10, 38, 0.08)'],
-    [0.7, 'rgba(52, 4, 24, 0.03)'],
+    [0, 'rgba(80, 100, 240, 0.16)'],
+    [0.35, 'rgba(96, 44, 176, 0.08)'],
+    [0.7, 'rgba(12, 22, 66, 0.03)'],
     [1, 'rgba(0, 0, 0, 0)']
   ]);
   [[-22, 10, -72, 44], [26, -12, -78, 48], [-6, -18, -85, 56], [18, 16, -80, 40], [-32, -8, -68, 38]].forEach(([x, y, z, s], idx) => {
     const sp = new THREE.Sprite(new THREE.SpriteMaterial({
-      map: nebTex, color: idx % 2 === 0 ? 0xff1e4c : 0xff5228,
+      map: nebTex, color: [0x5b6dff, 0x9b4dff, 0x18b8c8, 0xff4a8a, 0x3a7bff][idx % 5],
       transparent: true, opacity: 0.36, blending: THREE.AdditiveBlending, depthWrite: false
     }));
     sp.position.set(x, y, z); sp.scale.set(s, s * 0.72, 1); scene.add(sp);
@@ -3097,7 +3336,7 @@ function makeCraterMoonTex() {
   const n = compact ? 3400 : 5800;
   const pos = new Float32Array(n * 3), col = new Float32Array(n * 3);
   const v = new THREE.Vector3(), cTmp = new THREE.Color();
-  const palette = [0xfff0ea, 0xffd2c8, 0xff9f96, 0xff4662, 0xd8e0f0];
+  const palette = [0xf2f6ff, 0xcfe0ff, 0x9fc4ff, 0xffd9a8, 0xd8e0f0, 0xb89bff];
   for (let i = 0; i < n; i++) {
     v.randomDirection().multiplyScalar(42 + Math.random() * 110);
     pos.set([v.x, v.y, v.z], i * 3);
@@ -3117,13 +3356,13 @@ scene.add(distantSunGroup);
 {
   distantSunGroup.add(new THREE.Mesh(
     new THREE.SphereGeometry(1.1, 32, 32),
-    new THREE.MeshBasicMaterial({ color: 0xff2448 })
+    new THREE.MeshBasicMaterial({ color: 0xffb35a })
   ));
   const coronaTex = makeRadialTex([
-    [0, 'rgba(255, 170, 190, 0.46)'],
-    [0.24, 'rgba(255, 35, 78, 0.30)'],
-    [0.52, 'rgba(190, 8, 48, 0.14)'],
-    [0.8, 'rgba(90, 4, 28, 0.025)'],
+    [0, 'rgba(255, 228, 176, 0.46)'],
+    [0.24, 'rgba(255, 150, 70, 0.28)'],
+    [0.52, 'rgba(150, 72, 30, 0.13)'],
+    [0.8, 'rgba(50, 26, 14, 0.025)'],
     [1, 'rgba(0, 0, 0, 0)']
   ]);
   const corona = new THREE.Sprite(new THREE.SpriteMaterial({
@@ -3135,21 +3374,21 @@ scene.add(distantSunGroup);
   // Halo orbital y arcos solares para una estrella más viva y cinematográfica.
   const solarHalo = new THREE.Mesh(
     new THREE.TorusGeometry(2.05, 0.035, 8, 96),
-    new THREE.MeshBasicMaterial({ color: 0xff3158, transparent: true, opacity: 0.72, blending: THREE.AdditiveBlending })
+    new THREE.MeshBasicMaterial({ color: 0xffa04a, transparent: true, opacity: 0.55, blending: THREE.AdditiveBlending })
   );
   solarHalo.rotation.set(0.72, 0.28, -0.35);
   distantSunGroup.add(solarHalo);
   distantSunGroup.userData.solarHalo = solarHalo;
   const solarHalo2 = new THREE.Mesh(
     new THREE.TorusGeometry(2.42, 0.018, 6, 96),
-    new THREE.MeshBasicMaterial({ color: 0xff123f, transparent: true, opacity: 0.52, blending: THREE.AdditiveBlending })
+    new THREE.MeshBasicMaterial({ color: 0x7a6cff, transparent: true, opacity: 0.5, blending: THREE.AdditiveBlending })
   );
   solarHalo2.rotation.set(-0.5, 0.8, 0.2);
   distantSunGroup.add(solarHalo2);
   distantSunGroup.userData.solarHalo2 = solarHalo2;
 
   const flare = new THREE.Sprite(new THREE.SpriteMaterial({
-    map: coronaTex, color: 0xff1748, transparent: true, opacity: 0.23, blending: THREE.AdditiveBlending, depthWrite: false
+    map: coronaTex, color: 0x6a8cff, transparent: true, opacity: 0.23, blending: THREE.AdditiveBlending, depthWrite: false
   }));
   flare.scale.set(15.5, 1.05, 1);
   distantSunGroup.add(flare);
@@ -3191,7 +3430,7 @@ scene.add(distantExo);
 {
   distantExo.add(new THREE.Mesh(
     new THREE.SphereGeometry(1.15, 28, 24),
-    new THREE.MeshStandardMaterial({ color: 0x3b1224, emissive: 0x16030a, roughness: 0.78, metalness: 0.16 })
+    new THREE.MeshStandardMaterial({ color: 0x2c3150, emissive: 0x0a0d1c, roughness: 0.78, metalness: 0.16 })
   ));
   distantExo.add(new THREE.Mesh(
     new THREE.SphereGeometry(1.24, 28, 24),
@@ -3207,7 +3446,7 @@ scene.add(distantExo);
 const asteroidCount = compact ? 45 : 85;
 const asteroidMesh = new THREE.InstancedMesh(
   new THREE.DodecahedronGeometry(0.11, 0),
-  new THREE.MeshStandardMaterial({ color: 0x543134, roughness: 0.9, metalness: 0.2 }),
+  new THREE.MeshStandardMaterial({ color: 0x4b5072, roughness: 0.9, metalness: 0.2 }),
   asteroidCount
 );
 const asteroidData = [], dummyObj = new THREE.Object3D();
@@ -3224,7 +3463,7 @@ scene.add(asteroidMesh);
 const meteors = Array.from({ length: 3 }, (_, idx) => {
   const geo = new THREE.BufferGeometry();
   geo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(6), 3));
-  const line = new THREE.Line(geo, new THREE.LineBasicMaterial({ color: 0xffb896, transparent: true, opacity: 0, blending: THREE.AdditiveBlending, depthWrite: false }));
+  const line = new THREE.Line(geo, new THREE.LineBasicMaterial({ color: 0xa8d0ff, transparent: true, opacity: 0, blending: THREE.AdditiveBlending, depthWrite: false }));
   line.frustumCulled = false; scene.add(line);
   return { line, timer: 2 + idx * 4.2, active: false, life: 0, dur: 0.75, start: new THREE.Vector3(), dir: new THREE.Vector3() };
 });
@@ -3243,9 +3482,9 @@ const ll = (lat, lon, r = R) => {
 const LIMA = [-12.05, -77.04];
 const CITIES = [[40.7, -74], [34, -118], [51.5, -0.1], [40.4, -3.7], [-23.5, -46.6], [30, 31.2], [25.2, 55.3], [19, 73], [35.7, 139.7], [-33.9, 151.2], [55.7, 37.6], [-26.2, 28], [6.5, 3.4]];
 const limaPos = ll(...LIMA);
-const arcMat = new THREE.LineBasicMaterial({ color: 0xff2c52, transparent: true, opacity: 0.42, blending: THREE.AdditiveBlending, depthWrite: false });
-const pulseGeo = new THREE.SphereGeometry(0.032, 10, 10), pulseMat = new THREE.MeshBasicMaterial({ color: 0xffc8b0 });
-const dotGeo = new THREE.SphereGeometry(0.026, 10, 10), dotMat = new THREE.MeshBasicMaterial({ color: 0xff7082 });
+const arcMat = new THREE.LineBasicMaterial({ color: 0x4ea8ff, transparent: true, opacity: 0.42, blending: THREE.AdditiveBlending, depthWrite: false });
+const pulseGeo = new THREE.SphereGeometry(0.032, 10, 10), pulseMat = new THREE.MeshBasicMaterial({ color: 0xcfe8ff });
+const dotGeo = new THREE.SphereGeometry(0.026, 10, 10), dotMat = new THREE.MeshBasicMaterial({ color: 0x7ab8ff });
 const pulses = [];
 
 function arc(a, b) {
@@ -3259,9 +3498,9 @@ function arc(a, b) {
 CITIES.forEach(c => { arc(LIMA, c); const m = new THREE.Mesh(dotGeo, dotMat); m.position.copy(ll(...c, R * 1.005)); globe.add(m); });
 [[CITIES[0], CITIES[2]], [CITIES[8], CITIES[9]], [CITIES[6], CITIES[7]], [CITIES[3], CITIES[4]], [CITIES[2], CITIES[5]]].forEach(([a, b]) => arc(a, b));
 
-const hub = new THREE.Mesh(new THREE.SphereGeometry(0.055, 14, 14), new THREE.MeshBasicMaterial({ color: 0xffe4e8 }));
+const hub = new THREE.Mesh(new THREE.SphereGeometry(0.055, 14, 14), new THREE.MeshBasicMaterial({ color: 0xeaf4ff }));
 hub.position.copy(limaPos.clone().multiplyScalar(1.006)); globe.add(hub);
-const hubRing = new THREE.Mesh(new THREE.RingGeometry(0.085, 0.112, 40), new THREE.MeshBasicMaterial({ color: 0xff1c48, side: THREE.DoubleSide, transparent: true, opacity: 0.9, blending: THREE.AdditiveBlending, depthWrite: false }));
+const hubRing = new THREE.Mesh(new THREE.RingGeometry(0.085, 0.112, 40), new THREE.MeshBasicMaterial({ color: 0x5b8cff, side: THREE.DoubleSide, transparent: true, opacity: 0.9, blending: THREE.AdditiveBlending, depthWrite: false }));
 hubRing.position.copy(limaPos.clone().multiplyScalar(1.007)); hubRing.lookAt(limaPos.clone().multiplyScalar(2)); globe.add(hubRing);
 
 // ---------- Satélites Realistas ----------
@@ -3340,10 +3579,10 @@ const sats = ORBITS.map(o => {
   const grp = new THREE.Group(); grp.rotation.set(...o.tilt); scene.add(grp);
   const pts = [];
   for (let i = 0; i < 128; i++) pts.push(new THREE.Vector3(Math.cos(i / 128 * TAU) * o.r, 0, Math.sin(i / 128 * TAU) * o.r));
-  grp.add(new THREE.LineLoop(new THREE.BufferGeometry().setFromPoints(pts), new THREE.LineBasicMaterial({ color: 0xff224c, transparent: true, opacity: 0.15 })));
+  grp.add(new THREE.LineLoop(new THREE.BufferGeometry().setFromPoints(pts), new THREE.LineBasicMaterial({ color: 0x5b8cff, transparent: true, opacity: 0.18 })));
   const mesh = makeRealSat(); grp.add(mesh);
   const bg = new THREE.BufferGeometry(); bg.setAttribute('position', new THREE.BufferAttribute(new Float32Array(6), 3));
-  const beam = new THREE.Line(bg, new THREE.LineBasicMaterial({ color: 0xff4c38, transparent: true, opacity: 0, blending: THREE.AdditiveBlending, depthWrite: false }));
+  const beam = new THREE.Line(bg, new THREE.LineBasicMaterial({ color: 0x4ea8ff, transparent: true, opacity: 0, blending: THREE.AdditiveBlending, depthWrite: false }));
   beam.frustumCulled = false; scene.add(beam);
   return { ...o, mesh, beam };
 });
@@ -3387,7 +3626,7 @@ function makeRocket() {
 
   const flameOuter = new THREE.Mesh(
     new THREE.ConeGeometry(0.09, 0.68, 16, 1, true),
-    new THREE.MeshBasicMaterial({ color: 0xff361e, transparent: true, opacity: 0.70, blending: THREE.AdditiveBlending, side: THREE.DoubleSide, depthWrite: false })
+    new THREE.MeshBasicMaterial({ color: 0x3a8cff, transparent: true, opacity: 0.70, blending: THREE.AdditiveBlending, side: THREE.DoubleSide, depthWrite: false })
   );
   flameOuter.rotation.x = -Math.PI / 2; flameOuter.position.z = -0.84; g.add(flameOuter);
 
@@ -3414,7 +3653,7 @@ function createRocketRunner(points, speed, scale, startT) {
   const pCount = 60, pGeo = new THREE.BufferGeometry();
   pGeo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(pCount * 3), 3));
   const trail = new THREE.Points(pGeo, new THREE.PointsMaterial({
-    map: glowParticleTex, color: 0xff522e, size: 0.24 * scale,
+    map: glowParticleTex, color: 0x4ea8ff, size: 0.24 * scale,
     transparent: true, opacity: 0.65, blending: THREE.AdditiveBlending, depthWrite: false
   }));
   trail.frustumCulled = false; scene.add(trail);
@@ -3435,7 +3674,7 @@ const rockets = [
   ], 0.032, 0.68, 0.56)
 ];
 
-// ---------- Astronauta EVA Compacto con PULPO VERDE 3D dentro del Casco ----------
+// ---------- Astronauta EVA Compacto con NÚCLEO SENSORIAL 3D dentro del Casco ----------
 function makeGreenOctopusAstronaut() {
   const g = new THREE.Group();
   const suitWhite = new THREE.MeshStandardMaterial({ color: 0x8a8f98, roughness: 0.86, metalness: 0.04 });
@@ -3580,6 +3819,108 @@ function makeGreenOctopusAstronaut() {
 const astro = makeGreenOctopusAstronaut();
 scene.add(astro);
 
+// ---------- Explorador de roca (detalle): camina por el cuerpo del astronauta ----------
+const rockBug = (() => {
+  const g = new THREE.Group();
+  const rockMat  = new THREE.MeshStandardMaterial({ color: 0x7a8092, roughness: 0.92, metalness: 0.08, flatShading: true });
+  const plateMat = new THREE.MeshStandardMaterial({ color: 0xa4a9b8, roughness: 0.85, metalness: 0.10, flatShading: true });
+  const legMat   = new THREE.MeshStandardMaterial({ color: 0x484c5a, roughness: 0.80, metalness: 0.20 });
+  const jointMat = new THREE.MeshStandardMaterial({ color: 0x9aa0b0, roughness: 0.60, metalness: 0.30 });
+  const lampMat  = new THREE.MeshBasicMaterial({ color: 0x7aa2ff });
+  const body = new THREE.Mesh(new THREE.DodecahedronGeometry(0.03, 0), rockMat);
+  body.scale.set(1.25, 0.62, 1.05); g.add(body);
+  const plate = new THREE.Mesh(new THREE.IcosahedronGeometry(0.02, 0), plateMat);
+  plate.position.set(0, 0.012, -0.004); plate.scale.set(1.1, 0.55, 0.95); g.add(plate);
+  const lamp = new THREE.Mesh(new THREE.SphereGeometry(0.006, 8, 8), lampMat);
+  lamp.position.set(0, 0.002, 0.031); g.add(lamp);
+  const legs = [];
+  for (let i = 0; i < 5; i++) {
+    const baseAng = (i / 5) * TAU + 0.31;
+    const root = new THREE.Group(); root.rotation.y = baseAng; g.add(root);
+    const hip = new THREE.Group(); hip.position.set(0.027, -0.004, 0); root.add(hip);
+    const upper = new THREE.Mesh(new THREE.CylinderGeometry(0.0055, 0.0045, 0.03, 6), legMat);
+    upper.rotation.z = Math.PI / 2; upper.position.x = 0.015; hip.add(upper);
+    const knee = new THREE.Group(); knee.position.x = 0.03; knee.rotation.z = 0.7; hip.add(knee);
+    knee.add(new THREE.Mesh(new THREE.SphereGeometry(0.0065, 8, 6), jointMat));
+    const lower = new THREE.Mesh(new THREE.CylinderGeometry(0.0045, 0.003, 0.036, 6), legMat);
+    lower.position.y = -0.018; knee.add(lower);
+    const foot = new THREE.Mesh(new THREE.SphereGeometry(0.0042, 6, 6), jointMat);
+    foot.position.y = -0.036; knee.add(foot);
+    legs.push({ root, hip, baseAng, off: i * TAU * 2 / 5 });
+  }
+
+  // Superficie aproximada del torso (cápsula elíptica + panel pectoral)
+  const sstep = (a, b, v) => { const q = Math.min(1, Math.max(0, (v - a) / (b - a))); return q * q * (3 - 2 * q); };
+  const surfZ = (x, y) => {
+    const ex = Math.min(Math.abs(x) / 0.196, 0.999);
+    const torso = 0.137 * Math.sqrt(1 - ex * ex);
+    const panel = (1 - sstep(0.085, 0.115, Math.abs(x))) * sstep(0.37, 0.40, y) * (1 - sstep(0.50, 0.53, y));
+    return torso + (0.1825 - torso) * panel;
+  };
+  const surfPt = (u, out) => {
+    const x = 0.15 * Math.sin(u * 0.9), y = 0.47 + 0.11 * Math.sin(u * 0.62 + 0.8);
+    return out.set(x, y, surfZ(x, y));
+  };
+  const p0 = new THREE.Vector3(), p1 = new THREE.Vector3(), nrm = new THREE.Vector3(), fwd = new THREE.Vector3(), rgt = new THREE.Vector3();
+  const basis = new THREE.Matrix4();
+
+  const update = (w) => {
+    const u = w * 0.55;
+    surfPt(u, p0); surfPt(u + 0.03, p1);
+    const e = 0.004;
+    const zx = (surfZ(p0.x + e, p0.y) - surfZ(p0.x - e, p0.y)) / (2 * e);
+    const zy = (surfZ(p0.x, p0.y + e) - surfZ(p0.x, p0.y - e)) / (2 * e);
+    nrm.set(-zx, -zy, 1).normalize();
+    fwd.copy(p1).sub(p0); fwd.addScaledVector(nrm, -fwd.dot(nrm)).normalize();
+    rgt.crossVectors(nrm, fwd).normalize();
+    basis.makeBasis(rgt, nrm, fwd);
+    g.quaternion.setFromRotationMatrix(basis);
+    g.position.copy(p0).addScaledVector(nrm, 0.046);
+    const ph = u * 15;
+    // Latido doble (lub-dub) para halo, luz y cuerpo
+    const beat = Math.max(0, Math.sin(w * 4.2)) ** 3 + 0.55 * Math.max(0, Math.sin(w * 4.2 - 1.1)) ** 3;
+    halo.scale.setScalar(0.15 + beat * 0.11);
+    haloMat.opacity = 0.35 + Math.min(beat, 1) * 0.55;
+    lamp.scale.setScalar(1 + beat * 1.1);
+    g.scale.setScalar(1.5 * (1 + beat * 0.07));
+    legs.forEach(l => {
+      const s = Math.sin(ph + l.off);
+      l.root.rotation.y = l.baseAng + s * 0.28;
+      l.hip.rotation.z = -0.25 + Math.max(0, Math.cos(ph + l.off)) * 0.45;
+    });
+  };
+
+  const syncLamp = () => {
+    try {
+      const c = getComputedStyle(document.body).getPropertyValue('--t1').trim();
+      if (c) { lampMat.color.set(c); if (typeof haloMat !== 'undefined') haloMat.color.set(c); }
+    } catch (e) {}
+  };
+  syncLamp();
+  new MutationObserver(syncLamp).observe(document.body, { attributes: true, attributeFilter: ['data-theme', 'class'] });
+  // Halo que palpita para delatar su presencia
+  const haloMat = new THREE.SpriteMaterial({
+    map: makeRadialTex([[0, 'rgba(255,255,255,1)'], [0.30, 'rgba(255,255,255,.38)'], [1, 'rgba(255,255,255,0)']]),
+    color: 0x7aa2ff, transparent: true, opacity: 0.6, blending: THREE.AdditiveBlending, depthWrite: false
+  });
+  const halo = new THREE.Sprite(haloMat);
+  halo.scale.set(0.15, 0.15, 1); g.add(halo);
+  syncLamp();
+  g.scale.setScalar(1.5);
+  return { group: g, update, halo, haloMat, lamp, syncLamp };
+})();
+astro.add(rockBug.group);
+
+// ---------- Inactividad: tras 10 s sin escribir, el astronauta se pega a la pantalla ----------
+let lastActivity = performance.now(), stick = 0;
+const stickVec = new THREE.Vector3(), stickQA = new THREE.Quaternion(), stickQB = new THREE.Quaternion();
+const stickTilt = new THREE.Quaternion().setFromEuler(new THREE.Euler(0, 0, -0.22));
+{
+  const loginCardEl = document.getElementById('login-floating-card');
+  const markActive = () => { lastActivity = performance.now(); };
+  if (loginCardEl) ['input', 'keydown', 'focusin', 'pointerdown'].forEach(ev => loginCardEl.addEventListener(ev, markActive, { passive: true }));
+}
+
 const TETHER_SEG = 26;
 const tetherGeo = new THREE.BufferGeometry();
 tetherGeo.setAttribute('position', new THREE.BufferAttribute(new Float32Array((TETHER_SEG + 1) * 3), 3));
@@ -3614,10 +3955,9 @@ addEventListener('mousemove', e => {
   }
 }, { passive: true });
 
-addEventListener('wheel', e => {
-  if (!document.body.classList.contains('hunter-preauth')) return;
-  targetCamZ = THREE.MathUtils.clamp(targetCamZ + e.deltaY * 0.0045, 7.6, 17.5);
-}, { passive: true });
+// La rueda del mouse controla el scroll normal de toda la página.
+// El zoom orbital queda reservado a la animación ambiental para evitar que
+// parezca que solo se desplaza la tarjeta de acceso.
 
 addEventListener('resize', () => {
   camera.aspect = innerWidth / innerHeight;
@@ -3725,7 +4065,7 @@ function animate() {
     attr.needsUpdate = true;
   });
 
-  // Astronauta + animación viva del Pulpo Verde
+  // Unidad EVA + núcleo sensorial
   const asp = innerWidth / innerHeight;
   astro.position.set((asp > 1 ? 4.25 : 2.45) + Math.sin(t * 0.36) * 0.22, 1.3 + Math.cos(t * 0.48) * 0.22, 1.55 + Math.sin(t * 0.25) * 0.16);
   astro.rotation.set(0.16 + Math.sin(t * 0.28) * 0.09, -0.52 + Math.sin(t * 0.22 * k) * 0.28, -0.12 + Math.cos(t * 0.24) * 0.10);
@@ -3743,6 +4083,7 @@ function animate() {
   u.octo.position.y = Math.sin(w * 2.1) * 0.012;
   u.octo.rotation.y = Math.sin(w * 1.15) * 0.18;
   u.mantle.scale.set(0.96 + Math.sin(w * 2.4) * 0.04, 1.12 - Math.sin(w * 2.4) * 0.05, 1.0 + Math.sin(w * 2.4) * 0.04);
+  rockBug.update(w);
 
   astro.localToWorld(v3.set(0, 0.24, -0.24));
   sats[0].mesh.getWorldPosition(v1);
@@ -3764,6 +4105,31 @@ function animate() {
   camera.position.z += (desiredZ + breatheZ - camera.position.z) * 0.08;
   camera.lookAt(0, 0, 0);
 
+  // ---- El astronauta se pega a la pantalla si nadie escribe en 10 s ----
+  {
+    const idle = isPreauth && (performance.now() - lastActivity) > 10000;
+    stick += ((idle ? 1 : 0) - stick) * Math.min(1, dt * (idle ? 1.5 : 3));
+    const e = stick * stick * (3 - 2 * stick);
+    const base = 0.55;
+    if (e > 0.001) {
+      camera.updateMatrixWorld();
+      const d = 1.9;
+      const halfH = Math.tan(THREE.MathUtils.degToRad(camera.fov * 0.5)) * d;
+      const halfW = halfH * camera.aspect;
+      stickVec.set(0.56 * halfW, -0.04 * halfH + Math.sin(t * 1.3) * 0.012, -d);
+      camera.localToWorld(stickVec);
+      astro.position.lerp(stickVec, e);
+      stickQA.copy(astro.quaternion);
+      stickQB.copy(camera.quaternion).multiply(stickTilt);
+      stickQA.slerp(stickQB, e);
+      astro.quaternion.copy(stickQA);
+      const sc = base * (1 + 0.30 * e);
+      astro.scale.set(sc, sc, base * (1 - 0.45 * e));   // aplastado contra el cristal
+    } else {
+      astro.scale.setScalar(base);
+    }
+  }
+
   if (isPreauth) syncLoginCardToPlanet();
   composer.render();
 }
@@ -3783,5 +4149,1050 @@ if (hunterTotpInput) {
 syncLoginCardToPlanet();
 animate();
 </script>
+
+<script>
+/* HUNTER CORE · profundidad 3D compartida para toda la interfaz */
+(() => {
+  const root = document.body;
+  const frame = document.querySelector('.frame');
+  const login = document.getElementById('login-floating-card');
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (reduceMotion) return;
+
+  let raf = 0;
+  let px = 0, py = 0;
+  window.addEventListener('pointermove', (event) => {
+    if (event.pointerType === 'touch') return;
+    px = (event.clientX / Math.max(window.innerWidth, 1) - .5) * 2;
+    py = (event.clientY / Math.max(window.innerHeight, 1) - .5) * 2;
+    if (raf) return;
+    raf = requestAnimationFrame(() => {
+      raf = 0;
+      if (root.classList.contains('hunter-preauth')) {
+        if (login) {
+          login.style.setProperty('--login-tilt-y', `${(px * 1.6).toFixed(2)}deg`);
+          login.style.setProperty('--login-tilt-x', `${(-py * 1.2).toFixed(2)}deg`);
+        }
+      } else if (frame) {
+        frame.style.setProperty('--app-tilt-y', `${(px * .55).toFixed(2)}deg`);
+        frame.style.setProperty('--app-tilt-x', `${(-py * .38).toFixed(2)}deg`);
+      }
+    });
+  }, { passive: true });
+
+  window.addEventListener('pointerleave', () => {
+    if (frame) {
+      frame.style.setProperty('--app-tilt-x', '0deg');
+      frame.style.setProperty('--app-tilt-y', '0deg');
+    }
+    if (login) {
+      login.style.setProperty('--login-tilt-x', '0deg');
+      login.style.setProperty('--login-tilt-y', '0deg');
+    }
+  }, { passive: true });
+})();
+</script>
+
 </body>
 </html>
+<style id="hunter-orbital-login-v2">
+body.hunter-preauth #hunter-auth-modal { perspective: 1400px; }
+body.hunter-preauth #login-floating-card {
+  width: min(470px, 88vw) !important;
+  min-height: 470px !important;
+  height: auto !important;
+  aspect-ratio: 1 / 1;
+  padding: 62px 48px 48px !important;
+  border-radius: 50% !important;
+  overflow: visible !important;
+  background: radial-gradient(circle at 32% 22%, rgba(255,105,132,.25), transparent 34%), radial-gradient(circle at 70% 78%, rgba(125,8,35,.34), transparent 48%), linear-gradient(145deg, rgba(45,24,38,.94), rgba(12,18,30,.94)) !important;
+  border: 1px solid rgba(255,105,132,.72) !important;
+  box-shadow: 0 0 0 7px rgba(255,45,86,.07), 0 0 0 16px rgba(255,45,86,.035), 0 28px 90px rgba(0,0,0,.62), inset 0 0 42px rgba(255,55,90,.12), 0 0 52px rgba(255,30,72,.24) !important;
+  transform-style: preserve-3d;
+  translate: 0 var(--planet-drift-y, 0px);
+  transition: border-radius .4s ease, box-shadow .4s ease;
+}
+body.hunter-preauth #login-floating-card::before {
+  content:""; position:absolute; inset:-17px; border:1px solid rgba(255,85,117,.42); border-radius:50%; pointer-events:none;
+  transform: translateZ(-18px) rotateX(68deg); box-shadow: 0 0 22px rgba(255,34,75,.22);
+}
+body.hunter-preauth #login-floating-card::after {
+  content:""; position:absolute; inset:-29px; border:1px dashed rgba(255,100,130,.32); border-radius:50%; pointer-events:none;
+  transform: translateZ(-30px) rotateY(66deg); animation: hunterOrbitalRing 24s linear infinite;
+}
+@keyframes hunterOrbitalRing { to { transform: translateZ(-30px) rotateY(66deg) rotateZ(360deg); } }
+body.hunter-preauth #login-floating-card .orb-ring { opacity:.72; inset:13px; pointer-events:none; }
+body.hunter-preauth #login-floating-card .orb-ring.rev { inset:3px; opacity:.35; }
+body.hunter-preauth #login-floating-card .orb-ring svg { width:100%; height:100%; }
+body.hunter-preauth #login-floating-card .flex.items-center.justify-between.mb-3\.5 { margin-bottom:12px !important; }
+body.hunter-preauth #login-floating-card form { position:relative; z-index:2; }
+body.hunter-preauth #login-floating-card form .grid.grid-cols-2 { grid-template-columns:1fr !important; gap:7px !important; }
+body.hunter-preauth #login-floating-card form input { padding-top:8px !important; padding-bottom:8px !important; }
+body.hunter-preauth #login-floating-card form .p-3.rounded-xl { padding:9px !important; }
+body.hunter-preauth #login-floating-card .login-kraken-mark { filter: drop-shadow(0 0 5px rgba(255,40,82,.55)); }
+body.hunter-preauth #login-floating-card .w-10.h-10.rounded-xl { width:34px !important; height:34px !important; }
+body.hunter-preauth #login-floating-card .w-10.h-10.rounded-xl svg { width:28px !important; height:28px !important; }
+@media (max-width: 600px) {
+  body.hunter-preauth #hunter-auth-modal { padding: 70px 10px 34px !important; }
+  body.hunter-preauth #login-floating-card { width:min(94vw, 430px) !important; min-height:0 !important; aspect-ratio:auto; border-radius:44% / 26% !important; padding:54px 30px 34px !important; }
+  body.hunter-preauth #login-floating-card .orb-ring { opacity:.28; }
+}
+@media (prefers-reduced-motion: reduce) { body.hunter-preauth #login-floating-card::after { animation:none; } }
+</style>
+<script id="hunter-login-orbit-motion">
+(() => {
+ const c=document.getElementById('login-floating-card');
+ if(!c || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+ let raf=0, start=performance.now();
+ const tick=now=>{ const t=(now-start)/1000; c.style.setProperty('--planet-drift-y',(Math.sin(t*0.72)*5 + Math.sin(t*0.31)*2).toFixed(2)+'px'); raf=requestAnimationFrame(tick); };
+ raf=requestAnimationFrame(tick);
+})();
+</script>
+
+<style id="hunter-centered-liquid-orb-v3">
+body.hunter-preauth #hunter-auth-modal {
+  perspective: 1600px !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+body.hunter-preauth #login-floating-card {
+  position: relative !important;
+  box-sizing: border-box !important;
+  width: min(490px, 92vw) !important;
+  height: min(490px, 92vw) !important;
+  min-height: 0 !important;
+  aspect-ratio: 1 / 1 !important;
+  padding: clamp(52px, 7vw, 72px) clamp(42px, 7vw, 66px) 46px !important;
+  border-radius: 50% !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
+  align-items: center !important;
+  gap: 13px !important;
+  overflow: hidden !important;
+  isolation: isolate !important;
+  background:
+    radial-gradient(ellipse at 30% 18%, rgba(255,255,255,.24), transparent 34%),
+    radial-gradient(ellipse at 75% 80%, rgba(255,40,82,.22), transparent 42%),
+    linear-gradient(145deg, rgba(255,220,230,.16), rgba(48,20,39,.42) 48%, rgba(12,19,32,.56)) !important;
+  border: 1px solid rgba(255,220,232,.58) !important;
+  -webkit-backdrop-filter: blur(24px) saturate(175%) contrast(112%) !important;
+  backdrop-filter: blur(24px) saturate(175%) contrast(112%) !important;
+  box-shadow:
+    inset 0 2px 2px rgba(255,255,255,.42),
+    inset 0 -22px 45px rgba(5,9,18,.30),
+    0 0 0 1px rgba(255,65,105,.30),
+    0 0 38px rgba(255,40,82,.28),
+    0 28px 85px rgba(0,0,0,.48) !important;
+  transform-style: preserve-3d !important;
+  translate: 0 var(--planet-drift-y, 0px);
+}
+body.hunter-preauth #login-floating-card::before {
+  content:"" !important;
+  position:absolute !important; inset:10px !important;
+  border-radius:50% !important;
+  border:1px solid rgba(255,255,255,.25) !important;
+  background: radial-gradient(circle at 28% 18%, rgba(255,255,255,.10), transparent 38%) !important;
+  box-shadow: inset 0 0 28px rgba(255,255,255,.08), 0 0 30px rgba(255,45,90,.12) !important;
+  pointer-events:none !important; z-index:-1 !important;
+  transform: translateZ(-12px) !important;
+}
+body.hunter-preauth #login-floating-card::after {
+  content:"" !important;
+  position:absolute !important; inset:-14px !important;
+  border:1px solid rgba(255,115,145,.40) !important;
+  border-radius:50% !important;
+  pointer-events:none !important;
+  transform: translateZ(-24px) rotateY(66deg) !important;
+  animation:hunterOrbitalRing 18s linear infinite !important;
+}
+body.hunter-preauth #login-floating-card .orb-ring { opacity:.42 !important; inset:17px !important; pointer-events:none !important; }
+body.hunter-preauth #login-floating-card .orb-ring.rev { inset:7px !important; opacity:.20 !important; }
+body.hunter-preauth #login-floating-card > .flex.items-center.justify-between.mb-3\.5 {
+  width:100% !important; display:flex !important; flex-direction:column !important;
+  justify-content:center !important; align-items:center !important; gap:7px !important;
+  margin:0 !important; text-align:center !important; position:relative !important; z-index:2 !important;
+}
+body.hunter-preauth #login-floating-card > .flex.items-center.justify-between.mb-3\.5 > .flex.items-center.gap-2\.5 {
+  display:flex !important; flex-direction:column !important; align-items:center !important;
+  justify-content:center !important; gap:5px !important;
+}
+body.hunter-preauth #login-floating-card .w-10.h-10.rounded-xl {
+  width:42px !important; height:42px !important; border-radius:50% !important;
+  background:rgba(5,12,22,.48) !important; border:1px solid rgba(255,112,140,.7) !important;
+  box-shadow:0 0 18px rgba(255,44,83,.28), inset 0 1px 5px rgba(255,255,255,.18) !important;
+}
+body.hunter-preauth #login-floating-card .w-10.h-10.rounded-xl svg { width:34px !important; height:34px !important; }
+body.hunter-preauth #login-floating-card .login-kraken-mark { filter:drop-shadow(0 0 8px rgba(255,55,85,.8)) !important; }
+body.hunter-preauth #login-floating-card > .flex.items-center.justify-between.mb-3\.5 > span {
+  position:absolute !important; top:0 !important; right:0 !important;
+  background:rgba(255,255,255,.10) !important; border-color:rgba(255,255,255,.30) !important;
+}
+body.hunter-preauth #login-floating-card h3 { font-size:14px !important; letter-spacing:.12em !important; }
+body.hunter-preauth #login-floating-card form {
+  width:100% !important; max-width:320px !important; margin:0 auto !important;
+  display:flex !important; flex-direction:column !important; gap:10px !important;
+  position:relative !important; z-index:2 !important; text-align:center !important;
+}
+body.hunter-preauth #login-floating-card form .grid.grid-cols-2 {
+  display:flex !important; flex-direction:column !important; gap:8px !important;
+  width:100% !important;
+}
+body.hunter-preauth #login-floating-card form .grid.grid-cols-2 > div {
+  width:100% !important; text-align:center !important;
+}
+body.hunter-preauth #login-floating-card form label {
+  display:block !important; text-align:center !important; margin-bottom:3px !important;
+  letter-spacing:.10em !important; font-size:9px !important;
+}
+body.hunter-preauth #login-floating-card form input {
+  width:100% !important; box-sizing:border-box !important; text-align:center !important;
+  background:rgba(8,13,24,.46) !important;
+  border:1px solid rgba(255,200,215,.34) !important;
+  border-radius:999px !important;
+  box-shadow:inset 0 2px 8px rgba(0,0,0,.24), 0 0 12px rgba(255,60,95,.08) !important;
+  color:#fff !important; padding:8px 14px !important;
+}
+body.hunter-preauth #login-floating-card form .p-3.rounded-xl {
+  width:100% !important; box-sizing:border-box !important; padding:9px 11px !important;
+  border-radius:17px !important;
+  background:rgba(7,13,24,.40) !important;
+  border:1px solid rgba(255,190,210,.34) !important;
+  -webkit-backdrop-filter:blur(12px) !important; backdrop-filter:blur(12px) !important;
+}
+body.hunter-preauth #login-floating-card form .p-3.rounded-xl > .flex {
+  justify-content:center !important; gap:10px !important; text-align:center !important;
+}
+body.hunter-preauth #login-floating-card form .p-3.rounded-xl input {
+  border-radius:12px !important; background:rgba(25,14,27,.54) !important;
+}
+body.hunter-preauth #login-floating-card #sb-login-submit-btn {
+  border-radius:999px !important; margin-top:1px !important;
+  box-shadow:0 7px 22px rgba(255,32,80,.30), inset 0 1px 0 rgba(255,255,255,.35) !important;
+}
+@media (max-width:600px) {
+  body.hunter-preauth #hunter-auth-modal { padding:60px 8px 28px !important; }
+  body.hunter-preauth #login-floating-card {
+    width:min(94vw,460px) !important; height:min(94vw,460px) !important;
+    min-height:0 !important; aspect-ratio:1/1 !important;
+    padding:48px 34px 34px !important; border-radius:50% !important;
+    gap:8px !important;
+  }
+  body.hunter-preauth #login-floating-card form { max-width:100% !important; gap:7px !important; }
+  body.hunter-preauth #login-floating-card form input { padding:7px 10px !important; }
+  body.hunter-preauth #login-floating-card form .p-3.rounded-xl { padding:7px 9px !important; }
+}
+@media (prefers-reduced-motion: reduce) {
+  body.hunter-preauth #login-floating-card::after { animation:none !important; }
+}
+</style>
+
+<style id="hunter-transparent-orb-eye-v4">
+/* El círculo deja de ser una placa roja: planeta y escena quedan visibles detrás */
+body.hunter-preauth #login-floating-card {
+  width:min(450px, 90vw) !important;
+  height:min(450px, 90vw) !important;
+  min-height:0 !important;
+  aspect-ratio:1/1 !important;
+  padding:58px 48px 44px !important;
+  border-radius:50% !important;
+  background:
+    radial-gradient(circle at 50% 8%, rgba(255,255,255,.10), transparent 37%),
+    radial-gradient(circle at 50% 100%, rgba(255,40,82,.07), transparent 52%),
+    rgba(8,13,24,.055) !important;
+  -webkit-backdrop-filter:blur(8px) saturate(145%) !important;
+  backdrop-filter:blur(8px) saturate(145%) !important;
+  border:1px solid rgba(255,225,234,.38) !important;
+  box-shadow:
+    inset 0 1px 1px rgba(255,255,255,.25),
+    inset 0 0 35px rgba(255,255,255,.035),
+    0 12px 42px rgba(0,0,0,.19) !important;
+  overflow:visible !important;
+}
+/* Retirar los aros rojos gruesos que encerraban el login */
+body.hunter-preauth #login-floating-card::before {
+  inset:8px !important;
+  border-color:rgba(255,255,255,.16) !important;
+  background:transparent !important;
+  box-shadow:inset 0 0 22px rgba(255,255,255,.025) !important;
+}
+body.hunter-preauth #login-floating-card::after {
+  inset:-5px !important;
+  border:1px solid rgba(255,110,140,.17) !important;
+  box-shadow:none !important;
+  opacity:.7 !important;
+}
+body.hunter-preauth #login-floating-card .orb-ring { opacity:.13 !important; }
+body.hunter-preauth #login-floating-card .orb-ring.rev { opacity:.07 !important; }
+/* La tarjeta ya no compite con el planeta; los controles conservan contraste */
+body.hunter-preauth #login-floating-card form {
+  width:100% !important;
+  max-width:310px !important;
+  gap:9px !important;
+}
+body.hunter-preauth #login-floating-card form input {
+  background:rgba(8,12,22,.70) !important;
+  border:1px solid rgba(255,225,234,.42) !important;
+  box-shadow:inset 0 2px 7px rgba(0,0,0,.28), 0 0 10px rgba(255,65,95,.07) !important;
+  color:#fff !important;
+}
+body.hunter-preauth #login-floating-card form .p-3.rounded-xl {
+  background:rgba(8,12,22,.57) !important;
+  border:1px solid rgba(255,220,230,.32) !important;
+  -webkit-backdrop-filter:blur(5px) !important;
+  backdrop-filter:blur(5px) !important;
+}
+body.hunter-preauth #login-floating-card #sb-login-submit-btn {
+  display:block !important;
+  width:68% !important;
+  min-width:170px !important;
+  margin:3px auto 0 !important;
+  padding:8px 12px !important;
+  font-size:10px !important;
+  border-radius:999px !important;
+  box-shadow:0 4px 14px rgba(255,32,80,.20), inset 0 1px 0 rgba(255,255,255,.30) !important;
+}
+body.hunter-preauth #login-floating-card .hunter-bionic-lid {
+  opacity:0;
+  transform:translateY(-18px) scaleY(.04) !important;
+  transform-origin:51px 49px;
+  transition:transform .18s ease, opacity .12s ease;
+  pointer-events:none;
+}
+body.hunter-preauth #login-floating-card.eye-typing .hunter-bionic-lid {
+  opacity:1;
+  transform:translateY(0) scaleY(1) !important;
+}
+body.hunter-preauth #login-floating-card.eye-error .login-kraken-mark {
+  animation:hunterEyePanic .12s linear infinite !important;
+  filter:drop-shadow(0 0 9px #ff153f) drop-shadow(0 0 16px rgba(255,0,40,.8)) !important;
+}
+body.hunter-preauth #login-floating-card.eye-error .hunter-bionic-lid {
+  opacity:.95;
+  animation:hunterEyeBlinkFast .18s steps(2,end) infinite;
+}
+body.hunter-preauth #login-floating-card.eye-error {
+  border-color:rgba(255,35,65,.8) !important;
+  box-shadow:inset 0 0 28px rgba(255,0,40,.10), 0 0 26px rgba(255,0,40,.22) !important;
+}
+@keyframes hunterEyePanic {
+  0%{transform:translate(0,0) rotate(0)}
+  20%{transform:translate(-2px,1px) rotate(-7deg)}
+  45%{transform:translate(2px,-1px) rotate(6deg)}
+  70%{transform:translate(-1px,-2px) rotate(-4deg)}
+  100%{transform:translate(1px,1px) rotate(5deg)}
+}
+@keyframes hunterEyeBlinkFast {
+  0%,100%{transform:translateY(-18px) scaleY(.04)}
+  50%{transform:translateY(0) scaleY(1)}
+}
+@media(max-width:600px) {
+  body.hunter-preauth #login-floating-card {
+    width:min(94vw,430px) !important;
+    height:min(94vw,430px) !important;
+    padding:48px 32px 34px !important;
+  }
+  body.hunter-preauth #login-floating-card form { max-width:100% !important; gap:7px !important; }
+}
+@media(prefers-reduced-motion:reduce) {
+  body.hunter-preauth #login-floating-card.eye-error .login-kraken-mark,
+  body.hunter-preauth #login-floating-card.eye-error .hunter-bionic-lid { animation:none !important; }
+}
+</style>
+<script id="hunter-bionic-eye-reactivity">
+(() => {
+  const card = document.getElementById('login-floating-card');
+  const eye = card?.querySelector('.login-kraken-mark');
+  const user = document.getElementById('sb-user-input');
+  const pass = document.getElementById('sb-pass-input');
+  const totp = document.getElementById('sb-totp-input');
+  const error = document.getElementById('sb-auth-error');
+  if (!card || !eye) return;
+
+  let typingTimer = 0;
+  let errorTimer = 0;
+  const closeEye = () => {
+    card.classList.add('eye-typing');
+    clearTimeout(typingTimer);
+    typingTimer = setTimeout(() => card.classList.remove('eye-typing'), 850);
+  };
+  [user, pass, totp].filter(Boolean).forEach(input => {
+    input.addEventListener('input', () => {
+      card.classList.remove('eye-error');
+      closeEye();
+    });
+    input.addEventListener('focus', closeEye);
+    input.addEventListener('blur', () => {
+      clearTimeout(typingTimer);
+      typingTimer = setTimeout(() => card.classList.remove('eye-typing'), 450);
+    });
+  });
+
+  const triggerPanic = () => {
+    if (!error || error.classList.contains('ui-hidden') || !error.textContent.trim()) return;
+    card.classList.remove('eye-typing');
+    card.classList.remove('eye-error');
+    void card.offsetWidth;
+    card.classList.add('eye-error');
+    clearTimeout(errorTimer);
+    errorTimer = setTimeout(() => card.classList.remove('eye-error'), 2600);
+  };
+  if (error) {
+    new MutationObserver(triggerPanic).observe(error, {
+      attributes:true, childList:true, characterData:true, subtree:true
+    });
+  }
+  // El ojo inicia abierto y reacciona también cuando el formulario devuelve un error.
+})();
+</script>
+
+<style id="hunter-reference-balanced-orbit-login">
+/* Una composición circular geométricamente exacta, inspirada en la referencia */
+body.hunter-preauth #hunter-auth-modal {
+  min-height:100svh !important;
+  height:auto !important;
+  display:grid !important;
+  place-items:center !important;
+  padding:34px 14px !important;
+  overflow:visible !important;
+  perspective:1400px !important;
+}
+body.hunter-preauth #login-floating-card {
+  box-sizing:border-box !important;
+  position:relative !important;
+  width:min(570px, 91vw, 78svh) !important;
+  height:min(570px, 91vw, 78svh) !important;
+  min-width:0 !important; min-height:0 !important;
+  aspect-ratio:1/1 !important;
+  flex:none !important;
+  margin:auto !important;
+  padding:clamp(44px,7.2%,66px) clamp(32px,7%,58px) !important;
+  border-radius:50% !important;
+  display:flex !important;
+  flex-direction:column !important;
+  align-items:center !important;
+  justify-content:center !important;
+  gap:15px !important;
+  overflow:visible !important;
+  isolation:isolate !important;
+  background:
+    radial-gradient(ellipse at 50% 36%, rgba(255,255,255,.075), transparent 55%),
+    radial-gradient(ellipse at 50% 95%, rgba(255,42,85,.075), transparent 62%),
+    rgba(5,10,19,.075) !important;
+  border:1px solid rgba(255,225,235,.34) !important;
+  -webkit-backdrop-filter:blur(5px) saturate(130%) !important;
+  backdrop-filter:blur(5px) saturate(130%) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.23),
+    inset 0 0 48px rgba(255,255,255,.025),
+    0 0 0 1px rgba(255,55,95,.10),
+    0 18px 65px rgba(0,0,0,.22) !important;
+  transform-style:preserve-3d !important;
+}
+body.hunter-preauth #login-floating-card::before {
+  content:"" !important;
+  position:absolute !important;
+  inset:-17px !important;
+  border-radius:50% !important;
+  border:1px solid rgba(255,85,125,.38) !important;
+  background:transparent !important;
+  box-shadow:0 0 20px rgba(255,35,85,.09), inset 0 0 24px rgba(255,255,255,.025) !important;
+  pointer-events:none !important;
+  z-index:-1 !important;
+  transform:translateZ(-20px) !important;
+}
+body.hunter-preauth #login-floating-card::after {
+  content:"" !important;
+  position:absolute !important;
+  inset:-29px !important;
+  border-radius:50% !important;
+  border:1px dashed rgba(255,115,145,.25) !important;
+  background:transparent !important;
+  box-shadow:none !important;
+  pointer-events:none !important;
+  transform:rotateX(68deg) translateZ(-28px) !important;
+  animation:hunterReferenceOrbit 32s linear infinite !important;
+}
+@keyframes hunterReferenceOrbit { to { transform:rotateX(68deg) rotateZ(360deg) translateZ(-28px); } }
+body.hunter-preauth #login-floating-card .orb-ring { inset:-7px !important; opacity:.16 !important; }
+body.hunter-preauth #login-floating-card .orb-ring.rev { inset:-18px !important; opacity:.09 !important; }
+
+/* Encabezado centrado, compacto, con jerarquía visual */
+body.hunter-preauth #login-floating-card > .flex.items-center.justify-between.mb-3\.5 {
+  position:relative !important;
+  width:100% !important;
+  display:flex !important;
+  flex-direction:column !important;
+  align-items:center !important;
+  justify-content:center !important;
+  gap:8px !important;
+  margin:0 !important;
+  text-align:center !important;
+  z-index:2 !important;
+}
+body.hunter-preauth #login-floating-card > .flex.items-center.justify-between.mb-3\.5 > .flex.items-center.gap-2\.5 {
+  display:flex !important;
+  flex-direction:column !important;
+  align-items:center !important;
+  justify-content:center !important;
+  gap:6px !important;
+}
+body.hunter-preauth #login-floating-card .w-10.h-10.rounded-xl {
+  width:46px !important; height:46px !important;
+  border-radius:14px !important;
+  background:rgba(8,15,24,.40) !important;
+  border:1px solid rgba(75,255,190,.48) !important;
+  box-shadow:0 0 18px rgba(35,255,170,.17), inset 0 1px 6px rgba(255,255,255,.14) !important;
+}
+body.hunter-preauth #login-floating-card .login-kraken-mark {
+  filter:drop-shadow(0 0 7px rgba(45,255,180,.68)) !important;
+}
+body.hunter-preauth #login-floating-card > .flex.items-center.justify-between.mb-3\.5 > span {
+  position:absolute !important; top:-8px !important; right:0 !important;
+}
+body.hunter-preauth #login-floating-card h3 {
+  text-align:center !important;
+  letter-spacing:.08em !important;
+}
+
+/* Formulario horizontal como en la referencia, todo centrado dentro del círculo */
+body.hunter-preauth #login-floating-card form {
+  position:relative !important;
+  z-index:2 !important;
+  width:min(100%, 390px) !important;
+  max-width:390px !important;
+  margin:0 auto !important;
+  display:flex !important;
+  flex-direction:column !important;
+  align-items:stretch !important;
+  gap:12px !important;
+}
+body.hunter-preauth #login-floating-card form .grid.grid-cols-2 {
+  display:grid !important;
+  grid-template-columns:1fr 1fr !important;
+  gap:10px !important;
+  width:100% !important;
+}
+body.hunter-preauth #login-floating-card form .grid.grid-cols-2 > div {
+  min-width:0 !important;
+  width:auto !important;
+  text-align:left !important;
+}
+body.hunter-preauth #login-floating-card form label {
+  display:block !important;
+  text-align:left !important;
+  margin:0 0 5px 3px !important;
+  font-size:10px !important;
+  letter-spacing:.055em !important;
+}
+body.hunter-preauth #login-floating-card form input {
+  width:100% !important;
+  min-width:0 !important;
+  box-sizing:border-box !important;
+  text-align:left !important;
+  padding:10px 13px !important;
+  color:#fff !important;
+  background:rgba(5,11,20,.72) !important;
+  border:1px solid rgba(255,215,230,.38) !important;
+  border-radius:999px !important;
+  box-shadow:inset 0 2px 8px rgba(0,0,0,.32), 0 0 12px rgba(255,55,95,.07) !important;
+}
+body.hunter-preauth #login-floating-card form .p-3.rounded-xl {
+  width:100% !important;
+  box-sizing:border-box !important;
+  padding:12px 14px !important;
+  border-radius:20px !important;
+  background:rgba(5,11,20,.60) !important;
+  border:1px solid rgba(255,205,220,.34) !important;
+  -webkit-backdrop-filter:blur(9px) !important;
+  backdrop-filter:blur(9px) !important;
+}
+body.hunter-preauth #login-floating-card form .p-3.rounded-xl > .flex {
+  justify-content:space-between !important;
+  align-items:center !important;
+  gap:8px !important;
+}
+body.hunter-preauth #login-floating-card form .p-3.rounded-xl input {
+  text-align:center !important;
+  letter-spacing:.48em !important;
+  font-size:17px !important;
+  border-radius:999px !important;
+  background:rgba(2,8,15,.78) !important;
+}
+body.hunter-preauth #login-floating-card #sb-login-submit-btn {
+  display:block !important;
+  width:min(70%, 270px) !important;
+  min-width:190px !important;
+  margin:2px auto 0 !important;
+  padding:10px 15px !important;
+  font-size:11px !important;
+  border-radius:999px !important;
+}
+@media(max-width:620px) {
+  body.hunter-preauth #hunter-auth-modal { padding:38px 8px !important; }
+  body.hunter-preauth #login-floating-card {
+    width:min(94vw, 520px) !important;
+    height:min(94vw, 520px) !important;
+    padding:42px 28px !important;
+    gap:10px !important;
+  }
+  body.hunter-preauth #login-floating-card form { gap:8px !important; }
+  body.hunter-preauth #login-floating-card form input { padding:8px 10px !important; }
+  body.hunter-preauth #login-floating-card form .p-3.rounded-xl { padding:8px 10px !important; }
+}
+@media(max-width:390px) {
+  body.hunter-preauth #login-floating-card {
+    width:96vw !important; height:96vw !important;
+    padding:35px 23px !important;
+  }
+  body.hunter-preauth #login-floating-card form .grid.grid-cols-2 { gap:7px !important; }
+  body.hunter-preauth #login-floating-card form label { font-size:8px !important; }
+  body.hunter-preauth #login-floating-card form input { font-size:11px !important; }
+}
+@media(prefers-reduced-motion:reduce) {
+  body.hunter-preauth #login-floating-card::after { animation:none !important; }
+}
+</style>
+
+<style id="hunter-final-detail-adjustments">
+/* Halo de login con diámetro contenido y proporción orbital */
+body.hunter-preauth #login-floating-card {
+  width:min(520px, 72vmin, 88vw) !important;
+  height:min(520px, 72vmin, 88vw) !important;
+  min-width:0 !important; min-height:0 !important;
+  aspect-ratio:1/1 !important;
+  border-radius:50% !important;
+}
+body.hunter-preauth #login-floating-card::before { inset:-9px !important; }
+body.hunter-preauth #login-floating-card::after { inset:-17px !important; }
+body.hunter-preauth #login-floating-card .orb-ring { inset:-4px !important; }
+body.hunter-preauth #login-floating-card .orb-ring.rev { inset:-10px !important; }
+
+/* En el emblema, carcasa y contornos rojos; solo el iris bioluminiscente verde */
+body.hunter-preauth #login-floating-card .login-kraken-mark {
+  filter:drop-shadow(0 0 7px rgba(255,45,75,.60)) !important;
+}
+body.hunter-preauth #login-floating-card .login-kraken-mark ellipse[fill="url(#gatorIris)"] {
+  filter:drop-shadow(0 0 7px rgba(43,255,177,.95)) !important;
+}
+
+/* Indicador superior de conexión real a Supabase */
+#hunter-top-supabase-status {
+  display:inline-flex;
+  align-items:center;
+  gap:7px;
+  margin-top:4px;
+  color:rgba(210,220,232,.55);
+  font:700 9px/1.2 "JetBrains Mono",monospace;
+  letter-spacing:.12em;
+}
+#hunter-top-sb-dot {
+  display:inline-block;
+  width:7px;height:7px;border-radius:50%;
+  background:#ef4444;
+  box-shadow:0 0 7px rgba(239,68,68,.55);
+  transition:background .2s, box-shadow .2s;
+}
+#hunter-top-sb-dot.is-connected {
+  background:#22c55e;
+  box-shadow:0 0 6px #22c55e,0 0 13px rgba(34,197,94,.7);
+}
+#hunter-top-sb-label { transition:color .2s; }
+#hunter-top-sb-dot.is-connected + #hunter-top-sb-label { color:#4ade80; }
+</style>
+
+<style id="hunter-orbit-size-and-single-status-v5">
+body.hunter-preauth #login-floating-card {
+  width:min(390px, 54vmin, 66vw) !important;
+  height:min(390px, 54vmin, 66vw) !important;
+  min-width:0 !important;
+  min-height:0 !important;
+  aspect-ratio:1 / 1 !important;
+  border-radius:50% !important;
+}
+body.hunter-preauth #login-floating-card::before { inset:-7px !important; }
+body.hunter-preauth #login-floating-card::after { inset:-13px !important; }
+body.hunter-preauth #login-floating-card .orb-ring { inset:-3px !important; }
+body.hunter-preauth #login-floating-card .orb-ring.rev { inset:-8px !important; }
+
+#brand { display:flex !important; align-items:center !important; gap:10px !important; }
+#brand-copy { display:flex !important; flex-direction:column !important; gap:3px !important; }
+#brand-title { letter-spacing:.12em !important; }
+#hunter-top-supabase-status { margin-top:0 !important; }
+@media(max-width:620px) {
+  body.hunter-preauth #login-floating-card {
+    width:min(390px, 78vw, 62vmin) !important;
+    height:min(390px, 78vw, 62vmin) !important;
+  }
+}
+</style>
+
+<style id="hunter-planet-3d-ui-final">
+/* ================= DISEÑOS DE COLOR ================= */
+body.hunter-preauth {
+  --t1:#7aa2ff; --t2:#c08bff; --t1rgb:122,162,255; --t2rgb:192,139,255;
+  --accent-a:122,162,255; --accent-b:192,139,255;
+  --fa:#16204f; --fb:#080b22; --fedge:#04061a;
+  --btn1:#8aa0ff; --btn2:#5a52ee; --btn3:#2b2494; --btnedge:#171272; --btntext:#fff;
+  --bgA:rgba(120,70,255,.22); --bgB:rgba(20,190,210,.16); --bgC:rgba(255,80,150,.10); --bgD:rgba(70,100,255,.20);
+  --bgBase1:#070b1f; --bgBase2:#04061a;
+  --orbfilter:none;
+  --font:"Space Grotesk","Rajdhani",system-ui,sans-serif;
+}
+body.hunter-preauth[data-theme="aurora"] {
+  --t1:#4cf0c8; --t2:#8affb0; --t1rgb:76,240,200; --t2rgb:138,255,176;
+  --accent-a:76,240,200; --accent-b:138,255,176;
+  --fa:#0a2c2b; --fb:#031210; --fedge:#020a09;
+  --btn1:#5df5cf; --btn2:#19b79b; --btn3:#0b6e63; --btnedge:#064840; --btntext:#02211c;
+  --bgA:rgba(20,200,160,.20); --bgB:rgba(70,120,255,.16); --bgC:rgba(160,255,120,.08); --bgD:rgba(30,220,190,.16);
+  --bgBase1:#031014; --bgBase2:#020a10;
+  --orbfilter:hue-rotate(-55deg) saturate(1.05);
+  --font:"Exo 2","Rajdhani",system-ui,sans-serif;
+}
+body.hunter-preauth[data-theme="marte"] {
+  --t1:#ffa257; --t2:#ffd48e; --t1rgb:255,162,87; --t2rgb:255,212,142;
+  --accent-a:255,162,87; --accent-b:255,212,142;
+  --fa:#33170b; --fb:#150a05; --fedge:#0a0402;
+  --btn1:#ffb070; --btn2:#f0702a; --btn3:#a8380f; --btnedge:#6a2008; --btntext:#fff;
+  --bgA:rgba(255,110,40,.18); --bgB:rgba(255,190,90,.10); --bgC:rgba(200,60,40,.12); --bgD:rgba(255,130,60,.16);
+  --bgBase1:#120806; --bgBase2:#0a0508;
+  --orbfilter:hue-rotate(150deg) saturate(1.1);
+  --font:"Chakra Petch","Rajdhani",system-ui,sans-serif;
+}
+body.hunter-preauth[data-theme="neon"] {
+  --t1:#ff6fdc; --t2:#6ff3ff; --t1rgb:255,111,220; --t2rgb:111,243,255;
+  --accent-a:255,111,220; --accent-b:111,243,255;
+  --fa:#2a0d3a; --fb:#100619; --fedge:#080310;
+  --btn1:#f27cff; --btn2:#b040f5; --btn3:#5a22c0; --btnedge:#34107a; --btntext:#fff;
+  --bgA:rgba(200,60,255,.20); --bgB:rgba(40,220,255,.15); --bgC:rgba(255,70,170,.12); --bgD:rgba(160,80,255,.18);
+  --bgBase1:#0c0720; --bgBase2:#06041a;
+  --orbfilter:hue-rotate(70deg) saturate(1.1);
+  --font:"Rajdhani","Space Grotesk",system-ui,sans-serif;
+}
+
+body.hunter-preauth #canvas-container {
+  background:
+    radial-gradient(ellipse 38% 34% at 18% 22%, var(--bgA), transparent 70%),
+    radial-gradient(ellipse 34% 30% at 84% 74%, var(--bgB), transparent 70%),
+    radial-gradient(ellipse 28% 24% at 80% 16%, var(--bgC), transparent 70%),
+    radial-gradient(ellipse at 50% 48%, var(--bgD), transparent 58%),
+    linear-gradient(135deg, var(--bgBase1), var(--bgBase2)) !important;
+  filter:none !important;
+  transition:background .6s ease;
+}
+body.hunter-preauth #holo-orb-layer { filter:var(--orbfilter); transition:filter .7s ease; }
+
+/* ================= SIN BLUR ================= */
+body.hunter-preauth #login-floating-card,
+body.hunter-preauth #login-floating-card *,
+body.hunter-preauth #hunter-auth-modal .glass-panel {
+  -webkit-backdrop-filter:none !important;
+  backdrop-filter:none !important;
+}
+
+/* ================= Tarjeta ================= */
+body.hunter-preauth #login-floating-card {
+  width:min(440px, 60vmin, 80vw) !important;
+  height:min(440px, 60vmin, 80vw) !important;
+  padding:0 11% !important;
+  gap:11px !important;
+  justify-content:center !important;
+  background:transparent !important;
+  border:1px solid rgba(var(--t1rgb),.20) !important;
+  box-shadow:none !important;
+  font-family:var(--font) !important;
+}
+body.hunter-preauth #login-floating-card::before { border-color:rgba(var(--t1rgb),.22) !important; box-shadow:none !important; }
+body.hunter-preauth #login-floating-card::after { display:none !important; }
+body.hunter-preauth #login-floating-card .orb-ring { opacity:.10 !important; }
+body.hunter-preauth #login-floating-card .orb-ring.rev { opacity:.06 !important; }
+
+/* ================= Encabezado ================= */
+body.hunter-preauth #login-floating-card > .flex.items-center.justify-between.mb-3\.5 { gap:0 !important; margin-bottom:2px !important; }
+body.hunter-preauth #login-floating-card h3 {
+  font-family:var(--font) !important;
+  font-size:clamp(18px, 4.3vmin, 25px) !important;
+  font-weight:700 !important;
+  letter-spacing:.14em !important;
+  line-height:1.1 !important;
+  color:#fff !important;
+  text-shadow:0 0 16px rgba(var(--t1rgb),.70), 0 0 32px rgba(var(--t2rgb),.30) !important;
+}
+body.hunter-preauth #login-floating-card h3 sup { font-size:.42em !important; color:rgb(var(--t2rgb)) !important; }
+body.hunter-preauth #login-floating-card p.text-\[10px\] {
+  font-family:var(--font) !important;
+  font-size:11px !important;
+  font-weight:500 !important;
+  letter-spacing:.08em !important;
+  margin:3px 0 0 !important;
+  color:rgba(255,255,255,.72) !important;
+}
+body.hunter-preauth #login-floating-card > .flex.items-center.justify-between.mb-3\.5 > span {
+  top:-6px !important; right:-2px !important;
+  font-family:var(--font) !important; font-size:10px !important; font-weight:700 !important;
+  padding:1px 8px !important;
+  color:rgb(var(--t2rgb)) !important;
+  background:rgba(0,0,0,.55) !important;
+  border:1px solid rgba(var(--t2rgb),.55) !important;
+  box-shadow:inset 0 1px 1px rgba(255,255,255,.25), 0 0 10px rgba(var(--t2rgb),.30) !important;
+}
+
+/* ================= Formulario: módulos de cabina de nave ================= */
+body.hunter-preauth #login-floating-card form { width:100% !important; max-width:none !important; gap:12px !important; transform-style:preserve-3d; }
+body.hunter-preauth #login-floating-card form .grid.grid-cols-2 { grid-template-columns:1fr 1fr !important; gap:12px !important; }
+body.hunter-preauth #login-floating-card form input::placeholder { color:rgba(255,255,255,.34) !important; }
+
+/* --- módulos USUARIO / CONTRASEÑA: marco biselado + líneas de escaneo --- */
+body.hunter-preauth #login-floating-card form .grid.grid-cols-2 > div {
+  position:relative !important;
+  isolation:isolate;
+  min-height:58px;
+  padding:10px 14px 8px 17px !important;
+  text-align:left !important;
+  transform:translateZ(14px);
+  filter:drop-shadow(0 0 7px rgba(var(--m),.38));
+  transition:filter .2s;
+}
+body.hunter-preauth #login-floating-card form .grid.grid-cols-2 > div:nth-child(1) { --m:var(--t1rgb); }
+body.hunter-preauth #login-floating-card form .grid.grid-cols-2 > div:nth-child(2) { --m:var(--t2rgb); }
+body.hunter-preauth #login-floating-card form .grid.grid-cols-2 > div::before {
+  content:""; position:absolute; inset:0; z-index:-2;
+  background:linear-gradient(135deg, rgba(var(--m),.95), rgba(var(--m),.16) 46%, rgba(var(--m),.80));
+  clip-path:polygon(15px 0, 100% 0, 100% calc(100% - 15px), calc(100% - 15px) 100%, 0 100%, 0 15px);
+}
+body.hunter-preauth #login-floating-card form .grid.grid-cols-2 > div::after {
+  content:""; position:absolute; inset:1.5px; z-index:-1;
+  background:
+    linear-gradient(90deg, rgba(var(--m),.95), transparent) left 14px bottom 6px / 46% 2px no-repeat,
+    repeating-linear-gradient(0deg, rgba(255,255,255,.04) 0 1px, transparent 1px 3px),
+    radial-gradient(120% 150% at 0% 0%, rgba(var(--m),.22), transparent 62%),
+    linear-gradient(180deg, var(--fa), var(--fb));
+  clip-path:polygon(13.5px 0, 100% 0, 100% calc(100% - 13.5px), calc(100% - 13.5px) 100%, 0 100%, 0 13.5px);
+}
+body.hunter-preauth #login-floating-card form .grid.grid-cols-2 > div:focus-within { filter:drop-shadow(0 0 13px rgba(var(--m),.80)); }
+body.hunter-preauth #login-floating-card form .grid.grid-cols-2 > div:focus-within::before { filter:brightness(1.45); }
+
+body.hunter-preauth #login-floating-card form label {
+  display:block !important;
+  text-align:left !important;
+  font-family:var(--font) !important;
+  font-size:9px !important;
+  font-weight:700 !important;
+  letter-spacing:.24em !important;
+  margin:0 0 4px 0 !important;
+  color:rgb(var(--m, var(--t1rgb))) !important;
+  text-shadow:0 0 8px rgba(var(--m, var(--t1rgb)),.65) !important;
+}
+body.hunter-preauth #login-floating-card form label::before { content:"◢ "; font-size:.85em; }
+body.hunter-preauth #login-floating-card form label::after {   /* LED de estado */
+  content:""; position:absolute; top:10px; right:16px;
+  width:5px; height:5px; border-radius:50%;
+  background:rgb(var(--m)); box-shadow:0 0 7px rgb(var(--m));
+  animation:hunterLed 2.2s ease-in-out infinite;
+}
+@keyframes hunterLed { 0%,100%{opacity:.35} 50%{opacity:1} }
+
+body.hunter-preauth #login-floating-card form input#sb-user-input,
+body.hunter-preauth #login-floating-card form input#sb-pass-input {
+  display:block;
+  width:100% !important;
+  height:26px !important;
+  padding:0 !important;
+  margin:0 !important;
+  border:0 !important;
+  border-radius:0 !important;
+  background:transparent !important;
+  box-shadow:none !important;
+  filter:none !important;
+  transform:none !important;
+  text-align:left !important;
+  font-family:var(--font) !important;
+  font-size:15px !important;
+  font-weight:600 !important;
+  letter-spacing:.07em !important;
+  color:#fff !important;
+  caret-color:rgb(var(--m));
+  outline:none !important;
+}
+
+/* --- módulo CÓDIGO AUTENTICADOR: panel de control --- */
+body.hunter-preauth #login-floating-card form .p-3.rounded-xl {
+  --m:var(--t1rgb);
+  position:relative !important;
+  isolation:isolate;
+  padding:12px 17px 13px !important;
+  border:0 !important;
+  border-radius:0 !important;
+  background:transparent !important;
+  box-shadow:none !important;
+  transform:translateZ(18px);
+  filter:drop-shadow(0 0 9px rgba(var(--m),.36));
+}
+body.hunter-preauth #login-floating-card form .p-3.rounded-xl::before {
+  content:""; position:absolute; inset:0; z-index:-2;
+  background:linear-gradient(135deg, rgba(var(--m),.95), rgba(var(--t2rgb),.20) 48%, rgba(var(--m),.80));
+  clip-path:polygon(20px 0, calc(100% - 9px) 0, 100% 9px, 100% calc(100% - 20px), calc(100% - 20px) 100%, 9px 100%, 0 calc(100% - 9px), 0 20px);
+}
+body.hunter-preauth #login-floating-card form .p-3.rounded-xl::after {
+  content:""; position:absolute; inset:1.5px; z-index:-1;
+  background:
+    repeating-linear-gradient(0deg, rgba(255,255,255,.04) 0 1px, transparent 1px 3px),
+    radial-gradient(120% 130% at 0% 0%, rgba(var(--m),.20), transparent 62%),
+    linear-gradient(180deg, var(--fa), var(--fb));
+  clip-path:polygon(18.5px 0, calc(100% - 8px) 0, 100% 8px, 100% calc(100% - 18.5px), calc(100% - 18.5px) 100%, 8px 100%, 0 calc(100% - 8px), 0 18.5px);
+}
+body.hunter-preauth #login-floating-card form .p-3.rounded-xl > * { position:relative; z-index:1; }
+body.hunter-preauth #login-floating-card form .p-3.rounded-xl > .flex {
+  justify-content:center !important;
+  gap:8px !important;
+  font-family:var(--font) !important;
+  font-size:9.5px !important;
+  font-weight:700 !important;
+  letter-spacing:.14em !important;
+  margin-bottom:8px !important;
+  color:rgba(255,255,255,.92) !important;
+}
+body.hunter-preauth #login-floating-card form .p-3.rounded-xl > .flex #totp-timer-label {
+  font-family:"JetBrains Mono",monospace !important;
+  font-size:10px !important;
+  padding:1px 7px;
+  color:rgb(var(--t2rgb)) !important;
+  background:rgba(0,0,0,.5);
+  clip-path:polygon(5px 0,100% 0,100% calc(100% - 5px),calc(100% - 5px) 100%,0 100%,0 5px);
+}
+body.hunter-preauth #login-floating-card form .p-3.rounded-xl input#sb-totp-input {
+  height:36px !important;
+  padding:0 0 0 .5em !important;
+  font-family:"JetBrains Mono",monospace !important;
+  font-size:17px !important;
+  font-weight:700 !important;
+  letter-spacing:.5em !important;
+  text-align:center !important;
+  color:#fff !important;
+  border:0 !important;
+  border-radius:0 !important;
+  background:linear-gradient(180deg, rgba(0,0,0,.82), rgba(0,0,0,.50)) !important;
+  box-shadow:inset 0 0 0 1px rgba(var(--m),.50), inset 0 0 16px rgba(var(--m),.20) !important;
+  clip-path:polygon(9px 0,100% 0,100% calc(100% - 9px),calc(100% - 9px) 100%,0 100%,0 9px);
+  caret-color:rgb(var(--m));
+}
+body.hunter-preauth #login-floating-card form .p-3.rounded-xl .h-1 {
+  height:5px !important;
+  margin-top:9px !important;
+  border-radius:0 !important;
+  background:rgba(0,0,0,.6) !important;
+  -webkit-mask:repeating-linear-gradient(90deg,#000 0 7px,transparent 7px 9px);
+  mask:repeating-linear-gradient(90deg,#000 0 7px,transparent 7px 9px);
+}
+body.hunter-preauth #login-floating-card form .p-3.rounded-xl #totp-timer-bar { border-radius:0 !important; }
+
+/* --- Botón: panel biselado con barrido de luz --- */
+body.hunter-preauth #login-floating-card #sb-login-submit-btn {
+  position:relative !important;
+  overflow:hidden !important;
+  width:74% !important; min-width:0 !important;
+  height:40px !important; padding:0 14px !important;
+  margin:4px auto 0 !important;
+  font-family:var(--font) !important;
+  font-size:12px !important; font-weight:700 !important;
+  letter-spacing:.18em !important; text-transform:uppercase !important;
+  color:var(--btntext) !important;
+  border:2px solid transparent !important;
+  border-radius:0 !important;
+  background:
+    linear-gradient(180deg, var(--btn1) 0%, var(--btn2) 55%, var(--btn3) 100%) padding-box,
+    linear-gradient(135deg, #fff, rgba(var(--t1rgb),.95) 40%, rgba(var(--t2rgb),.95)) border-box !important;
+  clip-path:polygon(17px 0, 100% 0, 100% calc(100% - 17px), calc(100% - 17px) 100%, 0 100%, 0 17px);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.55), inset 0 -7px 10px rgba(0,0,0,.28) !important;
+  text-shadow:0 1px 2px rgba(0,0,0,.35) !important;
+  transform:translateZ(22px);
+}
+body.hunter-preauth #login-floating-card #sb-login-submit-btn::after {
+  content:""; position:absolute; top:0; bottom:0; left:-45%; width:32%;
+  background:linear-gradient(100deg, transparent, rgba(255,255,255,.55), transparent);
+  animation:hunterBtnShine 3.4s linear infinite;
+  pointer-events:none;
+}
+@keyframes hunterBtnShine { to { left:125%; } }
+body.hunter-preauth #login-floating-card #sb-login-submit-btn:hover { filter:brightness(1.12); }
+body.hunter-preauth #login-floating-card #sb-login-submit-btn:active { transform:translateZ(22px) translateY(2px); filter:brightness(.95); }
+
+/* ================= Selector de diseño ================= */
+#hunter-theme-picker {
+  position:fixed; right:16px; top:50%; transform:translateY(-50%);
+  z-index:9; display:flex; flex-direction:column; gap:10px; padding:8px 6px;
+  border-radius:999px; background:rgba(0,0,0,.35); border:1px solid rgba(255,255,255,.14);
+}
+#hunter-theme-picker button {
+  width:22px; height:22px; border-radius:50%; cursor:pointer; padding:0;
+  border:2px solid rgba(255,255,255,.35);
+  box-shadow:inset 0 1px 2px rgba(255,255,255,.5), 0 2px 6px rgba(0,0,0,.5);
+  transition:transform .15s, border-color .15s;
+}
+#hunter-theme-picker button:hover { transform:scale(1.15); }
+#hunter-theme-picker button.is-active { border-color:#fff; transform:scale(1.18); }
+#hunter-theme-picker [data-theme="nebula"] { background:linear-gradient(135deg,#7aa2ff,#c08bff); }
+#hunter-theme-picker [data-theme="aurora"] { background:linear-gradient(135deg,#4cf0c8,#8affb0); }
+#hunter-theme-picker [data-theme="marte"]  { background:linear-gradient(135deg,#ffa257,#e0502a); }
+#hunter-theme-picker [data-theme="neon"]   { background:linear-gradient(135deg,#ff6fdc,#6ff3ff); }
+#hunter-theme-picker [data-auto] { background:conic-gradient(#7aa2ff,#4cf0c8,#ffa257,#ff6fdc,#7aa2ff); margin-top:4px; }
+#hunter-theme-picker [data-auto].is-active { animation:hunterAutoSpin 5s linear infinite; }
+@keyframes hunterAutoSpin { to { transform:rotate(360deg) scale(1.18); } }
+body.hunter-preauth #login-floating-card.theme-swap form { animation:hunterThemeSwap .8s ease; }
+@keyframes hunterThemeSwap { 0% { opacity:.40; } 100% { opacity:1; } }
+body:not(.hunter-preauth) #hunter-theme-picker { display:none !important; }
+
+@media(max-width:620px) {
+  body.hunter-preauth #login-floating-card { width:min(92vw, 440px) !important; height:min(92vw, 440px) !important; padding:0 10% !important; gap:8px !important; }
+  body.hunter-preauth #login-floating-card form { gap:9px !important; }
+  body.hunter-preauth #login-floating-card form label { font-size:8px !important; letter-spacing:.16em !important; }
+  body.hunter-preauth #login-floating-card form .grid.grid-cols-2 > div { padding:9px 10px 7px 13px !important; min-height:52px; }
+  body.hunter-preauth #login-floating-card form input#sb-user-input, body.hunter-preauth #login-floating-card form input#sb-pass-input { font-size:13px !important; }
+  #hunter-theme-picker { right:8px; }
+}
+</style>
+<script id="hunter-theme-picker-js">
+(() => {
+  const picker = document.getElementById('hunter-theme-picker');
+  const card = document.getElementById('login-floating-card');
+  if (!picker) return;
+  const themes = ['nebula', 'aurora', 'marte', 'neon'];
+  const autoBtn = picker.querySelector('[data-auto]');
+  let idx = 0, auto = true, timer = 0;
+
+  const apply = (t) => {
+    document.body.dataset.theme = t;
+    idx = Math.max(0, themes.indexOf(t));
+    picker.querySelectorAll('button[data-theme]').forEach(b => {
+      const on = b.dataset.theme === t;
+      b.classList.toggle('is-active', on);
+      b.setAttribute('aria-pressed', on ? 'true' : 'false');
+    });
+    if (card) {
+      card.classList.remove('theme-swap'); void card.offsetWidth; card.classList.add('theme-swap');
+    }
+  };
+  const stop = () => { clearInterval(timer); timer = 0; };
+  const start = () => {
+    stop();
+    timer = setInterval(() => {
+      if (!document.body.classList.contains('hunter-preauth')) return;
+      apply(themes[(idx + 1) % themes.length]);
+    }, 5000);
+  };
+  const setAuto = (on) => {
+    auto = on;
+    if (autoBtn) { autoBtn.classList.toggle('is-active', on); autoBtn.setAttribute('aria-pressed', on ? 'true' : 'false'); }
+    on ? start() : stop();
+  };
+
+  apply('nebula');
+  setAuto(true);
+  picker.addEventListener('click', (e) => {
+    const a = e.target.closest('button[data-auto]');
+    if (a) { setAuto(!auto); return; }
+    const b = e.target.closest('button[data-theme]');
+    if (b) { setAuto(false); apply(b.dataset.theme); }   // elegir un color manual pausa el cambio automático
+  });
+})();
+</script>
