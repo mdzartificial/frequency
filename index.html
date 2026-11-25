@@ -1,10 +1,13 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27%3E%3Cpath d=%27M50 12 L74 34 L62 42 L84 62 L54 58 L50 88 L46 58 L16 62 L38 42 L26 34 Z%27 fill=%27%2338bdf8%27/%3E%3Ccircle cx=%2750%27 cy=%2736%27 r=%276%27 fill=%27%23e03a3e%27/%3E%3C/svg%3E">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27%3E%3Cdefs%3E%3CradialGradient id=%27g%27 cx=%2735%25%27 cy=%2728%25%27 r=%2770%25%27%3E%3Cstop offset=%270%25%27 stop-color=%27%23450918%27/%3E%3Cstop offset=%27100%25%27 stop-color=%27%230b0206%27/%3E%3C/radialGradient%3E%3C/defs%3E%3Ccircle cx=%2750%27 cy=%2747%27 r=%2742%27 fill=%27url(%23g)%27 stroke=%27%23ff2850%27 stroke-width=%274.5%27/%3E%3Cpath d=%27M31 62 Q22 72 28 77 M41 64 Q38 75 43 79 M59 64 Q62 75 57 79 M69 62 Q78 72 72 77%27 fill=%27none%27 stroke=%27%23ff2a55%27 stroke-width=%276.5%27 stroke-linecap=%27round%27/%3E%3Cellipse cx=%2750%27 cy=%2746%27 rx=%2722%27 ry=%2720%27 fill=%27%23ff2a55%27/%3E%3Cellipse cx=%2742%27 cy=%2736%27 rx=%276%27 ry=%274%27 fill=%27%23ff7a96%27 opacity=%270.65%27/%3E%3Ccircle cx=%2742%27 cy=%2750%27 r=%274.8%27 fill=%27%23ffffff%27/%3E%3Ccircle cx=%2758%27 cy=%2750%27 r=%274.8%27 fill=%27%23ffffff%27/%3E%3Ccircle cx=%2743%27 cy=%2750%27 r=%272.6%27 fill=%27%23090308%27/%3E%3Ccircle cx=%2759%27 cy=%2750%27 r=%272.6%27 fill=%27%23090308%27/%3E%3Cpath d=%27M24 30 A34 34 0 0 1 58 14%27 fill=%27none%27 stroke=%27%23ffffff%27 stroke-width=%273.5%27 stroke-linecap=%27round%27 opacity=%270.6%27/%3E%3Crect x=%2724%27 y=%2781%27 width=%2752%27 height=%2711%27 rx=%275.5%27 fill=%27%23e2e8f0%27 stroke=%27%23ff2850%27 stroke-width=%272.2%27/%3E%3C/svg%3E">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>HAWKS SKYNET · Orbital Telemetry</title>
+  <title>HUNTER™ CORE · Orbital Telemetry</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700&family=Orbitron:wght@500;700;800;900&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
@@ -604,36 +607,62 @@
       .cols { flex-direction: column; }
       .side { width: 100% !important; }
     }
-/* ===== HAWKS SKYNET · TEMA ROJO VIBRANTE + LIQUID GLASS GLOBAL ===== */
+
+/* ===== HUNTER™ CORE · LIQUID GLASS ULTRA-TRANSPARENTE + HUD FUTURISTA ===== */
   :root {
-    --accent-a: 255, 24, 58;
-    --accent-b: 255, 102, 26;
-    --accent: #ff2247;
-    --accent-soft: rgba(255, 34, 71, 0.20);
-    --accent-glow: rgba(255, 24, 58, 0.48);
-    --crimson: #ff2247;
-    --bg-body: #050104;
-    --bg-frame: rgba(18, 3, 8, 0.30);
-    --bg-rail: rgba(24, 4, 11, 0.44);
-    --bg-panel: rgba(20, 3, 9, 0.40);
-    --glass: rgba(32, 5, 14, 0.46);
-    --line: rgba(255, 96, 118, 0.24);
-    --map-grid: rgba(255, 34, 71, 0.055);
+    --accent-a: 255, 24, 62;
+    --accent-b: 255, 108, 28;
+    --accent: #ff224d;
+    --accent-soft: rgba(255, 34, 77, 0.22);
+    --accent-glow: rgba(255, 24, 62, 0.56);
+    --crimson: #ff224d;
+    --bg-body: #040103;
+    --bg-frame: transparent;
+    --bg-rail: rgba(18, 2, 8, 0.24);
+    --bg-panel: rgba(18, 2, 8, 0.20);
+    --glass: rgba(26, 4, 12, 0.24);
+    --line: rgba(255, 118, 138, 0.28);
+    --map-grid: rgba(255, 34, 77, 0.045);
+    --font-hud: "Orbitron", ui-sans-serif, system-ui, sans-serif;
+    --font-ui: "Rajdhani", Inter, ui-sans-serif, system-ui, sans-serif;
+    --font-mono: "JetBrains Mono", "Cascadia Code", Consolas, monospace;
   }
 
-  /* Alternador de acento en barra lateral: Carmesí Neón <-> Rojo Solar */
   body.accent-crimson {
     --accent: #ff5e1f;
-    --accent-soft: rgba(255, 94, 31, 0.22);
-    --accent-glow: rgba(255, 94, 31, 0.48);
-    --map-grid: rgba(255, 94, 31, 0.055);
+    --accent-soft: rgba(255, 94, 31, 0.24);
+    --accent-glow: rgba(255, 94, 31, 0.55);
+    --map-grid: rgba(255, 94, 31, 0.05);
   }
+
+  html, body {
+    font-family: var(--font-ui) !important;
+    letter-spacing: 0.02em;
+  }
+
+  .mono, code { font-family: var(--font-mono) !important; }
+
+  /* Tipografía futurista en títulos, botones, KPIs y encabezados */
+  h1, h2, h3, h4,
+  #brand-title,
+  #role-badge,
+  .btn,
+  #sb-login-submit-btn,
+  #globalStatsContent p.text-lg,
+  #view-noc p.text-lg,
+  #tech-body p.text-xl,
+  #price-body p.text-xl {
+    font-family: var(--font-hud) !important;
+    letter-spacing: 0.06em;
+  }
+
+  h1 { text-shadow: 0 0 18px rgba(255, 34, 77, 0.42); }
 
   #planet-copy, #planet-ui, #auto-control { display: none !important; }
 
-  /* Fondo 3D persistente incluso después de iniciar sesión */
+  /* Fondo 3D nítido y luminoso detrás del Liquid Glass */
   body:not(.hunter-preauth) {
-    background: #050104 !important;
+    background: #040103 !important;
   }
 
   body:not(.hunter-preauth) #hunter-auth-modal {
@@ -648,38 +677,31 @@
     display: none !important;
   }
 
-  body.hunter-preauth #canvas-container {
-    filter: none;
-    transform: scale(1);
-    transition: filter 700ms ease, transform 700ms ease;
-  }
-
+  /* Sin blur en el canvas para que el blur real lo hagan los cristales */
+  body.hunter-preauth #canvas-container,
   body:not(.hunter-preauth) #canvas-container {
-    filter: blur(3px) saturate(1.15) brightness(0.78);
-    transform: scale(1.03);
-    transition: filter 700ms ease, transform 700ms ease;
+    filter: saturate(1.18) brightness(1.06);
+    transform: scale(1);
+    transition: filter 600ms ease;
   }
 
+  /* Viñeta sutil solo en las esquinas, centro 100% libre para el planeta */
   body:not(.hunter-preauth)::before {
     content: "";
     position: fixed;
     inset: 0;
     z-index: 1;
     pointer-events: none;
-    background:
-      radial-gradient(circle at 20% 10%, rgba(255, 24, 58, 0.16), transparent 45%),
-      radial-gradient(circle at 82% 85%, rgba(255, 90, 32, 0.12), transparent 45%),
-      rgba(8, 1, 4, 0.28);
+    background: radial-gradient(circle at 52% 50%, transparent 38%, rgba(6, 0, 3, 0.42) 100%);
   }
 
   body.hunter-preauth::before {
     background:
-      radial-gradient(circle at 50% 50%, rgba(255, 20, 50, 0.20), transparent 40%),
-      radial-gradient(circle at 18% 14%, rgba(255, 110, 40, 0.12), transparent 36%),
-      linear-gradient(180deg, rgba(22, 2, 7, 0.22), rgba(2, 0, 4, 0.34));
+      radial-gradient(circle at 50% 50%, rgba(255, 20, 56, 0.16), transparent 44%),
+      radial-gradient(circle at 50% 50%, transparent 50%, rgba(4, 0, 3, 0.42) 100%);
   }
 
-  /* ---- Tarjeta Login: esfera sincronizada al planeta ---- */
+  /* ---- Tarjeta Login: esfera Liquid Glass cristalina sincronizada ---- */
   .liquid-card-3d.glass-panel {
     --d: 480px;
     --planet-scale: 1;
@@ -696,18 +718,18 @@
     transform-origin: center center;
     transform: translate(-50%, -50%) scale(var(--planet-scale)) rotateX(var(--tilt-x)) rotateY(var(--tilt-y)) !important;
     border-radius: 50% !important;
-    border: 1.5px solid rgba(255, 72, 92, 0.62);
-    backdrop-filter: blur(18px) saturate(185%) brightness(0.94);
-    -webkit-backdrop-filter: blur(18px) saturate(185%) brightness(0.94);
+    border: 1.5px solid rgba(255, 96, 118, 0.65);
+    backdrop-filter: blur(11px) saturate(195%) contrast(1.04);
+    -webkit-backdrop-filter: blur(11px) saturate(195%) contrast(1.04);
     background:
-      radial-gradient(circle at 28% 18%, rgba(255, 255, 255, 0.26), transparent 28%),
-      radial-gradient(circle at 50% 50%, rgba(28, 3, 8, 0.44) 0%, rgba(78, 6, 18, 0.46) 62%, rgba(255, 32, 62, 0.36) 100%);
+      radial-gradient(circle at 28% 18%, rgba(255, 255, 255, 0.28), transparent 28%),
+      radial-gradient(circle at 50% 50%, rgba(24, 2, 8, 0.28) 0%, rgba(64, 5, 18, 0.30) 62%, rgba(255, 32, 68, 0.28) 100%);
     box-shadow:
-      inset 0 0 58px rgba(255, 26, 62, 0.48),
-      inset 0 2px 2px rgba(255, 220, 225, 0.45),
-      inset 0 -34px 62px rgba(255, 70, 30, 0.22),
-      0 0 85px rgba(255, 22, 54, 0.40),
-      0 36px 90px rgba(0, 0, 0, 0.68);
+      inset 0 0 54px rgba(255, 28, 66, 0.44),
+      inset 0 2px 2px rgba(255, 235, 240, 0.52),
+      inset 0 -30px 58px rgba(255, 78, 32, 0.22),
+      0 0 90px rgba(255, 22, 58, 0.42),
+      0 32px 86px rgba(0, 0, 0, 0.62);
     transition: border-color 400ms ease, box-shadow 400ms ease, width 350ms cubic-bezier(0.22, 1, 0.36, 1);
   }
 
@@ -724,7 +746,7 @@
     transform: none;
     mix-blend-mode: screen;
     pointer-events: none;
-    background: radial-gradient(circle at 50% 116%, rgba(255, 58, 42, 0.50), transparent 56%);
+    background: radial-gradient(circle at 50% 116%, rgba(255, 62, 46, 0.48), transparent 56%);
   }
 
   .liquid-card-3d::after {
@@ -735,7 +757,7 @@
     border-radius: 50%;
     pointer-events: none;
     mix-blend-mode: screen;
-    background: radial-gradient(340px circle at var(--gx, 30%) var(--gy, 0%), rgba(255, 225, 220, 0.22), transparent 56%);
+    background: radial-gradient(340px circle at var(--gx, 30%) var(--gy, 0%), rgba(255, 232, 228, 0.26), transparent 56%);
   }
 
   .liquid-card-3d > .orb-ring {
@@ -750,230 +772,256 @@
     inset: -58px;
     animation-duration: 105s;
     animation-direction: reverse;
-    opacity: 0.68;
+    opacity: 0.72;
   }
   .orb-ring svg { width: 100%; height: 100%; overflow: visible; }
   .orb-ring text {
-    font: 700 2.65px ui-monospace, Menlo, Consolas, monospace;
-    fill: rgba(255, 130, 128, 0.95);
+    font: 700 2.55px "Orbitron", ui-monospace, monospace;
+    fill: rgba(255, 146, 152, 0.96);
     letter-spacing: 0.55px;
-    filter: drop-shadow(0 0 4px rgba(255, 28, 58, 0.72));
+    filter: drop-shadow(0 0 5px rgba(255, 24, 62, 0.85));
   }
   @keyframes orbSpin { to { transform: rotate(360deg); } }
 
   .liquid-input {
-    background: rgba(34, 4, 10, 0.56);
-    border: 1px solid rgba(255, 65, 88, 0.36);
+    background: rgba(22, 3, 9, 0.40);
+    border: 1px solid rgba(255, 86, 108, 0.40);
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
   }
   .liquid-input:focus {
-    border-color: rgba(255, 42, 74, 0.95);
-    box-shadow: 0 0 0 2px rgba(255, 28, 58, 0.28), 0 0 18px rgba(255, 38, 68, 0.35);
+    border-color: rgba(255, 42, 78, 0.98);
+    box-shadow: 0 0 0 2px rgba(255, 28, 64, 0.28), 0 0 22px rgba(255, 38, 72, 0.42);
   }
 
   /* =======================================================
-     DASHBOARD POST-LOGIN · LIQUID GLASS ROJO CARMESÍ
+     DASHBOARD POST-LOGIN · LIQUID GLASS CRISTALINO + HUD
      ======================================================= */
+  /* Marco exterior sin blur para NO opacar el planeta detrás */
   body:not(.hunter-preauth) .frame {
     position: relative;
     z-index: 10;
-    background:
-      radial-gradient(circle at 12% 0%, rgba(255, 34, 71, 0.16), transparent 42%),
-      radial-gradient(circle at 88% 100%, rgba(255, 96, 36, 0.12), transparent 44%),
-      linear-gradient(145deg, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0.01)),
-      rgba(16, 3, 8, 0.34);
-    border: 1px solid rgba(255, 102, 124, 0.28);
-    backdrop-filter: blur(18px) saturate(175%);
-    -webkit-backdrop-filter: blur(18px) saturate(175%);
+    background: linear-gradient(145deg, rgba(255, 255, 255, 0.045), rgba(14, 2, 7, 0.10));
+    border: 1px solid rgba(255, 118, 138, 0.34);
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
     box-shadow:
-      0 26px 72px rgba(0, 0, 0, 0.65),
-      0 0 46px rgba(255, 24, 58, 0.14),
-      inset 0 1px 0 rgba(255, 225, 230, 0.24),
-      inset 0 -1px 22px rgba(255, 40, 70, 0.08);
+      0 26px 72px rgba(0, 0, 0, 0.55),
+      0 0 42px rgba(255, 24, 62, 0.16),
+      inset 0 1px 0 rgba(255, 230, 235, 0.34);
   }
 
+  /* Barra lateral de vidrio líquido + íconos futuristas */
   body:not(.theme-day) .rail {
     background:
-      linear-gradient(180deg, rgba(255, 255, 255, 0.09), rgba(255, 255, 255, 0.02)),
-      rgba(22, 4, 10, 0.46);
-    border: 1px solid rgba(255, 96, 118, 0.24);
-    backdrop-filter: blur(22px) saturate(185%);
-    -webkit-backdrop-filter: blur(22px) saturate(185%);
-    box-shadow: inset 0 1px 0 rgba(255, 225, 230, 0.22);
-  }
-
-  body:not(.theme-day) .rail i { color: rgba(255, 190, 200, 0.58); }
-  body:not(.theme-day) .rail button:hover {
-    background: rgba(255, 34, 71, 0.14);
-    border-color: rgba(255, 96, 118, 0.32);
-  }
-  body:not(.theme-day) .rail button:hover i { color: #ffffff; }
-  body:not(.theme-day) .rail button.on {
-    background: linear-gradient(135deg, rgba(255, 24, 58, 0.34), rgba(255, 96, 36, 0.18));
-    border-color: rgba(255, 62, 92, 0.78);
-    box-shadow: 0 0 22px rgba(255, 24, 58, 0.42), inset 0 1px 0 rgba(255, 255, 255, 0.28);
-  }
-  body:not(.theme-day) .rail button.on i { color: #ff7a90; }
-
-  /* Logo del halcón en rojo vibrante */
-  .rail svg path { fill: #ff2247 !important; stroke: #ffc4ce !important; }
-  .rail svg circle { fill: #ffffff !important; }
-
-  body:not(.theme-day) .panel {
-    background:
-      radial-gradient(circle at 14% 8%, rgba(255, 42, 76, 0.13), transparent 46%),
-      linear-gradient(155deg, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0.015)),
-      rgba(20, 3, 9, 0.42);
-    border: 1px solid rgba(255, 96, 118, 0.22);
-    backdrop-filter: blur(22px) saturate(180%);
-    -webkit-backdrop-filter: blur(22px) saturate(180%);
+      linear-gradient(180deg, rgba(255, 255, 255, 0.11) 0%, rgba(255, 42, 78, 0.04) 45%, rgba(16, 2, 8, 0.26) 100%);
+    border: 1px solid rgba(255, 122, 144, 0.32);
+    backdrop-filter: blur(11px) saturate(195%);
+    -webkit-backdrop-filter: blur(11px) saturate(195%);
     box-shadow:
-      0 14px 40px rgba(0, 0, 0, 0.35),
-      inset 0 1px 0 rgba(255, 225, 230, 0.20);
+      inset 0 1px 1px rgba(255, 235, 240, 0.36),
+      inset 0 -1px 16px rgba(255, 34, 72, 0.12),
+      0 10px 30px rgba(0, 0, 0, 0.35);
+  }
+
+  body:not(.theme-day) .rail i {
+    color: rgba(255, 200, 210, 0.72);
+    font-size: 15px;
+    transition: transform 200ms cubic-bezier(0.22, 1, 0.36, 1), color 200ms ease, filter 200ms ease;
+  }
+  body:not(.theme-day) .rail button {
+    position: relative;
+    border-radius: 13px;
+  }
+  body:not(.theme-day) .rail button:hover {
+    background: linear-gradient(135deg, rgba(255, 34, 77, 0.22), rgba(255, 110, 40, 0.10));
+    border-color: rgba(255, 126, 148, 0.52);
+    box-shadow: 0 0 18px rgba(255, 34, 77, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.28);
+  }
+  body:not(.theme-day) .rail button:hover i {
+    color: #ffffff;
+    transform: scale(1.14);
+    filter: drop-shadow(0 0 8px rgba(255, 62, 96, 0.92));
+  }
+  body:not(.theme-day) .rail button.on {
+    background: linear-gradient(135deg, rgba(255, 24, 62, 0.38), rgba(255, 102, 34, 0.22));
+    border-color: rgba(255, 112, 134, 0.88);
+    box-shadow:
+      0 0 24px rgba(255, 24, 62, 0.56),
+      inset 0 1px 1px rgba(255, 255, 255, 0.42);
+  }
+  body:not(.theme-day) .rail button.on::before {
+    content: "";
+    position: absolute;
+    left: -7px;
+    top: 22%;
+    bottom: 22%;
+    width: 3px;
+    border-radius: 99px;
+    background: linear-gradient(180deg, #ff8da1, #ff1e4d);
+    box-shadow: 0 0 10px #ff224d;
+  }
+  body:not(.theme-day) .rail button.on i {
+    color: #ffffff;
+    filter: drop-shadow(0 0 10px rgba(255, 76, 104, 1));
+  }
+
+  /* Paneles principales: Liquid Glass cristalino con reflejo especular y brillo HUD */
+  body:not(.theme-day) .panel {
+    position: relative;
+    background:
+      radial-gradient(circle at 12% 4%, rgba(255, 255, 255, 0.11), transparent 38%),
+      radial-gradient(circle at 86% 94%, rgba(255, 58, 78, 0.10), transparent 44%),
+      linear-gradient(155deg, rgba(255, 255, 255, 0.065) 0%, rgba(22, 3, 10, 0.22) 100%);
+    border: 1px solid rgba(255, 122, 144, 0.28);
+    backdrop-filter: blur(9px) saturate(195%) brightness(1.03);
+    -webkit-backdrop-filter: blur(9px) saturate(195%) brightness(1.03);
+    box-shadow:
+      0 14px 38px rgba(0, 0, 0, 0.28),
+      inset 0 1px 1px rgba(255, 240, 244, 0.34),
+      inset 0 -1px 20px rgba(255, 34, 72, 0.08);
   }
 
   body:not(.theme-day) .map {
     background:
-      linear-gradient(var(--map-grid) 1px, transparent 1px) 0 0 / 36px 36px,
-      linear-gradient(90deg, var(--map-grid) 1px, transparent 1px) 0 0 / 36px 36px,
-      radial-gradient(circle at 18% 6%, rgba(255, 34, 71, 0.14), transparent 48%),
-      linear-gradient(155deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.01)),
-      rgba(18, 3, 8, 0.40);
+      linear-gradient(var(--map-grid) 1px, transparent 1px) 0 0 / 38px 38px,
+      linear-gradient(90deg, var(--map-grid) 1px, transparent 1px) 0 0 / 38px 38px,
+      radial-gradient(circle at 16% 6%, rgba(255, 255, 255, 0.09), transparent 36%),
+      linear-gradient(155deg, rgba(255, 255, 255, 0.055) 0%, rgba(16, 2, 7, 0.18) 100%);
   }
 
+  /* Tarjetas y Chips translúcidos con esquinas HUD */
   body:not(.theme-day) .card {
     background:
-      linear-gradient(145deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.015)),
-      rgba(30, 5, 13, 0.46);
-    border: 1px solid rgba(255, 102, 124, 0.22);
-    backdrop-filter: blur(18px) saturate(175%);
-    -webkit-backdrop-filter: blur(18px) saturate(175%);
+      linear-gradient(145deg, rgba(255, 255, 255, 0.10), rgba(255, 255, 255, 0.02)),
+      rgba(26, 4, 12, 0.28);
+    border: 1px solid rgba(255, 122, 144, 0.28);
+    backdrop-filter: blur(12px) saturate(190%);
+    -webkit-backdrop-filter: blur(12px) saturate(190%);
     box-shadow:
-      0 10px 30px rgba(0, 0, 0, 0.32),
-      inset 0 1px 0 rgba(255, 225, 230, 0.18);
+      0 10px 30px rgba(0, 0, 0, 0.26),
+      inset 0 1px 1px rgba(255, 238, 242, 0.28);
   }
   body:not(.theme-day) .card:hover {
-    border-color: rgba(255, 58, 88, 0.58);
-    box-shadow: 0 12px 34px rgba(0, 0, 0, 0.4), 0 0 24px rgba(255, 24, 58, 0.18);
+    border-color: rgba(255, 76, 104, 0.72);
+    box-shadow: 0 12px 34px rgba(0, 0, 0, 0.36), 0 0 26px rgba(255, 24, 62, 0.24), inset 0 1px 1px rgba(255, 255, 255, 0.36);
   }
 
   body:not(.theme-day) .chip {
     background:
-      linear-gradient(145deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.01)),
-      rgba(34, 6, 15, 0.46);
-    border: 1px solid rgba(255, 102, 124, 0.22);
-    backdrop-filter: blur(14px) saturate(165%);
-    -webkit-backdrop-filter: blur(14px) saturate(165%);
-    box-shadow: inset 0 1px 0 rgba(255, 225, 230, 0.16);
+      linear-gradient(145deg, rgba(255, 255, 255, 0.11), rgba(255, 255, 255, 0.015)),
+      rgba(28, 4, 13, 0.26);
+    border: 1px solid rgba(255, 122, 144, 0.28);
+    backdrop-filter: blur(10px) saturate(185%);
+    -webkit-backdrop-filter: blur(10px) saturate(185%);
+    box-shadow: inset 0 1px 1px rgba(255, 238, 242, 0.24);
   }
 
   body:not(.theme-day) .zone-reset,
   body:not(.theme-day) .zone-tech {
-    background: rgba(28, 4, 12, 0.48);
-    border: 1px solid rgba(255, 92, 116, 0.22);
-    backdrop-filter: blur(14px);
-    -webkit-backdrop-filter: blur(14px);
-  }
-
-  body:not(.theme-day) .sel,
-  body:not(.theme-day) #search-input {
-    background: rgba(26, 4, 11, 0.56);
-    border: 1px solid rgba(255, 96, 118, 0.26);
+    background: rgba(22, 3, 10, 0.30);
+    border: 1px solid rgba(255, 108, 130, 0.28);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
   }
 
-  /* Botones principales en gradiente rojo-solar Liquid Glass */
+  body:not(.theme-day) .sel,
+  body:not(.theme-day) #search-input {
+    background: rgba(20, 3, 9, 0.36);
+    border: 1px solid rgba(255, 114, 136, 0.34);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    color: #fff;
+  }
+
+  /* Iconos globales con sutil brillo futurista */
+  body:not(.theme-day) .chip i,
+  body:not(.theme-day) header i,
+  body:not(.theme-day) section h2 i {
+    filter: drop-shadow(0 0 7px rgba(255, 34, 77, 0.65));
+  }
+
+  /* Botones principales futuristas con brillo líquido */
   #sb-login-submit-btn,
   body:not(.hunter-preauth) .btn {
     color: #ffffff !important;
-    background: linear-gradient(135deg, #ff1642 0%, #ff4726 60%, #ff731f 100%) !important;
-    border: 1px solid rgba(255, 180, 185, 0.32) !important;
+    background: linear-gradient(135deg, #ff1646 0%, #ff4526 58%, #ff7b24 100%) !important;
+    border: 1px solid rgba(255, 210, 216, 0.48) !important;
     box-shadow:
-      0 8px 24px rgba(255, 24, 58, 0.44),
-      inset 0 1px 0 rgba(255, 255, 255, 0.34) !important;
-    text-shadow: 0 1px 5px rgba(0, 0, 0, 0.35);
+      0 8px 26px rgba(255, 24, 62, 0.52),
+      inset 0 1px 1px rgba(255, 255, 255, 0.48) !important;
+    text-shadow: 0 1px 6px rgba(0, 0, 0, 0.4);
   }
   #sb-login-submit-btn:hover,
   body:not(.hunter-preauth) .btn:hover {
     filter: brightness(1.12);
     box-shadow:
-      0 10px 30px rgba(255, 24, 58, 0.64),
-      inset 0 1px 0 rgba(255, 255, 255, 0.44) !important;
+      0 10px 32px rgba(255, 24, 62, 0.72),
+      inset 0 1px 1px rgba(255, 255, 255, 0.58) !important;
   }
 
-  /* Elimina todos los restos azules (Tailwind sky/slate-blue) en modo oscuro */
+  /* Limpieza total de tonos azules Tailwind en modo oscuro */
   body:not(.theme-day) .text-sky-300,
-  body:not(.theme-day) .text-sky-400 { color: #ff6b84 !important; }
-
+  body:not(.theme-day) .text-sky-400 { color: #ff7890 !important; }
   body:not(.theme-day) .bg-sky-500\/10,
   body:not(.theme-day) .bg-sky-500\/15,
-  body:not(.theme-day) .bg-sky-500\/20 { background-color: rgba(255, 28, 64, 0.18) !important; }
-
+  body:not(.theme-day) .bg-sky-500\/20 { background-color: rgba(255, 28, 66, 0.20) !important; }
   body:not(.theme-day) .hover\:bg-sky-500\/25:hover,
-  body:not(.theme-day) .hover\:bg-sky-500:hover { background-color: rgba(255, 28, 64, 0.36) !important; }
-
+  body:not(.theme-day) .hover\:bg-sky-500:hover { background-color: rgba(255, 28, 66, 0.38) !important; }
   body:not(.theme-day) .bg-sky-600\/80,
-  body:not(.theme-day) .bg-sky-600 { background-color: rgba(235, 22, 58, 0.86) !important; }
-
+  body:not(.theme-day) .bg-sky-600 { background-color: rgba(235, 22, 60, 0.88) !important; }
   body:not(.theme-day) .border-sky-400\/30,
   body:not(.theme-day) .border-sky-400\/40,
-  body:not(.theme-day) .hover\:border-sky-400:hover { border-color: rgba(255, 72, 98, 0.46) !important; }
-
-  body:not(.theme-day) .ring-sky-400 { --tw-ring-color: rgba(255, 34, 71, 0.85) !important; }
-
-  body:not(.theme-day) .file\:bg-sky-500\/20::file-selector-button { background-color: rgba(255, 28, 64, 0.24) !important; }
-  body:not(.theme-day) .file\:text-sky-300::file-selector-button { color: #ff94a6 !important; }
-
+  body:not(.theme-day) .hover\:border-sky-400:hover { border-color: rgba(255, 92, 118, 0.52) !important; }
+  body:not(.theme-day) .ring-sky-400 { --tw-ring-color: rgba(255, 34, 77, 0.88) !important; }
+  body:not(.theme-day) .file\:bg-sky-500\/20::file-selector-button { background-color: rgba(255, 28, 66, 0.26) !important; }
+  body:not(.theme-day) .file\:text-sky-300::file-selector-button { color: #ffa0b0 !important; }
   body:not(.theme-day) .bg-black\/30,
   body:not(.theme-day) .bg-black\/40,
   body:not(.theme-day) .bg-black\/20,
-  body:not(.theme-day) .bg-black\/15 {
-    background-color: rgba(24, 3, 10, 0.46) !important;
-  }
-
+  body:not(.theme-day) .bg-black\/15 { background-color: rgba(20, 3, 9, 0.34) !important; }
   body:not(.theme-day) .bg-\[\#0d121c\] {
-    background: rgba(26, 4, 11, 0.86) !important;
-    backdrop-filter: blur(22px) saturate(180%) !important;
-    border-color: rgba(255, 86, 108, 0.32) !important;
+    background: rgba(22, 3, 10, 0.82) !important;
+    backdrop-filter: blur(18px) saturate(190%) !important;
+    border-color: rgba(255, 104, 126, 0.38) !important;
   }
-
   button.bg-\[var\(--accent\)\] {
     color: #ffffff !important;
-    box-shadow: 0 4px 16px rgba(255, 24, 58, 0.42);
+    box-shadow: 0 4px 18px rgba(255, 24, 62, 0.48);
   }
-
   .inline-dev-input {
-    background: rgba(255, 28, 64, 0.14);
-    border-color: rgba(255, 76, 102, 0.55);
+    background: rgba(255, 28, 66, 0.14);
+    border-color: rgba(255, 86, 112, 0.58);
   }
 
-  /* Mapa táctico y Popups en tono rojo oscuro */
+  /* Mapa táctico y Popups */
   body:not(.theme-day) #map-canvas { background: #140308 !important; }
   body:not(.theme-day) #map-canvas .leaflet-tile-pane {
     filter: invert(1) hue-rotate(312deg) brightness(0.84) contrast(1.06) saturate(0.68) !important;
   }
   body:not(.theme-day) .leaflet-popup-content-wrapper,
   body:not(.theme-day) .leaflet-popup-tip {
-    background: rgba(26, 4, 11, 0.88) !important;
-    backdrop-filter: blur(16px);
-    border: 1px solid rgba(255, 80, 104, 0.34) !important;
+    background: rgba(24, 3, 10, 0.84) !important;
+    backdrop-filter: blur(14px);
+    border: 1px solid rgba(255, 92, 118, 0.38) !important;
   }
 
   /* Modales, Toasts y Scrollbar */
   body:not(.theme-day) #record-editor-modal .panel {
-    background: rgba(24, 4, 10, 0.72) !important;
-    backdrop-filter: blur(26px) saturate(185%) !important;
-    border: 1px solid rgba(255, 86, 108, 0.36) !important;
+    background: rgba(22, 3, 10, 0.62) !important;
+    backdrop-filter: blur(22px) saturate(195%) !important;
+    border: 1px solid rgba(255, 102, 124, 0.42) !important;
   }
   .toast {
-    background: rgba(28, 4, 12, 0.84) !important;
-    backdrop-filter: blur(18px);
-    border-color: rgba(255, 34, 71, 0.78) !important;
-    box-shadow: 0 8px 28px rgba(255, 24, 58, 0.36);
+    background: rgba(24, 3, 10, 0.78) !important;
+    backdrop-filter: blur(14px);
+    border-color: rgba(255, 34, 77, 0.82) !important;
+    box-shadow: 0 8px 28px rgba(255, 24, 62, 0.42);
   }
-  .scroll::-webkit-scrollbar-thumb { background: rgba(255, 68, 94, 0.36); }
+  .scroll::-webkit-scrollbar-thumb { background: rgba(255, 76, 102, 0.42); }
+
+
+
   </style>
 </head>
 <body class="hunter-preauth">
@@ -986,7 +1034,7 @@
     <div id="brand">
       <span id="brand-mark"></span>
       <div id="brand-copy">
-        <span id="brand-title">HAWKS SKYNET · SPACEX TELEMETRY</span>
+       <span id="brand-title">HUNTER™ CORE · ORBITAL TELEMETRY</span>
         <span id="brand-subtitle">RF / SAT / ORBITAL NETWORK · MDZHUNTER</span>
       </div>
     </div>
@@ -1014,7 +1062,7 @@
         <defs><path id="orbPath" d="M50,50 m-47,0 a47,47 0 1,1 94,0 a47,47 0 1,1 -94,0"/></defs>
         <circle cx="50" cy="50" r="49.6" fill="none" stroke="rgba(255,90,90,.35)" stroke-width=".25"/>
         <circle cx="50" cy="50" r="44.6" fill="none" stroke="rgba(255,90,90,.22)" stroke-width=".2" stroke-dasharray="1.2 1.8"/>
-        <text><textPath href="#orbPath" textLength="292" lengthAdjust="spacing">HAWKS SKYNET • SATELLITE LINK • MDZHUNTER • ENCRYPTED ACCESS • 2FA •</textPath></text>
+        <text><textPath href="#orbPath" textLength="292" lengthAdjust="spacing">HUNTER™ CORE • SATELLITE LINK • MDZHUNTER • ENCRYPTED ACCESS • 2FA •</textPath></text>
       </svg></div>
       <div class="orb-ring rev" aria-hidden="true"><svg viewBox="0 0 100 100">
         <circle cx="50" cy="50" r="49.6" fill="none" stroke="rgba(255,90,90,.45)" stroke-width=".2" stroke-dasharray="6 3 1 3"/>
@@ -1025,7 +1073,7 @@
             <i class="fa-solid fa-satellite text-sm" style="color: rgb(var(--accent-a));"></i>
           </div>
           <div>
-            <h3 class="text-sm font-extrabold text-white tracking-wide">HAWKS SKYNET</h3>
+            <h3 class="text-sm font-extrabold text-white tracking-wide">HUNTER<sup class="text-[9px] text-rose-300">™</sup> CORE</h3>
             <p class="text-[10px] text-slate-300/80">Acceso al sistema · mdzhunter</p>
           </div>
         </div>
@@ -1076,33 +1124,28 @@
        DASHBOARD PRINCIPAL HAWKS SKYNET
        ========================================================= -->
   <div class="frame">
-    <nav class="rail" aria-label="Navegación Principal">
-      <div class="w-10 h-10 rounded-xl bg-sky-500/10 border border-sky-400/30 flex items-center justify-center mb-1" title="HAWKS SKYNET">
-        <svg viewBox="0 0 64 64" class="w-6 h-6" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M32 7 L54 24 L42 30 L59 46 L36 43 L32 58 L28 43 L5 46 L22 30 L10 24 Z" fill="#38bdf8" stroke="#bae6fd" stroke-width="1.4" stroke-linejoin="round"/>
-          <circle cx="32" cy="25" r="3.2" fill="#e03a3e"/>
+<div class="w-10 h-10 rounded-xl bg-rose-500/15 border border-rose-400/40 flex items-center justify-center mb-1 shadow-[0_0_16px_rgba(255,34,77,0.35)]" title="HUNTER™ CORE">
+        <svg viewBox="0 0 100 100" class="w-7 h-7" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="50" cy="47" r="42" fill="rgba(45,6,18,0.75)" stroke="#ff355e" stroke-width="4.5"/>
+          <path d="M31 62 Q22 72 28 77 M41 64 Q38 75 43 79 M59 64 Q62 75 57 79 M69 62 Q78 72 72 77" fill="none" stroke="#ff2a55" stroke-width="6.5" stroke-linecap="round"/>
+          <ellipse cx="50" cy="46" rx="22" ry="20" fill="#ff2a55"/>
+          <ellipse cx="42" cy="36" rx="6" ry="4" fill="#ff85a1" opacity="0.65"/>
+          <circle cx="42" cy="50" r="4.8" fill="#ffffff"/>
+          <circle cx="58" cy="50" r="4.8" fill="#ffffff"/>
+          <circle cx="43" cy="50" r="2.6" fill="#090308"/>
+          <circle cx="59" cy="50" r="2.6" fill="#090308"/>
+          <path d="M24 30 A34 34 0 0 1 58 14" fill="none" stroke="#ffffff" stroke-width="3.5" stroke-linecap="round" opacity="0.65"/>
+          <rect x="24" y="81" width="52" height="11" rx="5.5" fill="#e2e8f0" stroke="#ff355e" stroke-width="2.2"/>
         </svg>
       </div>
 
-      <button id="nav-filter" class="on" data-v="filter" onclick="setView('filter')" title="Búsqueda de Puntos"><i class="fa-solid fa-crosshairs"></i></button>
-      <button id="nav-map" data-v="map" onclick="setView('map')" title="Mapa y Cobertura"><i class="fa-solid fa-location-dot"></i></button>
-      <button id="nav-tech" data-v="tech" onclick="setView('tech')" title="Analizador de Tecnologías"><i class="fa-solid fa-microchip"></i></button>
-      <button id="nav-maint" data-v="maint" onclick="setView('maint')" title="Plan de Mantenimiento"><i class="fa-solid fa-calendar-check"></i></button>
-      <button id="nav-price" data-v="price" onclick="setView('price')" title="Analizador de Precios"><i class="fa-solid fa-coins"></i></button>
-      <button id="nav-noc" data-v="noc" onclick="setView('noc')" title="Consola NOC"><i class="fa-solid fa-chart-line"></i></button>
-      <button id="nav-rafi" data-v="rafi" onclick="setView('rafi')" title="Módulo RAFI · Consola"><i class="fa-solid fa-brain"></i></button>
-
-      <div class="mt-auto flex flex-col gap-2 pb-1">
-        <button onclick="toggleAccent()" title="Alternar Acento Cian / Carmesí"><i class="fa-solid fa-palette"></i></button>
-        <button onclick="toggleTheme()" title="Día / Noche"><i id="theme-icon" class="fa-solid fa-moon"></i></button>
-      </div>
     </nav>
 
     <div class="flex-1 flex flex-col gap-3 min-w-0">
       <header class="flex flex-wrap items-center justify-between gap-2 px-2 pt-0.5">
         <div>
           <div class="flex items-center gap-2.5">
-            <h1 class="text-xl font-bold tracking-wide text-white">HAWKS <span class="text-[var(--accent)]">SKYNET</span></h1>
+            <h1 class="text-xl font-bold tracking-wider text-white">HUNTER<sup class="text-[11px] text-rose-300 align-super">™</sup> <span class="text-[var(--accent)]">CORE</span></h1>
             <span id="role-badge" class="px-2.5 py-0.5 rounded-full bg-white/5 border border-white/10 text-slate-300 text-[10px] font-bold uppercase tracking-wider">
               <span id="role-badge-text">Sesión</span>
             </span>
@@ -2664,7 +2707,7 @@
        THREE.JS: PLANETAS + SATÉLITES CON ANTENA + METEORITOS
        ========================================================= -->
 <script type="module">
-// ===== HAWKS SKYNET · ESCENA ESPACIAL ROJA (V3: SOL SUAVE + ASTRONAUTA MATE + FONDO PERSISTENTE) =====
+// ===== HUNTER™ CORE · ESCENA ESPACIAL V4 (PLANETA DESTELLANTE + PULPO EN EL CASCO) =====
 import * as THREE from 'three';
 import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
@@ -2676,39 +2719,38 @@ const card = document.getElementById('login-floating-card');
 const forcedMfaEl = document.getElementById('sb-forced-mfa');
 const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const compact = matchMedia('(max-width: 760px)').matches;
-const R = 2.3, TAU = Math.PI * 2;
+const R = 2.35, TAU = Math.PI * 2;
 
-// ---------- Renderer y Post-Procesado equilibrado ----------
+// ---------- Renderer y Post-Procesado (Planeta destellante, Sol suave) ----------
 const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
-renderer.setPixelRatio(Math.min(devicePixelRatio || 1, compact ? 1.25 : 1.6));
+renderer.setPixelRatio(Math.min(devicePixelRatio || 1, compact ? 1.25 : 1.65));
 renderer.setSize(innerWidth, innerHeight);
 renderer.setClearColor(0x050104, 1);
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
-renderer.toneMappingExposure = 1.06;
+renderer.toneMappingExposure = 1.12;
 container.appendChild(renderer.domElement);
 
 const scene = new THREE.Scene();
-const defaultCamZ = () => (innerWidth / innerHeight < 0.8 ? 14.8 : 11.4);
+const defaultCamZ = () => (innerWidth / innerHeight < 0.8 ? 14.6 : 11.2);
 let targetCamZ = defaultCamZ();
 const camera = new THREE.PerspectiveCamera(40, innerWidth / innerHeight, 0.1, 280);
 camera.position.set(0, 0.35, targetCamZ);
 
-// Iluminación controlada para evitar sobreexposición en el astronauta y el sol
-scene.add(new THREE.AmbientLight(0x4a1420, 1.05));
-scene.add(new THREE.HemisphereLight(0xd99b90, 0x1e040a, 0.55));
-const sunLight = new THREE.DirectionalLight(0xffdfc8, 2.05);
+scene.add(new THREE.AmbientLight(0x521624, 1.15));
+scene.add(new THREE.HemisphereLight(0xe5a49c, 0x22040c, 0.6));
+const sunLight = new THREE.DirectionalLight(0xffdfc8, 2.2);
 sunLight.position.set(-28, 13, 18);
 scene.add(sunLight);
-const rimRed = new THREE.PointLight(0xff143c, 52, 34);
-rimRed.position.set(5.5, -2.5, -4.5);
+const rimRed = new THREE.PointLight(0xff1442, 72, 38);
+rimRed.position.set(5.2, -2.2, -4.2);
 scene.add(rimRed);
-const frontFill = new THREE.PointLight(0xff3824, 12, 20);
-frontFill.position.set(-4.5, 2.2, 6.5);
+const frontFill = new THREE.PointLight(0xff3224, 16, 22);
+frontFill.position.set(-4.2, 2.0, 6.8);
 scene.add(frontFill);
 
 const composer = new EffectComposer(renderer);
 composer.addPass(new RenderPass(scene, camera));
-const bloomPass = new UnrealBloomPass(new THREE.Vector2(innerWidth, innerHeight), 0.58, 0.48, 0.24);
+const bloomPass = new UnrealBloomPass(new THREE.Vector2(innerWidth, innerHeight), 0.78, 0.56, 0.22);
 composer.addPass(bloomPass);
 composer.addPass(new OutputPass());
 
@@ -2736,16 +2778,10 @@ function makeKaptonFoilTex() {
     const x = Math.random() * 256, y = Math.random() * 256;
     const w = 6 + Math.random() * 22, h = 6 + Math.random() * 22;
     ctx.fillStyle = Math.random() > 0.5 ? 'rgba(245,200,100,0.22)' : 'rgba(85,42,8,0.24)';
-    ctx.beginPath();
-    ctx.moveTo(x, y);
-    ctx.lineTo(x + w, y + (Math.random() - 0.5) * 14);
-    ctx.lineTo(x + w * 0.5, y + h);
-    ctx.closePath();
-    ctx.fill();
+    ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x + w, y + (Math.random() - 0.5) * 14); ctx.lineTo(x + w * 0.5, y + h); ctx.closePath(); ctx.fill();
   }
   const t = new THREE.CanvasTexture(c);
-  t.wrapS = t.wrapT = THREE.RepeatWrapping;
-  t.colorSpace = THREE.SRGBColorSpace;
+  t.wrapS = t.wrapT = THREE.RepeatWrapping; t.colorSpace = THREE.SRGBColorSpace;
   return t;
 }
 
@@ -2754,28 +2790,21 @@ function makeSolarPanelTex() {
   c.width = 512; c.height = 256;
   const ctx = c.getContext('2d');
   const grad = ctx.createLinearGradient(0, 0, 512, 256);
-  grad.addColorStop(0, '#0c1630');
-  grad.addColorStop(0.5, '#19102c');
-  grad.addColorStop(1, '#2a0b1a');
-  ctx.fillStyle = grad;
-  ctx.fillRect(0, 0, 512, 256);
+  grad.addColorStop(0, '#0c1630'); grad.addColorStop(0.5, '#19102c'); grad.addColorStop(1, '#2a0b1a');
+  ctx.fillStyle = grad; ctx.fillRect(0, 0, 512, 256);
   const cols = 16, rows = 6, cw = 512 / cols, ch = 256 / rows;
   for (let r = 0; r < rows; r++) {
     for (let k = 0; k < cols; k++) {
       ctx.fillStyle = (r + k) % 2 ? 'rgba(40,90,175,0.24)' : 'rgba(180,30,70,0.14)';
       ctx.fillRect(k * cw + 2, r * ch + 2, cw - 4, ch - 4);
-      ctx.strokeStyle = 'rgba(200,215,245,0.36)';
-      ctx.lineWidth = 1;
+      ctx.strokeStyle = 'rgba(200,215,245,0.36)'; ctx.lineWidth = 1;
       ctx.strokeRect(k * cw + 1.5, r * ch + 1.5, cw - 3, ch - 3);
       ctx.fillStyle = 'rgba(255,195,115,0.38)';
       ctx.fillRect(k * cw + cw * 0.48, r * ch + 2, 1.2, ch - 4);
     }
   }
-  ctx.strokeStyle = '#8d96a6';
-  ctx.lineWidth = 6;
-  ctx.strokeRect(0, 0, 512, 256);
-  const t = new THREE.CanvasTexture(c);
-  t.colorSpace = THREE.SRGBColorSpace;
+  ctx.strokeStyle = '#8d96a6'; ctx.lineWidth = 6; ctx.strokeRect(0, 0, 512, 256);
+  const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace;
   return t;
 }
 
@@ -2784,18 +2813,13 @@ function makeGasGiantTex() {
   c.width = 512; c.height = 256;
   const ctx = c.getContext('2d');
   const bands = ['#2e0c14', '#6d1d22', '#b8422a', '#d47042', '#7c1c28', '#3c0d19', '#c25436', '#4f121e', '#993228', '#290912'];
-  bands.forEach((col, i) => {
-    ctx.fillStyle = col;
-    ctx.fillRect(0, (i / bands.length) * 256, 512, 256 / bands.length + 2);
-  });
+  bands.forEach((col, i) => { ctx.fillStyle = col; ctx.fillRect(0, (i / bands.length) * 256, 512, 256 / bands.length + 2); });
   for (let i = 0; i < 120; i++) {
     ctx.fillStyle = Math.random() > 0.5 ? 'rgba(255,150,100,0.10)' : 'rgba(20,2,8,0.18)';
     ctx.fillRect(Math.random() * 512, Math.random() * 256, 30 + Math.random() * 90, 2 + Math.random() * 6);
   }
-  ctx.fillStyle = 'rgba(255,90,60,0.38)';
-  ctx.beginPath(); ctx.ellipse(310, 148, 34, 16, 0, 0, TAU); ctx.fill();
-  const t = new THREE.CanvasTexture(c);
-  t.colorSpace = THREE.SRGBColorSpace;
+  ctx.fillStyle = 'rgba(255,90,60,0.38)'; ctx.beginPath(); ctx.ellipse(310, 148, 34, 16, 0, 0, TAU); ctx.fill();
+  const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace;
   return t;
 }
 
@@ -2805,18 +2829,13 @@ function makeSaturnRingsTex() {
   const ctx = c.getContext('2d');
   for (let x = 0; x < 512; x++) {
     const u = x / 512;
-    let a = Math.sin(u * Math.PI) * 0.68;
-    a *= 0.55 + 0.45 * Math.sin(u * 48) * Math.cos(u * 19);
+    let a = Math.sin(u * Math.PI) * 0.68 * (0.55 + 0.45 * Math.sin(u * 48) * Math.cos(u * 19));
     if (u > 0.56 && u < 0.63) a *= 0.08;
     if (u < 0.06 || u > 0.96) a = 0;
-    const r = Math.floor(220 + 25 * Math.sin(u * 20));
-    const g = Math.floor(105 + 40 * Math.cos(u * 14));
-    const b = Math.floor(85 + 30 * Math.sin(u * 10));
-    ctx.fillStyle = `rgba(${r},${g},${b},${Math.max(0, a)})`;
+    ctx.fillStyle = `rgba(${Math.floor(220 + 25 * Math.sin(u * 20))},${Math.floor(105 + 40 * Math.cos(u * 14))},${Math.floor(85 + 30 * Math.sin(u * 10))},${Math.max(0, a)})`;
     ctx.fillRect(x, 0, 1, 32);
   }
-  const t = new THREE.CanvasTexture(c);
-  t.colorSpace = THREE.SRGBColorSpace;
+  const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace;
   return t;
 }
 
@@ -2824,43 +2843,37 @@ function makeCraterMoonTex() {
   const c = document.createElement('canvas');
   c.width = 512; c.height = 256;
   const ctx = c.getContext('2d');
-  ctx.fillStyle = '#482026';
-  ctx.fillRect(0, 0, 512, 256);
+  ctx.fillStyle = '#482026'; ctx.fillRect(0, 0, 512, 256);
   for (let i = 0; i < 240; i++) {
     const x = Math.random() * 512, y = Math.random() * 256, rad = 2 + Math.random() * 18;
     ctx.fillStyle = Math.random() > 0.5 ? 'rgba(20,6,9,0.38)' : 'rgba(155,70,64,0.20)';
     ctx.beginPath(); ctx.arc(x, y, rad, 0, TAU); ctx.fill();
-    ctx.strokeStyle = 'rgba(245,130,115,0.14)';
-    ctx.lineWidth = 1; ctx.stroke();
+    ctx.strokeStyle = 'rgba(245,130,115,0.14)'; ctx.lineWidth = 1; ctx.stroke();
   }
-  const t = new THREE.CanvasTexture(c);
-  t.colorSpace = THREE.SRGBColorSpace;
+  const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace;
   return t;
 }
 
-// ---------- Nebulosa Carmesí + Campo Estelar ----------
+// ---------- Nebulosa Carmesí + Estrellas ----------
 {
   const nebTex = makeRadialTex([
-    [0, 'rgba(255, 24, 64, 0.22)'],
-    [0.35, 'rgba(175, 14, 46, 0.11)'],
-    [0.7, 'rgba(68, 6, 36, 0.04)'],
+    [0, 'rgba(255, 24, 68, 0.24)'],
+    [0.35, 'rgba(180, 14, 48, 0.12)'],
+    [0.7, 'rgba(72, 6, 38, 0.04)'],
     [1, 'rgba(0, 0, 0, 0)']
   ]);
-  [
-    [-22, 10, -72, 46], [26, -12, -78, 50], [-6, -18, -85, 60],
-    [18, 16, -80, 42], [-32, -8, -68, 40]
-  ].forEach(([x, y, z, s], idx) => {
+  [[-22, 10, -72, 48], [26, -12, -78, 52], [-6, -18, -85, 62], [18, 16, -80, 44], [-32, -8, -68, 42]].forEach(([x, y, z, s], idx) => {
     const sp = new THREE.Sprite(new THREE.SpriteMaterial({
-      map: nebTex, color: idx % 2 === 0 ? 0xff224e : 0xff5a2c,
+      map: nebTex, color: idx % 2 === 0 ? 0xff2252 : 0xff5a2c,
       transparent: true, opacity: 0.44, blending: THREE.AdditiveBlending, depthWrite: false
     }));
     sp.position.set(x, y, z); sp.scale.set(s, s * 0.72, 1); scene.add(sp);
   });
 
-  const n = compact ? 3600 : 6000;
+  const n = compact ? 3600 : 6200;
   const pos = new Float32Array(n * 3), col = new Float32Array(n * 3);
   const v = new THREE.Vector3(), cTmp = new THREE.Color();
-  const palette = [0xffeae4, 0xffd2c8, 0xff9f96, 0xff4c62, 0xd8e0f0];
+  const palette = [0xfff0ea, 0xffd2c8, 0xff9f96, 0xff4662, 0xd8e0f0];
   for (let i = 0; i < n; i++) {
     v.randomDirection().multiplyScalar(42 + Math.random() * 110);
     pos.set([v.x, v.y, v.z], i * 3);
@@ -2870,38 +2883,36 @@ function makeCraterMoonTex() {
   const g = new THREE.BufferGeometry();
   g.setAttribute('position', new THREE.BufferAttribute(pos, 3));
   g.setAttribute('color', new THREE.BufferAttribute(col, 3));
-  scene.add(new THREE.Points(g, new THREE.PointsMaterial({
-    size: 0.13, vertexColors: true, transparent: true, opacity: 0.88, depthWrite: false
-  })));
+  scene.add(new THREE.Points(g, new THREE.PointsMaterial({ size: 0.135, vertexColors: true, transparent: true, opacity: 0.9, depthWrite: false })));
 }
 
-// ---------- Sol Lejano Suave (sin encandilar) ----------
+// ---------- Sol Lejano Suave ----------
 const distantSunGroup = new THREE.Group();
-distantSunGroup.position.set(-29, 13.5, -62);
+distantSunGroup.position.set(-30, 14, -66);
 scene.add(distantSunGroup);
 {
   distantSunGroup.add(new THREE.Mesh(
-    new THREE.SphereGeometry(1.35, 32, 32),
-    new THREE.MeshBasicMaterial({ color: 0xe3843c })
+    new THREE.SphereGeometry(1.15, 32, 32),
+    new THREE.MeshBasicMaterial({ color: 0xcc6e34 })
   ));
   const coronaTex = makeRadialTex([
-    [0, 'rgba(255, 198, 132, 0.58)'],
-    [0.24, 'rgba(255, 122, 52, 0.36)'],
-    [0.52, 'rgba(220, 36, 46, 0.16)'],
-    [0.8, 'rgba(130, 12, 32, 0.04)'],
+    [0, 'rgba(255, 186, 120, 0.46)'],
+    [0.24, 'rgba(255, 112, 48, 0.28)'],
+    [0.52, 'rgba(210, 32, 46, 0.12)'],
+    [0.8, 'rgba(120, 10, 30, 0.03)'],
     [1, 'rgba(0, 0, 0, 0)']
   ]);
   const corona = new THREE.Sprite(new THREE.SpriteMaterial({
-    map: coronaTex, transparent: true, opacity: 0.72, blending: THREE.AdditiveBlending, depthWrite: false
+    map: coronaTex, transparent: true, opacity: 0.62, blending: THREE.AdditiveBlending, depthWrite: false
   }));
-  corona.scale.set(11.5, 11.5, 1);
+  corona.scale.set(9.5, 9.5, 1);
   distantSunGroup.add(corona);
   distantSunGroup.userData.corona = corona;
 
   const flare = new THREE.Sprite(new THREE.SpriteMaterial({
-    map: coronaTex, color: 0xff5a36, transparent: true, opacity: 0.22, blending: THREE.AdditiveBlending, depthWrite: false
+    map: coronaTex, color: 0xff5434, transparent: true, opacity: 0.18, blending: THREE.AdditiveBlending, depthWrite: false
   }));
-  flare.scale.set(17, 0.9, 1);
+  flare.scale.set(14, 0.75, 1);
   distantSunGroup.add(flare);
 }
 
@@ -2920,13 +2931,9 @@ scene.add(ringedPlanet);
 
   const rGeo = new THREE.RingGeometry(4.1, 7.6, 96, 1);
   const pAttr = rGeo.attributes.position, uvAttr = rGeo.attributes.uv;
-  for (let i = 0; i < pAttr.count; i++) {
-    const u = (Math.hypot(pAttr.getX(i), pAttr.getY(i)) - 4.1) / (7.6 - 4.1);
-    uvAttr.setXY(i, u, 0.5);
-  }
+  for (let i = 0; i < pAttr.count; i++) uvAttr.setXY(i, (Math.hypot(pAttr.getX(i), pAttr.getY(i)) - 4.1) / 3.5, 0.5);
   const rings = new THREE.Mesh(rGeo, new THREE.MeshStandardMaterial({
-    map: makeSaturnRingsTex(), transparent: true, opacity: 0.82,
-    side: THREE.DoubleSide, roughness: 0.72, depthWrite: false
+    map: makeSaturnRingsTex(), transparent: true, opacity: 0.82, side: THREE.DoubleSide, roughness: 0.72, depthWrite: false
   }));
   rings.rotation.x = Math.PI / 2;
   ringedPlanet.add(rings);
@@ -2957,7 +2964,7 @@ scene.add(distantExo);
   ));
 }
 
-// ---------- Cinturón de Asteroides ----------
+// ---------- Cinturón de Asteroides + Meteoritos ----------
 const asteroidCount = compact ? 45 : 85;
 const asteroidMesh = new THREE.InstancedMesh(
   new THREE.DodecahedronGeometry(0.11, 0),
@@ -2975,16 +2982,15 @@ for (let i = 0; i < asteroidCount; i++) {
 }
 scene.add(asteroidMesh);
 
-// ---------- Meteoritos Fugaces ----------
 const meteors = Array.from({ length: 3 }, (_, idx) => {
   const geo = new THREE.BufferGeometry();
   geo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(6), 3));
-  const line = new THREE.Line(geo, new THREE.LineBasicMaterial({ color: 0xffa88a, transparent: true, opacity: 0, blending: THREE.AdditiveBlending, depthWrite: false }));
+  const line = new THREE.Line(geo, new THREE.LineBasicMaterial({ color: 0xffb896, transparent: true, opacity: 0, blending: THREE.AdditiveBlending, depthWrite: false }));
   line.frustumCulled = false; scene.add(line);
   return { line, timer: 2 + idx * 4.2, active: false, life: 0, dur: 0.75, start: new THREE.Vector3(), dir: new THREE.Vector3() };
 });
 
-// ---------- Planeta Principal (Globo Rojo Vibrante) ----------
+// ---------- Planeta Principal: MUCHO MÁS DESTELLANTE Y LLAMATIVO ----------
 const globe = new THREE.Group();
 scene.add(globe);
 const ll = (lat, lon, r = R) => {
@@ -2994,86 +3000,121 @@ const ll = (lat, lon, r = R) => {
 
 globe.add(new THREE.Mesh(
   new THREE.SphereGeometry(R, 64, 48),
-  new THREE.MeshStandardMaterial({ color: 0x120206, emissive: 0x1a0208, roughness: 0.80, metalness: 0.25 })
+  new THREE.MeshStandardMaterial({ color: 0x160208, emissive: 0x2a030e, emissiveIntensity: 1.15, roughness: 0.72, metalness: 0.30 })
 ));
 
-{ // Continentes rojo carmesí eléctrico + naranja solar
-  const N = compact ? 5200 : 9500, pos = [], col = [];
-  const c1 = new THREE.Color(0xff143c), c2 = new THREE.Color(0xff5a22), cMix = new THREE.Color();
+{ // Continentes luminosos de doble intensidad + núcleos incandescentes
+  const N = compact ? 6200 : 11500, pos = [], col = [], hotPos = [];
+  const c1 = new THREE.Color(0xff1444), c2 = new THREE.Color(0xff6a24), cMix = new THREE.Color();
   for (let i = 0; i < N; i++) {
     const y = 1 - 2 * (i + 0.5) / N, r = Math.sqrt(1 - y * y), th = i * 2.399963;
     const x = Math.cos(th) * r, z = Math.sin(th) * r;
     const m = Math.sin(x * 3.1 + 1.3) * Math.cos(y * 3.7)
             + Math.sin(z * 4.2 - 0.7) * Math.cos(x * 2.3 + y * 1.9)
             + Math.sin(y * 5.1 + z * 2.7) * 0.6;
-    if (m > 0.23) {
-      pos.push(x * R * 1.005, y * R * 1.005, z * R * 1.005);
-      cMix.lerpColors(c1, c2, Math.min(1, Math.max(0, (m - 0.23) * 0.9)));
+    if (m > 0.21) {
+      pos.push(x * R * 1.006, y * R * 1.006, z * R * 1.006);
+      cMix.lerpColors(c1, c2, Math.min(1, Math.max(0, (m - 0.21) * 0.95)));
       col.push(cMix.r, cMix.g, cMix.b);
+      if (m > 1.18) hotPos.push(x * R * 1.010, y * R * 1.010, z * R * 1.010);
     }
   }
   const g = new THREE.BufferGeometry();
   g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
   g.setAttribute('color', new THREE.Float32BufferAttribute(col, 3));
   globe.add(new THREE.Points(g, new THREE.PointsMaterial({
-    size: 0.028, vertexColors: true, transparent: true, opacity: 1.0,
+    size: 0.036, vertexColors: true, transparent: true, opacity: 1.0,
+    blending: THREE.AdditiveBlending, depthWrite: false
+  })));
+
+  // Puntos "ciudades/nodos" super brillantes para efecto destellante
+  const hg = new THREE.BufferGeometry();
+  hg.setAttribute('position', new THREE.Float32BufferAttribute(hotPos, 3));
+  globe.add(new THREE.Points(hg, new THREE.PointsMaterial({
+    color: 0xffd2b0, size: 0.048, transparent: true, opacity: 0.95,
     blending: THREE.AdditiveBlending, depthWrite: false
   })));
 }
 
-{ // Paralelos y meridianos
+{ // Paralelos y meridianos rubí más visibles
   const s = [], seg = 64;
   for (let lat = -60; lat <= 60; lat += 30)
     for (let i = 0; i < seg; i++) {
-      const a = ll(lat, i / seg * 360 - 180, R * 1.001), b = ll(lat, (i + 1) / seg * 360 - 180, R * 1.001);
+      const a = ll(lat, i / seg * 360 - 180, R * 1.002), b = ll(lat, (i + 1) / seg * 360 - 180, R * 1.002);
       s.push(a.x, a.y, a.z, b.x, b.y, b.z);
     }
   for (let lon = -180; lon < 180; lon += 30)
     for (let i = 0; i < seg; i++) {
-      const a = ll(-90 + i / seg * 180, lon, R * 1.001), b = ll(-90 + (i + 1) / seg * 180, lon, R * 1.001);
+      const a = ll(-90 + i / seg * 180, lon, R * 1.002), b = ll(-90 + (i + 1) / seg * 180, lon, R * 1.002);
       s.push(a.x, a.y, a.z, b.x, b.y, b.z);
     }
   const g = new THREE.BufferGeometry();
   g.setAttribute('position', new THREE.Float32BufferAttribute(s, 3));
-  globe.add(new THREE.LineSegments(g, new THREE.LineBasicMaterial({ color: 0xff1e42, transparent: true, opacity: 0.18 })));
+  globe.add(new THREE.LineSegments(g, new THREE.LineBasicMaterial({ color: 0xff224e, transparent: true, opacity: 0.25 })));
 }
 
-// Atmósfera Fresnel de doble capa carmesí
-scene.add(new THREE.Mesh(new THREE.SphereGeometry(R * 1.045, 64, 48), new THREE.ShaderMaterial({
+// Atmósfera Fresnel de doble capa destellante + resplandor posterior
+scene.add(new THREE.Mesh(new THREE.SphereGeometry(R * 1.048, 64, 48), new THREE.ShaderMaterial({
   vertexShader: 'varying vec3 vN,vV;void main(){vN=normalize(normalMatrix*normal);vec4 mv=modelViewMatrix*vec4(position,1.);vV=normalize(-mv.xyz);gl_Position=projectionMatrix*mv;}',
-  fragmentShader: 'varying vec3 vN,vV;void main(){float f=pow(1.-abs(dot(vN,vV)),2.3);gl_FragColor=vec4(1.0,0.08,0.22,1.0)*f*1.55;}',
+  fragmentShader: 'varying vec3 vN,vV;void main(){float f=pow(1.-abs(dot(vN,vV)),2.15);gl_FragColor=vec4(1.0,0.10,0.28,1.0)*f*2.25;}',
   transparent: true, blending: THREE.AdditiveBlending, depthWrite: false
 })));
-scene.add(new THREE.Mesh(new THREE.SphereGeometry(R * 1.11, 64, 48), new THREE.ShaderMaterial({
+scene.add(new THREE.Mesh(new THREE.SphereGeometry(R * 1.13, 64, 48), new THREE.ShaderMaterial({
   vertexShader: 'varying vec3 vN,vV;void main(){vN=normalize(normalMatrix*normal);vec4 mv=modelViewMatrix*vec4(position,1.);vV=normalize(-mv.xyz);gl_Position=projectionMatrix*mv;}',
-  fragmentShader: 'varying vec3 vN,vV;void main(){float f=pow(1.-abs(dot(vN,vV)),4.2);gl_FragColor=vec4(1.0,0.28,0.12,1.0)*f*0.85;}',
+  fragmentShader: 'varying vec3 vN,vV;void main(){float f=pow(1.-abs(dot(vN,vV)),3.8);gl_FragColor=vec4(1.0,0.34,0.14,1.0)*f*1.25;}',
   transparent: true, blending: THREE.AdditiveBlending, depthWrite: false
 })));
+
+// Halo de brillo ambiental detrás del planeta
+const planetGlowTex = makeRadialTex([
+  [0, 'rgba(255, 24, 64, 0.34)'],
+  [0.45, 'rgba(255, 48, 36, 0.16)'],
+  [0.75, 'rgba(180, 12, 42, 0.04)'],
+  [1, 'rgba(0, 0, 0, 0)']
+]);
+const planetGlow = new THREE.Sprite(new THREE.SpriteMaterial({
+  map: planetGlowTex, transparent: true, opacity: 0.85, blending: THREE.AdditiveBlending, depthWrite: false
+}));
+planetGlow.scale.set(R * 4.4, R * 4.4, 1);
+scene.add(planetGlow);
+
+// Anillo holográfico táctico alrededor del planeta
+const holoRing = new THREE.Group();
+holoRing.rotation.set(0.32, 0, -0.22);
+scene.add(holoRing);
+{
+  const ringMesh = new THREE.Mesh(
+    new THREE.RingGeometry(R * 1.18, R * 1.205, 96),
+    new THREE.MeshBasicMaterial({ color: 0xff2854, side: THREE.DoubleSide, transparent: true, opacity: 0.34, blending: THREE.AdditiveBlending, depthWrite: false })
+  );
+  ringMesh.rotation.x = Math.PI / 2;
+  holoRing.add(ringMesh);
+}
 
 // ---------- Ciudades y Conexiones (Hub: Lima) ----------
 const LIMA = [-12.05, -77.04];
 const CITIES = [[40.7, -74], [34, -118], [51.5, -0.1], [40.4, -3.7], [-23.5, -46.6], [30, 31.2], [25.2, 55.3], [19, 73], [35.7, 139.7], [-33.9, 151.2], [55.7, 37.6], [-26.2, 28], [6.5, 3.4]];
 const limaPos = ll(...LIMA);
-const arcMat = new THREE.LineBasicMaterial({ color: 0xff2846, transparent: true, opacity: 0.62, blending: THREE.AdditiveBlending, depthWrite: false });
-const pulseGeo = new THREE.SphereGeometry(0.036, 10, 10), pulseMat = new THREE.MeshBasicMaterial({ color: 0xffd6c2 });
-const dotGeo = new THREE.SphereGeometry(0.03, 10, 10), dotMat = new THREE.MeshBasicMaterial({ color: 0xff8a7a });
+const arcMat = new THREE.LineBasicMaterial({ color: 0xff3656, transparent: true, opacity: 0.78, blending: THREE.AdditiveBlending, depthWrite: false });
+const pulseGeo = new THREE.SphereGeometry(0.042, 10, 10), pulseMat = new THREE.MeshBasicMaterial({ color: 0xfff0dc });
+const dotGeo = new THREE.SphereGeometry(0.034, 10, 10), dotMat = new THREE.MeshBasicMaterial({ color: 0xff9a88 });
 const pulses = [];
 
 function arc(a, b) {
   const A = ll(...a), B = ll(...b), d = A.distanceTo(B);
-  const M = A.clone().add(B).multiplyScalar(0.5).normalize().multiplyScalar(R + 0.36 + d * 0.16);
+  const M = A.clone().add(B).multiplyScalar(0.5).normalize().multiplyScalar(R + 0.38 + d * 0.16);
   const c = new THREE.QuadraticBezierCurve3(A, M, B);
   globe.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(c.getPoints(60)), arcMat));
   const p = new THREE.Mesh(pulseGeo, pulseMat); globe.add(p);
-  pulses.push({ c, p, t: Math.random(), s: 0.11 + Math.random() * 0.11 });
+  pulses.push({ c, p, t: Math.random(), s: 0.12 + Math.random() * 0.11 });
 }
-CITIES.forEach(c => { arc(LIMA, c); const m = new THREE.Mesh(dotGeo, dotMat); m.position.copy(ll(...c, R * 1.004)); globe.add(m); });
+CITIES.forEach(c => { arc(LIMA, c); const m = new THREE.Mesh(dotGeo, dotMat); m.position.copy(ll(...c, R * 1.005)); globe.add(m); });
 [[CITIES[0], CITIES[2]], [CITIES[8], CITIES[9]], [CITIES[6], CITIES[7]], [CITIES[3], CITIES[4]], [CITIES[2], CITIES[5]]].forEach(([a, b]) => arc(a, b));
 
-const hub = new THREE.Mesh(new THREE.SphereGeometry(0.06, 14, 14), new THREE.MeshBasicMaterial({ color: 0xffeae4 }));
-hub.position.copy(limaPos.clone().multiplyScalar(1.004)); globe.add(hub);
-const hubRing = new THREE.Mesh(new THREE.RingGeometry(0.09, 0.118, 40), new THREE.MeshBasicMaterial({ color: 0xff163c, side: THREE.DoubleSide, transparent: true, opacity: 0.95, blending: THREE.AdditiveBlending, depthWrite: false }));
-hubRing.position.copy(limaPos.clone().multiplyScalar(1.005)); hubRing.lookAt(limaPos.clone().multiplyScalar(2)); globe.add(hubRing);
+const hub = new THREE.Mesh(new THREE.SphereGeometry(0.072, 14, 14), new THREE.MeshBasicMaterial({ color: 0xffffff }));
+hub.position.copy(limaPos.clone().multiplyScalar(1.005)); globe.add(hub);
+const hubRing = new THREE.Mesh(new THREE.RingGeometry(0.10, 0.135, 40), new THREE.MeshBasicMaterial({ color: 0xff1644, side: THREE.DoubleSide, transparent: true, opacity: 1, blending: THREE.AdditiveBlending, depthWrite: false }));
+hubRing.position.copy(limaPos.clone().multiplyScalar(1.006)); hubRing.lookAt(limaPos.clone().multiplyScalar(2)); globe.add(hubRing);
 
 // ---------- Satélites Realistas ----------
 const kaptonTex = makeKaptonFoilTex();
@@ -3081,7 +3122,7 @@ const solarTex = makeSolarPanelTex();
 const foilMat = new THREE.MeshStandardMaterial({ map: kaptonTex, bumpMap: kaptonTex, bumpScale: 0.015, color: 0xd99c2e, metalness: 0.88, roughness: 0.36 });
 const carbonMat = new THREE.MeshStandardMaterial({ color: 0x181a22, metalness: 0.55, roughness: 0.5 });
 const aluMat = new THREE.MeshStandardMaterial({ color: 0xc2c8d2, metalness: 0.82, roughness: 0.3, side: THREE.DoubleSide });
-const solarMat = new THREE.MeshStandardMaterial({ map: solarTex, emissive: 0x20040a, emissiveIntensity: 0.3, metalness: 0.68, roughness: 0.26 });
+const solarMat = new THREE.MeshStandardMaterial({ map: solarTex, emissive: 0x24040c, emissiveIntensity: 0.35, metalness: 0.68, roughness: 0.26 });
 const whiteRadMat = new THREE.MeshStandardMaterial({ color: 0xc6cbd4, metalness: 0.15, roughness: 0.65 });
 
 const dishPts = [];
@@ -3107,17 +3148,13 @@ function makeRealSat() {
   [-1, 1].forEach(side => {
     const yoke = new THREE.Mesh(new THREE.CylinderGeometry(0.008, 0.008, 0.18, 8), aluMat);
     yoke.rotation.z = Math.PI / 2; yoke.position.x = side * 0.16; g.add(yoke);
-    const p1 = new THREE.Mesh(new THREE.BoxGeometry(0.32, 0.01, 0.21), solarMat);
-    p1.position.x = side * 0.40; g.add(p1);
-    const hinge = new THREE.Mesh(new THREE.BoxGeometry(0.02, 0.018, 0.215), aluMat);
-    hinge.position.x = side * 0.565; g.add(hinge);
-    const p2 = new THREE.Mesh(new THREE.BoxGeometry(0.30, 0.01, 0.21), solarMat);
-    p2.position.x = side * 0.72; g.add(p2);
+    const p1 = new THREE.Mesh(new THREE.BoxGeometry(0.32, 0.01, 0.21), solarMat); p1.position.x = side * 0.40; g.add(p1);
+    const hinge = new THREE.Mesh(new THREE.BoxGeometry(0.02, 0.018, 0.215), aluMat); hinge.position.x = side * 0.565; g.add(hinge);
+    const p2 = new THREE.Mesh(new THREE.BoxGeometry(0.30, 0.01, 0.21), solarMat); p2.position.x = side * 0.72; g.add(p2);
   });
 
   const dishGrp = new THREE.Group(); dishGrp.position.set(0, 0, 0.17);
-  const dish = new THREE.Mesh(parabolicDishGeo, aluMat);
-  dish.rotation.x = Math.PI / 2; dishGrp.add(dish);
+  const dish = new THREE.Mesh(parabolicDishGeo, aluMat); dish.rotation.x = Math.PI / 2; dishGrp.add(dish);
   const feed = new THREE.Mesh(new THREE.CylinderGeometry(0.012, 0.018, 0.04, 10), foilMat);
   feed.rotation.x = Math.PI / 2; feed.position.z = 0.095; dishGrp.add(feed);
   for (let k = 0; k < 3; k++) {
@@ -3133,7 +3170,7 @@ function makeRealSat() {
   const starTracker = new THREE.Mesh(new THREE.CylinderGeometry(0.024, 0.014, 0.05, 10), carbonMat);
   starTracker.position.set(-0.075, 0.135, 0.05); starTracker.rotation.z = 0.45; g.add(starTracker);
 
-  const ledRed = new THREE.Mesh(new THREE.SphereGeometry(0.016, 10, 10), new THREE.MeshBasicMaterial({ color: 0xff1638 }));
+  const ledRed = new THREE.Mesh(new THREE.SphereGeometry(0.017, 10, 10), new THREE.MeshBasicMaterial({ color: 0xff163c }));
   ledRed.position.set(0.08, 0.13, -0.09); g.add(ledRed);
   const ledWhite = new THREE.Mesh(new THREE.SphereGeometry(0.012, 8, 8), new THREE.MeshBasicMaterial({ color: 0xffd2cc }));
   ledWhite.position.set(-0.08, -0.12, -0.09); g.add(ledWhite);
@@ -3144,21 +3181,21 @@ function makeRealSat() {
 }
 
 const ORBITS = [
-  { r: 3.45, tilt: [0.48, 0, 0.28], sp: 0.21, ph: 0.2 },
-  { r: 3.95, tilt: [-0.58, 0, 0.48], sp: -0.16, ph: 2.1 },
-  { r: 4.45, tilt: [0.85, 0, -0.42], sp: 0.12, ph: 4.0 },
-  { r: 3.72, tilt: [0.12, 0, -0.88], sp: -0.19, ph: 5.4 },
-  { r: 4.85, tilt: [-0.32, 0.4, 0.72], sp: 0.095, ph: 1.3 }
+  { r: 3.55, tilt: [0.48, 0, 0.28], sp: 0.21, ph: 0.2 },
+  { r: 4.05, tilt: [-0.58, 0, 0.48], sp: -0.16, ph: 2.1 },
+  { r: 4.55, tilt: [0.85, 0, -0.42], sp: 0.12, ph: 4.0 },
+  { r: 3.82, tilt: [0.12, 0, -0.88], sp: -0.19, ph: 5.4 },
+  { r: 4.95, tilt: [-0.32, 0.4, 0.72], sp: 0.095, ph: 1.3 }
 ];
 
 const sats = ORBITS.map(o => {
   const grp = new THREE.Group(); grp.rotation.set(...o.tilt); scene.add(grp);
   const pts = [];
   for (let i = 0; i < 128; i++) pts.push(new THREE.Vector3(Math.cos(i / 128 * TAU) * o.r, 0, Math.sin(i / 128 * TAU) * o.r));
-  grp.add(new THREE.LineLoop(new THREE.BufferGeometry().setFromPoints(pts), new THREE.LineBasicMaterial({ color: 0xff1e42, transparent: true, opacity: 0.15 })));
+  grp.add(new THREE.LineLoop(new THREE.BufferGeometry().setFromPoints(pts), new THREE.LineBasicMaterial({ color: 0xff224c, transparent: true, opacity: 0.19 })));
   const mesh = makeRealSat(); grp.add(mesh);
   const bg = new THREE.BufferGeometry(); bg.setAttribute('position', new THREE.BufferAttribute(new Float32Array(6), 3));
-  const beam = new THREE.Line(bg, new THREE.LineBasicMaterial({ color: 0xff4836, transparent: true, opacity: 0, blending: THREE.AdditiveBlending, depthWrite: false }));
+  const beam = new THREE.Line(bg, new THREE.LineBasicMaterial({ color: 0xff4c38, transparent: true, opacity: 0, blending: THREE.AdditiveBlending, depthWrite: false }));
   beam.frustumCulled = false; scene.add(beam);
   return { ...o, mesh, beam };
 });
@@ -3202,13 +3239,13 @@ function makeRocket() {
 
   const flameOuter = new THREE.Mesh(
     new THREE.ConeGeometry(0.09, 0.68, 16, 1, true),
-    new THREE.MeshBasicMaterial({ color: 0xff361e, transparent: true, opacity: 0.68, blending: THREE.AdditiveBlending, side: THREE.DoubleSide, depthWrite: false })
+    new THREE.MeshBasicMaterial({ color: 0xff361e, transparent: true, opacity: 0.72, blending: THREE.AdditiveBlending, side: THREE.DoubleSide, depthWrite: false })
   );
   flameOuter.rotation.x = -Math.PI / 2; flameOuter.position.z = -0.84; g.add(flameOuter);
 
   const flameInner = new THREE.Mesh(
     new THREE.ConeGeometry(0.044, 0.38, 12),
-    new THREE.MeshBasicMaterial({ color: 0xffe2ba, transparent: true, opacity: 0.85, blending: THREE.AdditiveBlending, depthWrite: false })
+    new THREE.MeshBasicMaterial({ color: 0xffe4bc, transparent: true, opacity: 0.88, blending: THREE.AdditiveBlending, depthWrite: false })
   );
   flameInner.rotation.x = -Math.PI / 2; flameInner.position.z = -0.70; g.add(flameInner);
 
@@ -3230,7 +3267,7 @@ function createRocketRunner(points, speed, scale, startT) {
   pGeo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(pCount * 3), 3));
   const trail = new THREE.Points(pGeo, new THREE.PointsMaterial({
     map: glowParticleTex, color: 0xff522e, size: 0.24 * scale,
-    transparent: true, opacity: 0.66, blending: THREE.AdditiveBlending, depthWrite: false
+    transparent: true, opacity: 0.68, blending: THREE.AdditiveBlending, depthWrite: false
   }));
   trail.frustumCulled = false; scene.add(trail);
   const history = Array.from({ length: pCount }, () => new THREE.Vector3(999, 999, 999));
@@ -3250,20 +3287,35 @@ const rockets = [
   ], 0.032, 0.68, 0.56)
 ];
 
-// ---------- Astronauta EVA Más Pequeño y Mate (Sin Brillo Excesivo) ----------
-function makeRealAstronaut() {
+// ---------- Astronauta EVA Compacto con PULPO 3D dentro del Casco ----------
+function makeOctopusAstronaut() {
   const g = new THREE.Group();
   const suitWhite = new THREE.MeshStandardMaterial({ color: 0x8a8f98, roughness: 0.86, metalness: 0.04 });
   const suitPanel = new THREE.MeshStandardMaterial({ color: 0x666b74, roughness: 0.88, metalness: 0.10 });
   const carbonJoint = new THREE.MeshStandardMaterial({ color: 0x181a20, roughness: 0.78, metalness: 0.28 });
   const metalRing = new THREE.MeshStandardMaterial({ color: 0x767c88, roughness: 0.48, metalness: 0.62 });
   const missionRed = new THREE.MeshStandardMaterial({ color: 0xb51832, roughness: 0.65, metalness: 0.15 });
-  const visorMat = new THREE.MeshPhysicalMaterial({
-    color: 0x9c5a26, metalness: 0.85, roughness: 0.18, clearcoat: 0.6, clearcoatRoughness: 0.15
+  const dimLamp = new THREE.MeshStandardMaterial({ color: 0xc8beb0, emissive: 0x453a2a, emissiveIntensity: 0.45, roughness: 0.5 });
+  const dimCyan = new THREE.MeshStandardMaterial({ color: 0x268899, emissive: 0x124855, emissiveIntensity: 0.55 });
+  const dimRed = new THREE.MeshStandardMaterial({ color: 0xcc1834, emissive: 0x680818, emissiveIntensity: 0.75 });
+
+  // Materiales del Pulpo espacial (mate-satinado para no saturar el bloom)
+  const octoSkin = new THREE.MeshStandardMaterial({ color: 0xd9264e, roughness: 0.52, metalness: 0.08 });
+  const octoSpot = new THREE.MeshStandardMaterial({ color: 0x941132, roughness: 0.6 });
+  const octoSucker = new THREE.MeshStandardMaterial({ color: 0xe88ca0, roughness: 0.65 });
+  const eyeWhite = new THREE.MeshStandardMaterial({ color: 0xe8e2dc, roughness: 0.35 });
+  const eyePupil = new THREE.MeshStandardMaterial({ color: 0x09040a, roughness: 0.1, metalness: 0.4 });
+  const eyeSpark = new THREE.MeshBasicMaterial({ color: 0xffeef2 });
+  const glassDomeMat = new THREE.MeshPhysicalMaterial({
+    color: 0xffd0d8,
+    roughness: 0.08,
+    metalness: 0.08,
+    transparent: true,
+    opacity: 0.24,
+    clearcoat: 1.0,
+    clearcoatRoughness: 0.05,
+    depthWrite: false
   });
-  const dimLamp = new THREE.MeshStandardMaterial({ color: 0xc8beb0, emissive: 0x453a2a, emissiveIntensity: 0.5, roughness: 0.5 });
-  const dimCyan = new THREE.MeshStandardMaterial({ color: 0x268899, emissive: 0x124855, emissiveIntensity: 0.6 });
-  const dimRed = new THREE.MeshStandardMaterial({ color: 0xcc1834, emissive: 0x680818, emissiveIntensity: 0.8 });
 
   const M = (geo, mat, x = 0, y = 0, z = 0, parent = g) => {
     const m = new THREE.Mesh(geo, mat); m.position.set(x, y, z); parent.add(m); return m;
@@ -3274,7 +3326,7 @@ function makeRealAstronaut() {
   M(new THREE.CylinderGeometry(0.165, 0.17, 0.11, 20), carbonJoint, 0, 0.22, 0).scale.set(1.02, 1, 0.76);
   M(new THREE.TorusGeometry(0.155, 0.018, 10, 24), metalRing, 0, 0.27, 0).rotation.x = Math.PI / 2;
   M(new THREE.CapsuleGeometry(0.165, 0.09, 8, 18), suitWhite, 0, 0.08, 0).scale.set(1.02, 1, 0.78);
-  M(new THREE.TorusGeometry(0.125, 0.022, 10, 24), metalRing, 0, 0.72, 0).rotation.x = Math.PI / 2;
+  M(new THREE.TorusGeometry(0.15, 0.025, 10, 24), metalRing, 0, 0.72, 0).rotation.x = Math.PI / 2;
 
   // Panel pectoral DCM
   const dcm = M(new THREE.BoxGeometry(0.19, 0.13, 0.055), suitPanel, 0, 0.45, 0.155);
@@ -3293,15 +3345,64 @@ function makeRealAstronaut() {
   M(new THREE.CylinderGeometry(0.005, 0.005, 0.24, 6), metalRing, 0.14, 0.32, -0.02, plss);
   const packLed = M(new THREE.SphereGeometry(0.013, 8, 8), dimRed, -0.13, 0.24, -0.03, plss);
 
-  // Casco aerodinámico mate + visor oscuro reflectante
-  const head = new THREE.Group(); head.position.set(0, 0.89, 0.01); g.add(head);
-  M(new THREE.SphereGeometry(0.185, 32, 24), suitWhite, 0, 0, -0.015, head).scale.set(0.95, 1.04, 1.05);
-  M(new THREE.SphereGeometry(0.176, 28, 22, -Math.PI * 0.44, Math.PI * 0.88, Math.PI * 0.22, Math.PI * 0.56), carbonJoint, 0, 0.005, 0.022, head);
-  M(new THREE.SphereGeometry(0.172, 32, 24, -Math.PI * 0.40, Math.PI * 0.80, Math.PI * 0.25, Math.PI * 0.50), visorMat, 0, 0.005, 0.032, head);
-  M(new THREE.CylinderGeometry(0.188, 0.188, 0.045, 24, 1, true, -Math.PI * 0.42, Math.PI * 0.84), suitPanel, 0, 0.095, 0.01, head);
+  // ===== CASCO BURBUJA TRANSPARENTE CON PULPO 3D ADENTRO =====
+  const head = new THREE.Group();
+  head.position.set(0, 0.92, 0.01);
+  g.add(head);
+
+  // Grupo interno del pulpo (animado)
+  const octo = new THREE.Group();
+  head.add(octo);
+
+  // Manto bulboso (cabeza del pulpo) + manchitas orgánicas
+  const mantle = M(new THREE.SphereGeometry(0.115, 24, 18), octoSkin, 0, 0.055, -0.015, octo);
+  mantle.scale.set(0.95, 1.12, 1.0);
+  mantle.rotation.x = -0.22;
+  M(new THREE.SphereGeometry(0.026, 10, 10), octoSpot, -0.055, 0.11, 0.04, octo);
+  M(new THREE.SphereGeometry(0.022, 10, 10), octoSpot, 0.06, 0.095, -0.045, octo);
+  M(new THREE.SphereGeometry(0.03, 10, 10), octoSpot, 0.01, 0.13, -0.065, octo);
+
+  // Base facial del pulpo
+  M(new THREE.SphereGeometry(0.092, 18, 14), octoSkin, 0, -0.02, 0.015, octo);
+
+  // Ojos grandes y expresivos mirando hacia afuera del casco
   [-1, 1].forEach(s => {
-    M(new THREE.BoxGeometry(0.032, 0.045, 0.06), carbonJoint, s * 0.185, 0.02, 0.02, head);
-    M(new THREE.CircleGeometry(0.013, 12), dimLamp, s * 0.185, 0.02, 0.052, head);
+    M(new THREE.SphereGeometry(0.032, 14, 12), eyeWhite, s * 0.052, 0.005, 0.088, octo);
+    M(new THREE.SphereGeometry(0.021, 12, 10), eyePupil, s * 0.054, 0.005, 0.108, octo);
+    M(new THREE.SphereGeometry(0.007, 8, 8), eyeSpark, s * 0.046, 0.016, 0.123, octo);
+    // Párpado superior con toque expresivo
+    const brow = M(new THREE.TorusGeometry(0.033, 0.008, 8, 14, Math.PI), octoSkin, s * 0.052, 0.01, 0.09, octo);
+    brow.rotation.z = s * -0.18;
+  });
+
+  // 8 tentáculos curvos enroscándose dentro de la burbuja de cristal
+  for (let i = 0; i < 8; i++) {
+    const ang = (i / 8) * TAU + Math.PI / 8;
+    const ca = Math.cos(ang), sa = Math.sin(ang);
+    const curlUp = i % 2 === 0 ? 0.025 : -0.035;
+    const curve = new THREE.CatmullRomCurve3([
+      new THREE.Vector3(ca * 0.045, -0.055, sa * 0.045),
+      new THREE.Vector3(ca * 0.115, -0.115, sa * 0.115),
+      new THREE.Vector3(ca * 0.165, -0.085 + curlUp, sa * 0.165),
+      new THREE.Vector3(ca * 0.145, -0.015 + curlUp, sa * 0.145)
+    ]);
+    const tentacle = new THREE.Mesh(new THREE.TubeGeometry(curve, 14, 0.020, 8, false), octoSkin);
+    octo.add(tentacle);
+    // Punta redondeada y pequeña ventosa visible en el borde del vidrio
+    const tipPt = curve.getPoint(1);
+    M(new THREE.SphereGeometry(0.018, 8, 8), octoSkin, tipPt.x, tipPt.y, tipPt.z, octo);
+    const midPt = curve.getPoint(0.72);
+    M(new THREE.SphereGeometry(0.011, 6, 6), octoSucker, midPt.x * 0.94, midPt.y - 0.008, midPt.z * 0.94, octo);
+  }
+
+  // Burbuja de cristal + arcos estructurales + faros laterales del casco
+  M(new THREE.SphereGeometry(0.228, 32, 24), glassDomeMat, 0, 0.01, 0, head);
+  const rimFrame = M(new THREE.TorusGeometry(0.228, 0.010, 10, 32), suitPanel, 0, 0.01, 0, head);
+  rimFrame.rotation.y = Math.PI / 2;
+  const collarBase = M(new THREE.CylinderGeometry(0.155, 0.165, 0.055, 24), carbonJoint, 0, -0.165, 0, head);
+  [-1, 1].forEach(s => {
+    M(new THREE.BoxGeometry(0.035, 0.05, 0.068), carbonJoint, s * 0.225, 0.01, 0.01, head);
+    M(new THREE.CircleGeometry(0.014, 12), dimLamp, s * 0.225, 0.01, 0.046, head);
   });
 
   // Extremidades articuladas
@@ -3329,12 +3430,12 @@ function makeRealAstronaut() {
   const legL = makeLimb(-0.10, 0.04, 0, 0.28, 0.27, 0.082, 0.07, true);
   const legR = makeLimb(0.10, 0.04, 0, 0.28, 0.27, 0.082, 0.07, true);
 
-  g.userData = { head, armL, armR, legL, legR, packLed };
-  g.scale.setScalar(0.45);
+  g.userData = { head, octo, mantle, armL, armR, legL, legR, packLed };
+  g.scale.setScalar(0.55); // Compacto, pero el pulpo se aprecia clarísimo
   return g;
 }
 
-const astro = makeRealAstronaut();
+const astro = makeOctopusAstronaut();
 scene.add(astro);
 
 const TETHER_SEG = 26;
@@ -3385,7 +3486,7 @@ addEventListener('resize', () => {
   syncLoginCardToPlanet();
 }, { passive: true });
 
-// ---------- Loop de Animación (Activo en Login y en Dashboard) ----------
+// ---------- Loop de Animación ----------
 const clock = new THREE.Clock();
 const v1 = new THREE.Vector3(), v2 = new THREE.Vector3(), v3 = new THREE.Vector3(), vMid = new THREE.Vector3(), zero = new THREE.Vector3();
 const tetherCurve = new THREE.QuadraticBezierCurve3(new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3());
@@ -3395,14 +3496,18 @@ function animate() {
   const isPreauth = document.body.classList.contains('hunter-preauth');
   const dt = Math.min(clock.getDelta(), 0.04), t = clock.elapsedTime, k = reduce ? 0.3 : 1;
 
-  globe.rotation.y += dt * 0.055 * k;
+  globe.rotation.y += dt * 0.058 * k;
   globe.updateMatrixWorld(true);
+  holoRing.rotation.z -= dt * 0.08 * k;
+  const glowPulse = R * (4.35 + Math.sin(t * 1.3) * 0.22);
+  planetGlow.scale.set(glowPulse, glowPulse, 1);
+
   const pulseCycle = (t * 0.78) % 1;
-  hubRing.scale.setScalar(1 + pulseCycle * 2.5);
-  hubRing.material.opacity = 0.95 * (1 - pulseCycle);
+  hubRing.scale.setScalar(1 + pulseCycle * 2.7);
+  hubRing.material.opacity = 1.0 * (1 - pulseCycle);
   pulses.forEach(p => { p.t = (p.t + dt * p.s * k) % 1; p.p.position.copy(p.c.getPoint(p.t)); });
 
-  const sunPulse = 11.2 + Math.sin(t * 1.2) * 0.45;
+  const sunPulse = 9.4 + Math.sin(t * 1.1) * 0.35;
   distantSunGroup.userData.corona.scale.set(sunPulse, sunPulse, 1);
   ringedPlanet.userData.body.rotation.y += dt * 0.04 * k;
   crimsonMoon.rotation.y += dt * 0.06 * k;
@@ -3434,7 +3539,7 @@ function animate() {
         const tail = v2.copy(m.start).addScaledVector(m.dir, Math.max(0, u - 0.14));
         const pa = m.line.geometry.attributes.position;
         pa.setXYZ(0, head.x, head.y, head.z); pa.setXYZ(1, tail.x, tail.y, tail.z); pa.needsUpdate = true;
-        m.line.material.opacity = Math.sin(u * Math.PI) * 0.82;
+        m.line.material.opacity = Math.sin(u * Math.PI) * 0.85;
       }
     }
   });
@@ -3450,7 +3555,7 @@ function animate() {
     const vis = nrm.dot(v2.copy(v1).sub(limaW).normalize());
     const pa = s.beam.geometry.attributes.position;
     pa.setXYZ(0, v1.x, v1.y, v1.z); pa.setXYZ(1, limaW.x, limaW.y, limaW.z); pa.needsUpdate = true;
-    s.beam.material.opacity = vis > 0.2 ? 0.32 + 0.38 * Math.sin(t * 6.5 + i) : 0;
+    s.beam.material.opacity = vis > 0.2 ? 0.36 + 0.44 * Math.sin(t * 6.5 + i) : 0;
   });
 
   rockets.forEach((rk, i) => {
@@ -3468,10 +3573,10 @@ function animate() {
     attr.needsUpdate = true;
   });
 
-  // Astronauta flotando a escala proporcional
+  // Astronauta + animación viva del Pulpo dentro del casco
   const asp = innerWidth / innerHeight;
-  astro.position.set((asp > 1 ? 4.2 : 2.45) + Math.sin(t * 0.36) * 0.22, 1.3 + Math.cos(t * 0.48) * 0.22, 1.45 + Math.sin(t * 0.25) * 0.16);
-  astro.rotation.set(0.18 + Math.sin(t * 0.28) * 0.10, -0.62 + Math.sin(t * 0.22 * k) * 0.30, -0.14 + Math.cos(t * 0.24) * 0.12);
+  astro.position.set((asp > 1 ? 4.25 : 2.45) + Math.sin(t * 0.36) * 0.22, 1.3 + Math.cos(t * 0.48) * 0.22, 1.55 + Math.sin(t * 0.25) * 0.16);
+  astro.rotation.set(0.16 + Math.sin(t * 0.28) * 0.09, -0.52 + Math.sin(t * 0.22 * k) * 0.28, -0.12 + Math.cos(t * 0.24) * 0.10);
   const u = astro.userData, w = t * k;
   u.packLed.visible = Math.sin(w * 4.2) > 0.25;
   u.armL.hip.rotation.set(-0.55 + Math.sin(w * 0.7) * 0.12, 0.15, -0.62 + Math.sin(w * 0.8) * 0.14);
@@ -3482,7 +3587,11 @@ function animate() {
   u.legL.joint.rotation.set(0.55 + Math.cos(w * 0.55) * 0.12, 0, 0);
   u.legR.hip.rotation.set(-0.08 + Math.cos(w * 0.55) * 0.14, 0, 0.08);
   u.legR.joint.rotation.set(0.38 + Math.sin(w * 0.55) * 0.12, 0, 0);
-  u.head.rotation.set(0.06 + Math.sin(w * 0.4) * 0.07, 0.22 + Math.sin(w * 0.3) * 0.22, 0);
+  u.head.rotation.set(0.05 + Math.sin(w * 0.4) * 0.06, 0.18 + Math.sin(w * 0.3) * 0.20, 0);
+  // Respiración y movimiento curioso del pulpo dentro de la burbuja
+  u.octo.position.y = Math.sin(w * 2.1) * 0.012;
+  u.octo.rotation.y = Math.sin(w * 1.15) * 0.18;
+  u.mantle.scale.set(0.95 + Math.sin(w * 2.4) * 0.04, 1.12 - Math.sin(w * 2.4) * 0.05, 1.0 + Math.sin(w * 2.4) * 0.04);
 
   astro.localToWorld(v3.set(0, 0.24, -0.24));
   sats[0].mesh.getWorldPosition(v1);
@@ -3495,9 +3604,9 @@ function animate() {
   for (let i = 0; i <= TETHER_SEG; i++) ta.setXYZ(i, tPts[i].x, tPts[i].y, tPts[i].z);
   ta.needsUpdate = true;
 
-  // Cámara suave: ligeramente más abierta detrás del dashboard para lucir el fondo
-  const desiredZ = isPreauth ? targetCamZ : Math.max(defaultCamZ() + 1.6, 12.6);
-  const breatheZ = reduce ? 0 : Math.sin(t * 0.45) * 0.20;
+  // Cámara: mantiene el planeta grande y vistoso detrás del dashboard
+  const desiredZ = isPreauth ? targetCamZ : Math.max(defaultCamZ() - 0.3, 10.6);
+  const breatheZ = reduce ? 0 : Math.sin(t * 0.45) * 0.18;
   const parallaxX = isPreauth ? 0.72 : 0.35;
   const parallaxY = isPreauth ? 0.46 : 0.22;
   camera.position.x += (mouse.x * parallaxX - camera.position.x) * 0.035;
@@ -3510,6 +3619,6 @@ function animate() {
 }
 syncLoginCardToPlanet();
 animate();
-  </script>
+</script>
 </body>
 </html>
