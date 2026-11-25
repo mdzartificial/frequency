@@ -5686,15 +5686,34 @@ body.login-busy #login-floating-card{opacity:1!important;translate:0 0!important
 @media(max-width:340px){html body.hunter-preauth #login-floating-card form .grid.grid-cols-2{grid-template-columns:1fr!important}}
 </style>
 
-<style id="hunter-rail-fix">
-/* Rail sin logo (los módulos suben) y botones que no se encogen ni se pierden */
-html body:not(.hunter-preauth) .rail{justify-content:flex-start}
-html body:not(.hunter-preauth) .rail button{flex:none}
-html body:not(.hunter-preauth) .rail .mt-auto{margin-top:auto}
-@media(max-width:900px){
- html body:not(.hunter-preauth) .rail{justify-content:space-between;gap:0;padding-left:6px;padding-right:6px}
- html body:not(.hunter-preauth) .rail button{flex:1 1 0;min-width:28px;max-width:42px;width:auto;height:38px}
- html body:not(.hunter-preauth) .rail .mt-auto{display:flex;gap:0;margin:0!important}
- html body:not(.hunter-preauth) .rail button.on::before{bottom:-3px!important}
+<style id="hunter-rast-scroll-fix">
+/* Scroll interno solo en la grilla de tarjetas de Rastreadores */
+html body:not(.hunter-preauth) #rast-list {
+  max-height: clamp(300px, 46vh, 520px);
+  overflow-y: auto !important;
+  overflow-x: hidden;
+  align-content: start;
+  padding: 6px 10px 10px 4px;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(var(--sk), .75) rgba(0, 0, 0, .35);
+}
+html body:not(.hunter-preauth) #rast-list::-webkit-scrollbar {
+  width: 8px;
+}
+html body:not(.hunter-preauth) #rast-list::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, .38);
+  border: 1px solid rgba(var(--sk), .18);
+}
+html body:not(.hunter-preauth) #rast-list::-webkit-scrollbar-thumb {
+  background: rgba(var(--sk), .65);
+  border-radius: 0 !important;
+}
+html body:not(.hunter-preauth) #rast-list::-webkit-scrollbar-thumb:hover {
+  background: rgb(var(--sk));
+}
+@media (max-width: 900px) {
+  html body:not(.hunter-preauth) #rast-list {
+    max-height: 60vh;
+  }
 }
 </style>
