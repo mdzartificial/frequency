@@ -86,7 +86,7 @@
     }
 
     body.hunter-preauth .frame { display: none !important; }
-    #hunter-auth-modal:not(.viewer-hidden) {
+    #hunter-auth-modal:not(.ui-hidden) {
       background: radial-gradient(circle at 50% 25%, #2a090c 0%, #090b10 65%, #040508 100%);
     }
 
@@ -243,6 +243,22 @@
       border-radius: 16px;
     }
 
+    .inline-dev-input {
+      background: rgba(193, 211, 47, 0.12);
+      border: 1px dashed rgba(193, 211, 47, 0.55);
+      border-radius: 8px;
+      padding: 3px 8px;
+      color: #fff;
+      width: 100%;
+      transition: 0.15s;
+    }
+    .inline-dev-input:focus {
+      background: rgba(193, 211, 47, 0.22);
+      border-style: solid;
+      border-color: #C1D32F;
+      outline: none;
+    }
+
     .mono { font-family: "Cascadia Code", Consolas, monospace; }
     .fade { animation: f 0.25s ease-out; }
     @keyframes f { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
@@ -276,7 +292,7 @@
     #map-canvas { background: #0d1017; }
     #map-canvas .leaflet-tile-pane { filter: invert(1) hue-rotate(195deg) brightness(0.9) contrast(0.92) saturate(0.75); }
 
-    .viewer-hidden { display: none !important; }
+    .ui-hidden { display: none !important; }
     .marker-blink { animation: blink-alert 1.2s ease-in-out infinite; }
     @keyframes blink-alert {
       0%, 100% { stroke-opacity: 1; fill-opacity: 0.9; }
@@ -334,6 +350,10 @@
         </div>
 
         <div class="flex items-center gap-2 flex-wrap">
+          <button id="btn-export-excel-dev" onclick="exportModifiedExcel()" class="ui-hidden px-3.5 py-2 rounded-full bg-emerald-600/80 hover:bg-emerald-500 text-white text-xs font-bold transition flex items-center gap-1.5 cursor-pointer" title="Descargar base actual en formato Excel">
+            <i class="fa-solid fa-file-excel"></i> Exportar Excel
+          </button>
+
           <button onclick="syncFromSupabaseNow()" class="px-3.5 py-2 rounded-full bg-white/5 border border-white/15 hover:border-red-400/50 text-slate-200 text-xs font-bold transition flex items-center gap-1.5 cursor-pointer" title="Actualizar datos desde mdzhunter">
             <i class="fa-solid fa-rotate text-red-400"></i> Actualizar
           </button>
@@ -349,7 +369,7 @@
         </div>
       </header>
 
-      <div class="cols flex-1 flex gap-3 min-h-0">
+      <div class="cols flex-1 flex gap-3 min-w-0">
         <aside id="side" class="side panel p-4 w-[340px] shrink-0 overflow-y-auto scroll">
           <h2 class="text-xs font-bold uppercase tracking-wider text-red-400 mb-3">Búsqueda de Puntos</h2>
           <div class="relative">
@@ -381,14 +401,19 @@
         <section id="view-filter" class="map panel flex-1 min-w-0 flex flex-col overflow-hidden">
           <div class="flex items-center justify-between px-5 pt-4 pb-3 gap-3 flex-wrap">
             <h2 class="text-lg font-bold text-white">Resultados</h2>
-            <div id="results-count" class="hidden px-3 py-1 rounded-full text-xs font-semibold bg-red-500/15 text-red-200 border border-red-400/30"></div>
+            <div class="flex items-center gap-2">
+              <button id="btn-add-point-dev" onclick="openAddRecordModal()" class="ui-hidden px-3 py-1 rounded-full text-xs font-bold bg-[#C1D32F]/15 text-[#C1D32F] border border-[#C1D32F]/40 hover:bg-[#C1D32F]/25 transition cursor-pointer">
+                <i class="fa-solid fa-plus mr-1"></i>Agregar Punto
+              </button>
+              <div id="results-count" class="hidden px-3 py-1 rounded-full text-xs font-semibold bg-red-500/15 text-red-200 border border-red-400/30"></div>
+            </div>
           </div>
           <div id="tech-summary-container" class="hidden px-5 pb-3"><div id="tech-badges-wrapper" class="flex flex-wrap gap-2"></div></div>
           <div id="results-container" class="flex-1 overflow-y-auto scroll px-5 pb-5 space-y-4"></div>
         </section>
 
         <!-- VISTA MAPA -->
-        <section id="view-map" class="view viewer-hidden map panel flex-1 min-w-0 flex flex-col overflow-hidden">
+        <section id="view-map" class="view ui-hidden map panel flex-1 min-w-0 flex flex-col overflow-hidden">
           <div class="flex flex-wrap items-center gap-3 px-5 pt-4 pb-3">
             <h2 class="text-lg font-bold text-white mr-auto">Mapa y Distribución</h2>
             <span id="map-info" class="text-xs text-slate-400"></span>
@@ -426,7 +451,7 @@
         </section>
 
         <!-- VISTA ANALIZADOR DE TECNOLOGÍA -->
-        <section id="view-tech" class="view viewer-hidden map panel flex-1 min-w-0 flex flex-col overflow-hidden">
+        <section id="view-tech" class="view ui-hidden map panel flex-1 min-w-0 flex flex-col overflow-hidden">
           <div class="flex flex-col xl:flex-row xl:items-center justify-between gap-3 px-5 pt-4 pb-3 border-b border-white/5">
             <h2 class="text-lg font-bold text-white mr-auto">Analizador de Tecnologías</h2>
             <div class="flex bg-black/40 p-1.5 rounded-xl border border-white/10 w-full xl:w-auto overflow-x-auto scroll" id="tech-tabs">
@@ -440,7 +465,7 @@
         </section>
 
         <!-- VISTA PLAN DE MANTENIMIENTO -->
-        <section id="view-maint" class="view viewer-hidden map panel flex-1 min-w-0 flex flex-col overflow-hidden">
+        <section id="view-maint" class="view ui-hidden map panel flex-1 min-w-0 flex flex-col overflow-hidden">
           <div class="flex flex-col md:flex-row items-center gap-3 px-5 pt-4 pb-3 border-b border-white/5">
             <h2 class="text-lg font-bold text-white mr-auto"><i class="fa-solid fa-calendar-check text-[#C1D32F] mr-2"></i>Plan de Mantenimiento</h2>
             <div class="flex gap-2 w-full md:w-auto">
@@ -456,7 +481,7 @@
         </section>
 
         <!-- VISTA ANALIZADOR DE PRECIOS -->
-        <section id="view-price" class="view viewer-hidden map panel flex-1 min-w-0 flex flex-col overflow-hidden">
+        <section id="view-price" class="view ui-hidden map panel flex-1 min-w-0 flex flex-col overflow-hidden">
           <div class="flex flex-wrap items-center gap-3 px-5 pt-4 pb-3">
             <h2 class="text-lg font-bold text-white mr-auto">Analizador de Precios</h2>
             <label class="text-xs text-slate-400">Precio <select id="price-col" class="sel" onchange="renderPrice()"></select></label>
@@ -466,7 +491,7 @@
         </section>
 
         <!-- VISTA CONSOLA NOC CON CARGA DE 3 EXCELS -->
-        <section id="view-noc" class="view viewer-hidden map panel flex-1 min-w-0 flex flex-col overflow-hidden">
+        <section id="view-noc" class="view ui-hidden map panel flex-1 min-w-0 flex flex-col overflow-hidden">
           <div class="flex flex-wrap items-center justify-between gap-3 px-5 pt-4 pb-3 border-b border-white/10">
             <div>
               <h2 class="text-lg font-bold text-white flex items-center gap-2">
@@ -481,6 +506,9 @@
               </button>
               <button type="button" onclick="nocClearAll()" class="px-3 py-1.5 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 text-slate-300 text-xs font-semibold transition cursor-pointer">
                 <i class="fa-solid fa-rotate-left mr-1"></i>Limpiar
+              </button>
+              <button id="btnNocExportExcel" type="button" disabled onclick="nocExportExcelEjecutivo()" class="ui-hidden btn px-4 py-1.5 rounded-xl text-white text-xs font-bold transition cursor-pointer">
+                <i class="fa-solid fa-file-excel mr-1"></i>Generar Excel Ejecutivo
               </button>
             </div>
           </div>
@@ -538,7 +566,7 @@
               </div>
             </div>
 
-            <div id="nocAlertBox" class="viewer-hidden p-3.5 rounded-xl border text-xs"></div>
+            <div id="nocAlertBox" class="ui-hidden p-3.5 rounded-xl border text-xs"></div>
 
             <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
               <div class="chip p-3 text-center">
@@ -645,8 +673,33 @@
     </div>
   </div>
 
+  <!-- MODAL FICHA COMPLETA (SOLO DEV) -->
+  <div id="record-editor-modal" class="ui-hidden fixed inset-0 z-[100] bg-black/75 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="panel w-full max-w-3xl max-h-[88vh] flex flex-col border border-red-400/40 shadow-2xl fade">
+      <div class="flex items-center justify-between px-6 py-4 border-b border-white/10">
+        <div>
+          <h3 id="editor-modal-title" class="text-lg font-bold text-white">Editar Registro</h3>
+          <p class="text-xs text-slate-400">Los cambios se guardan directamente en mdzhunter.</p>
+        </div>
+        <button onclick="closeRecordEditor()" class="text-slate-400 hover:text-white text-lg"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div id="editor-fields-container" class="flex-1 overflow-y-auto scroll p-6 grid grid-cols-1 sm:grid-cols-2 gap-4"></div>
+      <div class="px-6 py-4 border-t border-white/10 bg-black/20 flex flex-wrap items-center justify-between gap-2">
+        <button id="btn-delete-record" onclick="deleteCurrentRecord()" class="px-3.5 py-2 rounded-xl bg-red-500/15 border border-red-500/40 text-red-300 hover:bg-red-500/25 text-xs font-bold transition">
+          <i class="fa-solid fa-trash mr-1"></i>Eliminar fila
+        </button>
+        <div class="flex gap-2 ml-auto">
+          <button onclick="closeRecordEditor()" class="chip px-4 py-2 text-xs font-semibold hover:bg-white/10">Cancelar</button>
+          <button onclick="saveRecordChanges()" class="btn px-5 py-2 rounded-xl text-white text-xs font-bold shadow-lg transition">
+            <i class="fa-solid fa-floppy-disk mr-1"></i>Guardar Cambios
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- MODAL DE LOGIN INICIAL DINÁMICO POR CORREO -->
-  <div id="hunter-auth-modal" class="viewer-hidden fixed inset-0 z-[100] flex items-center justify-center p-4">
+  <div id="hunter-auth-modal" class="ui-hidden fixed inset-0 z-[100] flex items-center justify-center p-4">
     <div class="panel w-full max-w-sm p-6 border border-red-500/40 shadow-2xl fade">
       <div class="flex flex-col items-center text-center mb-4">
         <div class="w-16 h-16 rounded-2xl bg-red-500/15 border border-red-400/50 flex items-center justify-center mb-2.5 shadow-[0_0_24px_rgba(224,58,62,0.45)]">
@@ -673,8 +726,8 @@
           <label class="block text-[11px] font-bold text-slate-300 uppercase mb-1">Código 2FA (6 dígitos)</label>
           <input type="text" id="sb-totp-input" maxlength="6" inputmode="numeric" placeholder="000000" class="w-full px-3 py-2.5 rounded-xl bg-black/40 border border-white/15 text-white font-mono text-center tracking-widest outline-none focus:border-red-400">
         </div>
-        <div id="sb-forced-mfa" class="viewer-hidden p-3 rounded-xl bg-black/40 border border-red-400/30 text-center space-y-2"></div>
-        <p id="sb-auth-error" class="viewer-hidden text-xs text-red-400 text-center"></p>
+        <div id="sb-forced-mfa" class="ui-hidden p-3 rounded-xl bg-black/40 border border-red-400/30 text-center space-y-2"></div>
+        <p id="sb-auth-error" class="ui-hidden text-xs text-red-400 text-center"></p>
         <button type="submit" id="sb-login-submit-btn" class="btn w-full py-2.5 rounded-xl text-xs font-extrabold uppercase tracking-wider text-white transition cursor-pointer mt-1">
           Ingresar
         </button>
@@ -700,6 +753,7 @@
     let hunterRole = "viewer";
     let hunterPendingMfaId = null;
     let excelData = [];
+    let editingRowIndex = null;
     let activeSearchTechFilter = "ALL";
     let lastMatchedItems = [];
     let currentPriceRows = [];
@@ -707,6 +761,14 @@
     let currentTechRows = [];
     let currentTechGroup = "ALL";
     let maintSchedule = null;
+
+    const SKYNET_CANONICAL_HEADERS = [
+      "ID","CP","STATUS","PUNTOS","MSK SLOT TX","FSK1 - SLOT 1 TX","FSK1 - SUBSLOT TX","FSK2 - SLOT TX",
+      "POTENCIA","TIPO DE ANTENA","ALTURA ANTENA","ALTURA COMPLETA MSNM","TECNOLOGIA","MODEM QUECLINK",
+      "MODEM IP","MODEM NUMERO","MODEM SIM","FW-IP","VLU","IMEI RESETEADOR","SIM RESETEADOR","RADIO",
+      "TARJETA","TRIMMER (OHM)","MODO DE RADIO","TIPO","LATITUD","LONGITUD","PRECIO DE ALQUILER MENSUAL",
+      "PRECIO DE EQUIPOS","OBSERVACION"
+    ];
 
     const $ = id => document.getElementById(id);
     const searchInput = $("search-input");
@@ -728,6 +790,7 @@
       return null;
     }
 
+    const isDevRole = () => hunterRole === "dev";
     const msg = (icon, title, sub) => `<div class="text-center py-20 text-slate-500"><i class="fa-solid ${icon} text-5xl mb-4 block"></i><p class="text-lg font-semibold text-slate-300">${title}</p><p class="text-sm mt-1">${sub}</p></div>`;
 
     let tt;
@@ -762,10 +825,10 @@
       const isVolt = document.body.classList.toggle("hawks-volt-accent");
       showToast(isVolt ? "Acento: Hawks Volt" : "Acento: Hawks Carmesí");
       if (map && ($("map-color").value === "tec" || $("map-mode").value === "cluster")) renderMap();
-      if (!$("view-tech").classList.contains("viewer-hidden")) renderTech();
-      if (!$("view-price").classList.contains("viewer-hidden")) renderPrice();
-      if (!$("view-maint").classList.contains("viewer-hidden")) renderMaint();
-      if (!$("view-noc").classList.contains("viewer-hidden")) nocRecalculate();
+      if (!$("view-tech").classList.contains("ui-hidden")) renderTech();
+      if (!$("view-price").classList.contains("ui-hidden")) renderPrice();
+      if (!$("view-maint").classList.contains("ui-hidden")) renderMaint();
+      if (!$("view-noc").classList.contains("ui-hidden")) nocRecalculate();
     }
 
     function toggleTheme() {
@@ -774,22 +837,27 @@
     }
 
     function resolveRoleFromSession(session) {
-      const metaRole = String(session?.user?.app_metadata?.role || "").toLowerCase().trim();
-      if (metaRole === "dev" || metaRole === "admin") return "dev";
-      if (metaRole === "viewer" || metaRole === "user") return "viewer";
       const email = String(session?.user?.email || "").toLowerCase().trim();
-      if (email === "mdz@mdz.local" || email.startsWith("mdz@") || email.startsWith("dev@")) return "dev";
+      const metaRole = String(session?.user?.app_metadata?.role || "").toLowerCase().trim();
+      if (email.startsWith("visor@") || metaRole === "viewer") return "viewer";
+      if (metaRole === "dev" || metaRole === "admin" || email === "mdz@mdz.local" || email.startsWith("mdz@") || email.startsWith("dev@")) return "dev";
       return "viewer";
     }
 
     function applySessionRoleUI(session) {
       hunterSession = session || null;
       hunterRole = resolveRoleFromSession(session);
+      const dev = isDevRole();
       const email = session?.user?.email || "mdzhunter";
-      const roleLabel = hunterRole === "dev" ? "DEV / ADMIN" : "VISOR";
+      const roleLabel = dev ? "DEV / ADMIN" : "VISOR";
+
       if ($("role-badge-text")) $("role-badge-text").textContent = roleLabel;
       if ($("user-email-subtitle")) $("user-email-subtitle").textContent = `${email} · ${roleLabel}`;
       if ($("sb-status-label")) $("sb-status-label").textContent = `mdzhunter (${hunterRole})`;
+
+      if ($("btn-add-point-dev")) $("btn-add-point-dev").classList.toggle("ui-hidden", !dev);
+      if ($("btn-export-excel-dev")) $("btn-export-excel-dev").classList.toggle("ui-hidden", !dev);
+      if ($("btnNocExportExcel")) $("btnNocExportExcel").classList.toggle("ui-hidden", !dev);
     }
 
     function stripPlaceholderPrefix(val) {
@@ -849,18 +917,90 @@
       return rowObj;
     }
 
+    function mapSkynetRowToDbPayload(rowObj, numFallback = 1) {
+      const latStr = String(rowObj["LATITUD"] ?? "").trim();
+      const lonStr = String(rowObj["LONGITUD"] ?? "").trim();
+      const latNum = latStr !== "" && !isNaN(parseFloat(latStr.replace(",", "."))) ? parseFloat(latStr.replace(",", ".")) : null;
+      const lonNum = lonStr !== "" && !isNaN(parseFloat(lonStr.replace(",", "."))) ? parseFloat(lonStr.replace(",", ".")) : null;
+      const rentParsed = num(rowObj["PRECIO DE ALQUILER MENSUAL"]);
+      const rentNum = isFinite(rentParsed) ? Number(rentParsed.toFixed(2)) : 0;
+
+      const extras = {};
+      Object.entries(rowObj).forEach(([k, v]) => {
+        if (!k.startsWith("_") && !SKYNET_CANONICAL_HEADERS.includes(k)) extras[k] = v;
+      });
+
+      return {
+        num: Number(rowObj._num || numFallback),
+        id_codigo: String(rowObj["ID"] ?? "").trim() || null,
+        cp: String(rowObj["CP"] ?? "").trim() || null,
+        status: String(rowObj["STATUS"] ?? "").trim() || null,
+        puntos: String(rowObj["PUNTOS"] ?? "").trim() || "SIN PUNTO",
+        msk_slot_tx: String(rowObj["MSK SLOT TX"] ?? "").trim() || null,
+        fsk1_slot_1_tx: String(rowObj["FSK1 - SLOT 1 TX"] ?? "").trim() || null,
+        fsk1_subslot_tx: String(rowObj["FSK1 - SUBSLOT TX"] ?? "").trim() || null,
+        fsk2_slot_tx: String(rowObj["FSK2 - SLOT TX"] ?? "").trim() || null,
+        potencia: String(rowObj["POTENCIA"] ?? "").trim() || null,
+        tipo_de_antena: String(rowObj["TIPO DE ANTENA"] ?? "").trim() || null,
+        altura_antena: String(rowObj["ALTURA ANTENA"] ?? "").trim() || null,
+        altura_completa_msnm: String(rowObj["ALTURA COMPLETA MSNM"] ?? "").trim() || null,
+        tecnologia: String(rowObj["TECNOLOGIA"] ?? "").trim() || "SIN ESPECIFICAR",
+        modem_queclink: String(rowObj["MODEM QUECLINK"] ?? "").trim() || null,
+        modem_ip: String(rowObj["MODEM IP"] ?? "").trim() || null,
+        modem_numero: String(rowObj["MODEM NUMERO"] ?? "").trim() || null,
+        modem_sim: String(rowObj["MODEM SIM"] ?? "").trim() || null,
+        fw_ip: String(rowObj["FW-IP"] ?? "").trim() || null,
+        vlu: String(rowObj["VLU"] ?? "").trim() || null,
+        imei_reseteador: String(rowObj["IMEI RESETEADOR"] ?? "").trim() || null,
+        sim_reseteador: String(rowObj["SIM RESETEADOR"] ?? "").trim() || null,
+        radio: String(rowObj["RADIO"] ?? "").trim() || null,
+        tarjeta: String(rowObj["TARJETA"] ?? "").trim() || null,
+        trimmer_ohm: String(rowObj["TRIMMER (OHM)"] ?? "").trim() || null,
+        modo_de_radio: String(rowObj["MODO DE RADIO"] ?? "").trim() || null,
+        tipo: String(rowObj["TIPO"] ?? "").trim() || null,
+        latitud: latStr || null,
+        longitud: lonStr || null,
+        lat_num: latNum,
+        lon_num: lonNum,
+        coordenadas_validas: (latNum !== null && lonNum !== null && isFinite(latNum) && isFinite(lonNum)) ? "SI" : "NO",
+        precio_alquiler_mensual: rentNum,
+        precio_de_equipos: String(rowObj["PRECIO DE EQUIPOS"] ?? "").trim() || null,
+        observacion: String(rowObj["OBSERVACION"] ?? "").trim() || null,
+        extras
+      };
+    }
+
+    async function persistRowToSupabase(rowObj, isNew = false) {
+      if (!hunterSbClient || !hunterSession || !isDevRole()) return;
+      const payload = mapSkynetRowToDbPayload(rowObj, (excelData.indexOf(rowObj) + 1) || 1);
+      if (isNew || !rowObj._dbId) {
+        const { data, error } = await hunterSbClient.from(HUNTER_TABLE).insert(payload).select("id").single();
+        if (error) { showToast(`Error al insertar: ${error.message}`); return; }
+        if (data && data.id) rowObj._dbId = data.id;
+      } else {
+        const { error } = await hunterSbClient.from(HUNTER_TABLE).update(payload).eq("id", rowObj._dbId);
+        if (error) showToast(`Error al actualizar: ${error.message}`);
+      }
+    }
+
+    async function deleteRowFromSupabase(rowObj) {
+      if (!hunterSbClient || !hunterSession || !isDevRole() || !rowObj?._dbId) return;
+      const { error } = await hunterSbClient.from(HUNTER_TABLE).delete().eq("id", rowObj._dbId);
+      if (error) showToast(`Error al eliminar: ${error.message}`);
+    }
+
     function openHunterAuthModal() {
-      $("sb-auth-error").classList.add("viewer-hidden");
-      $("sb-forced-mfa").classList.add("viewer-hidden");
+      $("sb-auth-error").classList.add("ui-hidden");
+      $("sb-forced-mfa").classList.add("ui-hidden");
       $("sb-totp-input").value = "";
-      $("hunter-auth-modal").classList.remove("viewer-hidden");
+      $("hunter-auth-modal").classList.remove("ui-hidden");
       setTimeout(() => $("sb-user-input").focus(), 60);
     }
 
     async function completeLoginWithSession(session) {
       applySessionRoleUI(session);
       document.body.classList.remove("hunter-preauth");
-      $("hunter-auth-modal").classList.add("viewer-hidden");
+      $("hunter-auth-modal").classList.add("ui-hidden");
       await syncFromSupabaseNow();
     }
 
@@ -868,7 +1008,7 @@
       e.preventDefault();
       if (!hunterSbClient) return;
       const errEl = $("sb-auth-error");
-      errEl.classList.add("viewer-hidden");
+      errEl.classList.add("ui-hidden");
 
       let emailVal = $("sb-user-input").value.trim();
       const passVal = $("sb-pass-input").value.trim();
@@ -878,7 +1018,7 @@
       const { data: authData, error: authErr } = await hunterSbClient.auth.signInWithPassword({ email: emailVal, password: passVal });
       if (authErr || !authData.session) {
         errEl.textContent = "Usuario o contraseña incorrectos en mdzhunter.";
-        errEl.classList.remove("viewer-hidden");
+        errEl.classList.remove("ui-hidden");
         return;
       }
 
@@ -892,13 +1032,13 @@
         const { data: enr, error: enrErr } = await hunterSbClient.auth.mfa.enroll({ factorType: "totp", friendlyName: `Hawks_${Date.now()}` });
         if (enrErr) {
           errEl.textContent = `Error al generar QR 2FA: ${enrErr.message}`;
-          errEl.classList.remove("viewer-hidden");
+          errEl.classList.remove("ui-hidden");
           await hunterSbClient.auth.signOut();
           return;
         }
         hunterPendingMfaId = enr.id;
         const box = $("sb-forced-mfa");
-        box.classList.remove("viewer-hidden");
+        box.classList.remove("ui-hidden");
         box.innerHTML = `
           <p class="font-bold text-[#C1D32F]">Configuración 2FA requerida</p>
           <img src="${enr.totp.qr_code}" alt="QR 2FA" class="mx-auto w-36 h-36 bg-white p-1.5 rounded-lg">
@@ -910,7 +1050,7 @@
 
       if (!/^\d{6}$/.test(codeVal)) {
         errEl.textContent = "Ingresa el código 2FA de 6 dígitos.";
-        errEl.classList.remove("viewer-hidden");
+        errEl.classList.remove("ui-hidden");
         await hunterSbClient.auth.signOut();
         return;
       }
@@ -918,7 +1058,7 @@
       const { error: mfaErr } = await hunterSbClient.auth.mfa.challengeAndVerify({ factorId: verifiedTotp.id, code: codeVal });
       if (mfaErr) {
         errEl.textContent = "Código 2FA incorrecto o expirado.";
-        errEl.classList.remove("viewer-hidden");
+        errEl.classList.remove("ui-hidden");
         await hunterSbClient.auth.signOut();
         return;
       }
@@ -932,13 +1072,13 @@
       const errEl = $("sb-auth-error");
       if (!/^\d{6}$/.test(codeVal) || !hunterPendingMfaId) {
         errEl.textContent = "Escribe los 6 dígitos del código 2FA y vuelve a pulsar.";
-        errEl.classList.remove("viewer-hidden");
+        errEl.classList.remove("ui-hidden");
         return;
       }
       const { error } = await hunterSbClient.auth.mfa.challengeAndVerify({ factorId: hunterPendingMfaId, code: codeVal });
       if (error) {
         errEl.textContent = "Código 2FA inválido.";
-        errEl.classList.remove("viewer-hidden");
+        errEl.classList.remove("ui-hidden");
         return;
       }
       hunterPendingMfaId = null;
@@ -976,7 +1116,6 @@
         .order("id", { ascending: true });
 
       if (error) {
-        console.error("Error consultando mdz_hunter_inventario:", error);
         showToast(`Error al leer mdzhunter: ${error.message}`);
         return;
       }
@@ -1101,9 +1240,112 @@
       applySearchTechFilter();
     }
 
+    async function updateCardFieldInline(realIdx, colKey, newValue, shouldReRender = true) {
+      if (!isDevRole() || !excelData[realIdx] || !colKey) return;
+      excelData[realIdx][colKey] = newValue;
+      maintSchedule = null;
+      priceSig = "";
+      updateGlobalStats();
+      await persistRowToSupabase(excelData[realIdx], false);
+      showToast(`Guardado: ${colKey}`);
+      if (shouldReRender) executeSearch(true);
+    }
+
+    async function addObservationInline(realIdx) {
+      if (!isDevRole() || !excelData[realIdx]) return;
+      excelData[realIdx]["OBSERVACION"] = "NUEVA ADVERTENCIA";
+      await persistRowToSupabase(excelData[realIdx], false);
+      executeSearch(true);
+    }
+
+    function openRecordEditor(rowIndex) {
+      if (!isDevRole()) return;
+      editingRowIndex = rowIndex;
+      const row = excelData[rowIndex];
+      if (!row) return;
+      $("editor-modal-title").textContent = `Ficha Completa del Registro #${rowIndex + 1}`;
+      $("btn-delete-record").classList.remove("ui-hidden");
+      $("editor-fields-container").innerHTML = SKYNET_CANONICAL_HEADERS.map(k => `
+        <div>
+          <label class="block text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">${escapeHtml(k)}</label>
+          <input type="text" data-col="${escapeHtml(k)}" value="${escapeHtml(row[k] ?? "")}" class="dev-modal-field w-full px-3 py-2 text-xs rounded-xl bg-black/40 border border-white/10 text-white outline-none focus:border-red-400">
+        </div>
+      `).join("");
+      $("record-editor-modal").classList.remove("ui-hidden");
+    }
+
+    function openAddRecordModal() {
+      if (!isDevRole()) return;
+      editingRowIndex = -1;
+      $("editor-modal-title").textContent = "Agregar Nuevo Punto";
+      $("btn-delete-record").classList.add("ui-hidden");
+      $("editor-fields-container").innerHTML = SKYNET_CANONICAL_HEADERS.map(k => `
+        <div>
+          <label class="block text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">${escapeHtml(k)}</label>
+          <input type="text" data-col="${escapeHtml(k)}" value="" placeholder="Ingresar ${escapeHtml(k)}..." class="dev-modal-field w-full px-3 py-2 text-xs rounded-xl bg-black/40 border border-white/10 text-white outline-none focus:border-red-400">
+        </div>
+      `).join("");
+      $("record-editor-modal").classList.remove("ui-hidden");
+    }
+
+    function closeRecordEditor() {
+      $("record-editor-modal").classList.add("ui-hidden");
+      editingRowIndex = null;
+    }
+
+    async function saveRecordChanges() {
+      if (!isDevRole()) return;
+      const inputs = document.querySelectorAll(".dev-modal-field");
+      if (editingRowIndex === -1) {
+        const newRow = {};
+        inputs.forEach(inp => { newRow[inp.dataset.col] = inp.value; });
+        if (isEmpty(newRow["PUNTOS"])) { showToast("El campo PUNTOS es obligatorio"); return; }
+        excelData.unshift(newRow);
+        await persistRowToSupabase(newRow, true);
+        closeRecordEditor();
+        updateGlobalStats();
+        executeSearch(true);
+        showToast("Punto creado en mdzhunter");
+      } else if (editingRowIndex !== null && excelData[editingRowIndex]) {
+        inputs.forEach(inp => { excelData[editingRowIndex][inp.dataset.col] = inp.value; });
+        await persistRowToSupabase(excelData[editingRowIndex], false);
+        closeRecordEditor();
+        updateGlobalStats();
+        executeSearch(true);
+        showToast("Registro actualizado");
+      }
+    }
+
+    async function deleteCurrentRecord() {
+      if (!isDevRole() || editingRowIndex === null || editingRowIndex < 0) return;
+      if (!confirm("¿Eliminar este registro de mdzhunter?")) return;
+      const target = excelData[editingRowIndex];
+      excelData.splice(editingRowIndex, 1);
+      await deleteRowFromSupabase(target);
+      closeRecordEditor();
+      updateGlobalStats();
+      executeSearch(true);
+      showToast("Registro eliminado");
+    }
+
+    function exportModifiedExcel() {
+      if (!isDevRole() || !excelData.length) return;
+      const cleanRows = excelData.map(r => {
+        const obj = {};
+        SKYNET_CANONICAL_HEADERS.forEach(c => { obj[c] = r[c] !== undefined ? r[c] : ""; });
+        return obj;
+      });
+      const ws = XLSX.utils.json_to_sheet(cleanRows, { header: SKYNET_CANONICAL_HEADERS });
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, "LISTA DEFINITIVA");
+      XLSX.writeFile(wb, `MDZ_HUNTER_HAWKS_${new Date().toISOString().slice(0, 10)}.xlsx`);
+      showToast("Excel exportado");
+    }
+
     function renderResults(matchedItems) {
       const autoExpand = matchedItems.length === 1;
-      resultsContainer.innerHTML = matchedItems.map(({ row }, index) => {
+      const dev = isDevRole();
+      resultsContainer.innerHTML = matchedItems.map(({ row, realIdx }, index) => {
         const K = p => findColumn(row, p);
         const pk = K(["PUNTOS", "PUNTO"]), tk = K(["TECNOLOGIA"]), ik = K(["IMEI RESETEADOR", "IMEI"]), sk = K(["SIM RESETEADOR", "SIM MODEM", "SIM"]), ok = K(["OBSERVACION"]), lk = K(["LATITUD", "LAT"]), gk = K(["LONGITUD", "LON", "LNG"]), yk = K(["TIPO"]);
         const punto = pk ? row[pk] : "Desconocido", tec = tk ? String(row[tk]).trim().toUpperCase() : "SIN ESPECIFICAR", imei = ik ? row[ik] : "-", sim = sk ? row[sk] : "-", obs = ok ? row[ok] : "", lat = lk ? row[lk] : "", lon = gk ? row[gk] : "";
@@ -1130,7 +1372,20 @@
           </div>`;
         }).join("") : `<div class="p-3.5 rounded-xl bg-amber-500/15 border border-amber-400/30 text-xs text-amber-100"><b>Comandos no registrados.</b> El prefijo del IMEI ${escapeHtml(imei)} no coincide con un equipo configurado.</div>`;
 
-        const obsHtml = hasObs ? `<div class="mx-5 mb-4 px-3.5 py-2.5 rounded-xl bg-red-500/15 border-l-[3px] border-red-400 flex gap-2.5"><i class="fa-solid fa-triangle-exclamation text-red-400 mt-0.5"></i><div><p class="text-[11px] font-bold text-red-300">Observación</p><p class="text-xs text-red-100 mt-0.5 break-words leading-relaxed">${escapeHtml(obs)}</p></div></div>` : "";
+        const safeCol = c => c ? c.replace(/\\/g, "\\\\").replace(/'/g, "\\'") : "";
+        const titleHtml = dev && pk
+          ? `<input type="text" value="${escapeHtml(punto)}" onchange="updateCardFieldInline(${realIdx}, '${safeCol(pk)}', this.value)" class="inline-dev-input text-xl font-bold mt-1">`
+          : `<h3 class="text-2xl font-bold text-white break-words tracking-tight">${escapeHtml(punto)}</h3>`;
+
+        const obsHtml = dev
+          ? (hasObs
+              ? `<div class="mx-5 mb-4 px-3.5 py-2.5 rounded-xl bg-red-500/15 border-l-[3px] border-[#C1D32F] flex items-start gap-2.5"><i class="fa-solid fa-triangle-exclamation text-[#C1D32F] mt-1"></i><div class="flex-1 min-w-0"><p class="text-[11px] font-bold text-[#C1D32F] mb-1">Observación (Editable)</p><input type="text" value="${escapeHtml(obs)}" onchange="updateCardFieldInline(${realIdx}, '${safeCol(ok)}', this.value)" class="inline-dev-input text-xs font-semibold"></div></div>`
+              : `<div class="mx-5 mb-4"><button onclick="addObservationInline(${realIdx})" class="px-3 py-1.5 rounded-xl bg-[#C1D32F]/15 border border-dashed border-[#C1D32F]/40 text-[#C1D32F] text-xs font-bold">+ Agregar Observación</button></div>`)
+          : (hasObs ? `<div class="mx-5 mb-4 px-3.5 py-2.5 rounded-xl bg-red-500/15 border-l-[3px] border-red-400 flex gap-2.5"><i class="fa-solid fa-triangle-exclamation text-red-400 mt-0.5"></i><div><p class="text-[11px] font-bold text-red-300">Observación</p><p class="text-xs text-red-100 mt-0.5 break-words leading-relaxed">${escapeHtml(obs)}</p></div></div>` : "");
+
+        const devFullBtn = dev
+          ? `<button onclick="openRecordEditor(${realIdx})" class="px-3 py-2 rounded-xl bg-[#C1D32F]/15 border border-[#C1D32F]/40 text-[#C1D32F] text-xs font-bold cursor-pointer"><i class="fa-solid fa-sliders mr-1"></i>Editar Ficha</button>`
+          : "";
 
         return `<article id="card-item-${index}" class="card fade overflow-hidden transition-all duration-300 ${autoExpand ? "card-expanded" : ""}">
           <div class="p-5 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
@@ -1139,19 +1394,22 @@
                 <span class="px-2.5 py-1 rounded-md border ${movil ? "bg-indigo-500/20 text-indigo-200 border-indigo-400/40" : "bg-red-500/20 text-red-200 border-red-400/40"}"><i class="fa-solid ${movil ? "fa-truck-fast" : "fa-tower-cell"} mr-1"></i>${movil ? "Móvil / Rastreo" : "Torre / Fija"}</span>
                 <span class="text-slate-400">#${index + 1}</span>
               </div>
-              <h3 class="text-2xl font-bold text-white break-words tracking-tight">${escapeHtml(punto)}</h3>
+              ${titleHtml}
               <div class="flex flex-wrap gap-2 mt-3 text-xs font-semibold">
                 <span class="chip px-3 py-1.5 text-red-300 border-red-400/30"><i class="fa-solid fa-microchip mr-1.5"></i>Reseteador: ${escapeHtml(eq.modelo)}</span>
                 <span class="chip px-3 py-1.5 text-[#C1D32F] border-white/15"><i class="fa-solid fa-tower-broadcast mr-1.5"></i>Tecnología: ${escapeHtml(tec)}</span>
               </div>
             </div>
-            <button onclick="toggleCard(${index})" class="chip px-4 py-2 text-xs font-bold text-white hover:border-red-400 transition cursor-pointer self-start lg:self-center shrink-0">
-              <span id="toggle-text-${index}">${autoExpand ? "Contraer" : "Desplegar"}</span>
-              <i id="toggle-icon-${index}" class="fa-solid ${autoExpand ? "fa-chevron-up" : "fa-chevron-down"} ml-1.5 text-red-400"></i>
-            </button>
+            <div class="flex items-center gap-2 self-start lg:self-center shrink-0">
+              ${devFullBtn}
+              <button onclick="toggleCard(${index})" class="chip px-4 py-2 text-xs font-bold text-white hover:border-red-400 transition cursor-pointer">
+                <span id="toggle-text-${index}">${autoExpand ? "Contraer" : "Desplegar"}</span>
+                <i id="toggle-icon-${index}" class="fa-solid ${autoExpand ? "fa-chevron-up" : "fa-chevron-down"} ml-1.5 text-red-400"></i>
+              </button>
+            </div>
           </div>
           ${obsHtml}
-          <div id="card-details-${index}" class="${autoExpand ? "" : "viewer-hidden"} border-t border-white/10 p-5 bg-black/15">
+          <div id="card-details-${index}" class="${autoExpand ? "" : "ui-hidden"} border-t border-white/10 p-5 bg-black/15">
             <div class="grid grid-cols-1 xl:grid-cols-12 gap-5 items-stretch">
               <div class="xl:col-span-7 zone-reset p-5 flex flex-col justify-between">
                 <div>
@@ -1173,7 +1431,7 @@
                   <span class="px-2.5 py-1 rounded-lg bg-white/10 text-[#C1D32F] text-xs font-bold">${escapeHtml(tec)}</span>
                 </div>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 overflow-y-auto scroll pr-1 max-h-[30rem]">
-                  ${renderAdditionalData(row, [pk, tk, ik, sk, ok, lk, gk])}
+                  ${renderAdditionalData(row, [pk, tk, ik, sk, ok, lk, gk], realIdx)}
                 </div>
               </div>
             </div>
@@ -1184,28 +1442,34 @@
 
     function toggleCard(i) {
       const d = $(`card-details-${i}`), t = $(`toggle-text-${i}`), ic = $(`toggle-icon-${i}`), card = $(`card-item-${i}`);
-      const h = d.classList.toggle("viewer-hidden");
+      const h = d.classList.toggle("ui-hidden");
       t.textContent = h ? "Desplegar" : "Contraer";
       ic.className = "fa-solid ml-1.5 text-red-400 " + (h ? "fa-chevron-down" : "fa-chevron-up");
       if (card) card.classList.toggle("card-expanded", !h);
     }
 
-    function renderAdditionalData(row, excluded) {
+    function renderAdditionalData(row, excluded, realIdx) {
+      const dev = isDevRole();
       const ex = new Set(excluded.filter(Boolean).map(k => String(k).toUpperCase()));
       let h = "";
       Object.entries(row).forEach(([k, v]) => {
-        if (k.startsWith("_") || ex.has(k.toUpperCase()) || isEmpty(v)) return;
+        if (k.startsWith("_") || ex.has(k.toUpperCase())) return;
+        if (!dev && isEmpty(v)) return;
         const n = normalizeText(k);
+        const safeCol = k.replace(/\\/g, "\\\\").replace(/'/g, "\\'");
         if (n === "vlu") {
-          h += `<div class="col-span-full p-3.5 rounded-xl bg-amber-500/15 border border-amber-400/40"><p class="text-[11px] font-bold text-amber-300 uppercase tracking-wider"><i class="fa-solid fa-key mr-1.5"></i>VLU</p><p class="text-lg font-extrabold text-amber-100 break-words mt-0.5">${escapeHtml(v)}</p></div>`;
+          const vHtml = dev ? `<input type="text" value="${escapeHtml(v ?? "")}" onchange="updateCardFieldInline(${realIdx}, '${safeCol}', this.value, false)" class="inline-dev-input text-base font-extrabold text-amber-100 mt-1">` : `<p class="text-lg font-extrabold text-amber-100 break-words mt-0.5">${escapeHtml(v)}</p>`;
+          h += `<div class="col-span-full p-3.5 rounded-xl bg-amber-500/15 border border-amber-400/40"><p class="text-[11px] font-bold text-amber-300 uppercase tracking-wider"><i class="fa-solid fa-key mr-1.5"></i>VLU</p>${vHtml}</div>`;
           return;
         }
         if (n.includes("modem sim") || n === "sim") {
-          const safeSim = String(v).replace(/\\/g, "\\\\").replace(/'/g, "\\'");
-          h += `<div class="col-span-full p-3.5 rounded-xl bg-emerald-500/15 border border-emerald-400/40"><p class="text-[11px] font-extrabold text-emerald-300 uppercase tracking-wider"><i class="fa-solid fa-sim-card mr-1.5"></i>${escapeHtml(k)}</p><div class="flex items-center justify-between gap-2 mt-1"><p class="mono text-sm font-extrabold text-emerald-100 break-all">${escapeHtml(v)}</p><button onclick="copyToClipboard('${safeSim}')" class="shrink-0 px-3 py-1 rounded-lg bg-emerald-500/25 text-emerald-200 text-xs font-bold cursor-pointer"><i class="fa-regular fa-copy mr-1"></i>Copiar</button></div></div>`;
+          const safeSim = String(v ?? "").replace(/\\/g, "\\\\").replace(/'/g, "\\'");
+          const sHtml = dev ? `<input type="text" value="${escapeHtml(v ?? "")}" onchange="updateCardFieldInline(${realIdx}, '${safeCol}', this.value, false)" class="inline-dev-input mono text-sm font-extrabold text-emerald-100 mt-1">` : `<div class="flex items-center justify-between gap-2 mt-1"><p class="mono text-sm font-extrabold text-emerald-100 break-all">${escapeHtml(v)}</p><button onclick="copyToClipboard('${safeSim}')" class="shrink-0 px-3 py-1 rounded-lg bg-emerald-500/25 text-emerald-200 text-xs font-bold cursor-pointer"><i class="fa-regular fa-copy mr-1"></i>Copiar</button></div>`;
+          h += `<div class="col-span-full p-3.5 rounded-xl bg-emerald-500/15 border border-emerald-400/40"><p class="text-[11px] font-extrabold text-emerald-300 uppercase tracking-wider"><i class="fa-solid fa-sim-card mr-1.5"></i>${escapeHtml(k)}</p>${sHtml}</div>`;
           return;
         }
-        h += `<div class="chip border-l-[3px] border-red-400/70 rounded-xl px-3 py-2.5"><p class="text-[10px] font-bold uppercase tracking-wider text-slate-400 truncate">${escapeHtml(k)}</p><p class="text-sm font-bold text-white break-words mt-1">${escapeHtml(v)}</p></div>`;
+        const fHtml = dev ? `<input type="text" value="${escapeHtml(v ?? "")}" placeholder="Vacío..." onchange="updateCardFieldInline(${realIdx}, '${safeCol}', this.value, false)" class="inline-dev-input text-xs font-bold mt-1">` : `<p class="text-sm font-bold text-white break-words mt-1">${escapeHtml(v)}</p>`;
+        h += `<div class="chip border-l-[3px] border-red-400/70 rounded-xl px-3 py-2.5"><p class="text-[10px] font-bold uppercase tracking-wider text-slate-400 truncate">${escapeHtml(k)}</p>${fHtml}</div>`;
       });
       return h || `<div class="col-span-full text-xs text-slate-400 italic p-3">Sin datos adicionales registrados.</div>`;
     }
@@ -1218,11 +1482,11 @@
     function setView(v) {
       if (!excelData.length && v !== "noc") { showToast("No hay datos cargados"); return; }
       document.querySelectorAll(".rail button[data-v]").forEach(b => b.classList.toggle("on", b.dataset.v === v));
-      $("side").classList.toggle("viewer-hidden", v !== "filter");
-      $("view-filter").classList.toggle("viewer-hidden", v !== "filter");
+      $("side").classList.toggle("ui-hidden", v !== "filter");
+      $("view-filter").classList.toggle("ui-hidden", v !== "filter");
       ["map", "tech", "maint", "price", "noc"].forEach(x => {
         const el = $("view-" + x);
-        if (el) el.classList.toggle("viewer-hidden", v !== x);
+        if (el) el.classList.toggle("ui-hidden", v !== x);
       });
       if (v === "map") renderMap();
       if (v === "tech") renderTech();
@@ -1438,12 +1702,12 @@
         + grid("lg:grid-cols-4", kpi("fa-location-dot", "Puntos físicos", n.toLocaleString()) + kpi("fa-tower-broadcast", "Tecnologías evaluadas", techs.length) + kpi("fa-microchip", "Modelos de equipo", models.filter(m => m[0] !== "Desconocido").length) + kpi("fa-truck-fast", "Móviles / Rastreo", pct(R.filter(i => i.movil).length)))
         + grid("lg:grid-cols-3", kpi("fa-circle-question", "Sin modelo reconocido", `${unk} (${pct(unk)})`) + kpi("fa-map-pin", "Con coordenadas válidas", `${loc} (${pct(loc)})`) + kpi("fa-triangle-exclamation", "Con observación", `${obs} (${pct(obs)})`))
         + `<div class="grid grid-cols-1 xl:grid-cols-2 gap-3">` + box("Tecnologías", bars(techs)) + box("Modelos de Equipo", bars(models, "#C1D32F")) + box("Versiones FW", bars(fws, "#a3e635")) + box("Potencia", bars(ohms, "#f43f5e")) + box("Operador SIM", bars(ops, "#f59e0b")) + box("Combinaciones", bars(cross, "#38bdf8")) + `</div></div>`
-        + `<div id="tech-list-container" class="viewer-hidden flex-col gap-4"><div class="flex flex-wrap gap-3 items-center mb-2"><button onclick="hideTechList()" class="chip px-4 py-2.5 text-xs font-semibold hover:bg-white/10 transition"><i class="fa-solid fa-arrow-left mr-2"></i>Volver al Dashboard</button><div class="relative flex-1 min-w-[250px]"><i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 text-sm"></i><input id="tech-search-input" oninput="filterTechList()" placeholder="Buscar un punto físico específico..." class="w-full py-2.5 pl-11 pr-4 text-sm rounded-xl bg-black/30 border border-white/10 outline-none focus:border-red-400"></div></div><div id="tech-list-grid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3 pb-8"></div></div>`
-        + `<div id="tech-detail-container" class="viewer-hidden flex-col gap-4 pb-8"></div>`;
+        + `<div id="tech-list-container" class="ui-hidden flex-col gap-4"><div class="flex flex-wrap gap-3 items-center mb-2"><button onclick="hideTechList()" class="chip px-4 py-2.5 text-xs font-semibold hover:bg-white/10 transition"><i class="fa-solid fa-arrow-left mr-2"></i>Volver al Dashboard</button><div class="relative flex-1 min-w-[250px]"><i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 text-sm"></i><input id="tech-search-input" oninput="filterTechList()" placeholder="Buscar un punto físico específico..." class="w-full py-2.5 pl-11 pr-4 text-sm rounded-xl bg-black/30 border border-white/10 outline-none focus:border-red-400"></div></div><div id="tech-list-grid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3 pb-8"></div></div>`
+        + `<div id="tech-detail-container" class="ui-hidden flex-col gap-4 pb-8"></div>`;
     }
 
-    function showTechList() { $("tech-dash-content").classList.add("viewer-hidden"); $("tech-detail-container").classList.add("viewer-hidden"); $("tech-detail-container").classList.remove("flex"); $("tech-list-container").classList.remove("viewer-hidden"); $("tech-list-container").classList.add("flex"); filterTechList(); }
-    function hideTechList() { $("tech-list-container").classList.add("viewer-hidden"); $("tech-list-container").classList.remove("flex"); $("tech-detail-container").classList.add("viewer-hidden"); $("tech-detail-container").classList.remove("flex"); $("tech-dash-content").classList.remove("viewer-hidden"); }
+    function showTechList() { $("tech-dash-content").classList.add("ui-hidden"); $("tech-detail-container").classList.add("ui-hidden"); $("tech-detail-container").classList.remove("flex"); $("tech-list-container").classList.remove("ui-hidden"); $("tech-list-container").classList.add("flex"); filterTechList(); }
+    function hideTechList() { $("tech-list-container").classList.add("ui-hidden"); $("tech-list-container").classList.remove("flex"); $("tech-detail-container").classList.add("ui-hidden"); $("tech-detail-container").classList.remove("flex"); $("tech-dash-content").classList.remove("ui-hidden"); }
     function filterTechList() {
       const q = normalizeText($("tech-search-input").value), grid = $("tech-list-grid");
       const matches = currentTechRows.filter(x => normalizeText(x.punto).includes(q));
@@ -1452,8 +1716,8 @@
     }
 
     function showTechDetail(index) {
-      $("tech-list-container").classList.add("viewer-hidden"); $("tech-list-container").classList.remove("flex");
-      const container = $("tech-detail-container"); container.classList.remove("viewer-hidden"); container.classList.add("flex");
+      $("tech-list-container").classList.add("ui-hidden"); $("tech-list-container").classList.remove("flex");
+      const container = $("tech-detail-container"); container.classList.remove("ui-hidden"); container.classList.add("flex");
       const x = currentTechRows[index];
       const slotsHtml = x.sl.filter(([, v]) => !isEmpty(v)).map(([n, v]) => `<div class="chip px-4 py-3 flex justify-between items-center gap-4"><span class="text-[11px] text-slate-400 font-semibold uppercase tracking-wide">${escapeHtml(n)}</span><code class="text-xs font-bold text-amber-300 bg-amber-500/10 px-2.5 py-1 rounded border border-amber-500/20">${escapeHtml(v)}</code></div>`).join("");
       container.innerHTML = `<div class="flex flex-wrap items-center justify-between gap-3 mb-2"><button onclick="showTechList()" class="chip px-4 py-2.5 text-xs font-semibold hover:bg-white/10 transition"><i class="fa-solid fa-arrow-left mr-2"></i>Volver a la lista</button><span class="px-3 py-1 rounded-full text-[10px] uppercase tracking-wider font-bold border ${x.movil ? "bg-indigo-500/15 text-indigo-300 border-indigo-400/30" : "bg-red-500/15 text-red-200 border-red-400/30"}">${x.movil ? "Móvil / Rastreo" : "Punto Fijo"}</span></div>
@@ -1579,16 +1843,16 @@
       const top = [...rows].sort((a, b) => b.p - a.p).slice(0, 10);
 
       body.innerHTML = `<div class="flex items-center gap-3 mb-5 p-4 rounded-2xl bg-black/20 border border-white/5 w-full md:w-auto self-start"><div><label class="text-[11px] font-semibold text-slate-400 uppercase tracking-wide block mb-1">Convertidor a Dólares (USD)</label><div class="flex items-center gap-3"><input type="number" id="tc-input" step="0.01" min="0" placeholder="Tipo de cambio" class="w-32 px-3 py-1.5 text-sm font-semibold rounded-lg bg-black/50 border border-white/10 text-white outline-none" oninput="updateTotalUSD()"><span id="total-usd-display" class="text-lg font-bold text-[#C1D32F] hidden"></span></div></div></div>`
-        + grid("lg:grid-cols-5", kpi("fa-coins", "Suma Total", money(tot)) + kpi("fa-scale-balanced", "Promedio", money(avg)) + kpi("fa-arrow-down", "Mínimo", money(Math.min(...rows.map(x => x.p)))) + kpi("fa-arrow-up", "Máximo", money(Math.max(...rows.map(x => x.p)))) + `<div class="chip p-4 cursor-pointer hover:border-red-400 transition" onclick="document.getElementById('outliers-list').classList.toggle('viewer-hidden')"><i class="fa-solid fa-circle-exclamation text-red-400 text-xs"></i><p class="text-2xl font-bold text-white mt-1">${out.length}</p><p class="text-[11px] text-slate-400">Atípicos altos <span class="text-red-400 ml-1 font-semibold">(Ver)</span></p></div>`)
-        + (out.length ? `<div id="outliers-list" class="viewer-hidden mt-3 p-5 border border-red-500/30 bg-red-500/10 rounded-2xl"><h4 class="text-sm font-semibold text-red-400 mb-3">Puntos con alquiler atípico</h4><div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">${out.map(x => `<div class="px-4 py-3 bg-black/40 border border-red-500/20 rounded-xl flex justify-between items-center text-xs text-white"><div class="min-w-0 pr-3"><p class="text-[10px] text-slate-400 truncate">${escapeHtml(x.g)}</p><p class="font-semibold truncate text-sm text-slate-200">${escapeHtml(x.n)}</p></div><b class="text-red-300 text-sm">${money(x.p)}</b></div>`).join("")}</div></div>` : "")
-        + `<div class="relative mb-5 max-w-xl mt-5"><i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 text-sm"></i><input id="price-search-input" oninput="doPriceSearch()" placeholder="Buscar punto específico..." class="w-full py-3.5 pl-11 pr-4 text-sm rounded-xl bg-black/30 border border-white/10 outline-none focus:border-red-400"></div><div id="price-search-results" class="viewer-hidden grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 mb-6"></div><div id="price-dash-content" class="space-y-4"><div class="grid grid-cols-1 xl:grid-cols-2 gap-3">${box(`Suma Total por ${escapeHtml(gcn)}`, bars(sums, "var(--hawks-red)", money))}${box(`Promedio por ${escapeHtml(gcn)}`, bars(avgs, "#C1D32F", money))}</div>${box("Top 10 valores más altos", top.map(x => `<div class="flex justify-between items-center gap-3 py-2.5 border-b border-white/5 text-xs"><div class="min-w-0 flex-1"><p class="text-slate-300 font-bold truncate text-sm">${escapeHtml(x.n)}</p><p class="text-slate-500 truncate text-[10px]">${escapeHtml(x.g)}</p></div><b class="text-white text-sm">${money(x.p)}</b></div>`).join(""))}</div>`;
+        + grid("lg:grid-cols-5", kpi("fa-coins", "Suma Total", money(tot)) + kpi("fa-scale-balanced", "Promedio", money(avg)) + kpi("fa-arrow-down", "Mínimo", money(Math.min(...rows.map(x => x.p)))) + kpi("fa-arrow-up", "Máximo", money(Math.max(...rows.map(x => x.p)))) + `<div class="chip p-4 cursor-pointer hover:border-red-400 transition" onclick="document.getElementById('outliers-list').classList.toggle('ui-hidden')"><i class="fa-solid fa-circle-exclamation text-red-400 text-xs"></i><p class="text-2xl font-bold text-white mt-1">${out.length}</p><p class="text-[11px] text-slate-400">Atípicos altos <span class="text-red-400 ml-1 font-semibold">(Ver)</span></p></div>`)
+        + (out.length ? `<div id="outliers-list" class="ui-hidden mt-3 p-5 border border-red-500/30 bg-red-500/10 rounded-2xl"><h4 class="text-sm font-semibold text-red-400 mb-3">Puntos con alquiler atípico</h4><div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">${out.map(x => `<div class="px-4 py-3 bg-black/40 border border-red-500/20 rounded-xl flex justify-between items-center text-xs text-white"><div class="min-w-0 pr-3"><p class="text-[10px] text-slate-400 truncate">${escapeHtml(x.g)}</p><p class="font-semibold truncate text-sm text-slate-200">${escapeHtml(x.n)}</p></div><b class="text-red-300 text-sm">${money(x.p)}</b></div>`).join("")}</div></div>` : "")
+        + `<div class="relative mb-5 max-w-xl mt-5"><i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 text-sm"></i><input id="price-search-input" oninput="doPriceSearch()" placeholder="Buscar punto específico..." class="w-full py-3.5 pl-11 pr-4 text-sm rounded-xl bg-black/30 border border-white/10 outline-none focus:border-red-400"></div><div id="price-search-results" class="ui-hidden grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 mb-6"></div><div id="price-dash-content" class="space-y-4"><div class="grid grid-cols-1 xl:grid-cols-2 gap-3">${box(`Suma Total por ${escapeHtml(gcn)}`, bars(sums, "var(--hawks-red)", money))}${box(`Promedio por ${escapeHtml(gcn)}`, bars(avgs, "#C1D32F", money))}</div>${box("Top 10 valores más altos", top.map(x => `<div class="flex justify-between items-center gap-3 py-2.5 border-b border-white/5 text-xs"><div class="min-w-0 flex-1"><p class="text-slate-300 font-bold truncate text-sm">${escapeHtml(x.n)}</p><p class="text-slate-500 truncate text-[10px]">${escapeHtml(x.g)}</p></div><b class="text-white text-sm">${money(x.p)}</b></div>`).join(""))}</div>`;
     }
 
     function doPriceSearch() {
       const q = normalizeText($("price-search-input").value), resContainer = $("price-search-results"), dashContainer = $("price-dash-content");
-      if (!q) { resContainer.innerHTML = ""; resContainer.classList.add("viewer-hidden"); dashContainer.classList.remove("viewer-hidden"); return; }
+      if (!q) { resContainer.innerHTML = ""; resContainer.classList.add("ui-hidden"); dashContainer.classList.remove("ui-hidden"); return; }
       const matches = currentPriceRows.filter(x => normalizeText(x.n).includes(q));
-      dashContainer.classList.add("viewer-hidden"); resContainer.classList.remove("viewer-hidden");
+      dashContainer.classList.add("ui-hidden"); resContainer.classList.remove("ui-hidden");
       if (!matches.length) { resContainer.innerHTML = `<div class="col-span-full p-6 text-center chip text-slate-500 text-sm">Sin coincidencias.</div>`; return; }
       resContainer.innerHTML = matches.map(x => `<div class="chip p-4 flex justify-between items-center border-l-4 border-red-400"><div class="min-w-0 pr-3"><p class="text-[10px] text-slate-400 font-semibold truncate uppercase">${escapeHtml(x.g)}</p><p class="text-sm font-bold text-white truncate mt-0.5">${escapeHtml(x.n)}</p></div><b class="text-red-300 text-lg">${money(x.p)}</b></div>`).join("");
     }
@@ -1596,16 +1860,9 @@
     if (typeof Chart !== "undefined" && typeof ChartDataLabels !== "undefined") Chart.register(ChartDataLabels);
 
     const nocState = {
-      rawDet: null,
-      rawRep: null,
-      rawLoj: null,
-      dfTotal: [],
-      dfEval: [],
-      incidencias: [],
-      resumenGrupos: [],
-      resumenTotal: null,
-      fechaCorte: new Date(),
-      charts: { comp: null, bar: null, donut: null }
+      rawDet: null, rawRep: null, rawLoj: null,
+      dfTotal: [], dfEval: [], incidencias: [], resumenGrupos: [], resumenTotal: null,
+      fechaCorte: new Date(), charts: { comp: null, bar: null, donut: null }
     };
 
     function nocParseDate(val) {
@@ -1673,11 +1930,19 @@
       return rows.map(raw => {
         const row = {};
         Object.keys(raw).forEach(k => { row[String(k).trim()] = raw[k]; });
+        let disp = null;
+        if (row["% DISPONIBILIDAD"] !== undefined && row["% DISPONIBILIDAD"] !== null && String(row["% DISPONIBILIDAD"]).trim() !== "") {
+          const n = parseFloat(String(row["% DISPONIBILIDAD"]).replace("%", "").trim());
+          if (!isNaN(n)) disp = n;
+        }
         return {
           GRUPO: grupo,
           ID: row["Id"] !== undefined && row["Id"] !== null ? String(row["Id"]).trim() : (row["ID"] !== undefined && row["ID"] !== null ? String(row["ID"]).trim() : "-"),
           NOMBRE: row["NOMBRE"] !== undefined && row["NOMBRE"] !== null ? String(row["NOMBRE"]).trim() : "-",
           CONECTIVIDAD_DT: nocParseDate(row["CONECTIVIDAD"]),
+          RADIO_RX_DT: nocParseDate(row["RADIO RX"]),
+          COMANDO_RX: row["COMANDO RX"] !== undefined && row["COMANDO RX"] !== null && String(row["COMANDO RX"]).trim() !== "" ? String(row["COMANDO RX"]).trim() : "-",
+          DISP_SISTEMA: disp,
           OBS_ORIG: ""
         };
       });
@@ -1708,7 +1973,7 @@
         }
         const conDt = nocCombinarFechaHora(idxFec !== -1 ? row[idxFec] : null, idxHor !== -1 ? row[idxHor] : null);
         const obsClean = idxObs !== -1 && row[idxObs] !== null && row[idxObs] !== undefined ? String(row[idxObs]).trim() : "";
-        out.push({ GRUPO: "LOJACK", ID: idLj, NOMBRE: antStr, CONECTIVIDAD_DT: conDt, OBS_ORIG: obsClean });
+        out.push({ GRUPO: "LOJACK", ID: idLj, NOMBRE: antStr, CONECTIVIDAD_DT: conDt, RADIO_RX_DT: null, COMANDO_RX: "-", DISP_SISTEMA: null, OBS_ORIG: obsClean });
       }
       if (!out.length) throw new Error("No se encontraron puntos válidos en LOJACK.");
       return out;
@@ -1716,14 +1981,14 @@
 
     function nocShowAlert(msgText, type = "error") {
       const boxEl = $("nocAlertBox");
-      boxEl.classList.remove("viewer-hidden", "bg-red-500/15", "border-red-500/40", "text-red-200", "bg-emerald-500/15", "border-emerald-500/40", "text-emerald-200");
+      boxEl.classList.remove("ui-hidden", "bg-red-500/15", "border-red-500/40", "text-red-200", "bg-emerald-500/15", "border-emerald-500/40", "text-emerald-200");
       boxEl.classList.add(...(type === "error" ? ["bg-red-500/15", "border-red-500/40", "text-red-200"] : ["bg-emerald-500/15", "border-emerald-500/40", "text-emerald-200"]));
       boxEl.textContent = msgText;
     }
 
     async function nocHandleFile(inputEl, tipo) {
       const file = inputEl.files[0]; if (!file) return;
-      $("nocAlertBox").classList.add("viewer-hidden");
+      $("nocAlertBox").classList.add("ui-hidden");
       try {
         const wb = await nocReadWb(file);
         if (tipo === "DET") { nocState.rawDet = nocParseDr(wb, "DETEKTOR"); $("nocBadgeDet").textContent = `${nocState.rawDet.length} pts`; $("nocBadgeDet").className = "text-[11px] font-bold text-emerald-400"; }
@@ -1742,27 +2007,28 @@
         nocState.dfTotal.forEach(r => { if (r.CONECTIVIDAD_DT instanceof Date && !isNaN(r.CONECTIVIDAD_DT.getTime()) && r.CONECTIVIDAD_DT.getTime() > maxT) maxT = r.CONECTIVIDAD_DT.getTime(); });
         nocState.fechaCorte = maxT > -Infinity ? new Date(maxT) : new Date();
         $("nocParamCorte").value = nocToInputDt(nocState.fechaCorte);
+        if ($("btnNocExportExcel")) $("btnNocExportExcel").disabled = false;
         $("nocStatusText").textContent = `Tablas simuladas con ${nocState.dfTotal.length} puntos.`;
         nocRecalculate();
       }
     }
 
     function nocLoadDemoData() {
-      $("nocAlertBox").classList.add("viewer-hidden");
+      $("nocAlertBox").classList.add("ui-hidden");
       const now = new Date(), hAgo = h => new Date(now.getTime() - h * 3600000);
       nocState.rawDet = [
-        { GRUPO: "DETEKTOR", ID: "DT-01", NOMBRE: "NODO CENTRAL LIMA", CONECTIVIDAD_DT: hAgo(1.5), OBS_ORIG: "" },
-        { GRUPO: "DETEKTOR", ID: "DT-02", NOMBRE: "ESTACIÓN CALLAO", CONECTIVIDAD_DT: hAgo(27.0), OBS_ORIG: "" },
-        { GRUPO: "DETEKTOR", ID: "DT-03", NOMBRE: "TORRE COMAS NORTE", CONECTIVIDAD_DT: hAgo(56.0), OBS_ORIG: "" }
+        { GRUPO: "DETEKTOR", ID: "DT-01", NOMBRE: "NODO CENTRAL LIMA", CONECTIVIDAD_DT: hAgo(1.5), RADIO_RX_DT: hAgo(1.4), COMANDO_RX: "OK", DISP_SISTEMA: 99.6, OBS_ORIG: "" },
+        { GRUPO: "DETEKTOR", ID: "DT-02", NOMBRE: "ESTACIÓN CALLAO", CONECTIVIDAD_DT: hAgo(27.0), RADIO_RX_DT: hAgo(27.0), COMANDO_RX: "TIMEOUT", DISP_SISTEMA: 85.0, OBS_ORIG: "" },
+        { GRUPO: "DETEKTOR", ID: "DT-03", NOMBRE: "TORRE COMAS NORTE", CONECTIVIDAD_DT: hAgo(56.0), RADIO_RX_DT: hAgo(56.2), COMANDO_RX: "NO_RESP", DISP_SISTEMA: 40.0, OBS_ORIG: "" }
       ];
       nocState.rawRep = [
-        { GRUPO: "REPOTENCIADOS", ID: "RP-01", NOMBRE: "REPETIDOR TRUJILLO", CONECTIVIDAD_DT: hAgo(0.8), OBS_ORIG: "" },
-        { GRUPO: "REPOTENCIADOS", ID: "RP-02", NOMBRE: "ANTENA AREQUIPA", CONECTIVIDAD_DT: hAgo(30.5), OBS_ORIG: "" }
+        { GRUPO: "REPOTENCIADOS", ID: "RP-01", NOMBRE: "REPETIDOR TRUJILLO", CONECTIVIDAD_DT: hAgo(0.8), RADIO_RX_DT: hAgo(0.8), COMANDO_RX: "OK", DISP_SISTEMA: 99.8, OBS_ORIG: "" },
+        { GRUPO: "REPOTENCIADOS", ID: "RP-02", NOMBRE: "ANTENA AREQUIPA", CONECTIVIDAD_DT: hAgo(30.5), RADIO_RX_DT: hAgo(30.5), COMANDO_RX: "WARN", DISP_SISTEMA: 82.0, OBS_ORIG: "" }
       ];
       nocState.rawLoj = [
-        { GRUPO: "LOJACK", ID: "LJ-001", NOMBRE: "PUNTO LOJACK SUR KM 25", CONECTIVIDAD_DT: hAgo(0.3), OBS_ORIG: "OPERATIVO" },
-        { GRUPO: "LOJACK", ID: "LJ-002", NOMBRE: "PUNTO LOJACK NORTE", CONECTIVIDAD_DT: hAgo(4.0), OBS_ORIG: "INACTIVO" },
-        { GRUPO: "LOJACK", ID: "LJ-003", NOMBRE: "PUNTO LOJACK ANTIGUO", CONECTIVIDAD_DT: hAgo(300.0), OBS_ORIG: "DESINSTALADO" }
+        { GRUPO: "LOJACK", ID: "LJ-001", NOMBRE: "PUNTO LOJACK SUR KM 25", CONECTIVIDAD_DT: hAgo(0.3), RADIO_RX_DT: null, COMANDO_RX: "-", DISP_SISTEMA: null, OBS_ORIG: "OPERATIVO" },
+        { GRUPO: "LOJACK", ID: "LJ-002", NOMBRE: "PUNTO LOJACK NORTE", CONECTIVIDAD_DT: hAgo(4.0), RADIO_RX_DT: null, COMANDO_RX: "-", DISP_SISTEMA: null, OBS_ORIG: "INACTIVO" },
+        { GRUPO: "LOJACK", ID: "LJ-003", NOMBRE: "PUNTO LOJACK ANTIGUO", CONECTIVIDAD_DT: hAgo(300.0), RADIO_RX_DT: null, COMANDO_RX: "-", DISP_SISTEMA: null, OBS_ORIG: "DESINSTALADO" }
       ];
       $("nocBadgeDet").textContent = "3 pts (Demo)"; $("nocBadgeRep").textContent = "2 pts (Demo)"; $("nocBadgeLoj").textContent = "3 pts (Demo)";
       nocCheckReady();
@@ -1775,7 +2041,8 @@
       $("nocBadgeDet").textContent = "Pendiente"; $("nocBadgeRep").textContent = "Pendiente"; $("nocBadgeLoj").textContent = "Pendiente";
       $("nocParamCorte").value = ""; $("nocBannerCorte").textContent = "Esperando reportes...";
       $("nocStatusText").textContent = "Carga los 3 reportes Excel o usa Datos Demo.";
-      $("nocAlertBox").classList.add("viewer-hidden");
+      if ($("btnNocExportExcel")) $("btnNocExportExcel").disabled = true;
+      $("nocAlertBox").classList.add("ui-hidden");
       nocRecalculate();
     }
 
@@ -1879,6 +2146,18 @@
         const acc = isRojo ? `Revisar enlace / energía (${inc.DIAS.toFixed(1)} días fuera)` : `Monitorear reconexión (${inc.HORAS !== null ? inc.HORAS.toFixed(2) : "0.00"}h sin reporte)`;
         return `<tr class="text-slate-200"><td class="py-2 px-2 text-center text-slate-400">${idx + 1}</td><td class="py-2 px-2 text-center font-bold">${escapeHtml(inc.GRUPO)}</td><td class="py-2 px-2 text-center font-mono text-red-300">${escapeHtml(inc.ID)}</td><td class="py-2 px-3 font-semibold text-white">${escapeHtml(inc.NOMBRE)}</td><td class="py-2 px-2 text-center font-mono text-[11px]">${nocFmtDt(inc.CONECTIVIDAD_DT)}</td><td class="py-2 px-2 text-center font-bold ${isRojo ? "text-red-400" : "text-amber-400"}">${inc.DIAS.toFixed(1)}</td><td class="py-2 px-2 text-center"><span class="px-2 py-0.5 rounded text-[10px] font-extrabold ${isRojo ? "bg-red-500/20 text-red-300" : "bg-amber-500/20 text-amber-300"}">${isRojo ? "CRÍTICO" : "ALERTA"}</span></td><td class="py-2 px-3 text-slate-300">${escapeHtml(acc)}</td></tr>`;
       }).join("");
+    }
+
+    function nocExportExcelEjecutivo() {
+      if (!isDevRole() || !nocState.dfEval.length) return;
+      const wb = XLSX.utils.book_new();
+      const wsDbData = [["Tecnología / Grupo", "ID", "Nombre / Punto", "Último Reporte", "Observación", "Horas sin Reportar", "Estado Semáforo"]];
+      nocState.dfEval.forEach(row => {
+        wsDbData.push([row.GRUPO, row.ID, row.NOMBRE, row.CONECTIVIDAD_DT || "", row.OBS_ORIG || "", row.HORAS ?? "", row.ESTADO]);
+      });
+      XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(wsDbData), "Base de Datos");
+      XLSX.writeFile(wb, `Hawks_Dashboard_NOC_${new Date().toISOString().slice(0, 10)}.xlsx`);
+      nocShowAlert("Excel ejecutivo generado", "success");
     }
 
     $("nocFileDet").addEventListener("change", e => nocHandleFile(e.target, "DET"));
