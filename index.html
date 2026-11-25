@@ -5699,9 +5699,41 @@ html body:not(.hunter-preauth) .rail .mt-auto{margin-top:auto}
 }
 </style>
 <style id="hunter-rast-scroll-fix">
-/* Scroll interno solo en la grilla de tarjetas de Rastreadores */
+/* Extiende Rastreadores hasta el filo inferior del cuadro y mantiene el scroll interno */
+@media (min-width: 901px) {
+  html body:not(.hunter-preauth) .frame:has(#view-rast:not(.ui-hidden)) {
+    height: calc(100svh - 88px) !important;
+  }
+  html body:not(.hunter-preauth) .frame:has(#view-rast:not(.ui-hidden)) > .flex-1.flex.flex-col {
+    min-height: 0 !important;
+  }
+  html body:not(.hunter-preauth) .frame:has(#view-rast:not(.ui-hidden)) .cols {
+    flex: 1 1 0 !important;
+    min-height: 0 !important;
+  }
+  html body:not(.hunter-preauth) #view-rast {
+    height: 100% !important;
+    min-height: 0 !important;
+  }
+  html body:not(.hunter-preauth) #rast-body {
+    display: flex !important;
+    flex-direction: column !important;
+    flex: 1 1 0 !important;
+    min-height: 0 !important;
+    overflow: hidden !important;
+    padding-bottom: 12px !important;
+  }
+  html body:not(.hunter-preauth) #rast-body > :not(#rast-list) {
+    flex-shrink: 0 !important;
+  }
+  html body:not(.hunter-preauth) #rast-list {
+    flex: 1 1 0 !important;
+    min-height: 0 !important;
+    max-height: none !important;
+  }
+}
+
 html body:not(.hunter-preauth) #rast-list {
-  max-height: clamp(300px, 46vh, 520px);
   overflow-y: auto !important;
   overflow-x: hidden;
   align-content: start;
@@ -5723,9 +5755,10 @@ html body:not(.hunter-preauth) #rast-list::-webkit-scrollbar-thumb {
 html body:not(.hunter-preauth) #rast-list::-webkit-scrollbar-thumb:hover {
   background: rgb(var(--sk));
 }
+
 @media (max-width: 900px) {
   html body:not(.hunter-preauth) #rast-list {
-    max-height: 60vh;
+    max-height: 62vh;
   }
 }
 </style>
