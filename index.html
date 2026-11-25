@@ -6342,10 +6342,9 @@ html body:not(.hunter-preauth) #maint-list::-webkit-scrollbar-thumb:hover { back
     html body.hunter-preauth #login-floating-card.theme-swap,
     html body.hunter-preauth #login-floating-card.cp-glitch,
     html body.hunter-preauth #login-floating-card.theme-swap form > *,
-    html body.hunter-preauth #login-floating-card form > * {
+    html body.hunter-preauth #login-floating-card.cp-glitch form > * {
       animation: none !important;
       translate: none !important;
-      transform: none !important;
       clip-path: none !important;
       opacity: 1 !important;
     }
@@ -6380,7 +6379,6 @@ html body:not(.hunter-preauth) #maint-list::-webkit-scrollbar-thumb:hover { back
     }, 220);
   }
 
-  // Al salir de un input o presionar OK / Enter, vuelve a la vista general
   document.addEventListener('focusout', (e) => {
     if (e.target && ['INPUT', 'TEXTAREA', 'SELECT'].includes(e.target.tagName)) {
       setTimeout(restoreGeneralView, 90);
@@ -6394,7 +6392,6 @@ html body:not(.hunter-preauth) #maint-list::-webkit-scrollbar-thumb:hover { back
     }
   }, true);
 
-  // Al cambiar el zoom del navegador o el tamaño de pantalla, refresca layout y nitidez
   const refreshSharpness = () => {
     if (typeof window.syncLoginCardToPlanet === 'function') {
       window.syncLoginCardToPlanet();
