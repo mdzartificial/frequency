@@ -5196,15 +5196,16 @@ body:not(.hunter-preauth) #hunter-theme-picker { display:none !important; }
   });
 })();
 </script>
+
 <!-- ===== HUNTER CORE · PARCHE: móvil + cyberpunk + 3D + skins + export NOC =====
-     PEGAR AL FINAL DEL ARCHIVO (después del último </style>/<script>) -->
+     REEMPLAZAR TODO EL BLOQUE FINAL DESDE AQUÍ HASTA EL ÚLTIMO </script> -->
 <style id="hunter-cyberpunk-patch">
 /* 1 · Login: solo queda el punto de "ORBITADO" */
 #brand-mark{display:none!important}
 #brand{gap:0!important}
 
-/* 2 · Skins */
-body{--sk:255,42,78;--sk2:255,112,74;--skt:#fff;--skc:rgb(var(--sk))}
+/* 2 · Skins (base Ámbar) */
+body{--sk:255,176,0;--sk2:255,60,60;--skt:#02060c;--skc:rgb(var(--sk))}
 html body:not(.hunter-preauth):not(.theme-day){--accent:rgb(var(--sk));--accent-soft:rgba(var(--sk),.16);--accent-glow:rgba(var(--sk),.45);--accent-a:var(--sk);--accent-b:var(--sk2)}
 
 /* 3 · Forma angular (nada redondo) */
@@ -5233,13 +5234,21 @@ html body:not(.hunter-preauth):not(.theme-day)::after{content:"";position:fixed;
 html body:not(.hunter-preauth) h1{animation:cpGlitch 6s infinite}
 @keyframes cpGlitch{0%,92%,100%{text-shadow:0 0 14px rgba(var(--sk),.5)}94%{text-shadow:2px 0 #00e5ff,-2px 0 #ff2bd6}96%{text-shadow:-2px 0 #00e5ff,2px 0 #ff2bd6}}
 
-/* 5 · 3D más notorio */
+/* 5 · 3D más sutil (mitad de profundidad) + cuadrado del dashboard más compacto */
 html body:not(.hunter-preauth) .frame{backdrop-filter:none!important;-webkit-backdrop-filter:none!important;transform:perspective(1700px) rotateX(var(--m-x,0deg)) rotateY(var(--m-y,0deg));transform-style:preserve-3d}
 html body:not(.hunter-preauth) :is(.frame>.flex-1,.cols){transform-style:preserve-3d}
-html body:not(.hunter-preauth) .rail{transform:translateZ(46px)}
-html body:not(.hunter-preauth) :is(#side,.map.panel){transform:translateZ(28px)}
-html body:not(.hunter-preauth) .frame .card:hover{transform:translateZ(24px) translateY(-3px)!important}
+html body:not(.hunter-preauth) .rail{transform:translateZ(23px)}
+html body:not(.hunter-preauth) :is(#side,.map.panel){transform:translateZ(14px)}
+html body:not(.hunter-preauth) .frame .card:hover{transform:translateZ(12px) translateY(-2px)!important}
 body.hunter-preauth #login-floating-card{transform:perspective(1400px) rotateX(var(--l-x,0deg)) rotateY(var(--l-y,0deg))!important}
+
+@media(min-width:901px){
+ html body:not(.hunter-preauth){padding:28px 36px!important}
+ html body:not(.hunter-preauth) .frame{width:min(90%,1320px)!important;margin:0 auto!important;min-height:calc(100svh - 88px)!important;padding:12px!important;gap:12px!important}
+ html body:not(.hunter-preauth) .cols{min-height:min(70vh,760px)!important}
+ html body:not(.hunter-preauth) .frame>.flex-1.flex.flex-col{min-height:70vh!important}
+ html body:not(.hunter-preauth) #side{width:290px!important}
+}
 
 /* 6 · Móvil */
 @media(max-width:900px){
@@ -5270,7 +5279,7 @@ body.hunter-preauth #login-floating-card{transform:perspective(1400px) rotateX(v
 (() => {
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  /* ---------- Skins del dashboard ---------- */
+  /* ---------- Skins del dashboard (inicia siempre en Ámbar al ingresar) ---------- */
   const SK = {
     crimson:{n:'Carmesí',hex:'#ff2a4e',rgb:'255,42,78',b:'255,112,74',t:'#fff'},
     cyan:{n:'Cian',hex:'#00e5ff',rgb:'0,229,255',b:'255,43,214',t:'#02060c'},
@@ -5280,14 +5289,11 @@ body.hunter-preauth #login-floating-card{transform:perspective(1400px) rotateX(v
     violet:{n:'Violeta',hex:'#9d6bff',rgb:'157,107,255',b:'0,229,255',t:'#fff'}
   };
   const order = Object.keys(SK);
-  let cur = 'crimson';
-  try { cur = localStorage.getItem('HUNTER_SKIN') || cur; } catch (e) {}
-  if (!SK[cur]) cur = 'crimson';
+  let cur = 'amber';
 
   function applySkin(k, notify) {
     cur = k; const S = SK[k], st = document.body.style;
     st.setProperty('--sk', S.rgb); st.setProperty('--sk2', S.b); st.setProperty('--skt', S.t);
-    try { localStorage.setItem('HUNTER_SKIN', k); } catch (e) {}
     if (notify) {
       showToast('Color: ' + S.n);
       if (!$('view-tech').classList.contains('ui-hidden') && excelData.length) renderTech();
@@ -5295,7 +5301,15 @@ body.hunter-preauth #login-floating-card{transform:perspective(1400px) rotateX(v
     }
   }
   window.toggleAccent = () => applySkin(order[(order.indexOf(cur) + 1) % order.length], true);
-  applySkin(cur, false);
+  applySkin('amber', false);
+
+  const _completeLogin = window.completeLoginWithSession;
+  if (typeof _completeLogin === 'function') {
+    window.completeLoginWithSession = async function (s) {
+      applySkin('amber', false);
+      return _completeLogin(s);
+    };
+  }
 
   /* ---------- Gráficos cyberpunk (barras angulares, neón, sin donuts) ---------- */
   const ORIG = window.Chart;
@@ -5360,7 +5374,7 @@ body.hunter-preauth #login-floating-card{transform:perspective(1400px) rotateX(v
   };
   if (hunterSession) window.applySessionRoleUI(hunterSession);
 
-  /* ---------- Movimiento 3D amplio y suave (mouse + deriva automática) ---------- */
+  /* ---------- Movimiento 3D del dashboard reducido a la mitad ---------- */
   if (!reduce) {
     const login = document.getElementById('login-floating-card');
     let tx = 0, ty = 0, cx = 0, cy = 0;
@@ -5375,7 +5389,7 @@ body.hunter-preauth #login-floating-card{transform:perspective(1400px) rotateX(v
       if (document.body.classList.contains('hunter-preauth')) {
         if (login) { login.style.setProperty('--l-y', (cx * 9).toFixed(2) + 'deg'); login.style.setProperty('--l-x', (-cy * 7).toFixed(2) + 'deg'); }
       } else if (fr && innerWidth > 900) {
-        fr.style.setProperty('--m-y', (cx * 3.6).toFixed(2) + 'deg'); fr.style.setProperty('--m-x', (-cy * 2.6).toFixed(2) + 'deg');
+        fr.style.setProperty('--m-y', (cx * 1.8).toFixed(2) + 'deg'); fr.style.setProperty('--m-x', (-cy * 1.3).toFixed(2) + 'deg');
       }
       requestAnimationFrame(loop);
     };
