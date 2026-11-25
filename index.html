@@ -622,37 +622,48 @@ body.hunter-preauth::before {
     linear-gradient(180deg, rgba(20, 3, 5, .30), rgba(0, 0, 0, .35));
 }
 
-/* ---- Tarjeta: losa 3D con grosor, bisel y reflejo ---- */
+/* ---- Tarjeta: esfera de vidrio con blur ---- */
 .liquid-card-3d.glass-panel {
-  transform-style: preserve-3d;
+  --d: 480px;
+  width: var(--d);
+  aspect-ratio: 1 / 1;
+  padding: 0 calc(var(--d) * .17);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
   overflow: visible;
-  backdrop-filter: none;            /* el blur aplana el 3D, por eso se quita */
-  -webkit-backdrop-filter: none;
-  border-radius: 22px;
-  border: 1px solid rgba(255, 110, 110, .38);
+  transform-style: flat;
+  border-radius: 50% !important;
+  border: 1px solid rgba(255, 130, 130, .42);
+  backdrop-filter: blur(20px) saturate(165%) brightness(.9);
+  -webkit-backdrop-filter: blur(20px) saturate(165%) brightness(.9);
   background:
-    linear-gradient(145deg, rgba(255, 255, 255, .09), rgba(255, 255, 255, 0) 40%),
-    linear-gradient(160deg, rgba(62, 8, 12, .93), rgba(14, 2, 4, .97));
+    radial-gradient(circle at 30% 20%, rgba(255, 255, 255, .22), transparent 28%),
+    radial-gradient(circle at 50% 50%, rgba(36, 4, 8, .50) 0%, rgba(70, 8, 14, .46) 62%, rgba(255, 70, 70, .28) 100%);
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, .30),
-    inset 0 0 0 1px rgba(255, 60, 60, .08),
-    inset 0 -24px 44px rgba(255, 40, 40, .08),
-    0 0 54px rgba(255, 40, 40, .24),
-    0 44px 90px rgba(0, 0, 0, .75);
+    inset 0 0 52px rgba(255, 60, 60, .38),
+    inset 0 2px 1px rgba(255, 255, 255, .38),
+    inset 0 -34px 60px rgba(255, 40, 40, .14),
+    0 0 70px rgba(255, 40, 40, .30),
+    0 40px 90px rgba(0, 0, 0, .65);
 }
+/* si aparece el QR de MFA forzado, la esfera crece para que quepa */
+.liquid-card-3d.glass-panel:has(#sb-forced-mfa:not(.ui-hidden)) { --d: 620px; }
+@media (max-width: 540px) { .liquid-card-3d.glass-panel { zoom: .74; } .liquid-card-3d > .orb-ring.rev { display: none; } }
+@media (max-height: 580px) { .liquid-card-3d.glass-panel { zoom: .78; } }
 
-/* Placa trasera: da profundidad real cuando la tarjeta se inclina */
+/* Brillo inferior interno (refracción) */
 .liquid-card-3d::before {
   content: "";
   position: absolute;
   inset: 0;
-  z-index: -1;
-  border-radius: inherit;
+  z-index: 0;
+  border-radius: 50%;
   animation: none;
-  transform: translateZ(-16px);
-  background: #34060a;
-  border: 1px solid rgba(255, 90, 90, .32);
-  box-shadow: 0 0 34px rgba(255, 40, 40, .38);
+  transform: none;
+  mix-blend-mode: screen;
+  pointer-events: none;
+  background: radial-gradient(circle at 50% 118%, rgba(255, 90, 70, .38), transparent 55%);
 }
 
 /* Reflejo especular que sigue al mouse */
@@ -661,14 +672,31 @@ body.hunter-preauth::before {
   position: absolute;
   inset: 0;
   z-index: 4;
-  border-radius: inherit;
+  border-radius: 50%;
   pointer-events: none;
-  transform: translateZ(18px);
   mix-blend-mode: screen;
-  background: radial-gradient(420px circle at var(--gx, 30%) var(--gy, 0%), rgba(255, 255, 255, .16), transparent 55%);
+  background: radial-gradient(360px circle at var(--gx, 30%) var(--gy, 0%), rgba(255, 255, 255, .15), transparent 58%);
 }
 
-.liquid-input { background: rgba(30, 4, 7, .65); }
+/* Anillos orbitales con texto alrededor de la esfera */
+.liquid-card-3d > .orb-ring {
+  position: absolute;
+  inset: -34px;
+  z-index: 1;
+  pointer-events: none;
+  transform: none;
+  animation: orbSpin 70s linear infinite;
+}
+.liquid-card-3d > .orb-ring.rev { inset: -58px; animation-duration: 110s; animation-direction: reverse; opacity: .55; }
+.orb-ring svg { width: 100%; height: 100%; overflow: visible; }
+.orb-ring text { font: 600 2.6px ui-monospace, Menlo, Consolas, monospace; fill: rgba(255, 150, 140, .85); letter-spacing: .5px; }
+@keyframes orbSpin { to { transform: rotate(360deg); } }
+
+.liquid-input {
+  background: rgba(30, 4, 7, .55);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
 
   </style>
 </head>
@@ -706,6 +734,15 @@ body.hunter-preauth::before {
 
     <!-- TARJETA LIQUID GLASS CON EFECTO TILT 3D Y MORPHING -->
     <div id="login-floating-card" class="glass-panel liquid-card-3d shape-0 fade">
+      <div class="orb-ring" aria-hidden="true"><svg viewBox="0 0 100 100">
+        <defs><path id="orbPath" d="M50,50 m-47,0 a47,47 0 1,1 94,0 a47,47 0 1,1 -94,0"/></defs>
+        <circle cx="50" cy="50" r="49.6" fill="none" stroke="rgba(255,90,90,.35)" stroke-width=".25"/>
+        <circle cx="50" cy="50" r="44.6" fill="none" stroke="rgba(255,90,90,.22)" stroke-width=".2" stroke-dasharray="1.2 1.8"/>
+        <text><textPath href="#orbPath" textLength="292" lengthAdjust="spacing">HAWKS SKYNET • SATELLITE LINK • MDZHUNTER • ENCRYPTED ACCESS • 2FA •</textPath></text>
+      </svg></div>
+      <div class="orb-ring rev" aria-hidden="true"><svg viewBox="0 0 100 100">
+        <circle cx="50" cy="50" r="49.6" fill="none" stroke="rgba(255,90,90,.45)" stroke-width=".2" stroke-dasharray="6 3 1 3"/>
+      </svg></div>
       <div class="flex items-center justify-between mb-3.5">
         <div class="flex items-center gap-2.5">
           <div class="w-9 h-9 rounded-xl bg-white/5 border border-white/15 flex items-center justify-center">
@@ -2493,21 +2530,69 @@ const sats = ORBITS.map(o => {
 // ---------- Astronauta flotando (amarrado a un satélite) ----------
 function makeAstronaut() {
   const g = new THREE.Group();
-  const suit = new THREE.MeshStandardMaterial({ color: 0xf3f1ef, roughness: 0.55, metalness: 0.05 });
-  const gray = new THREE.MeshStandardMaterial({ color: 0xcfcfd2, roughness: 0.5, metalness: 0.2 });
-  const visor = new THREE.MeshStandardMaterial({ color: 0x1a0a05, metalness: 1, roughness: 0.08, emissive: 0x3a0505 });
+  const suit = new THREE.MeshStandardMaterial({ color: 0xf4f1ee, roughness: 0.6, metalness: 0.05 });
+  const suit2 = new THREE.MeshStandardMaterial({ color: 0xd2cfcc, roughness: 0.65, metalness: 0.1 });
+  const dark = new THREE.MeshStandardMaterial({ color: 0x2b2b32, roughness: 0.55, metalness: 0.3 });
+  const gray = new THREE.MeshStandardMaterial({ color: 0xa9a9b0, roughness: 0.4, metalness: 0.5 });
+  const skin = new THREE.MeshStandardMaterial({ color: 0xe2ae8c, roughness: 0.7 });
+  const eye = new THREE.MeshBasicMaterial({ color: 0x1b1210 });
   const red = new THREE.MeshBasicMaterial({ color: 0xff2a2a });
-  const add = (geo, mat, x, y, z, rx = 0, rz = 0) => { const m = new THREE.Mesh(geo, mat); m.position.set(x, y, z); m.rotation.set(rx, 0, rz); g.add(m); return m; };
-  add(new THREE.CapsuleGeometry(0.17, 0.26, 6, 12), suit, 0, 0, 0);
-  add(new THREE.SphereGeometry(0.19, 20, 16), suit, 0, 0.4, 0);
-  const v = add(new THREE.SphereGeometry(0.15, 20, 16), visor, 0, 0.4, 0.09); v.scale.set(1, 0.85, 0.7);
-  add(new THREE.BoxGeometry(0.3, 0.38, 0.16), gray, 0, 0.02, -0.17);
-  add(new THREE.BoxGeometry(0.12, 0.05, 0.02), red, 0, 0.08, 0.17);
-  add(new THREE.CapsuleGeometry(0.06, 0.24, 4, 8), suit, -0.26, 0.05, 0.08, 0.5, 0.5);
-  add(new THREE.CapsuleGeometry(0.06, 0.24, 4, 8), suit, 0.26, 0.1, 0.1, 0.8, -0.7);
-  add(new THREE.CapsuleGeometry(0.075, 0.28, 4, 8), suit, -0.1, -0.42, 0.04, 0.3, 0);
-  add(new THREE.CapsuleGeometry(0.075, 0.28, 4, 8), suit, 0.1, -0.46, -0.02, -0.2, 0);
-  g.scale.setScalar(0.9); return g;
+  const green = new THREE.MeshBasicMaterial({ color: 0x3dff8a });
+  const glass = new THREE.MeshStandardMaterial({ color: 0xffb070, metalness: 0.9, roughness: 0.05, transparent: true, opacity: 0.22, depthWrite: false });
+  const M = (geo, mat, x = 0, y = 0, z = 0, parent = g) => { const m = new THREE.Mesh(geo, mat); m.position.set(x, y, z); parent.add(m); return m; };
+
+  // Tronco, pelvis, cinturón y cuello
+  M(new THREE.CapsuleGeometry(0.2, 0.3, 8, 16), suit, 0, 0.4, 0).scale.set(1, 1, 0.72);
+  M(new THREE.CapsuleGeometry(0.18, 0.08, 8, 16), suit, 0, 0.08, 0).scale.set(1, 1, 0.78);
+  M(new THREE.CylinderGeometry(0.19, 0.19, 0.05, 20), dark, 0, 0.17, 0).scale.set(1, 1, 0.78);
+  M(new THREE.TorusGeometry(0.12, 0.035, 10, 24), gray, 0, 0.78, 0).rotation.x = Math.PI / 2;
+  // Panel de control en el pecho
+  M(new THREE.BoxGeometry(0.22, 0.14, 0.03), gray, 0, 0.46, 0.15);
+  M(new THREE.BoxGeometry(0.035, 0.035, 0.01), red, -0.06, 0.48, 0.17);
+  M(new THREE.BoxGeometry(0.035, 0.035, 0.01), green, 0.0, 0.48, 0.17);
+  M(new THREE.BoxGeometry(0.1, 0.03, 0.01), dark, 0, 0.42, 0.17);
+  // Mochila de soporte vital
+  M(new THREE.BoxGeometry(0.36, 0.48, 0.15), suit2, 0, 0.42, -0.2);
+  M(new THREE.CylinderGeometry(0.035, 0.035, 0.1, 10), gray, -0.1, 0.2, -0.2);
+  M(new THREE.CylinderGeometry(0.035, 0.035, 0.1, 10), gray, 0.1, 0.2, -0.2);
+
+  // Cabeza con rostro visible dentro de un casco de burbuja
+  const head = new THREE.Group(); head.position.set(0, 0.97, 0); g.add(head);
+  M(new THREE.SphereGeometry(0.125, 24, 18), skin, 0, -0.01, 0.02, head).scale.set(0.95, 1.1, 1);
+  M(new THREE.SphereGeometry(0.02, 8, 8), skin, 0, -0.03, 0.14, head);            // nariz
+  M(new THREE.SphereGeometry(0.017, 8, 8), eye, -0.045, 0.015, 0.108, head);        // ojos
+  M(new THREE.SphereGeometry(0.017, 8, 8), eye, 0.045, 0.015, 0.108, head);
+  M(new THREE.BoxGeometry(0.05, 0.008, 0.01), eye, 0, -0.07, 0.115, head);          // boca
+  M(new THREE.SphereGeometry(0.135, 20, 12, 0, Math.PI * 2, 0, Math.PI * 0.42), new THREE.MeshStandardMaterial({ color: 0x3a2518, roughness: 0.9 }), 0, 0.0, -0.01, head); // pelo
+  // Casco: cascarón blanco con abertura frontal + burbuja de cristal
+  const shell = M(new THREE.SphereGeometry(0.24, 32, 24, Math.PI / 2 + 0.95, Math.PI * 2 - 1.9), suit, 0, 0, 0, head);
+  shell.material = suit.clone(); shell.material.side = THREE.DoubleSide;
+  M(new THREE.SphereGeometry(0.245, 32, 24), glass, 0, 0, 0, head);
+
+  // Extremidades articuladas
+  const limb = (x, y, z, upLen, loLen, rUp, rLo, matUp, matLo, endMat, endGeo, endY) => {
+    const hip = new THREE.Group(); hip.position.set(x, y, z); g.add(hip);
+    M(new THREE.SphereGeometry(rUp * 1.12, 12, 10), matUp, 0, 0, 0, hip);
+    M(new THREE.CapsuleGeometry(rUp, upLen, 6, 12), matUp, 0, -upLen / 2 - 0.03, 0, hip);
+    const joint = new THREE.Group(); joint.position.y = -upLen - 0.07; hip.add(joint);
+    M(new THREE.SphereGeometry(rLo * 1.1, 12, 10), matLo, 0, 0, 0, joint);
+    M(new THREE.CapsuleGeometry(rLo, loLen, 6, 12), matLo, 0, -loLen / 2 - 0.03, 0, joint);
+    M(endGeo, endMat, 0, endY - loLen, 0.0, joint);
+    return { hip, joint };
+  };
+  const handGeo = new THREE.SphereGeometry(0.075, 12, 10);
+  const bootGeo = new THREE.BoxGeometry(0.15, 0.1, 0.27);
+  const armL = limb(-0.27, 0.6, 0, 0.22, 0.2, 0.062, 0.056, suit, suit, dark, handGeo, -0.07);
+  const armR = limb(0.27, 0.6, 0, 0.22, 0.2, 0.062, 0.056, suit, suit, dark, handGeo, -0.07);
+  const legL = limb(-0.1, 0.05, 0, 0.28, 0.26, 0.088, 0.075, suit, suit, dark, bootGeo, -0.06);
+  const legR = limb(0.1, 0.05, 0, 0.28, 0.26, 0.088, 0.075, suit, suit, dark, bootGeo, -0.06);
+  // Parches rojos en los hombros
+  M(new THREE.BoxGeometry(0.03, 0.09, 0.09), red, -0.335, 0.62, 0);
+  M(new THREE.BoxGeometry(0.03, 0.09, 0.09), red, 0.335, 0.62, 0);
+
+  g.userData = { head, armL, armR, legL, legR };
+  g.scale.setScalar(0.75);
+  return g;
 }
 const astro = makeAstronaut(); scene.add(astro);
 const tetherGeo = new THREE.BufferGeometry(); tetherGeo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(6), 3));
@@ -2554,8 +2639,17 @@ function animate() {
 
   const asp = innerWidth / innerHeight;
   astro.position.set((asp > 1 ? 4.6 : 2.6) + Math.sin(t * 0.4) * 0.25, 1.4 + Math.sin(t * 0.55) * 0.3, 1.6);
-  astro.rotation.set(Math.sin(t * 0.3) * 0.5, t * 0.25 * k, Math.sin(t * 0.2) * 0.4);
-  astro.localToWorld(v3.set(0, 0, -0.2));
+  astro.rotation.set(0.12 + Math.sin(t * 0.3) * 0.12, -0.5 + Math.sin(t * 0.25 * k) * 0.45, Math.sin(t * 0.2) * 0.18);
+  const u = astro.userData, w = t * k;
+  u.armL.hip.rotation.z = -(2.3 + Math.sin(w * 2.6) * 0.28);   // saluda con el brazo izquierdo
+  u.armL.joint.rotation.z = -Math.sin(w * 2.6 + 1) * 0.35;
+  u.armL.joint.rotation.x = -0.3;
+  u.armR.hip.rotation.z = 0.38 + Math.sin(w * 0.9) * 0.08;
+  u.armR.hip.rotation.x = -0.35; u.armR.joint.rotation.x = -0.7;
+  u.legL.hip.rotation.x = -0.35 + Math.sin(w * 0.8) * 0.18; u.legL.joint.rotation.x = 0.7 + Math.sin(w * 0.8 + 1) * 0.12;
+  u.legR.hip.rotation.x = -0.1 + Math.sin(w * 0.8 + 2) * 0.18; u.legR.joint.rotation.x = 0.45 + Math.sin(w * 0.8 + 3) * 0.12;
+  u.head.rotation.set(Math.sin(w * 0.5) * 0.08, Math.sin(w * 0.35) * 0.3, 0);
+  astro.localToWorld(v3.set(0, 0.45, -0.3));
   sats[0].mesh.getWorldPosition(v1);
   const ta = tether.geometry.attributes.position; ta.setXYZ(0, v3.x, v3.y, v3.z); ta.setXYZ(1, v1.x, v1.y, v1.z); ta.needsUpdate = true;
 
