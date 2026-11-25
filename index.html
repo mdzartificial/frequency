@@ -5439,9 +5439,23 @@ body.hunter-preauth::after{content:"";position:fixed;inset:0;z-index:2;pointer-e
   const RT = 'mdz_hunter_rastreadores';
   const ESTADOS = ['ACTIVO', 'SIN_SENAL', 'MANTENIMIENTO', 'INACTIVO'];
   const EC = { ACTIVO: '#22c55e', SIN_SENAL: '#f59e0b', MANTENIMIENTO: '#00e5ff', INACTIVO: '#ef4444' };
-  const FIELDS = [['imei', 'IMEI *'], ['placa', 'Placa'], ['vehiculo', 'Vehículo'], ['cliente', 'Cliente'], ['modelo', 'Modelo'], ['sim', 'SIM'], ['operador', 'Operador'], ['estado', 'Estado'], ['ultima_conexion', 'Última conexión'], ['latitud', 'Latitud'], ['longitud', 'Longitud'], ['observacion', 'Observación']];
+  const FIELDS = [
+    ['orden', 'Orden'],
+    ['unidad', 'Unidad / Nombre *'],
+    ['placa', 'Placa'],
+    ['imei', 'GPS / IMEI'],
+    ['modelo', 'Modelo'],
+    ['detektor', 'Detektor'],
+    ['activacion', 'Activación'],
+    ['respuesta', 'Respuesta'],
+    ['responsable', 'Responsable'],
+    ['zona', 'Zona'],
+    ['estado', 'Estado'],
+    ['detalles', 'Detalles']
+  ];
   const SHIP = '<svg class="hud-ico rast-ship" viewBox="0 0 24 24"><path d="M12 2.5c2.6 2.2 3.6 5.2 3.6 8.4v3.6L12 17.5l-3.6-3v-3.6c0-3.2 1-6.2 3.6-8.4z"/><circle cx="12" cy="9.5" r="1.7"/><path d="M8.4 12.6 4 16v3.2l4.4-2.2M15.6 12.6 20 16v3.2L15.6 17M10.3 19.5 12 22l1.7-2.5"/></svg>';
   const esc = escapeHtml;
+  const hasVal = v => v !== null && v !== undefined && String(v).trim() !== '';
   let rows = [];
 
   const nav = document.createElement('button');
@@ -5459,41 +5473,64 @@ body.hunter-preauth::after{content:"";position:fixed;inset:0;z-index:2;pointer-e
     <button id="rast-refresh" class="chip px-3 py-1.5 text-xs font-semibold text-slate-200 cursor-pointer">Actualizar</button></div></div>
     <div id="rast-body" class="flex-1 overflow-y-auto scroll px-5 py-4 space-y-4">
       <div id="rast-kpis" class="grid grid-cols-2 lg:grid-cols-5 gap-2.5"></div>
-      <div class="flex flex-wrap gap-2"><input id="rast-q" placeholder="Placa, IMEI, SIM, cliente..." class="flex-1 min-w-[180px] px-3 py-2 text-xs bg-black/40 border border-white/10 text-white outline-none">
+      <div class="flex flex-wrap gap-2"><input id="rast-q" placeholder="Unidad, placa, IMEI, Detektor, responsable, zona..." class="flex-1 min-w-[180px] px-3 py-2 text-xs bg-black/40 border border-white/10 text-white outline-none">
       <select id="rast-estado" class="sel"><option value="ALL">Todos los estados</option>${ESTADOS.map(e => `<option>${e}</option>`).join('')}</select></div>
       <div id="rast-list" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3"></div></div>`;
   $('view-rafi').after(sec);
 
-  const ago = d => { if (!d) return '—'; const h = (Date.now() - new Date(d)) / 36e5; return h < 1 ? 'hace ' + Math.round(h * 60) + ' min' : h < 48 ? 'hace ' + h.toFixed(1) + ' h' : 'hace ' + Math.round(h / 24) + ' d'; };
-
   function render() {
     const q = normalizeText($('rast-q').value), f = $('rast-estado').value, dev = isDevRole();
-    const list = rows.filter(r => (f === 'ALL' || r.estado === f) && (!q || normalizeText([r.imei, r.placa, r.vehiculo, r.cliente, r.modelo, r.sim, r.operador, r.observacion].join(' ')).includes(q)));
+    const list = rows.filter(r =>
+      (f === 'ALL' || r.estado === f) &&
+      (!q || normalizeText([r.orden, r.unidad, r.placa, r.imei, r.modelo, r.detektor, r.activacion, r.respuesta, r.detalles, r.responsable, r.zona, r.estado].join(' ')).includes(q))
+    );
     $('rast-count').textContent = rows.length;
     $('rast-kpis').innerHTML = [['Total', rows.length, 'var(--accent)'], ...ESTADOS.map(e => [e.replace('_', ' '), rows.filter(r => r.estado === e).length, EC[e]])]
       .map(([l, v, c]) => `<div class="chip p-3"><p class="text-xl font-bold" style="color:${c}">${v}</p><p class="text-[11px] text-slate-400 uppercase">${l}</p></div>`).join('');
+
     $('rast-list').innerHTML = list.map(r => {
-      const has = r.latitud != null && r.longitud != null, c = EC[r.estado] || '#64748b';
-      return `<article class="card p-4 space-y-2 fade">
-        <div class="flex items-start justify-between gap-2"><div class="min-w-0"><h3 class="text-sm font-bold text-white truncate">${esc(r.placa || r.vehiculo || 'SIN PLACA')}</h3>
-        <p class="text-[11px] text-slate-400 truncate">${esc(r.cliente || '—')}${r.vehiculo && r.placa ? ' · ' + esc(r.vehiculo) : ''}</p></div>
-        <span class="px-2 py-0.5 text-[10px] font-bold shrink-0" style="color:${c};border:1px solid ${c};background:${c}22">${esc((r.estado || '').replace('_', ' '))}</span></div>
-        <div class="grid grid-cols-2 gap-1.5 text-[11px]">
-          <div class="chip px-2 py-1.5"><span class="text-slate-400">IMEI</span><p class="mono font-bold text-white truncate">${esc(r.imei)}</p></div>
-          <div class="chip px-2 py-1.5"><span class="text-slate-400">Modelo</span><p class="font-bold text-white truncate">${esc(r.modelo || '—')}</p></div>
-          <div class="chip px-2 py-1.5"><span class="text-slate-400">SIM · ${esc(r.operador || '—')}</span><p class="mono font-bold text-white truncate">${esc(r.sim || '—')}</p></div>
-          <div class="chip px-2 py-1.5"><span class="text-slate-400">Última conexión</span><p class="font-bold text-white">${ago(r.ultima_conexion)}</p></div></div>
-        ${r.observacion ? `<p class="text-[11px] text-amber-200 border-l-2 border-amber-400 pl-2">${esc(r.observacion)}</p>` : ''}
-        <div class="flex items-center justify-between gap-2 pt-1">
-          ${has ? `<a target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query=${Number(r.latitud)},${Number(r.longitud)}" class="text-[11px] text-[var(--accent)] font-semibold mono">${Number(r.latitud).toFixed(5)}, ${Number(r.longitud).toFixed(5)} ↗</a>` : '<span class="text-[11px] text-slate-500">Sin coordenadas</span>'}
-          ${dev ? `<span class="flex gap-1.5"><button data-act="edit" data-id="${r.id}" class="chip px-2.5 py-1 text-[11px] font-semibold text-white">Editar</button><button data-act="del" data-id="${r.id}" class="chip px-2.5 py-1 text-[11px] font-semibold text-red-300">Eliminar</button></span>` : ''}
-        </div></article>`;
+      const c = EC[r.estado] || '#64748b';
+      const titulo = r.unidad || r.placa || 'SIN UNIDAD';
+      const subtitulo = [r.placa, r.zona, r.responsable].filter(hasVal).join(' · ');
+      const chips = [
+        ['GPS / IMEI', r.imei, true],
+        ['Modelo', r.modelo, false],
+        ['Detektor', r.detektor, true],
+        ['Activación', r.activacion, true],
+        ['Respuesta', r.respuesta, true]
+      ].filter(([, v]) => hasVal(v));
+
+      return `<article class="card p-4 space-y-2.5 fade">
+        <div class="flex items-start justify-between gap-2">
+          <div class="min-w-0">
+            <h3 class="text-sm font-bold text-white truncate">${esc(titulo)}</h3>
+            ${subtitulo ? `<p class="text-[11px] text-slate-400 truncate">${esc(subtitulo)}</p>` : ''}
+          </div>
+          <span class="px-2 py-0.5 text-[10px] font-bold shrink-0" style="color:${c};border:1px solid ${c};background:${c}22">${esc((r.estado || 'ACTIVO').replace('_', ' '))}</span>
+        </div>
+        ${chips.length ? `<div class="grid grid-cols-2 gap-1.5 text-[11px]">${chips.map(([lbl, val, mono]) =>
+          `<div class="chip px-2 py-1.5"><span class="text-slate-400">${lbl}</span><p class="${mono ? 'mono ' : ''}font-bold text-white truncate" title="${esc(val)}">${esc(val)}</p></div>`
+        ).join('')}</div>` : ''}
+        ${hasVal(r.detalles) ? `<p class="text-[11px] text-amber-200 border-l-2 border-amber-400 pl-2">${esc(r.detalles)}</p>` : ''}
+        ${dev ? `<div class="flex items-center justify-between gap-2 pt-1">
+          <span class="text-[10px] text-slate-500 mono">${hasVal(r.orden) ? '#' + esc(r.orden) : ''}</span>
+          <span class="flex gap-1.5">
+            <button data-act="edit" data-id="${r.id}" class="chip px-2.5 py-1 text-[11px] font-semibold text-white cursor-pointer">Editar</button>
+            <button data-act="del" data-id="${r.id}" class="chip px-2.5 py-1 text-[11px] font-semibold text-red-300 cursor-pointer">Eliminar</button>
+          </span>
+        </div>` : ''}
+      </article>`;
     }).join('') || `<div class="col-span-full">${msg('fa-satellite-dish', 'Sin rastreadores', 'Aún no hay registros que coincidan.')}</div>`;
   }
 
   async function load() {
     if (!hunterSbClient) return;
-    const { data, error } = await hunterSbClient.from(RT).select('*').order('updated_at', { ascending: false }).limit(2000);
+    const { data, error } = await hunterSbClient
+      .from(RT)
+      .select('*')
+      .order('orden', { ascending: true, nullsFirst: false })
+      .order('id', { ascending: true })
+      .limit(2000);
     if (error) { $('rast-list').innerHTML = `<div class="col-span-full">${msg('fa-triangle-exclamation', 'No se pudo cargar', esc(error.message))}</div>`; return; }
     rows = data || []; render();
   }
@@ -5501,21 +5538,25 @@ body.hunter-preauth::after{content:"";position:fixed;inset:0;z-index:2;pointer-e
   function openForm(r) {
     const o = document.createElement('div');
     o.className = 'fixed inset-0 z-[400] bg-black/75 flex items-center justify-center p-4';
-    const val = k => r ? (k === 'ultima_conexion' && r[k] ? nocToInputDt(new Date(r[k])) : (r[k] ?? '')) : (k === 'estado' ? 'ACTIVO' : '');
+    const val = k => r ? (r[k] ?? '') : (k === 'estado' ? 'ACTIVO' : '');
     o.innerHTML = `<div class="panel w-full max-w-2xl max-h-[88vh] flex flex-col fade"><div class="px-5 py-3 border-b border-white/10 text-sm font-bold text-white">${r ? 'Editar' : 'Nuevo'} rastreador</div>
       <div class="flex-1 overflow-y-auto scroll p-5 grid grid-cols-1 sm:grid-cols-2 gap-3">${FIELDS.map(([k, l]) => `<label class="block text-[10px] font-bold uppercase text-slate-400">${l}${k === 'estado'
         ? `<select data-k="${k}" class="sel w-full max-w-none mt-1">${ESTADOS.map(e => `<option ${e === val(k) ? 'selected' : ''}>${e}</option>`).join('')}</select>`
-        : `<input data-k="${k}" type="${k === 'ultima_conexion' ? 'datetime-local' : 'text'}" value="${esc(val(k))}" class="w-full mt-1 px-3 py-2 text-xs bg-black/40 border border-white/10 text-white outline-none">`}</label>`).join('')}</div>
+        : `<input data-k="${k}" type="${k === 'orden' ? 'number' : 'text'}" value="${esc(val(k))}" class="w-full mt-1 px-3 py-2 text-xs bg-black/40 border border-white/10 text-white outline-none">`}</label>`).join('')}</div>
       <div class="px-5 py-3 border-t border-white/10 flex justify-end gap-2"><button data-m="x" class="chip px-4 py-2 text-xs font-semibold">Cancelar</button><button data-m="ok" class="btn px-5 py-2 text-xs font-bold text-white">Guardar</button></div></div>`;
     o.addEventListener('click', async e => {
       const m = e.target.closest('[data-m]');
       if (!m) { if (e.target === o) o.remove(); return; }
       if (m.dataset.m === 'x') { o.remove(); return; }
       const p = {}; o.querySelectorAll('[data-k]').forEach(i => p[i.dataset.k] = i.value.trim());
-      if (!p.imei) { showToast('El IMEI es obligatorio'); return; }
-      ['latitud', 'longitud'].forEach(k => { const n = parseFloat(String(p[k]).replace(',', '.')); p[k] = isFinite(n) ? n : null; });
-      p.ultima_conexion = p.ultima_conexion ? new Date(p.ultima_conexion).toISOString() : null;
-      ['placa', 'vehiculo', 'cliente', 'modelo', 'sim', 'operador', 'observacion'].forEach(k => { if (!p[k]) p[k] = null; });
+      if (!p.unidad && !p.placa) { showToast('Ingresa al menos Unidad o Placa'); return; }
+      const ord = parseInt(p.orden, 10);
+      p.orden = Number.isFinite(ord) ? ord : null;
+      if (!p.modelo && p.imei) {
+        const eq = getEquipmentInfo(p.imei);
+        if (eq && eq.modelo && eq.modelo !== 'Desconocido') p.modelo = eq.modelo;
+      }
+      ['unidad', 'placa', 'imei', 'modelo', 'detektor', 'activacion', 'respuesta', 'responsable', 'zona', 'detalles'].forEach(k => { if (!p[k]) p[k] = null; });
       const { error } = await (r ? hunterSbClient.from(RT).update(p).eq('id', r.id) : hunterSbClient.from(RT).insert(p));
       if (error) { showToast('Error: ' + error.message); return; }
       o.remove(); showToast('Guardado'); load();
@@ -5562,7 +5603,7 @@ body.hunter-preauth::after{content:"";position:fixed;inset:0;z-index:2;pointer-e
   const card = $('login-floating-card');
   if (card && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
     const go = () => setTimeout(() => {
-      if (document.body.classList.contains('hunter-preauth')) {
+      if (document.body.classList.contains('hunter-preauth') && !document.body.classList.contains('login-busy')) {
         card.classList.remove('cp-glitch'); void card.offsetWidth; card.classList.add('cp-glitch');
         setTimeout(() => card.classList.remove('cp-glitch'), 420);
       }
