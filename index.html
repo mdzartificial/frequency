@@ -5861,32 +5861,435 @@ html body:not(.hunter-preauth):not(.theme-day) #view-noc input[type="file"]::-we
   border-color: rgb(var(--sk)) !important;
 }
 </style>
-function onFormSubmit(e) {
-  const r = e.namedValues;
-  const get = k => (r[k] && r[k][0] ? String(r[k][0]).trim() : null);
-
-  const payload = {
-    punto: get('Antena / Punto'),
-    ciclo: String(new Date().getFullYear()),
-    sector: (get('Sector') || '').toUpperCase() || null,
-    estado: (get('Estado') || 'COMPLETADO').toUpperCase(),
-    tecnico: get('Técnico'),
-    fecha_ejecucion: new Date().toISOString().slice(0, 10),
-    duracion_min: Number(get('Duración (min)')) || null,
-    observaciones: get('Observaciones'),
-    evidencia_url: get('Enlace de Fotos'),
-    origen: 'GOOGLE_FORM',
-    updated_at: new Date().toISOString()
-  };
-
-  UrlFetchApp.fetch('https://uswtlvzyrujjjmbsbnmj.supabase.co/rest/v1/mdz_hunter_mantenimiento?on_conflict=punto,ciclo', {
-    method: 'post',
-    contentType: 'application/json',
-    headers: {
-      apikey: 'TU_SERVICE_ROLE_KEY',
-      Authorization: 'Bearer TU_SERVICE_ROLE_KEY',
-      Prefer: 'resolution=merge-duplicates'
-    },
-    payload: JSON.stringify(payload)
-  });
+<style id="hunter-maint-v2-css">
+@media (min-width: 901px) {
+  html body:not(.hunter-preauth) .frame:has(#view-maint:not(.ui-hidden)) {
+    height: calc(100svh - 88px) !important;
+  }
+  html body:not(.hunter-preauth) .frame:has(#view-maint:not(.ui-hidden)) > .flex-1.flex.flex-col,
+  html body:not(.hunter-preauth) .frame:has(#view-maint:not(.ui-hidden)) .cols {
+    flex: 1 1 0 !important;
+    min-height: 0 !important;
+  }
+  html body:not(.hunter-preauth) #view-maint {
+    height: 100% !important;
+    min-height: 0 !important;
+  }
+  html body:not(.hunter-preauth) #maint-body {
+    display: flex !important;
+    flex-direction: column !important;
+    flex: 1 1 0 !important;
+    min-height: 0 !important;
+    overflow: hidden !important;
+    padding-bottom: 12px !important;
+  }
+  html body:not(.hunter-preauth) #maint-body > :not(#maint-list) {
+    flex-shrink: 0 !important;
+  }
+  html body:not(.hunter-preauth) #maint-list {
+    flex: 1 1 0 !important;
+    min-height: 0 !important;
+    max-height: none !important;
+  }
 }
+html body:not(.hunter-preauth) #maint-list {
+  overflow-y: auto !important;
+  overflow-x: hidden;
+  align-content: start;
+  padding: 6px 10px 10px 4px;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(var(--sk), .75) rgba(0, 0, 0, .35);
+}
+html body:not(.hunter-preauth) #maint-list::-webkit-scrollbar { width: 8px; }
+html body:not(.hunter-preauth) #maint-list::-webkit-scrollbar-track { background: rgba(0, 0, 0, .38); border: 1px solid rgba(var(--sk), .18); }
+html body:not(.hunter-preauth) #maint-list::-webkit-scrollbar-thumb { background: rgba(var(--sk), .65); border-radius: 0 !important; }
+html body:not(.hunter-preauth) #maint-list::-webkit-scrollbar-thumb:hover { background: rgb(var(--sk)); }
+@media (max-width: 900px) {
+  html body:not(.hunter-preauth) #maint-list { max-height: 62vh; }
+}
+</style>
+
+<script id="hunter-maint-v2-js">
+(() => {
+  const MT = 'mdz_hunter_mantenimiento';
+  const GOOGLE_FORM_URL = '';
+  const SECTORES = ['LIMA', 'ALREDEDORES', 'NORTE', 'SUR'];
+  const ESTADOS = ['PENDIENTE', 'PROGRAMADO', 'EN_PROCESO', 'COMPLETADO', 'CON_OBSERVACIONES'];
+  const EC = {
+    PENDIENTE: '#94a3b8',
+    PROGRAMADO: '#00e5ff',
+    EN_PROCESO: '#a855f7',
+    COMPLETADO: '#22c55e',
+    CON_OBSERVACIONES: '#f59e0b'
+  };
+  const CHECKS = [
+    ['antena_conectores', 'Antena, coaxiales y sellado'],
+    ['gabinete_limpieza', 'Limpieza de gabinete y fijación'],
+    ['energia_ups_baterias', 'Energía, UPS y baterías'],
+    ['pozo_tierra_tablero', 'Tablero eléctrico y pozo a tierra'],
+    ['prueba_reseteador', 'Prueba de reseteador (AT)'],
+    ['reporte_noc_ok', 'Validación de reporte en NOC']
+  ];
+
+  const esc = escapeHtml;
+  const view = $('view-maint');
+  if (!view) return;
+
+  let maintMap = new Map();
+  let curCiclo = '2027';
+  let uiBuilt = false;
+
+  function buildUI() {
+    if (uiBuilt) return;
+    uiBuilt = true;
+    const y = new Date().getFullYear();
+    view.innerHTML = `
+      <div class="flex flex-wrap items-center justify-between gap-2 px-5 pt-4 pb-3 border-b border-white/10">
+        <div>
+          <h2 class="text-base font-bold text-white flex items-center gap-2">
+            <i class="fa-solid fa-calendar-check text-[var(--accent)]"></i> Plan de Mantenimiento
+          </h2>
+          <p class="text-[11px] text-slate-400">Todas las antenas fijas · Checklist, sectorización y bitácora independiente</p>
+        </div>
+        <div class="flex flex-wrap items-center gap-2">
+          <select id="maint-ciclo" class="sel text-xs py-1.5 px-2.5 font-semibold">
+            <option value="${y}">${y}</option>
+            <option value="2027" selected>2027</option>
+            <option value="${y + 2}">${y + 2}</option>
+          </select>
+          ${GOOGLE_FORM_URL ? `<a href="${esc(GOOGLE_FORM_URL)}" target="_blank" rel="noopener" class="chip px-3 py-1.5 text-xs font-semibold text-[var(--accent)]">Google Form ↗</a>` : ''}
+          <button id="maint-export" class="btn ui-hidden px-3 py-1.5 text-xs font-bold text-white cursor-pointer"><i class="fa-solid fa-file-excel mr-1"></i>Excel</button>
+          <button id="maint-refresh" class="chip px-3 py-1.5 text-xs font-semibold text-slate-200 cursor-pointer">Actualizar</button>
+        </div>
+      </div>
+      <div id="maint-body" class="flex-1 overflow-y-auto scroll px-5 py-4 space-y-3">
+        <div id="maint-kpis" class="grid grid-cols-2 lg:grid-cols-5 gap-2.5"></div>
+        <div id="maint-sector-bars" class="grid grid-cols-2 lg:grid-cols-4 gap-2"></div>
+        <div class="flex flex-wrap gap-2">
+          <input id="maint-q" placeholder="Buscar antena, tecnología, técnico u observación..." class="flex-1 min-w-[180px] px-3 py-2 text-xs bg-black/40 border border-white/10 text-white outline-none">
+          <select id="maint-f-sector" class="sel">
+            <option value="ALL">Todos los sectores</option>
+            ${SECTORES.map(s => `<option value="${s}">${s}</option>`).join('')}
+            <option value="SIN_SECTOR">Sin asignar</option>
+          </select>
+          <select id="maint-f-estado" class="sel">
+            <option value="ALL">Todos los estados</option>
+            ${ESTADOS.map(e => `<option value="${e}">${e.replace('_', ' ')}</option>`).join('')}
+          </select>
+        </div>
+        <div id="maint-list" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3"></div>
+      </div>`;
+
+    $('maint-ciclo').onchange = e => { curCiclo = e.target.value; loadMaint(); };
+    $('maint-refresh').onclick = loadMaint;
+    $('maint-export').onclick = exportMaintExcel;
+    $('maint-q').addEventListener('input', renderMaintCards);
+    $('maint-f-sector').onchange = renderMaintCards;
+    $('maint-f-estado').onchange = renderMaintCards;
+    $('maint-list').addEventListener('change', onInlineSectorChange);
+    $('maint-list').addEventListener('click', onCardAction);
+  }
+
+  function getAllAntennas() {
+    if (!excelData.length) return [];
+    const P = findColumn(excelData[0], ['PUNTOS', 'PUNTO']);
+    const map = new Map();
+    excelData.forEach(r => {
+      let name = P ? String(r[P] || '').trim() : '';
+      if (!name) return;
+      name = name.replace(/\s*\(\s*PE\s*\)\s*/gi, '').trim();
+      const key = name.toUpperCase();
+      const meta = info(r);
+      if (meta.movil || meta.tec.includes('LABORATORIO')) return;
+      if (!map.has(key)) {
+        map.set(key, { punto: name, key, tecs: new Set([meta.tec]), lat: meta.lat, lon: meta.lon, ok: meta.ok });
+      } else {
+        map.get(key).tecs.add(meta.tec);
+      }
+    });
+    return Array.from(map.values())
+      .map(a => ({ ...a, tec: Array.from(a.tecs).filter(Boolean).sort().join(' + ') }))
+      .sort((a, b) => a.punto.localeCompare(b.punto));
+  }
+
+  function mergedItems() {
+    return getAllAntennas().map(a => {
+      const db = maintMap.get(a.key) || {};
+      const chk = Object.assign(
+        Object.fromEntries(CHECKS.map(([k]) => [k, false])),
+        db.checklist && typeof db.checklist === 'object' ? db.checklist : {}
+      );
+      const doneChecks = CHECKS.filter(([k]) => !!chk[k]).length;
+      return {
+        ...a,
+        dbId: db.id || null,
+        sector: db.sector || '',
+        estado: db.estado || 'PENDIENTE',
+        tipo_mant: db.tipo_mant || 'PREVENTIVO',
+        tecnico: db.tecnico || '',
+        fecha_programada: db.fecha_programada || '',
+        fecha_ejecucion: db.fecha_ejecucion || '',
+        duracion_min: db.duracion_min ?? '',
+        checklist: chk,
+        doneChecks,
+        observaciones: db.observaciones || '',
+        evidencia_url: db.evidencia_url || '',
+        origen: db.origen || 'WEB'
+      };
+    });
+  }
+
+  async function upsertMaint(punto, patch) {
+    if (!hunterSbClient || !isDevRole()) return false;
+    const key = punto.toUpperCase();
+    const prev = maintMap.get(key) || {};
+    const payload = {
+      punto,
+      ciclo: curCiclo,
+      sector: patch.sector !== undefined ? (patch.sector || null) : (prev.sector || null),
+      estado: patch.estado !== undefined ? patch.estado : (prev.estado || 'PENDIENTE'),
+      tipo_mant: patch.tipo_mant !== undefined ? patch.tipo_mant : (prev.tipo_mant || 'PREVENTIVO'),
+      tecnico: patch.tecnico !== undefined ? (patch.tecnico || null) : (prev.tecnico || null),
+      fecha_programada: patch.fecha_programada !== undefined ? (patch.fecha_programada || null) : (prev.fecha_programada || null),
+      fecha_ejecucion: patch.fecha_ejecucion !== undefined ? (patch.fecha_ejecucion || null) : (prev.fecha_ejecucion || null),
+      duracion_min: patch.duracion_min !== undefined ? (patch.duracion_min !== '' && isFinite(Number(patch.duracion_min)) ? Number(patch.duracion_min) : null) : (prev.duracion_min ?? null),
+      checklist: patch.checklist !== undefined ? patch.checklist : (prev.checklist || Object.fromEntries(CHECKS.map(([k]) => [k, false]))),
+      observaciones: patch.observaciones !== undefined ? (patch.observaciones || null) : (prev.observaciones || null),
+      evidencia_url: patch.evidencia_url !== undefined ? (patch.evidencia_url || null) : (prev.evidencia_url || null),
+      origen: 'WEB',
+      updated_at: new Date().toISOString()
+    };
+    const { data, error } = await hunterSbClient
+      .from(MT)
+      .upsert(payload, { onConflict: 'punto,ciclo' })
+      .select('*')
+      .single();
+    if (error) { showToast('Error mantenimiento: ' + error.message); return false; }
+    if (data) maintMap.set(key, data);
+    return true;
+  }
+
+  async function onInlineSectorChange(e) {
+    const sel = e.target.closest('select[data-maint-sector]');
+    if (!sel || !isDevRole()) return;
+    const punto = sel.dataset.maintSector;
+    const ok = await upsertMaint(punto, { sector: sel.value });
+    if (ok) { showToast(`Sector guardado: ${sel.value || 'Sin asignar'}`); renderMaintCards(); }
+  }
+
+  function onCardAction(e) {
+    const btn = e.target.closest('[data-maint-open]');
+    if (!btn) return;
+    const item = mergedItems().find(x => x.key === btn.dataset.maintOpen);
+    if (item) openMaintModal(item);
+  }
+
+  function renderMaintCards() {
+    if (!uiBuilt) buildUI();
+    const dev = isDevRole();
+    if ($('maint-export')) $('maint-export').classList.toggle('ui-hidden', !dev);
+    const all = mergedItems();
+    const tot = all.length;
+    const comp = all.filter(x => x.estado === 'COMPLETADO').length;
+    const obs = all.filter(x => x.estado === 'CON_OBSERVACIONES').length;
+    const pend = all.filter(x => x.estado === 'PENDIENTE').length;
+    const pct = tot ? Math.round((comp / tot) * 100) : 0;
+
+    $('maint-kpis').innerHTML = [
+      ['Antenas', tot, 'var(--accent)'],
+      ['Completadas', `${comp} (${pct}%)`, '#22c55e'],
+      ['Con Obs.', obs, '#f59e0b'],
+      ['Pendientes', pend, '#94a3b8'],
+      ['Sin Sector', all.filter(x => !x.sector).length, '#ef4444']
+    ].map(([l, v, c]) => `<div class="chip p-2.5"><p class="text-lg font-bold" style="color:${c}">${v}</p><p class="text-[10px] text-slate-400 uppercase">${l}</p></div>`).join('');
+
+    $('maint-sector-bars').innerHTML = SECTORES.map(s => {
+      const sub = all.filter(x => x.sector === s);
+      const done = sub.filter(x => x.estado === 'COMPLETADO').length;
+      const p = sub.length ? Math.round((done / sub.length) * 100) : 0;
+      return `<div class="chip px-3 py-2 text-[11px]">
+        <div class="flex justify-between font-bold text-white"><span>${s}</span><span class="text-[var(--accent)]">${done}/${sub.length} (${p}%)</span></div>
+        <div class="h-1.5 bg-white/10 mt-1.5"><div class="h-full" style="width:${p}%;background:var(--accent)"></div></div>
+      </div>`;
+    }).join('');
+
+    const q = normalizeText($('maint-q').value);
+    const fs = $('maint-f-sector').value;
+    const fe = $('maint-f-estado').value;
+
+    const filtered = all.filter(x => {
+      if (fs === 'SIN_SECTOR' && x.sector) return false;
+      if (fs !== 'ALL' && fs !== 'SIN_SECTOR' && x.sector !== fs) return false;
+      if (fe !== 'ALL' && x.estado !== fe) return false;
+      if (q && !normalizeText([x.punto, x.tec, x.sector, x.tecnico, x.observaciones, x.estado].join(' ')).includes(q)) return false;
+      return true;
+    });
+
+    $('maint-list').innerHTML = filtered.map(x => {
+      const c = EC[x.estado] || '#94a3b8';
+      const chkPct = Math.round((x.doneChecks / CHECKS.length) * 100);
+      const sectorCtrl = dev
+        ? `<select data-maint-sector="${esc(x.punto)}" class="sel text-[10px] py-0.5 px-1.5 max-w-[125px]">
+            <option value="">Sin sector</option>
+            ${SECTORES.map(s => `<option value="${s}" ${x.sector === s ? 'selected' : ''}>${s}</option>`).join('')}
+          </select>`
+        : `<span class="chip px-2 py-0.5 text-[10px] font-semibold text-slate-300">${esc(x.sector || 'SIN SECTOR')}</span>`;
+
+      return `<article class="card p-3.5 space-y-2.5 fade">
+        <div class="flex items-start justify-between gap-2">
+          <div class="min-w-0">
+            <h3 class="text-sm font-bold text-white truncate" title="${esc(x.punto)}">${esc(x.punto)}</h3>
+            <p class="text-[10px] text-slate-400 truncate">${esc(x.tec)} · ${esc(x.tipo_mant)}</p>
+          </div>
+          <span class="px-2 py-0.5 text-[10px] font-bold shrink-0" style="color:${c};border:1px solid ${c};background:${c}22">${esc(x.estado.replace('_', ' '))}</span>
+        </div>
+
+        <div class="flex items-center justify-between gap-2 text-[11px]">
+          ${sectorCtrl}
+          <span class="mono text-[10px] text-slate-300">Checklist: <b class="text-[var(--accent)]">${x.doneChecks}/${CHECKS.length}</b></span>
+        </div>
+        <div class="h-1.5 bg-white/10"><div class="h-full" style="width:${chkPct}%;background:${c}"></div></div>
+
+        <div class="grid grid-cols-2 gap-1.5 text-[10px]">
+          <div class="chip px-2 py-1"><span class="text-slate-400">Técnico</span><p class="font-bold text-white truncate">${esc(x.tecnico || '—')}</p></div>
+          <div class="chip px-2 py-1"><span class="text-slate-400">Duración / Fecha</span><p class="mono font-bold text-white truncate">${x.duracion_min !== '' ? esc(x.duracion_min) + ' min' : '—'}${x.fecha_ejecucion ? ' · ' + esc(x.fecha_ejecucion) : ''}</p></div>
+        </div>
+
+        ${x.observaciones ? `<p class="text-[11px] text-amber-200 border-l-2 border-amber-400 pl-2 line-clamp-2">${esc(x.observaciones)}</p>` : ''}
+
+        <div class="flex items-center justify-between gap-2 pt-1 text-[11px]">
+          <div class="flex items-center gap-2">
+            ${x.ok ? `<a href="https://www.google.com/maps/dir/?api=1&destination=${x.lat},${x.lon}" target="_blank" rel="noopener" class="text-[var(--accent)] font-semibold">Ruta ↗</a>` : ''}
+            ${x.evidencia_url ? `<a href="${esc(x.evidencia_url)}" target="_blank" rel="noopener" class="text-emerald-400 font-semibold">Fotos ↗</a>` : ''}
+          </div>
+          <button data-maint-open="${esc(x.key)}" class="chip px-2.5 py-1 text-[11px] font-semibold text-white cursor-pointer">
+            ${dev ? 'Checklist / Editar' : 'Ver detalle'}
+          </button>
+        </div>
+      </article>`;
+    }).join('') || `<div class="col-span-full">${msg('fa-clipboard-check', 'Sin antenas en este filtro', 'Ajusta los filtros de sector o estado.')}</div>`;
+  }
+
+  function openMaintModal(item) {
+    const dev = isDevRole(), dis = dev ? '' : 'disabled';
+    const o = document.createElement('div');
+    o.className = 'fixed inset-0 z-[400] bg-black/75 flex items-center justify-center p-4';
+    o.innerHTML = `<div class="panel w-full max-w-2xl max-h-[88vh] flex flex-col fade">
+      <div class="px-5 py-3 border-b border-white/10 flex items-center justify-between">
+        <div>
+          <h3 class="text-sm font-bold text-white">${esc(item.punto)}</h3>
+          <p class="text-[11px] text-slate-400">Ciclo ${esc(curCiclo)} · ${esc(item.tec)}</p>
+        </div>
+        <button data-m="x" class="text-slate-400 hover:text-white cursor-pointer"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="flex-1 overflow-y-auto scroll p-5 space-y-4 text-xs">
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <label class="block text-[10px] font-bold uppercase text-slate-400">Sector
+            <select data-k="sector" ${dis} class="sel w-full max-w-none mt-1">
+              <option value="">Sin asignar</option>
+              ${SECTORES.map(s => `<option value="${s}" ${item.sector === s ? 'selected' : ''}>${s}</option>`).join('')}
+            </select>
+          </label>
+          <label class="block text-[10px] font-bold uppercase text-slate-400">Estado
+            <select data-k="estado" ${dis} class="sel w-full max-w-none mt-1">
+              ${ESTADOS.map(e => `<option value="${e}" ${item.estado === e ? 'selected' : ''}>${e.replace('_', ' ')}</option>`).join('')}
+            </select>
+          </label>
+          <label class="block text-[10px] font-bold uppercase text-slate-400">Tipo
+            <select data-k="tipo_mant" ${dis} class="sel w-full max-w-none mt-1">
+              <option value="PREVENTIVO" ${item.tipo_mant === 'PREVENTIVO' ? 'selected' : ''}>PREVENTIVO</option>
+              <option value="CORRECTIVO" ${item.tipo_mant === 'CORRECTIVO' ? 'selected' : ''}>CORRECTIVO</option>
+            </select>
+          </label>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <label class="block text-[10px] font-bold uppercase text-slate-400">Técnico a cargo
+            <input data-k="tecnico" ${dis} type="text" value="${esc(item.tecnico)}" placeholder="Nombre del técnico..." class="w-full mt-1 px-3 py-2 bg-black/40 border border-white/10 text-white">
+          </label>
+          <label class="block text-[10px] font-bold uppercase text-slate-400">Fecha ejecución
+            <input data-k="fecha_ejecucion" ${dis} type="date" value="${esc(item.fecha_ejecucion)}" class="w-full mt-1 px-3 py-2 bg-black/40 border border-white/10 text-white">
+          </label>
+          <label class="block text-[10px] font-bold uppercase text-slate-400">Duración (min)
+            <input data-k="duracion_min" ${dis} type="number" min="0" value="${esc(item.duracion_min)}" placeholder="Ej: 45" class="w-full mt-1 px-3 py-2 bg-black/40 border border-white/10 text-white">
+          </label>
+        </div>
+
+        <div class="chip p-3 space-y-2">
+          <p class="text-[10px] font-bold uppercase text-[var(--accent)]">Checklist Técnico</p>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+            ${CHECKS.map(([k, lbl]) => `
+              <label class="flex items-center gap-2 text-xs text-slate-200 cursor-pointer">
+                <input type="checkbox" data-chk="${k}" ${dis} ${item.checklist[k] ? 'checked' : ''} class="accent-[var(--accent)] w-4 h-4">
+                <span>${esc(lbl)}</span>
+              </label>
+            `).join('')}
+          </div>
+        </div>
+
+        <label class="block text-[10px] font-bold uppercase text-slate-400">Observaciones y trabajos realizados
+          <textarea data-k="observaciones" ${dis} rows="3" placeholder="Detalles técnicos, repuestos cambiados, pendientes..." class="w-full mt-1 px-3 py-2 bg-black/40 border border-white/10 text-white">${esc(item.observaciones)}</textarea>
+        </label>
+
+        <label class="block text-[10px] font-bold uppercase text-slate-400">Enlace de evidencias / fotos (Drive)
+          <input data-k="evidencia_url" ${dis} type="url" value="${esc(item.evidencia_url)}" placeholder="https://drive.google.com/..." class="w-full mt-1 px-3 py-2 bg-black/40 border border-white/10 text-white">
+        </label>
+      </div>
+      <div class="px-5 py-3 border-t border-white/10 flex justify-end gap-2">
+        <button data-m="x" class="chip px-4 py-2 text-xs font-semibold cursor-pointer">Cerrar</button>
+        ${dev ? `<button data-m="ok" class="btn px-5 py-2 text-xs font-bold text-white cursor-pointer">Guardar</button>` : ''}
+      </div>
+    </div>`;
+
+    o.addEventListener('click', async e => {
+      const m = e.target.closest('[data-m]');
+      if (!m) { if (e.target === o) o.remove(); return; }
+      if (m.dataset.m === 'x') { o.remove(); return; }
+      const patch = { checklist: {} };
+      o.querySelectorAll('[data-k]').forEach(el => patch[el.dataset.k] = el.value.trim());
+      o.querySelectorAll('[data-chk]').forEach(el => patch.checklist[el.dataset.chk] = el.checked);
+      const ok = await upsertMaint(item.punto, patch);
+      if (ok) { o.remove(); showToast('Mantenimiento guardado'); renderMaintCards(); }
+    });
+    document.body.appendChild(o);
+  }
+
+  function exportMaintExcel() {
+    if (!isDevRole()) return;
+    const rows = mergedItems().map(x => ({
+      CICLO: curCiclo,
+      PUNTO: x.punto,
+      TECNOLOGIA: x.tec,
+      SECTOR: x.sector || 'SIN ASIGNAR',
+      ESTADO: x.estado,
+      TIPO: x.tipo_mant,
+      TECNICO: x.tecnico,
+      FECHA_EJECUCION: x.fecha_ejecucion,
+      DURACION_MIN: x.duracion_min,
+      CHECKLIST: `${x.doneChecks}/${CHECKS.length}`,
+      OBSERVACIONES: x.observaciones,
+      EVIDENCIA: x.evidencia_url
+    }));
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(rows), `MANT_${curCiclo}`);
+    XLSX.writeFile(wb, `Plan_Mantenimiento_${curCiclo}.xlsx`);
+    showToast('Excel de mantenimiento exportado');
+  }
+
+  async function loadMaint() {
+    buildUI();
+    if (!hunterSbClient) { renderMaintCards(); return; }
+    const { data, error } = await hunterSbClient
+      .from(MT)
+      .select('*')
+      .eq('ciclo', curCiclo)
+      .limit(2000);
+    if (error) { showToast('Error cargando mantenimiento: ' + error.message); return; }
+    maintMap = new Map((data || []).map(r => [String(r.punto || '').toUpperCase(), r]));
+    renderMaintCards();
+  }
+
+  window.renderMaintSetup = loadMaint;
+  window.renderMaint = renderMaintCards;
+})();
+</script>
