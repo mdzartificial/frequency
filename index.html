@@ -5861,3 +5861,32 @@ html body:not(.hunter-preauth):not(.theme-day) #view-noc input[type="file"]::-we
   border-color: rgb(var(--sk)) !important;
 }
 </style>
+function onFormSubmit(e) {
+  const r = e.namedValues;
+  const get = k => (r[k] && r[k][0] ? String(r[k][0]).trim() : null);
+
+  const payload = {
+    punto: get('Antena / Punto'),
+    ciclo: String(new Date().getFullYear()),
+    sector: (get('Sector') || '').toUpperCase() || null,
+    estado: (get('Estado') || 'COMPLETADO').toUpperCase(),
+    tecnico: get('Técnico'),
+    fecha_ejecucion: new Date().toISOString().slice(0, 10),
+    duracion_min: Number(get('Duración (min)')) || null,
+    observaciones: get('Observaciones'),
+    evidencia_url: get('Enlace de Fotos'),
+    origen: 'GOOGLE_FORM',
+    updated_at: new Date().toISOString()
+  };
+
+  UrlFetchApp.fetch('https://uswtlvzyrujjjmbsbnmj.supabase.co/rest/v1/mdz_hunter_mantenimiento?on_conflict=punto,ciclo', {
+    method: 'post',
+    contentType: 'application/json',
+    headers: {
+      apikey: 'TU_SERVICE_ROLE_KEY',
+      Authorization: 'Bearer TU_SERVICE_ROLE_KEY',
+      Prefer: 'resolution=merge-duplicates'
+    },
+    payload: JSON.stringify(payload)
+  });
+}
