@@ -6405,3 +6405,166 @@ html body:not(.hunter-preauth) #maint-list::-webkit-scrollbar-thumb:hover { back
   }
 })();
 </script>
+<style id="hunter-ios-fix-v9">
+  @media (max-width: 768px) {
+    html, body {
+      width: 100% !important;
+      max-width: 100vw !important;
+      overflow-x: clip !important;
+    }
+
+    /* 16px evita que iOS haga zoom al enfocar cualquier campo */
+    input, select, textarea, .sel,
+    #login-floating-card input,
+    #login-floating-card select,
+    #login-floating-card textarea {
+      font-size: 16px !important;
+      letter-spacing: normal !important;
+    }
+
+    #sb-totp-input {
+      letter-spacing: 0.25em !important;
+      padding-left: 0.25em !important;
+    }
+  }
+
+  @media (max-width: 620px) {
+    html body.hunter-preauth #hunter-auth-modal {
+      position: relative !important;
+      min-height: 100dvh !important;
+      width: 100% !important;
+      max-width: 100vw !important;
+      padding: 62px 12px 68px !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      overflow-x: clip !important;
+    }
+
+    html body.hunter-preauth #login-floating-card {
+      position: relative !important;
+      top: auto !important;
+      left: auto !important;
+      width: 100% !important;
+      max-width: 390px !important;
+      min-width: 0 !important;
+      height: auto !important;
+      min-height: 0 !important;
+      aspect-ratio: auto !important;
+      margin: 0 auto !important;
+      padding: 24px 16px !important;
+      transform: none !important;
+      translate: 0 0 !important;
+      clip-path: none !important;
+      animation: none !important;
+    }
+
+    html body.hunter-preauth #login-floating-card *,
+    html body.hunter-preauth #login-floating-card::before,
+    html body.hunter-preauth #login-floating-card::after {
+      max-width: 100% !important;
+    }
+
+    html body.hunter-preauth #login-floating-card::before,
+    html body.hunter-preauth #login-floating-card::after {
+      display: none !important;
+      animation: none !important;
+    }
+
+    html body.hunter-preauth #login-floating-card.theme-swap,
+    html body.hunter-preauth #login-floating-card.cp-glitch,
+    html body.hunter-preauth #login-floating-card.theme-swap form,
+    html body.hunter-preauth #login-floating-card.cp-glitch form,
+    html body.hunter-preauth #login-floating-card.theme-swap form > *,
+    html body.hunter-preauth #login-floating-card.cp-glitch form > * {
+      animation: none !important;
+      translate: 0 0 !important;
+      transform: none !important;
+      clip-path: none !important;
+      opacity: 1 !important;
+    }
+
+    html body.hunter-preauth #login-floating-card h3 {
+      font-size: 18px !important;
+      letter-spacing: 0.12em !important;
+      white-space: nowrap !important;
+    }
+
+    html body.hunter-preauth #login-floating-card #sb-login-submit-btn {
+      width: 100% !important;
+      max-width: 100% !important;
+      font-size: 11px !important;
+      letter-spacing: 0.1em !important;
+      white-space: nowrap !important;
+      animation: none !important;
+    }
+  }
+</style>
+
+<script id="hunter-ios-zoom-reset-v9">
+(() => {
+  if (window.innerWidth > 768) return;
+
+  let metaVp = document.querySelector('meta[name="viewport"]');
+  if (!metaVp) {
+    metaVp = document.createElement('meta');
+    metaVp.name = 'viewport';
+    document.head.appendChild(metaVp);
+  }
+
+  const VP_NORMAL = 'width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover';
+  const VP_RESET  = 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover';
+  metaVp.setAttribute('content', VP_NORMAL);
+
+  let resetTimer = null;
+
+  function forceResetView() {
+    clearTimeout(resetTimer);
+    metaVp.setAttribute('content', VP_RESET);
+
+    const snap = () => {
+      window.scrollTo(0, 0);
+      document.documentElement.scrollLeft = 0;
+      document.body.scrollLeft = 0;
+      if (window.visualViewport) {
+        window.scrollTo(0, 0);
+      }
+    };
+
+    snap();
+    requestAnimationFrame(snap);
+    setTimeout(snap, 60);
+    setTimeout(snap, 180);
+
+    resetTimer = setTimeout(() => {
+      metaVp.setAttribute('content', VP_NORMAL);
+      snap();
+    }, 320);
+  }
+
+  document.addEventListener('focusout', (e) => {
+    if (e.target && ['INPUT', 'TEXTAREA', 'SELECT'].includes(e.target.tagName)) {
+      setTimeout(forceResetView, 60);
+    }
+  }, true);
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && e.target && ['INPUT', 'SELECT'].includes(e.target.tagName)) {
+      e.target.blur();
+      setTimeout(forceResetView, 60);
+    }
+  }, true);
+
+  if (window.visualViewport) {
+    let prevScale = window.visualViewport.scale || 1;
+    window.visualViewport.addEventListener('resize', () => {
+      const currScale = window.visualViewport.scale || 1;
+      // Si el teclado se cerró o el zoom quedó arriba de 1, regresa a la vista general
+      if (currScale > 1.02 || (prevScale > 1.02 && currScale <= 1.02)) {
+        forceResetView();
+      }
+      prevScale = currScale;
+    });
+  }
+})();
+</script>
