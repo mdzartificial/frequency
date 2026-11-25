@@ -4154,7 +4154,7 @@ function animate() {
 
   // ---- El astronauta se pega a la pantalla si nadie escribe en 10 s ----
   {
-    const idle = isPreauth && (performance.now() - lastActivity) > 10000;
+    const idle = isPreauth && (performance.now() - lastActivity) > 90000;
     stick += ((idle ? 1 : 0) - stick) * Math.min(1, dt * (idle ? 1.5 : 3));
     const e = stick * stick * (3 - 2 * stick);
     const base = 0.55;
