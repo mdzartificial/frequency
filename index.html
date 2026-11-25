@@ -4,9 +4,10 @@
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27%3E%3Cpath d=%27M50 12 L74 34 L62 42 L84 62 L54 58 L50 88 L46 58 L16 62 L38 42 L26 34 Z%27 fill=%27%23E03A3E%27/%3E%3Ccircle cx=%2750%27 cy=%2736%27 r=%276%27 fill=%27%23C1D32F%27/%3E%3C/svg%3E">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>MDZ SKYNET · HAWKS HUD — Visor</title>
+  <title>MDZ SKYNET · HAWKS HUD</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -80,8 +81,7 @@
       color: var(--text-main);
       margin: 0;
       padding: 16px;
-      background:
-        radial-gradient(circle at 15% 12%, var(--bg-body-1), var(--bg-body-2) 55%, var(--bg-body-3));
+      background: radial-gradient(circle at 15% 12%, var(--bg-body-1), var(--bg-body-2) 55%, var(--bg-body-3));
       transition: background 0.3s, color 0.3s;
     }
 
@@ -107,12 +107,7 @@
       content: "";
       position: absolute;
       inset: 0;
-      background: repeating-linear-gradient(
-        to bottom,
-        transparent 0px,
-        transparent 3px,
-        rgba(255, 255, 255, 0.015) 4px
-      );
+      background: repeating-linear-gradient(to bottom, transparent 0px, transparent 3px, rgba(255, 255, 255, 0.015) 4px);
       pointer-events: none;
       z-index: 2;
     }
@@ -142,10 +137,7 @@
       cursor: pointer;
       transition: 0.2s;
     }
-    .rail button:hover {
-      border-color: var(--hawks-red);
-      background: rgba(224, 58, 62, 0.12);
-    }
+    .rail button:hover { border-color: var(--hawks-red); background: rgba(224, 58, 62, 0.12); }
     .rail button:hover i { color: var(--text-head); }
     .rail button.on {
       background: linear-gradient(135deg, var(--hawks-red), var(--hawks-red-deep));
@@ -304,8 +296,7 @@
 </head>
 <body class="hunter-preauth">
   <div class="frame">
-    <!-- BARRA LATERAL FUTURISTA HAWKS -->
-    <nav class="rail" aria-label="Navegación Visor Hawks">
+    <nav class="rail" aria-label="Navegación Hawks">
       <div class="relative inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-red-500/15 border border-red-500/40 eagle-hud-logo" title="MDZ SKYNET · ATLANTA HAWKS">
         <svg viewBox="0 0 64 64" class="w-8 h-8" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path d="M32 7 L54 24 L42 30 L59 46 L36 43 L32 58 L28 43 L5 46 L22 30 L10 24 Z" fill="#E03A3E" stroke="#FF7A7E" stroke-width="1.5" stroke-linejoin="round"/>
@@ -328,7 +319,6 @@
     </nav>
 
     <div class="flex-1 flex flex-col gap-3 min-w-0">
-      <!-- ENCABEZADO HAWKS FUTURISTA -->
       <header class="flex flex-wrap items-center justify-between gap-2 px-2 pt-1">
         <div>
           <div class="flex items-center gap-2.5">
@@ -336,11 +326,11 @@
               <span>HAWKS</span>
               <span class="text-red-500">SKYNET</span>
             </h1>
-            <span class="px-2.5 py-0.5 rounded-full bg-red-500/15 border border-red-400/40 text-red-300 text-[10px] font-bold uppercase tracking-widest">
-              <i class="fa-solid fa-eye mr-1"></i>Modo Visor
+            <span id="role-badge" class="px-2.5 py-0.5 rounded-full bg-red-500/15 border border-red-400/40 text-red-300 text-[10px] font-bold uppercase tracking-widest">
+              <i class="fa-solid fa-shield-halved mr-1"></i><span id="role-badge-text">Sesión</span>
             </span>
           </div>
-          <p class="text-xs text-slate-300/80">Atlanta Tactical Telemetry · Control RF / AVL · <span class="text-[#C1D32F] font-semibold">Solo Lectura</span></p>
+          <p class="text-xs text-slate-300/80">Atlanta Tactical Telemetry · Control RF / AVL · <span id="user-email-subtitle" class="text-[#C1D32F] font-semibold">mdzhunter</span></p>
         </div>
 
         <div class="flex items-center gap-2 flex-wrap">
@@ -354,21 +344,20 @@
 
           <div class="flex items-center gap-2 px-3.5 py-2 rounded-full bg-[#090b10] border border-white/10 text-xs font-semibold">
             <span id="sb-status-dot" class="w-2 h-2 rounded-full bg-[#C1D32F] animate-pulse"></span>
-            <span id="sb-status-label">mdzhunter · visor</span>
+            <span id="sb-status-label">mdzhunter</span>
           </div>
         </div>
       </header>
 
       <div class="cols flex-1 flex gap-3 min-h-0">
-        <!-- BARRA LATERAL DE BÚSQUEDA -->
         <aside id="side" class="side panel p-4 w-[340px] shrink-0 overflow-y-auto scroll">
-          <h2 class="text-sm font-bold text-white mb-3 uppercase tracking-wider text-xs text-red-400">Búsqueda de Puntos</h2>
+          <h2 class="text-xs font-bold uppercase tracking-wider text-red-400 mb-3">Búsqueda de Puntos</h2>
           <div class="relative">
             <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500 text-xs"></i>
             <input id="search-input" autocomplete="off" placeholder="LIMA-50 COMAS, PL004, DETEKTOR..." class="w-full py-3 pl-9 pr-3 text-sm rounded-xl bg-black/30 border border-white/10 outline-none focus:border-red-400 placeholder-slate-600">
           </div>
           <button id="search-btn" class="btn w-full mt-2 py-2.5 rounded-xl text-sm font-bold text-white transition">Buscar</button>
-          <p class="text-xs text-slate-500 mt-2">Consulta en modo visor por punto, ID, tecnología o equipo.</p>
+          <p class="text-xs text-slate-500 mt-2">Consulta por punto, ID, tecnología o equipo.</p>
 
           <div id="global-stats-container" class="mt-6">
             <h2 class="text-xs font-bold uppercase tracking-wider text-red-400 mb-3">Resumen global</h2>
@@ -381,7 +370,7 @@
             <div class="chip p-3 flex items-center gap-3">
               <i class="fa-solid fa-database text-[#C1D32F]"></i>
               <div class="min-w-0 flex-1">
-                <p id="file-status-label" class="text-[11px] text-[#C1D32F] font-semibold">Solo lectura activa</p>
+                <p id="file-status-label" class="text-[11px] text-[#C1D32F] font-semibold">Conectado a mdzhunter</p>
                 <p id="file-name" class="text-xs text-slate-300 truncate">mdz_hunter_inventario</p>
               </div>
             </div>
@@ -476,29 +465,60 @@
           <div id="price-body" class="flex-1 overflow-y-auto scroll px-5 pb-5 space-y-4"></div>
         </section>
 
-        <!-- VISTA CONSOLA NOC (SOLO VISUALIZACIÓN EN MODO VISOR) -->
+        <!-- VISTA CONSOLA NOC CON CARGA DE 3 EXCELS -->
         <section id="view-noc" class="view viewer-hidden map panel flex-1 min-w-0 flex flex-col overflow-hidden">
           <div class="flex flex-wrap items-center justify-between gap-3 px-5 pt-4 pb-3 border-b border-white/10">
             <div>
               <h2 class="text-lg font-bold text-white flex items-center gap-2">
                 <i class="fa-solid fa-chart-line text-red-400"></i>
-                Consola NOC · <span class="text-[#C1D32F]">Visor</span>
+                Consola NOC · <span class="text-[#C1D32F]">Simulador de Reportes</span>
               </h2>
-              <p class="text-xs text-slate-400">Monitoreo consolidado: DETEKTOR • REPOTENCIADOS • LOJACK · <span id="nocBannerCorte" class="text-red-300 font-semibold">Corte desde base</span></p>
+              <p class="text-xs text-slate-400">Carga DETEKTOR, REPOTENCIADOS y LOJACK para simular tablas · <span id="nocBannerCorte" class="text-red-300 font-semibold">Esperando reportes...</span></p>
             </div>
             <div class="flex items-center gap-2 flex-wrap">
               <button type="button" onclick="nocLoadDemoData()" class="px-3 py-1.5 rounded-xl bg-white/5 border border-white/15 hover:bg-white/10 text-slate-200 text-xs font-bold transition cursor-pointer">
-                <i class="fa-solid fa-eye mr-1 text-[#C1D32F]"></i>Simular Demo
+                <i class="fa-solid fa-sparkles mr-1 text-[#C1D32F]"></i>Datos Demo
               </button>
               <button type="button" onclick="nocClearAll()" class="px-3 py-1.5 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 text-slate-300 text-xs font-semibold transition cursor-pointer">
-                <i class="fa-solid fa-rotate-left mr-1"></i>Limpiar Vista
+                <i class="fa-solid fa-rotate-left mr-1"></i>Limpiar
               </button>
             </div>
           </div>
 
           <div class="flex-1 overflow-y-auto scroll px-5 py-4 space-y-5">
-            <div class="card p-4">
-              <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-xs">
+            <div class="card p-4 space-y-4">
+              <div class="flex flex-wrap items-center justify-between gap-2">
+                <span class="text-xs font-bold uppercase tracking-wider text-red-300"><i class="fa-solid fa-folder-open mr-1.5"></i>Simular Tablas desde 3 Excels</span>
+                <span id="nocStatusText" class="text-xs font-semibold text-[#C1D32F]">Carga los 3 reportes Excel o usa Datos Demo.</span>
+              </div>
+
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                <div class="chip p-3">
+                  <div class="flex items-center justify-between text-xs font-bold text-white mb-1.5">
+                    <span>1. DETEKTOR (.xls/.xlsx)</span>
+                    <span id="nocBadgeDet" class="text-[11px] text-slate-400">Pendiente</span>
+                  </div>
+                  <input id="nocFileDet" type="file" accept=".xls,.xlsx,.xlsm" class="w-full text-xs text-slate-300 file:mr-2 file:py-1 file:px-2.5 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-red-500/20 file:text-red-200 hover:file:bg-red-500/30 cursor-pointer">
+                </div>
+
+                <div class="chip p-3">
+                  <div class="flex items-center justify-between text-xs font-bold text-white mb-1.5">
+                    <span>2. REPOTENCIADOS (.xls/.xlsx)</span>
+                    <span id="nocBadgeRep" class="text-[11px] text-slate-400">Pendiente</span>
+                  </div>
+                  <input id="nocFileRep" type="file" accept=".xls,.xlsx,.xlsm" class="w-full text-xs text-slate-300 file:mr-2 file:py-1 file:px-2.5 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-red-500/20 file:text-red-200 hover:file:bg-red-500/30 cursor-pointer">
+                </div>
+
+                <div class="chip p-3">
+                  <div class="flex items-center justify-between text-xs font-bold text-white mb-1.5">
+                    <span>3. Puntos LOJACK (.xlsx)</span>
+                    <span id="nocBadgeLoj" class="text-[11px] text-slate-400">Pendiente</span>
+                  </div>
+                  <input id="nocFileLoj" type="file" accept=".xls,.xlsx,.xlsm" class="w-full text-xs text-slate-300 file:mr-2 file:py-1 file:px-2.5 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-red-500/20 file:text-red-200 hover:file:bg-red-500/30 cursor-pointer">
+                </div>
+              </div>
+
+              <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 pt-2 border-t border-white/10 text-xs">
                 <div>
                   <label class="block text-[10px] font-bold uppercase text-slate-400 mb-1">Fecha de Corte</label>
                   <input id="nocParamCorte" type="datetime-local" step="1" onchange="nocRecalculate()" class="w-full px-2.5 py-1.5 rounded-lg bg-black/40 border border-white/15 text-red-200 font-semibold outline-none">
@@ -516,8 +536,9 @@
                   <input id="nocParamAmarillo" type="number" step="1" min="1" value="48" oninput="nocRecalculate()" class="w-full px-2.5 py-1.5 rounded-lg bg-black/40 border border-white/15 text-amber-400 font-bold outline-none">
                 </div>
               </div>
-              <p id="nocStatusText" class="text-xs text-slate-400 mt-3">Indicadores calculados desde el inventario cargado.</p>
             </div>
+
+            <div id="nocAlertBox" class="viewer-hidden p-3.5 rounded-xl border text-xs"></div>
 
             <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
               <div class="chip p-3 text-center">
@@ -624,7 +645,7 @@
     </div>
   </div>
 
-  <!-- MODAL DE LOGIN INICIAL OBLIGATORIO CON ÍCONO DE ÁGUILA -->
+  <!-- MODAL DE LOGIN INICIAL DINÁMICO POR CORREO -->
   <div id="hunter-auth-modal" class="viewer-hidden fixed inset-0 z-[100] flex items-center justify-center p-4">
     <div class="panel w-full max-w-sm p-6 border border-red-500/40 shadow-2xl fade">
       <div class="flex flex-col items-center text-center mb-4">
@@ -636,13 +657,13 @@
           </svg>
         </div>
         <h3 class="text-lg font-extrabold text-white tracking-wide">HAWKS <span class="text-red-500">SKYNET</span></h3>
-        <p class="text-xs text-slate-400">Acceso Visor · Proyecto mdzhunter</p>
+        <p class="text-xs text-slate-400">Acceso Hawks HUD · Proyecto mdzhunter</p>
       </div>
 
       <form onsubmit="submitHunterSupabaseLogin(event)" class="space-y-3 text-xs">
         <div>
           <label class="block text-[11px] font-bold text-slate-300 uppercase mb-1">Usuario o Correo</label>
-          <input type="text" id="sb-user-input" required placeholder="mdz@mdz.local" class="w-full px-3 py-2.5 rounded-xl bg-black/40 border border-white/15 text-white outline-none focus:border-red-400">
+          <input type="text" id="sb-user-input" required placeholder="usuario@mdz.local" class="w-full px-3 py-2.5 rounded-xl bg-black/40 border border-white/15 text-white outline-none focus:border-red-400">
         </div>
         <div>
           <label class="block text-[11px] font-bold text-slate-300 uppercase mb-1">Contraseña</label>
@@ -655,7 +676,7 @@
         <div id="sb-forced-mfa" class="viewer-hidden p-3 rounded-xl bg-black/40 border border-red-400/30 text-center space-y-2"></div>
         <p id="sb-auth-error" class="viewer-hidden text-xs text-red-400 text-center"></p>
         <button type="submit" id="sb-login-submit-btn" class="btn w-full py-2.5 rounded-xl text-xs font-extrabold uppercase tracking-wider text-white transition cursor-pointer mt-1">
-          Ingresar como Visor
+          Ingresar
         </button>
       </form>
     </div>
@@ -676,6 +697,7 @@
       : null;
 
     let hunterSession = null;
+    let hunterRole = "viewer";
     let hunterPendingMfaId = null;
     let excelData = [];
     let activeSearchTechFilter = "ALL";
@@ -751,6 +773,25 @@
       $("theme-icon").className = isDay ? "fa-solid fa-sun" : "fa-solid fa-moon";
     }
 
+    function resolveRoleFromSession(session) {
+      const metaRole = String(session?.user?.app_metadata?.role || "").toLowerCase().trim();
+      if (metaRole === "dev" || metaRole === "admin") return "dev";
+      if (metaRole === "viewer" || metaRole === "user") return "viewer";
+      const email = String(session?.user?.email || "").toLowerCase().trim();
+      if (email === "mdz@mdz.local" || email.startsWith("mdz@") || email.startsWith("dev@")) return "dev";
+      return "viewer";
+    }
+
+    function applySessionRoleUI(session) {
+      hunterSession = session || null;
+      hunterRole = resolveRoleFromSession(session);
+      const email = session?.user?.email || "mdzhunter";
+      const roleLabel = hunterRole === "dev" ? "DEV / ADMIN" : "VISOR";
+      if ($("role-badge-text")) $("role-badge-text").textContent = roleLabel;
+      if ($("user-email-subtitle")) $("user-email-subtitle").textContent = `${email} · ${roleLabel}`;
+      if ($("sb-status-label")) $("sb-status-label").textContent = `mdzhunter (${hunterRole})`;
+    }
+
     function stripPlaceholderPrefix(val) {
       if (val === null || val === undefined) return "";
       const s = String(val).trim();
@@ -816,6 +857,13 @@
       setTimeout(() => $("sb-user-input").focus(), 60);
     }
 
+    async function completeLoginWithSession(session) {
+      applySessionRoleUI(session);
+      document.body.classList.remove("hunter-preauth");
+      $("hunter-auth-modal").classList.add("viewer-hidden");
+      await syncFromSupabaseNow();
+    }
+
     async function submitHunterSupabaseLogin(e) {
       e.preventDefault();
       if (!hunterSbClient) return;
@@ -841,7 +889,7 @@
         for (const f of (factors?.all || [])) {
           if (f.status !== "verified") await hunterSbClient.auth.mfa.unenroll({ factorId: f.id });
         }
-        const { data: enr, error: enrErr } = await hunterSbClient.auth.mfa.enroll({ factorType: "totp", friendlyName: `HawksViewer_${Date.now()}` });
+        const { data: enr, error: enrErr } = await hunterSbClient.auth.mfa.enroll({ factorType: "totp", friendlyName: `Hawks_${Date.now()}` });
         if (enrErr) {
           errEl.textContent = `Error al generar QR 2FA: ${enrErr.message}`;
           errEl.classList.remove("viewer-hidden");
@@ -876,11 +924,7 @@
       }
 
       const { data: { session } } = await hunterSbClient.auth.getSession();
-      hunterSession = session || authData.session;
-      document.body.classList.remove("hunter-preauth");
-      $("hunter-auth-modal").classList.add("viewer-hidden");
-      $("sb-status-label").textContent = "mdzhunter · visor";
-      await syncFromSupabaseNow();
+      await completeLoginWithSession(session || authData.session);
     }
 
     async function confirmHunterForcedMfa() {
@@ -899,21 +943,18 @@
       }
       hunterPendingMfaId = null;
       const { data: { session } } = await hunterSbClient.auth.getSession();
-      hunterSession = session;
-      document.body.classList.remove("hunter-preauth");
-      $("hunter-auth-modal").classList.add("viewer-hidden");
-      $("sb-status-label").textContent = "mdzhunter · visor";
-      await syncFromSupabaseNow();
+      await completeLoginWithSession(session);
     }
 
     async function signOutHunterSupabase() {
       if (hunterSbClient) await hunterSbClient.auth.signOut();
       hunterSession = null;
+      hunterRole = "viewer";
       excelData = [];
       lastMatchedItems = [];
       document.body.classList.add("hunter-preauth");
       openHunterAuthModal();
-      showToast("Sesión de visor cerrada");
+      showToast("Sesión cerrada");
     }
 
     async function syncFromSupabaseNow() {
@@ -925,7 +966,7 @@
         openHunterAuthModal();
         return;
       }
-      hunterSession = session;
+      applySessionRoleUI(session);
       document.body.classList.remove("hunter-preauth");
 
       const { data, error } = await hunterSbClient
@@ -948,8 +989,8 @@
       updateGlobalStats();
       resultsContainer.innerHTML = msg(
         "fa-crosshairs text-red-400",
-        "Hawks Skynet Visor listo",
-        `${excelData.length.toLocaleString()} registros disponibles en solo lectura.`
+        "Hawks Skynet listo",
+        `${excelData.length.toLocaleString()} registros disponibles en ${HUNTER_TABLE}.`
       );
       if (searchInput.value.trim()) executeSearch(true);
     }
@@ -968,9 +1009,7 @@
         openHunterAuthModal();
         return;
       }
-      hunterSession = session;
-      document.body.classList.remove("hunter-preauth");
-      await syncFromSupabaseNow();
+      await completeLoginWithSession(session);
     }
 
     initDatabase();
@@ -1044,7 +1083,7 @@
       if (!q) {
         lastMatchedItems = [];
         activeSearchTechFilter = "ALL";
-        resultsContainer.innerHTML = msg("fa-crosshairs text-red-400", "Hawks Skynet Visor listo", `${excelData.length.toLocaleString()} registros disponibles. Usa el buscador.`);
+        resultsContainer.innerHTML = msg("fa-crosshairs text-red-400", "Hawks Skynet listo", `${excelData.length.toLocaleString()} registros disponibles. Usa el buscador.`);
         return;
       }
       lastMatchedItems = excelData
@@ -1177,7 +1216,7 @@
     searchInput.addEventListener("keydown", e => { if (e.key === "Enter") executeSearch(false); });
 
     function setView(v) {
-      if (!excelData.length) { showToast("No hay datos cargados"); return; }
+      if (!excelData.length && v !== "noc") { showToast("No hay datos cargados"); return; }
       document.querySelectorAll(".rail button[data-v]").forEach(b => b.classList.toggle("on", b.dataset.v === v));
       $("side").classList.toggle("viewer-hidden", v !== "filter");
       $("view-filter").classList.toggle("viewer-hidden", v !== "filter");
@@ -1555,64 +1594,197 @@
     }
 
     if (typeof Chart !== "undefined" && typeof ChartDataLabels !== "undefined") Chart.register(ChartDataLabels);
-    const nocState = { dfEval: [], incidencias: [], resumenGrupos: [], resumenTotal: null, fechaCorte: new Date(), charts: { comp: null, bar: null, donut: null } };
+
+    const nocState = {
+      rawDet: null,
+      rawRep: null,
+      rawLoj: null,
+      dfTotal: [],
+      dfEval: [],
+      incidencias: [],
+      resumenGrupos: [],
+      resumenTotal: null,
+      fechaCorte: new Date(),
+      charts: { comp: null, bar: null, donut: null }
+    };
+
+    function nocParseDate(val) {
+      if (val === null || val === undefined || val === "") return null;
+      if (val instanceof Date && !isNaN(val.getTime())) return val;
+      if (typeof val === "number" && !isNaN(val)) {
+        const utcDays = Math.floor(val - 25569);
+        const base = new Date(utcDays * 86400 * 1000);
+        const frac = val - Math.floor(val) + 0.0000001;
+        let totalSec = Math.floor(86400 * frac);
+        const sec = totalSec % 60; totalSec -= sec;
+        const hr = Math.floor(totalSec / 3600); const min = Math.floor(totalSec / 60) % 60;
+        return new Date(base.getUTCFullYear(), base.getUTCMonth(), base.getUTCDate(), hr, min, sec);
+      }
+      const s = String(val).trim();
+      if (!s || ["nan", "nat", "null", "-", "none"].includes(s.toLowerCase())) return null;
+      const direct = new Date(s);
+      if (!isNaN(direct.getTime())) return direct;
+      const m = s.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{2,4})(?:\s+(\d{1,2}):(\d{1,2})(?::(\d{1,2}))?)?/);
+      if (m) {
+        let yr = parseInt(m[3], 10); if (yr < 100) yr += 2000;
+        return new Date(yr, parseInt(m[2], 10) - 1, parseInt(m[1], 10), m[4] ? parseInt(m[4], 10) : 0, m[5] ? parseInt(m[5], 10) : 0, m[6] ? parseInt(m[6], 10) : 0);
+      }
+      return null;
+    }
+
+    function nocCombinarFechaHora(fechaVal, horaVal) {
+      const f = nocParseDate(fechaVal); if (!f) return null;
+      if (horaVal !== null && horaVal !== undefined && String(horaVal).trim() !== "") {
+        if (typeof horaVal === "number") {
+          const frac = horaVal - Math.floor(horaVal);
+          let totalSec = Math.round(frac * 86400);
+          const sec = totalSec % 60; totalSec -= sec;
+          const hr = Math.floor(totalSec / 3600); const min = Math.floor(totalSec / 60) % 60;
+          return new Date(f.getFullYear(), f.getMonth(), f.getDate(), hr, min, sec);
+        }
+        const hStr = String(horaVal).trim();
+        if (!["nan", "nat", ""].includes(hStr.toLowerCase())) {
+          const tm = hStr.match(/(\d{1,2}):(\d{1,2})(?::(\d{1,2}))?/);
+          if (tm) return new Date(f.getFullYear(), f.getMonth(), f.getDate(), parseInt(tm[1], 10), parseInt(tm[2], 10), tm[3] ? parseInt(tm[3], 10) : 0);
+          const td = nocParseDate(hStr);
+          if (td) return new Date(f.getFullYear(), f.getMonth(), f.getDate(), td.getHours(), td.getMinutes(), td.getSeconds());
+        }
+      }
+      return f;
+    }
 
     function nocFmtDt(dt) { if (!dt || !(dt instanceof Date) || isNaN(dt.getTime())) return "-"; const p = n => String(n).padStart(2, "0"); return `${dt.getFullYear()}-${p(dt.getMonth() + 1)}-${p(dt.getDate())} ${p(dt.getHours())}:${p(dt.getMinutes())}:${p(dt.getSeconds())}`; }
     function nocFmtBanner(dt) { if (!dt || !(dt instanceof Date) || isNaN(dt.getTime())) return "-"; const p = n => String(n).padStart(2, "0"); return `${p(dt.getDate())}/${p(dt.getMonth() + 1)}/${dt.getFullYear()} ${p(dt.getHours())}:${p(dt.getMinutes())}:${p(dt.getSeconds())}`; }
     function nocToInputDt(dt) { if (!dt || !(dt instanceof Date) || isNaN(dt.getTime())) return ""; const p = n => String(n).padStart(2, "0"); return `${dt.getFullYear()}-${p(dt.getMonth() + 1)}-${p(dt.getDate())}T${p(dt.getHours())}:${p(dt.getMinutes())}:${p(dt.getSeconds())}`; }
 
-    function nocBuildFromInventory() {
-      const now = new Date();
-      return excelData.map((r, idx) => {
-        const K = p => findColumn(r, p);
-        const idCol = K(["ID"]), pCol = K(["PUNTOS", "PUNTO"]), tCol = K(["TECNOLOGIA"]), oCol = K(["OBSERVACION"]), sCol = K(["STATUS"]);
-        const techRaw = tCol && !isEmpty(r[tCol]) ? String(r[tCol]).trim().toUpperCase() : "DETEKTOR";
-        const grupo = techRaw.includes("REPOTENCIADO") ? "REPOTENCIADOS" : (techRaw.includes("VUT") || techRaw.includes("RASTREO") ? "LOJACK" : "DETEKTOR");
-        const obsVal = oCol && !isEmpty(r[oCol]) ? String(r[oCol]).trim() : "";
-        const stVal = sCol && !isEmpty(r[sCol]) ? String(r[sCol]).trim().toUpperCase() : "";
-        const isVis = /VISITADO|OK|REALIZADO/.test(stVal);
-        const hAgo = isVis ? (1 + (idx % 12)) : (26 + (idx % 48));
+    function nocReadWb(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = e => { try { resolve(XLSX.read(new Uint8Array(e.target.result), { type: "array", cellDates: false })); } catch (err) { reject(err); } };
+        reader.onerror = () => reject(new Error("Error al leer el archivo."));
+        reader.readAsArrayBuffer(file);
+      });
+    }
+
+    function nocParseDr(wb, grupo) {
+      const ws = wb.Sheets[wb.SheetNames[0]];
+      const rows = XLSX.utils.sheet_to_json(ws, { defval: null });
+      if (!rows.length) throw new Error(`El reporte ${grupo} no tiene filas.`);
+      return rows.map(raw => {
+        const row = {};
+        Object.keys(raw).forEach(k => { row[String(k).trim()] = raw[k]; });
         return {
           GRUPO: grupo,
-          ID: idCol && !isEmpty(r[idCol]) ? String(r[idCol]).trim() : `HK-${String(idx + 1).padStart(3, "0")}`,
-          NOMBRE: pCol && !isEmpty(r[pCol]) ? String(r[pCol]).trim() : `PUNTO ${idx + 1}`,
-          CONECTIVIDAD_DT: new Date(now.getTime() - hAgo * 3600000),
-          OBS_ORIG: obsVal
+          ID: row["Id"] !== undefined && row["Id"] !== null ? String(row["Id"]).trim() : (row["ID"] !== undefined && row["ID"] !== null ? String(row["ID"]).trim() : "-"),
+          NOMBRE: row["NOMBRE"] !== undefined && row["NOMBRE"] !== null ? String(row["NOMBRE"]).trim() : "-",
+          CONECTIVIDAD_DT: nocParseDate(row["CONECTIVIDAD"]),
+          OBS_ORIG: ""
         };
       });
     }
 
+    function nocParseLojack(wb) {
+      const ws = wb.Sheets[wb.SheetNames[0]];
+      const matrix = XLSX.utils.sheet_to_json(ws, { header: 1, defval: null });
+      let headerIdx = -1;
+      for (let i = 0; i < matrix.length; i++) {
+        const row = matrix[i] || [];
+        const vals = row.filter(v => v !== null && v !== undefined).map(v => String(v).trim().toUpperCase());
+        if (vals.includes("ANTENAS") && vals.includes("FECHA")) { headerIdx = i; break; }
+      }
+      if (headerIdx === -1) throw new Error("No se encontraron las columnas 'ANTENAS' y 'FECHA' en LOJACK.");
+      const headers = matrix[headerIdx].map(c => (c !== null && c !== undefined ? String(c).trim().toUpperCase() : ""));
+      const idxAnt = headers.indexOf("ANTENAS"), idxFec = headers.indexOf("FECHA"), idxHor = headers.findIndex(c => c.startsWith("HORA")), idxObs = headers.findIndex(c => c.includes("OBSERV"));
+      const out = [];
+      for (let r = headerIdx + 1; r < matrix.length; r++) {
+        const row = matrix[r]; if (!row) continue;
+        const rawAnt = row[idxAnt]; if (rawAnt === null || rawAnt === undefined) continue;
+        const antStr = String(rawAnt).trim(); if (!antStr || antStr.toUpperCase() === "ANTENAS") continue;
+        let idLj = "-";
+        const firstVal = row[0];
+        if (firstVal !== null && firstVal !== undefined && String(firstVal).trim() !== "") {
+          const numV = Number(firstVal);
+          if (!isNaN(numV) && isFinite(numV)) idLj = `LJ-${String(Math.trunc(numV)).padStart(3, "0")}`;
+        }
+        const conDt = nocCombinarFechaHora(idxFec !== -1 ? row[idxFec] : null, idxHor !== -1 ? row[idxHor] : null);
+        const obsClean = idxObs !== -1 && row[idxObs] !== null && row[idxObs] !== undefined ? String(row[idxObs]).trim() : "";
+        out.push({ GRUPO: "LOJACK", ID: idLj, NOMBRE: antStr, CONECTIVIDAD_DT: conDt, OBS_ORIG: obsClean });
+      }
+      if (!out.length) throw new Error("No se encontraron puntos válidos en LOJACK.");
+      return out;
+    }
+
+    function nocShowAlert(msgText, type = "error") {
+      const boxEl = $("nocAlertBox");
+      boxEl.classList.remove("viewer-hidden", "bg-red-500/15", "border-red-500/40", "text-red-200", "bg-emerald-500/15", "border-emerald-500/40", "text-emerald-200");
+      boxEl.classList.add(...(type === "error" ? ["bg-red-500/15", "border-red-500/40", "text-red-200"] : ["bg-emerald-500/15", "border-emerald-500/40", "text-emerald-200"]));
+      boxEl.textContent = msgText;
+    }
+
+    async function nocHandleFile(inputEl, tipo) {
+      const file = inputEl.files[0]; if (!file) return;
+      $("nocAlertBox").classList.add("viewer-hidden");
+      try {
+        const wb = await nocReadWb(file);
+        if (tipo === "DET") { nocState.rawDet = nocParseDr(wb, "DETEKTOR"); $("nocBadgeDet").textContent = `${nocState.rawDet.length} pts`; $("nocBadgeDet").className = "text-[11px] font-bold text-emerald-400"; }
+        else if (tipo === "REP") { nocState.rawRep = nocParseDr(wb, "REPOTENCIADOS"); $("nocBadgeRep").textContent = `${nocState.rawRep.length} pts`; $("nocBadgeRep").className = "text-[11px] font-bold text-emerald-400"; }
+        else if (tipo === "LOJ") { nocState.rawLoj = nocParseLojack(wb); $("nocBadgeLoj").textContent = `${nocState.rawLoj.length} pts`; $("nocBadgeLoj").className = "text-[11px] font-bold text-emerald-400"; }
+        nocCheckReady();
+      } catch (err) { nocShowAlert(`Error en ${tipo}: ${err.message}`, "error"); inputEl.value = ""; }
+    }
+
+    function nocCheckReady() {
+      const countLoaded = [nocState.rawDet, nocState.rawRep, nocState.rawLoj].filter(Boolean).length;
+      $("nocStatusText").textContent = `Reportes cargados: ${countLoaded} de 3.`;
+      if (countLoaded === 3) {
+        nocState.dfTotal = [...nocState.rawDet, ...nocState.rawRep, ...nocState.rawLoj];
+        let maxT = -Infinity;
+        nocState.dfTotal.forEach(r => { if (r.CONECTIVIDAD_DT instanceof Date && !isNaN(r.CONECTIVIDAD_DT.getTime()) && r.CONECTIVIDAD_DT.getTime() > maxT) maxT = r.CONECTIVIDAD_DT.getTime(); });
+        nocState.fechaCorte = maxT > -Infinity ? new Date(maxT) : new Date();
+        $("nocParamCorte").value = nocToInputDt(nocState.fechaCorte);
+        $("nocStatusText").textContent = `Tablas simuladas con ${nocState.dfTotal.length} puntos.`;
+        nocRecalculate();
+      }
+    }
+
     function nocLoadDemoData() {
+      $("nocAlertBox").classList.add("viewer-hidden");
       const now = new Date(), hAgo = h => new Date(now.getTime() - h * 3600000);
-      nocState.dfEval = [
+      nocState.rawDet = [
         { GRUPO: "DETEKTOR", ID: "DT-01", NOMBRE: "NODO CENTRAL LIMA", CONECTIVIDAD_DT: hAgo(1.5), OBS_ORIG: "" },
         { GRUPO: "DETEKTOR", ID: "DT-02", NOMBRE: "ESTACIÓN CALLAO", CONECTIVIDAD_DT: hAgo(27.0), OBS_ORIG: "" },
-        { GRUPO: "REPOTENCIADOS", ID: "RP-01", NOMBRE: "REPETIDOR TRUJILLO", CONECTIVIDAD_DT: hAgo(0.8), OBS_ORIG: "" },
-        { GRUPO: "LOJACK", ID: "LJ-001", NOMBRE: "PUNTO LOJACK SUR KM 25", CONECTIVIDAD_DT: hAgo(56.0), OBS_ORIG: "" }
+        { GRUPO: "DETEKTOR", ID: "DT-03", NOMBRE: "TORRE COMAS NORTE", CONECTIVIDAD_DT: hAgo(56.0), OBS_ORIG: "" }
       ];
-      nocState.fechaCorte = now;
-      $("nocParamCorte").value = nocToInputDt(now);
-      nocRecalculate();
-      showToast("Simulación demo cargada en modo visor");
+      nocState.rawRep = [
+        { GRUPO: "REPOTENCIADOS", ID: "RP-01", NOMBRE: "REPETIDOR TRUJILLO", CONECTIVIDAD_DT: hAgo(0.8), OBS_ORIG: "" },
+        { GRUPO: "REPOTENCIADOS", ID: "RP-02", NOMBRE: "ANTENA AREQUIPA", CONECTIVIDAD_DT: hAgo(30.5), OBS_ORIG: "" }
+      ];
+      nocState.rawLoj = [
+        { GRUPO: "LOJACK", ID: "LJ-001", NOMBRE: "PUNTO LOJACK SUR KM 25", CONECTIVIDAD_DT: hAgo(0.3), OBS_ORIG: "OPERATIVO" },
+        { GRUPO: "LOJACK", ID: "LJ-002", NOMBRE: "PUNTO LOJACK NORTE", CONECTIVIDAD_DT: hAgo(4.0), OBS_ORIG: "INACTIVO" },
+        { GRUPO: "LOJACK", ID: "LJ-003", NOMBRE: "PUNTO LOJACK ANTIGUO", CONECTIVIDAD_DT: hAgo(300.0), OBS_ORIG: "DESINSTALADO" }
+      ];
+      $("nocBadgeDet").textContent = "3 pts (Demo)"; $("nocBadgeRep").textContent = "2 pts (Demo)"; $("nocBadgeLoj").textContent = "3 pts (Demo)";
+      nocCheckReady();
     }
 
     function nocClearAll() {
-      nocState.dfEval = [];
-      nocState.incidencias = [];
+      nocState.rawDet = null; nocState.rawRep = null; nocState.rawLoj = null;
+      nocState.dfTotal = []; nocState.dfEval = []; nocState.incidencias = [];
+      $("nocFileDet").value = ""; $("nocFileRep").value = ""; $("nocFileLoj").value = "";
+      $("nocBadgeDet").textContent = "Pendiente"; $("nocBadgeRep").textContent = "Pendiente"; $("nocBadgeLoj").textContent = "Pendiente";
+      $("nocParamCorte").value = ""; $("nocBannerCorte").textContent = "Esperando reportes...";
+      $("nocStatusText").textContent = "Carga los 3 reportes Excel o usa Datos Demo.";
+      $("nocAlertBox").classList.add("viewer-hidden");
       nocRecalculate();
     }
 
     function nocRecalculate() {
-      if (!nocState.dfEval.length && excelData.length) {
-        nocState.dfEval = nocBuildFromInventory();
-        nocState.fechaCorte = new Date();
-        if (!$("nocParamCorte").value) $("nocParamCorte").value = nocToInputDt(nocState.fechaCorte);
-      }
-      if (!nocState.dfEval.length) {
+      if (!nocState.dfTotal.length) {
         $("nocKpiGlobal").textContent = "0.00%"; $("nocKpiPond").textContent = "0.00%"; $("nocKpiPlanta").textContent = "0";
         $("nocKpiVerde").textContent = "0"; $("nocKpiAmarillo").textContent = "0"; $("nocKpiRojo").textContent = "0";
-        $("nocTbodyMatriz").innerHTML = `<tr><td colspan="12" class="py-6 text-center text-slate-500">Sin datos para evaluar.</td></tr>`;
-        $("nocTbodyInc").innerHTML = `<tr><td colspan="8" class="py-4 text-center text-slate-500">Sin incidencias.</td></tr>`;
+        $("nocTbodyMatriz").innerHTML = `<tr><td colspan="12" class="py-6 text-center text-slate-500">Carga los 3 archivos Excel o pulsa Datos Demo para simular las tablas.</td></tr>`;
+        $("nocTbodyInc").innerHTML = `<tr><td colspan="8" class="py-4 text-center text-slate-500">Sin incidencias cargadas.</td></tr>`;
         $("nocIncCount").textContent = "0 INCIDENCIAS";
         return;
       }
@@ -1622,23 +1794,27 @@
       const metaSla = (parseFloat($("nocParamSla").value) || 95.0) / 100.0;
       const uVerde = parseFloat($("nocParamVerde").value) || 24;
       const uAmarillo = parseFloat($("nocParamAmarillo").value) || 48;
-      $("nocBannerCorte").textContent = `Corte: ${nocFmtBanner(nocState.fechaCorte)}`;
+      $("nocBannerCorte").textContent = `Corte de Datos: ${nocFmtBanner(nocState.fechaCorte)}`;
 
-      const evaluated = nocState.dfEval.map(r => {
-        const horas = r.CONECTIVIDAD_DT instanceof Date ? Math.round(((nocState.fechaCorte.getTime() - r.CONECTIVIDAD_DT.getTime()) / 3600000) * 100) / 100 : 0;
+      nocState.dfEval = nocState.dfTotal.map(r => {
+        const horas = (r.CONECTIVIDAD_DT instanceof Date && !isNaN(r.CONECTIVIDAD_DT.getTime()))
+          ? Math.round(((nocState.fechaCorte.getTime() - r.CONECTIVIDAD_DT.getTime()) / 3600000) * 100) / 100
+          : null;
         const obsU = String(r.OBS_ORIG || "").trim().toUpperCase();
         let estado = "VERDE";
         if (obsU.includes("DESINSTALADO")) estado = "DESINSTALADO";
-        else if (horas > uAmarillo) estado = "ROJO";
-        else if (obsU === "INACTIVO" || horas >= uVerde) estado = "AMARILLO";
-        const dias = Math.round((horas / 24.0) * 10) / 10;
+        else if (horas !== null && horas > uAmarillo) estado = "ROJO";
+        else if (obsU === "INACTIVO" || (horas !== null && horas >= uVerde)) estado = "AMARILLO";
+        const dias = horas !== null ? Math.round((horas / 24.0) * 10) / 10 : 0;
         return { ...r, HORAS: horas, DIAS: dias, ESTADO: estado };
       });
 
-      nocState.incidencias = evaluated.filter(r => r.ESTADO === "ROJO" || r.ESTADO === "AMARILLO").sort((a, b) => (a.ESTADO === "ROJO" ? -1 : 1) || (b.HORAS - a.HORAS));
+      nocState.incidencias = nocState.dfEval
+        .filter(r => r.ESTADO === "ROJO" || r.ESTADO === "AMARILLO")
+        .sort((a, b) => (a.ESTADO === "ROJO" ? -1 : 1) || ((b.HORAS || 0) - (a.HORAS || 0)));
 
       nocState.resumenGrupos = ["DETEKTOR", "REPOTENCIADOS", "LOJACK"].map(grp => {
-        const items = evaluated.filter(r => r.GRUPO === grp);
+        const items = nocState.dfEval.filter(r => r.GRUPO === grp);
         const total = items.length, bajas = items.filter(r => r.ESTADO === "DESINSTALADO").length, activa = total - bajas;
         const verde = items.filter(r => r.ESTADO === "VERDE").length, amarillo = items.filter(r => r.ESTADO === "AMARILLO").length, rojo = items.filter(r => r.ESTADO === "ROJO").length;
         const dispEstricta = activa > 0 ? verde / activa : 0;
@@ -1697,13 +1873,17 @@
       const q = normalizeText($("nocIncSearch").value), sev = $("nocIncSev").value;
       const list = nocState.incidencias.filter(inc => (sev === "ALL" || inc.ESTADO === sev) && (!q || normalizeText(`${inc.GRUPO} ${inc.ID} ${inc.NOMBRE}`).includes(q)));
       $("nocIncCount").textContent = `${nocState.incidencias.length} INCIDENCIAS`;
-      if (!list.length) { $("nocTbodyInc").innerHTML = `<tr><td colspan="8" class="py-4 text-center text-slate-500">Sin incidencias para este filtro.</td></tr>`; return; }
+      if (!list.length) { $("nocTbodyInc").innerHTML = `<tr><td colspan="8" class="py-4 text-center text-slate-500">Sin incidencias para el filtro seleccionado.</td></tr>`; return; }
       $("nocTbodyInc").innerHTML = list.map((inc, idx) => {
         const isRojo = inc.ESTADO === "ROJO";
-        const acc = isRojo ? `Revisar enlace / energía (${inc.DIAS.toFixed(1)} días fuera)` : `Monitorear reconexión (${inc.HORAS.toFixed(2)}h sin reporte)`;
+        const acc = isRojo ? `Revisar enlace / energía (${inc.DIAS.toFixed(1)} días fuera)` : `Monitorear reconexión (${inc.HORAS !== null ? inc.HORAS.toFixed(2) : "0.00"}h sin reporte)`;
         return `<tr class="text-slate-200"><td class="py-2 px-2 text-center text-slate-400">${idx + 1}</td><td class="py-2 px-2 text-center font-bold">${escapeHtml(inc.GRUPO)}</td><td class="py-2 px-2 text-center font-mono text-red-300">${escapeHtml(inc.ID)}</td><td class="py-2 px-3 font-semibold text-white">${escapeHtml(inc.NOMBRE)}</td><td class="py-2 px-2 text-center font-mono text-[11px]">${nocFmtDt(inc.CONECTIVIDAD_DT)}</td><td class="py-2 px-2 text-center font-bold ${isRojo ? "text-red-400" : "text-amber-400"}">${inc.DIAS.toFixed(1)}</td><td class="py-2 px-2 text-center"><span class="px-2 py-0.5 rounded text-[10px] font-extrabold ${isRojo ? "bg-red-500/20 text-red-300" : "bg-amber-500/20 text-amber-300"}">${isRojo ? "CRÍTICO" : "ALERTA"}</span></td><td class="py-2 px-3 text-slate-300">${escapeHtml(acc)}</td></tr>`;
       }).join("");
     }
+
+    $("nocFileDet").addEventListener("change", e => nocHandleFile(e.target, "DET"));
+    $("nocFileRep").addEventListener("change", e => nocHandleFile(e.target, "REP"));
+    $("nocFileLoj").addEventListener("change", e => nocHandleFile(e.target, "LOJ"));
   </script>
 </body>
 </html>
