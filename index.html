@@ -778,6 +778,38 @@
   }
   @keyframes orbSpin { to { transform: rotate(360deg); } }
 
+  /* LOGIN HD: cristal definido y tipografía estable durante el zoom */
+  body.hunter-preauth #login-floating-card {
+    -webkit-font-smoothing: antialiased;
+    text-rendering: geometricPrecision;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    transform: translate3d(-50%, -50%, 0) scale3d(var(--planet-scale), var(--planet-scale), 1) rotateX(var(--tilt-x)) rotateY(var(--tilt-y)) !important;
+    border-color: rgba(255, 92, 120, 0.86);
+    box-shadow:
+      inset 0 0 42px rgba(255, 24, 62, 0.34),
+      inset 0 1px 1px rgba(255, 220, 226, 0.48),
+      0 0 42px rgba(255, 24, 62, 0.42),
+      0 28px 84px rgba(0, 0, 0, 0.82);
+  }
+  body.hunter-preauth #login-floating-card :is(h3, p, label, span, input, button) {
+    -webkit-font-smoothing: antialiased;
+    text-rendering: geometricPrecision;
+  }
+  body.hunter-preauth #login-floating-card .liquid-input {
+    background: rgba(5, 1, 4, 0.90);
+    border-color: rgba(255, 92, 120, 0.62);
+    box-shadow: inset 0 1px 8px rgba(0, 0, 0, 0.48), 0 0 12px rgba(255, 30, 68, 0.08);
+  }
+  body.hunter-preauth #login-floating-card input {
+    color: #fff7f8;
+    caret-color: #ff5275;
+  }
+  body.hunter-preauth #login-floating-card input::placeholder {
+    color: rgba(230, 205, 211, 0.72);
+    opacity: 1;
+  }
+
   /* Inputs tipo píldora oscura (estilo referencia Sanctuary, súper legibles) */
   .liquid-input {
     background: rgba(7, 2, 5, 0.78);
@@ -1018,6 +1050,68 @@ body:not(.theme-day) .bg-\[\#0d121c\] {
     box-shadow: 0 8px 26px rgba(255, 24, 62, 0.42);
   }
   .scroll::-webkit-scrollbar-thumb { background: rgba(255, 76, 102, 0.42); }
+  
+  /* HUNTER CORE · refinamiento visual del dashboard, sin tocar estructura ni funciones */
+  body:not(.hunter-preauth) .frame { border-radius: 22px; }
+  body:not(.hunter-preauth) .panel, body:not(.hunter-preauth) .card, body:not(.hunter-preauth) .chip {
+    transition: border-color .22s ease, box-shadow .22s ease, background .22s ease;
+  }
+  body:not(.theme-day):not(.hunter-preauth) .panel {
+    background: linear-gradient(145deg, rgba(22,28,39,.94), rgba(9,13,21,.96));
+    border-color: rgba(255,255,255,.105);
+    box-shadow: 0 12px 30px rgba(0,0,0,.25), inset 0 1px 0 rgba(255,255,255,.035);
+  }
+  body:not(.theme-day):not(.hunter-preauth) .card {
+    background: linear-gradient(145deg, rgba(27,35,48,.92), rgba(14,19,28,.94));
+    border-color: rgba(148,163,184,.16);
+    box-shadow: 0 6px 18px rgba(0,0,0,.18), inset 0 1px 0 rgba(255,255,255,.04);
+  }
+  body:not(.theme-day):not(.hunter-preauth) .card:hover { border-color: rgba(255,65,94,.42); }
+  body:not(.theme-day):not(.hunter-preauth) .chip { border-color: rgba(148,163,184,.18); }
+  body:not(.hunter-preauth) :is(input,select,textarea,.sel) { transition: border-color .18s, box-shadow .18s; }
+  body:not(.hunter-preauth) :is(input,select,textarea,.sel):focus { outline: none; border-color: var(--accent) !important; box-shadow: 0 0 0 3px var(--accent-soft) !important; }
+  body:not(.hunter-preauth) button { transition: transform .16s ease, filter .16s ease, box-shadow .16s ease; }
+  body:not(.hunter-preauth) button:hover:not(:disabled) { filter: brightness(1.07); }
+  body:not(.hunter-preauth) button:active:not(:disabled) { transform: translateY(1px) scale(.985); }
+  body:not(.theme-day):not(.hunter-preauth) :is(.text-slate-300,.text-slate-200) { color: #d7e1ee !important; }
+  body:not(.theme-day):not(.hunter-preauth) .text-slate-400 { color: #a7b5c8 !important; }
+  body.theme-day:not(.hunter-preauth) .panel { box-shadow: 0 8px 24px rgba(15,23,42,.06), inset 0 1px 0 rgba(255,255,255,.8); }
+  body.theme-day:not(.hunter-preauth) .rail { box-shadow: 0 6px 20px rgba(15,23,42,.05); }
+  body.theme-day:not(.hunter-preauth) .card { box-shadow: 0 4px 14px rgba(15,23,42,.04); }
+  body:not(.hunter-preauth) .rail button { transition: all .2s cubic-bezier(.2,.8,.2,1); }
+  body:not(.hunter-preauth) .rail button:hover { transform: translateY(-1px); }
+  @media (prefers-reduced-motion: reduce) { body:not(.hunter-preauth) button, body:not(.hunter-preauth) .panel, body:not(.hunter-preauth) .card { transition-duration: .01ms !important; } }
+
+
+
+  /* HUNTER CORE · VISUAL REFINEMENT (sin tocar estructura ni lógica) */
+  body:not(.theme-day) .frame { background: rgba(5, 3, 7, .48) !important; border-color: rgba(255,90,120,.22) !important; }
+  body:not(.theme-day) .main, body:not(.theme-day) .content, body:not(.theme-day) .workspace { color: #f4f7fb; }
+  body:not(.theme-day) .panel, body:not(.theme-day) .card {
+    border-color: rgba(255,100,125,.20) !important;
+    background: linear-gradient(145deg,rgba(24,17,25,.88),rgba(9,7,12,.88)) !important;
+    box-shadow: 0 12px 30px rgba(0,0,0,.30), inset 0 1px 0 rgba(255,255,255,.045) !important;
+  }
+  body:not(.theme-day) .panel:hover { border-color: rgba(255,110,135,.34) !important; }
+  body:not(.theme-day) h1, body:not(.theme-day) h2, body:not(.theme-day) h3 { color:#fff !important; text-shadow:0 0 12px rgba(255,45,85,.16); }
+  body:not(.theme-day) input, body:not(.theme-day) textarea, body:not(.theme-day) select, body:not(.theme-day) .sel {
+    color:#f8fafc !important; background:rgba(7,9,15,.88) !important; border-color:rgba(255,105,130,.24) !important;
+  }
+  body:not(.theme-day) table { border-color:rgba(255,100,125,.18); }
+  body:not(.theme-day) th { color:#ffb8c5 !important; background:rgba(255,45,85,.075) !important; letter-spacing:.06em; }
+  body:not(.theme-day) td { color:#e5eaf2 !important; border-color:rgba(255,255,255,.055) !important; }
+  body:not(.theme-day) tr:hover td { background:rgba(255,45,85,.055) !important; }
+  body:not(.theme-day) .rail { background:linear-gradient(180deg,rgba(14,12,20,.96),rgba(7,5,11,.97)) !important; border-color:rgba(255,90,120,.19) !important; }
+  body:not(.theme-day) .rail button { transition:background .2s ease,transform .2s ease,color .2s ease; }
+  body:not(.theme-day) .rail button:hover { transform:translateX(2px); }
+  body:not(.theme-day) .chip { color:#f1f5f9 !important; border-color:rgba(255,100,125,.22) !important; }
+  body:not(.theme-day) .text-slate-400 { color:#b6c2d2 !important; }
+  body:not(.theme-day) .text-slate-500 { color:#9aa8bb !important; }
+  body:not(.theme-day) .scroll::-webkit-scrollbar { width:8px; height:8px; }
+  body:not(.theme-day) .scroll::-webkit-scrollbar-track { background:rgba(3,3,8,.35); }
+  body:not(.theme-day) .scroll::-webkit-scrollbar-thumb { border-radius:8px; background:rgba(255,85,115,.34); }
+  @media(max-width:900px) { body:not(.theme-day) .panel,body:not(.theme-day) .card { backdrop-filter:blur(7px) !important; } }
+
   </style>
 </head>
 <body class="hunter-preauth">
@@ -2769,7 +2863,9 @@ const R = 2.38, TAU = Math.PI * 2;
 
 // ---------- Renderer y Post-Procesado limpio (LEDs nítidos, sin neblina blanca) ----------
 const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
-renderer.setPixelRatio(Math.min(devicePixelRatio || 1, compact ? 1.3 : 1.75));
+// Resolución adaptativa: conserva detalle al ampliar y al cambiar el zoom del navegador.
+const getRenderDpr = () => Math.min(window.devicePixelRatio || 1, compact ? 1.8 : 2.35);
+renderer.setPixelRatio(getRenderDpr());
 renderer.setSize(innerWidth, innerHeight);
 renderer.setClearColor(0x040103, 1);
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
@@ -2795,6 +2891,7 @@ frontFill.position.set(-4.2, 2.0, 6.8);
 scene.add(frontFill);
 
 const composer = new EffectComposer(renderer);
+composer.setPixelRatio(getRenderDpr());
 composer.addPass(new RenderPass(scene, camera));
 const bloomPass = new UnrealBloomPass(new THREE.Vector2(innerWidth, innerHeight), 0.42, 0.36, 0.30);
 composer.addPass(bloomPass);
@@ -2949,16 +3046,16 @@ scene.add(distantSunGroup);
     [1, 'rgba(0, 0, 0, 0)']
   ]);
   const corona = new THREE.Sprite(new THREE.SpriteMaterial({
-    map: coronaTex, transparent: true, opacity: 0.56, blending: THREE.AdditiveBlending, depthWrite: false
+    map: coronaTex, transparent: true, opacity: 0.76, blending: THREE.AdditiveBlending, depthWrite: false
   }));
-  corona.scale.set(9.0, 9.0, 1);
+  corona.scale.set(10.8, 10.8, 1);
   distantSunGroup.add(corona);
   distantSunGroup.userData.corona = corona;
 
   const flare = new THREE.Sprite(new THREE.SpriteMaterial({
-    map: coronaTex, color: 0xff5434, transparent: true, opacity: 0.15, blending: THREE.AdditiveBlending, depthWrite: false
+    map: coronaTex, color: 0xff5434, transparent: true, opacity: 0.23, blending: THREE.AdditiveBlending, depthWrite: false
   }));
-  flare.scale.set(13, 0.7, 1);
+  flare.scale.set(15.5, 1.05, 1);
   distantSunGroup.add(flare);
 }
 
@@ -3046,7 +3143,7 @@ const ll = (lat, lon, r = R) => {
 
 // Núcleo oscuro obsidiana (oculta los LEDs traseros para que los del frente se lean súper nítidos)
 globe.add(new THREE.Mesh(
-  new THREE.SphereGeometry(R * 0.988, 64, 48),
+  new THREE.SphereGeometry(R * 0.988, 128, 96),
   new THREE.MeshBasicMaterial({ color: 0x070104 })
 ));
 
@@ -3056,13 +3153,13 @@ const ledUniforms = {
   uPixelRatio: { value: renderer.getPixelRatio() }
 };
 {
-  const latRows = compact ? 52 : 76;
+  const latRows = compact ? 68 : 112;
   const positions = [];
   const phases = [];
   for (let i = 1; i < latRows; i++) {
     const phi = (i / latRows) * Math.PI;
     const sinPhi = Math.sin(phi), cosPhi = Math.cos(phi);
-    const lonCols = Math.max(8, Math.round(sinPhi * (compact ? 112 : 168)));
+    const lonCols = Math.max(8, Math.round(sinPhi * (compact ? 148 : 232)));
     for (let j = 0; j < lonCols; j++) {
       const theta = (j / lonCols) * TAU;
       const x = sinPhi * Math.cos(theta);
@@ -3091,9 +3188,11 @@ const ledUniforms = {
         float w1 = sin(n.y * 7.5 + n.x * 4.2 - uTime * 1.35);
         float w2 = cos(n.z * 6.8 - n.y * 5.2 + uTime * 0.95);
         float w3 = sin((n.x * n.z) * 10.0 + uTime * 0.7);
-        float wave = smoothstep(-0.25, 0.92, (w1 * 0.5 + w2 * 0.35 + w3 * 0.25));
-        vWave = wave;
-        vSpark = pow(max(0.0, sin(uTime * 2.4 + aPhase * 28.0)), 8.0);
+        float w4 = cos((n.x * 11.0 + n.y * 8.0 - n.z * 9.0) - uTime * 1.15);
+        float scan = sin((n.y * 19.0 + n.x * 7.0 + n.z * 5.0) - uTime * 2.1);
+        float wave = smoothstep(-0.30, 0.90, (w1 * 0.36 + w2 * 0.27 + w3 * 0.20 + w4 * 0.17));
+        vWave = clamp(wave * 0.88 + smoothstep(0.72, 1.0, scan) * 0.22, 0.0, 1.0);
+        vSpark = pow(max(0.0, sin(uTime * 2.4 + aPhase * 28.0)), 10.0);
 
         // Ligero relieve en las crestas de las ondas LED
         vec3 displaced = position * (1.0 + wave * 0.014);
@@ -3102,8 +3201,8 @@ const ledUniforms = {
         vec3 viewDir = normalize(-mvPos.xyz);
         vRim = pow(1.0 - max(0.0, dot(viewN, viewDir)), 2.2);
 
-        float baseSize = (18.5 + wave * 14.0 + vRim * 11.0 + vSpark * 9.0) * uPixelRatio;
-        gl_PointSize = clamp(baseSize / -mvPos.z, 1.6, 7.2);
+        float baseSize = (19.5 + vWave * 15.5 + vRim * 12.0 + vSpark * 10.0) * uPixelRatio;
+        gl_PointSize = clamp(baseSize / -mvPos.z, 1.7, 8.5);
         gl_Position = projectionMatrix * mvPos;
       }
     `,
@@ -3118,11 +3217,13 @@ const ledUniforms = {
         float core = smoothstep(0.5, 0.08, d);
         vec3 deepCrimson = vec3(0.42, 0.02, 0.09);
         vec3 vividRed    = vec3(1.00, 0.11, 0.29);
-        vec3 hotCoral    = vec3(1.00, 0.44, 0.26);
-        vec3 col = mix(deepCrimson, vividRed, clamp(vWave * 0.9 + vRim * 0.7, 0.0, 1.0));
-        col = mix(col, hotCoral, clamp(vSpark * 0.75 + vRim * vWave * 0.5, 0.0, 1.0));
-        float alpha = core * (0.28 + vWave * 0.62 + vRim * 0.55);
-        gl_FragColor = vec4(col * (0.9 + vWave * 0.55 + vSpark * 0.5), clamp(alpha, 0.0, 0.98));
+        vec3 hotCoral    = vec3(1.00, 0.48, 0.30);
+        vec3 iceWhite    = vec3(1.00, 0.82, 0.78);
+        vec3 col = mix(deepCrimson, vividRed, clamp(vWave * 0.92 + vRim * 0.72, 0.0, 1.0));
+        col = mix(col, hotCoral, clamp(vSpark * 0.82 + vRim * vWave * 0.52, 0.0, 1.0));
+        col = mix(col, iceWhite, clamp(vSpark * 0.36, 0.0, 0.55));
+        float alpha = core * (0.30 + vWave * 0.66 + vRim * 0.58);
+        gl_FragColor = vec4(col * (0.96 + vWave * 0.62 + vSpark * 0.72), clamp(alpha, 0.0, 0.99));
       }
     `,
     transparent: true,
@@ -3133,7 +3234,7 @@ const ledUniforms = {
 }
 
 // Borde Fresnel delgado y nítido (sin saturar el centro)
-scene.add(new THREE.Mesh(new THREE.SphereGeometry(R * 1.032, 64, 48), new THREE.ShaderMaterial({
+scene.add(new THREE.Mesh(new THREE.SphereGeometry(R * 1.032, 128, 96), new THREE.ShaderMaterial({
   vertexShader: 'varying vec3 vN,vV;void main(){vN=normalize(normalMatrix*normal);vec4 mv=modelViewMatrix*vec4(position,1.);vV=normalize(-mv.xyz);gl_Position=projectionMatrix*mv;}',
   fragmentShader: 'varying vec3 vN,vV;void main(){float f=pow(1.-abs(dot(vN,vV)),4.2);gl_FragColor=vec4(1.0,0.12,0.30,1.0)*f*1.15;}',
   transparent: true, blending: THREE.AdditiveBlending, depthWrite: false
@@ -3523,7 +3624,10 @@ addEventListener('resize', () => {
   camera.aspect = innerWidth / innerHeight;
   targetCamZ = defaultCamZ();
   camera.updateProjectionMatrix();
+  const nextDpr = getRenderDpr();
+  renderer.setPixelRatio(nextDpr);
   renderer.setSize(innerWidth, innerHeight);
+  composer.setPixelRatio(nextDpr);
   composer.setSize(innerWidth, innerHeight);
   ledUniforms.uPixelRatio.value = renderer.getPixelRatio();
   syncLoginCardToPlanet();
@@ -3549,7 +3653,7 @@ function animate() {
   hubRing.material.opacity = 0.92 * (1 - pulseCycle);
   pulses.forEach(p => { p.t = (p.t + dt * p.s * k) % 1; p.p.position.copy(p.c.getPoint(p.t)); });
 
-  const sunPulse = 8.9 + Math.sin(t * 1.1) * 0.3;
+  const sunPulse = 10.7 + Math.sin(t * 1.1) * 0.38;
   distantSunGroup.userData.corona.scale.set(sunPulse, sunPulse, 1);
   ringedPlanet.userData.body.rotation.y += dt * 0.04 * k;
   crimsonMoon.rotation.y += dt * 0.06 * k;
