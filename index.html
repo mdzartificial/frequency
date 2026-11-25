@@ -1722,7 +1722,13 @@ body:not(.hunter-preauth) #map-canvas { background: #4a303a !important; }
         <section id="view-price" class="view ui-hidden map panel flex-1 min-w-0 flex flex-col overflow-hidden">
           <div class="flex flex-wrap items-center gap-3 px-5 pt-4 pb-3 border-b border-white/5">
             <h2 class="text-base font-bold text-white mr-auto">Analizador de Precios</h2>
-            <label class="text-xs text-slate-400">Precio <select id="price-col" class="sel" onchange="renderPrice()"></select></label>
+            <label class="text-xs text-slate-400">Moneda
+              <select id="price-currency" class="sel" onchange="renderPrice()">
+                <option value="PEN" selected>Soles (S/)</option>
+                <option value="USD">Dólares ($)</option>
+                <option value="EUR">Euros (€)</option>
+              </select>
+            </label>
             <label class="text-xs text-slate-400">Agrupar por <select id="price-grp" class="sel" onchange="renderPrice()"></select></label>
           </div>
           <div id="price-body" class="flex-1 overflow-y-auto scroll px-5 py-4 space-y-4"></div>
@@ -2911,41 +2917,120 @@ body:not(.hunter-preauth) #map-canvas { background: #4a303a !important; }
       }
     }
 
-    const num = v => { let s = String(v ?? "").replace(/S\/\.?|US\$|USD|PEN|\$/gi, ""); if (/[A-Za-z]/.test(s) || !/\d/.test(s)) return NaN; s = s.replace(/[^\d.,-]/g, ""); if (s.includes(",") && s.includes(".")) s = s.replace(/,/g, ""); else if (/,\d{1,2}$/.test(s)) s = s.replace(",", "."); else s = s.replace(/,/g, ""); return parseFloat(s); };
-    const money = n => "S/ " + n.toLocaleString("es-PE", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-    function updateTotalUSD() { const tc = parseFloat($("tc-input").value), d = $("total-usd-display"); if (tc > 0 && currentTotalSoles > 0) { d.textContent = "= $ " + (currentTotalSoles / tc).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 }); d.classList.remove("hidden"); } else d.classList.add("hidden"); }
+const num = v => { let s = String(v ?? "").replace(/S\/\.?|US\$|USD|EUR|PEN|\$|€/gi, ""); if (/[A-Za-z]/.test(s) || !/\d/.test(s)) return NaN; s = s.replace(/[^\d.,-]/g, ""); if (s.includes(",") && s.includes(".")) s = s.replace(/,/g, ""); else if (/,\d{1,2}$/.test(s)) s = s.replace(",", "."); else s = s.replace(/,/g, ""); return parseFloat(s); };
+    const PRICE_RATES = { PEN: 1, USD: 1 / 3.47, EUR: 1 / 3.80 };
+    let priceRatesLoaded = false;
+    let priceSearchQuery = "";
+
+    async function loadPriceExchangeRates() {
+      if (priceRatesLoaded) return;
+      priceRatesLoaded = true;
+      try {
+        const res = await fetch("https://open.er-api.com/v6/latest/PEN");
+        const data = await res.json();
+        if (data?.rates?.USD) PRICE_RATES.USD = data.rates.USD;
+        if (data?.rates?.EUR) PRICE_RATES.EUR = data.rates.EUR;
+        if ($("view-price") && !$("view-price").classList.contains("ui-hidden")) renderPrice();
+      } catch (e) {}
+    }
+
+    function getPriceCurrency() {
+      return $("price-currency")?.value || "PEN";
+    }
+
+    function money(n) {
+      const cur = getPriceCurrency();
+      const val = n * (PRICE_RATES[cur] || 1);
+      if (cur === "USD") return "$ " + val.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      if (cur === "EUR") return "€ " + val.toLocaleString("es-ES", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      return "S/ " + val.toLocaleString("es-PE", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+
+    function renderPricePointsList() {
+      const listEl = $("price-points-list"), metaEl = $("price-points-meta");
+      if (!listEl) return;
+      priceSearchQuery = $("price-point-search")?.value ?? priceSearchQuery;
+      const q = normalizeText(priceSearchQuery);
+      const matches = (q ? currentPriceRows.filter(x => normalizeText(`${x.n} ${x.g}`).includes(q)) : currentPriceRows)
+        .slice()
+        .sort((a, b) => b.p - a.p);
+      const subTot = matches.reduce((a, x) => a + x.p, 0);
+      if (metaEl) metaEl.textContent = `${matches.length} punto${matches.length !== 1 ? "s" : ""} · Subtotal: ${money(subTot)}`;
+      listEl.innerHTML = matches.map(x => `
+        <div class="chip px-3 py-2 flex items-center justify-between gap-2 text-xs">
+          <div class="min-w-0">
+            <p class="font-bold text-white truncate" title="${escapeHtml(x.n)}">${escapeHtml(x.n)}</p>
+            <p class="text-[10px] text-slate-400 truncate">${escapeHtml(x.g)}</p>
+          </div>
+          <span class="mono font-bold text-[var(--accent)] shrink-0">${money(x.p)}</span>
+        </div>
+      `).join("") || `<p class="col-span-full text-xs text-slate-500 text-center py-4">Sin puntos que coincidan con "${escapeHtml(priceSearchQuery)}".</p>`;
+    }
 
     let priceSig = "";
     function renderPrice() {
-      const cols = Object.keys(excelData[0]).filter(k => !k.startsWith("_")), body = $("price-body");
-      const numCols = cols.filter(c => { if (/LAT|LON|IMEI|SIM|^ID|\bID$|TEL|CEL|SLOT|MODEM/.test(c)) return false; const v = excelData.map(r => r[c]).filter(x => !isEmpty(x)); return v.length && v.filter(x => isFinite(num(x))).length / v.length > 0.6; });
-      if (!numCols.length) { body.innerHTML = box("Sin datos de precios", "<p class='text-xs text-slate-400'>No se detectó columna numérica.</p>"); return; }
+      loadPriceExchangeRates();
+      const body = $("price-body");
+      if (!excelData.length) { body.innerHTML = ""; return; }
+      const cols = Object.keys(excelData[0]).filter(k => !k.startsWith("_"));
+      const pc = findColumn(excelData[0], ["PRECIO DE ALQUILER MENSUAL", "PRECIO DE ALQUILER", "ALQUILER", "PRECIO", "RENTA"]);
+      if (!pc) { body.innerHTML = box("Sin datos de precios", "<p class='text-xs text-slate-400'>No se encontró la columna de precio de alquiler.</p>"); return; }
+
       const sig = cols.join("|");
       if (sig !== priceSig) {
         priceSig = sig;
-        const def = numCols.find(c => /PRECIO|COSTO|TARIFA|MONTO|VALOR|RENTA/.test(c)) || numCols[0];
-        $("price-col").innerHTML = numCols.map(c => `<option ${c === def ? "selected" : ""}>${escapeHtml(c)}</option>`).join("");
-        const gc = cols.filter(c => { const d = new Set(excelData.map(r => r[c]).filter(x => !isEmpty(x))); return d.size > 1 && d.size <= 60 && !numCols.includes(c); });
+        const gc = cols.filter(c => {
+          if (/LAT|LON|IMEI|SIM|^ID|\bID$|PRECIO|COSTO|TARIFA|MONTO|VALOR|RENTA|CP|FW|TRIMMER/.test(c.toUpperCase())) return false;
+          const d = new Set(excelData.map(r => r[c]).filter(x => !isEmpty(x)));
+          return d.size > 1 && d.size <= 60;
+        });
         const tk = findColumn(excelData[0], ["TECNOLOGIA"]);
         $("price-grp").innerHTML = gc.map(c => `<option ${c === tk ? "selected" : ""}>${escapeHtml(c)}</option>`).join("");
       }
-      const pc = $("price-col").value, gcn = $("price-grp").value, P = findColumn(excelData[0], ["PUNTOS", "PUNTO"]), yk = findColumn(excelData[0], ["TIPO"]), uniqueMap = new Map();
+
+      const gcn = $("price-grp").value || findColumn(excelData[0], ["TECNOLOGIA"]) || "";
+      const P = findColumn(excelData[0], ["PUNTOS", "PUNTO"]), yk = findColumn(excelData[0], ["TIPO"]), uniqueMap = new Map();
       excelData.forEach(r => {
         let pName = P ? String(r[P]).trim() : ""; if (!pName) return;
         pName = pName.replace(/\s*\(\s*PE\s*\)\s*/gi, "").trim();
         const tipo = yk && !isEmpty(r[yk]) ? String(r[yk]).toUpperCase() : "";
         if (tipo.includes("RASTREO") || pName.toUpperCase().startsWith("R-") || pName.toUpperCase().includes("RASTREO")) return;
-        if (!uniqueMap.has(pName.toUpperCase())) uniqueMap.set(pName.toUpperCase(), { p: num(r[pc]), g: isEmpty(r[gcn]) ? "SIN DATO" : String(r[gcn]).trim().toUpperCase(), n: pName });
+        if (!uniqueMap.has(pName.toUpperCase())) {
+          uniqueMap.set(pName.toUpperCase(), {
+            p: num(r[pc]),
+            g: gcn && !isEmpty(r[gcn]) ? String(r[gcn]).trim().toUpperCase() : "SIN DATO",
+            n: pName
+          });
+        }
       });
-      const rows = Array.from(uniqueMap.values()).filter(x => isFinite(x.p)); currentPriceRows = rows;
-      if (!rows.length) { body.innerHTML = ""; return; }
-      const tot = rows.reduce((a, x) => a + x.p, 0); currentTotalSoles = tot;
-      const avg = tot / rows.length, G = {}; rows.forEach(x => { (G[x.g] = G[x.g] || []).push(x.p); });
+
+      const rows = Array.from(uniqueMap.values()).filter(x => isFinite(x.p));
+      currentPriceRows = rows;
+      if (!rows.length) { body.innerHTML = box("Sin datos de precios", "<p class='text-xs text-slate-400'>No hay montos válidos en la columna de alquiler.</p>"); return; }
+
+      const tot = rows.reduce((a, x) => a + x.p, 0);
+      currentTotalSoles = tot;
+      const avg = tot / rows.length, G = {};
+      rows.forEach(x => { (G[x.g] = G[x.g] || []).push(x.p); });
       const sums = Object.entries(G).map(([k, v]) => [k, v.reduce((a, b) => a + b, 0)]).sort((a, b) => b[1] - a[1]).slice(0, 10);
       const top = [...rows].sort((a, b) => b.p - a.p).slice(0, 10);
-      body.innerHTML = `<div class="chip p-3 inline-flex items-center gap-3 text-xs"><span class="text-slate-400">USD:</span><input type="number" id="tc-input" step="0.01" placeholder="T.C." class="w-24 px-2 py-1 rounded bg-black/40 border border-white/10 text-white" oninput="updateTotalUSD()"><span id="total-usd-display" class="font-bold text-emerald-400 hidden"></span></div>`
+
+      body.innerHTML =
+        `<div class="card p-4 space-y-3">
+          <div class="flex flex-wrap items-center justify-between gap-2">
+            <h4 class="text-xs font-bold uppercase tracking-wider text-slate-300">Buscar precio por punto</h4>
+            <span id="price-points-meta" class="text-xs font-semibold text-[var(--accent)]"></span>
+          </div>
+          <div class="relative">
+            <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 text-xs"></i>
+            <input id="price-point-search" value="${escapeHtml(priceSearchQuery)}" oninput="renderPricePointsList()" placeholder="Escribe el nombre del punto o tecnología (ej: COMAS, TRUJILLO, DETEKTOR)..." class="w-full py-2 pl-9 pr-3 text-xs bg-black/40 border border-white/10 text-white outline-none">
+          </div>
+          <div id="price-points-list" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-2 max-h-60 overflow-y-auto scroll pr-1"></div>
+        </div>`
         + grid("lg:grid-cols-4", kpi("fa-coins", "Total", money(tot)) + kpi("fa-scale-balanced", "Promedio", money(avg)) + kpi("fa-arrow-down", "Mínimo", money(Math.min(...rows.map(x => x.p)))) + kpi("fa-arrow-up", "Máximo", money(Math.max(...rows.map(x => x.p)))))
-        + `<div class="grid grid-cols-1 lg:grid-cols-2 gap-3">${box(`Total por ${escapeHtml(gcn)}`, bars(sums, "var(--accent)", money))}${box("Top 10 Alquileres", top.map(x => `<div class="flex justify-between py-1.5 border-b border-white/5 text-xs"><span class="text-slate-300 truncate">${escapeHtml(x.n)}</span><b class="text-white">${money(x.p)}</b></div>`).join(""))}</div>`;
+        + `<div class="grid grid-cols-1 lg:grid-cols-2 gap-3">${box(`Total por ${escapeHtml(gcn || "Grupo")}`, bars(sums, "var(--accent)", money))}${box("Top 10 Alquileres", top.map(x => `<div class="flex justify-between py-1.5 border-b border-white/5 text-xs"><span class="text-slate-300 truncate">${escapeHtml(x.n)}</span><b class="text-white">${money(x.p)}</b></div>`).join(""))}</div>`;
+
+      renderPricePointsList();
     }
 
     if (typeof Chart !== "undefined" && typeof ChartDataLabels !== "undefined") Chart.register(ChartDataLabels);
