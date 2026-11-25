@@ -5196,3 +5196,190 @@ body:not(.hunter-preauth) #hunter-theme-picker { display:none !important; }
   });
 })();
 </script>
+<!-- ===== HUNTER CORE · PARCHE: móvil + cyberpunk + 3D + skins + export NOC =====
+     PEGAR AL FINAL DEL ARCHIVO (después del último </style>/<script>) -->
+<style id="hunter-cyberpunk-patch">
+/* 1 · Login: solo queda el punto de "ORBITADO" */
+#brand-mark{display:none!important}
+#brand{gap:0!important}
+
+/* 2 · Skins */
+body{--sk:255,42,78;--sk2:255,112,74;--skt:#fff;--skc:rgb(var(--sk))}
+html body:not(.hunter-preauth):not(.theme-day){--accent:rgb(var(--sk));--accent-soft:rgba(var(--sk),.16);--accent-glow:rgba(var(--sk),.45);--accent-a:var(--sk);--accent-b:var(--sk2)}
+
+/* 3 · Forma angular (nada redondo) */
+html body:not(.hunter-preauth) :is(.rounded,.rounded-md,.rounded-lg,.rounded-xl,.rounded-2xl,.panel,.card,.chip,.sel,.frame,.rail,.rail button,button,input,textarea,select,.toast,.zone-reset,.zone-tech){border-radius:0!important}
+html body:not(.hunter-preauth) .h-2.rounded-full,html body:not(.hunter-preauth) .h-2.rounded-full>div{border-radius:0!important}
+html body:not(.hunter-preauth) .h-2.rounded-full>div{-webkit-mask:repeating-linear-gradient(90deg,#000 0 6px,transparent 6px 8px);mask:repeating-linear-gradient(90deg,#000 0 6px,transparent 6px 8px)}
+
+/* 4 · Look cyberpunk (modo noche) */
+html body:not(.hunter-preauth):not(.theme-day) .frame{background:linear-gradient(160deg,rgba(var(--sk),.07),rgba(4,6,12,.90) 40%)!important;border:1px solid rgba(var(--sk),.5)!important;box-shadow:0 0 44px rgba(var(--sk),.2),inset 0 0 60px rgba(var(--sk),.04)!important}
+html body:not(.hunter-preauth):not(.theme-day) :is(.panel,.card){background:linear-gradient(150deg,rgba(var(--sk),.08),rgba(6,8,16,.92) 45%)!important;border:1px solid rgba(var(--sk),.32)!important;box-shadow:inset 0 0 24px rgba(var(--sk),.05)!important}
+html body:not(.hunter-preauth):not(.theme-day) .chip{background:rgba(var(--sk),.07)!important;border:1px solid rgba(var(--sk),.28)!important;clip-path:polygon(7px 0,100% 0,100% calc(100% - 7px),calc(100% - 7px) 100%,0 100%,0 7px)}
+html body:not(.hunter-preauth):not(.theme-day) .rail{background:rgba(4,6,12,.92)!important;border:1px solid rgba(var(--sk),.4)!important}
+html body:not(.hunter-preauth):not(.theme-day) .rail button.on{clip-path:polygon(8px 0,100% 0,100% calc(100% - 8px),calc(100% - 8px) 100%,0 100%,0 8px);background:rgba(var(--sk),.25)!important;border-color:rgb(var(--sk))!important}
+html body:not(.hunter-preauth):not(.theme-day) :is(input,textarea,select,.sel){background:rgba(3,5,10,.85)!important;border:1px solid rgba(var(--sk),.35)!important;border-bottom:2px solid rgb(var(--sk))!important;color:#fff!important}
+html body:not(.hunter-preauth):not(.theme-day) .btn{background:linear-gradient(135deg,rgba(var(--sk),.95),rgba(var(--sk2),.9))!important;color:var(--skt)!important;font-weight:800;text-transform:uppercase;letter-spacing:.12em;border:0!important;clip-path:polygon(10px 0,100% 0,100% calc(100% - 10px),calc(100% - 10px) 100%,0 100%,0 10px);box-shadow:none!important}
+html body:not(.hunter-preauth):not(.theme-day) :is(.text-sky-300,.text-sky-400){color:rgb(var(--sk))!important}
+html body:not(.hunter-preauth):not(.theme-day) :is(h2,h3,th){text-transform:uppercase;letter-spacing:.14em}
+html body:not(.hunter-preauth):not(.theme-day) h2{color:#fff!important;text-shadow:0 0 10px rgba(var(--sk),.6)}
+html body:not(.hunter-preauth) :is(.panel,.card){position:relative}
+html body:not(.hunter-preauth) :is(.panel,.card)::after{content:"";position:absolute;inset:0;pointer-events:none;z-index:3;
+ background:linear-gradient(var(--skc),var(--skc)) 0 0/16px 2px,linear-gradient(var(--skc),var(--skc)) 0 0/2px 16px,
+ linear-gradient(var(--skc),var(--skc)) 100% 0/16px 2px,linear-gradient(var(--skc),var(--skc)) 100% 0/2px 16px,
+ linear-gradient(var(--skc),var(--skc)) 0 100%/16px 2px,linear-gradient(var(--skc),var(--skc)) 0 100%/2px 16px,
+ linear-gradient(var(--skc),var(--skc)) 100% 100%/16px 2px,linear-gradient(var(--skc),var(--skc)) 100% 100%/2px 16px;background-repeat:no-repeat}
+html body:not(.hunter-preauth):not(.theme-day)::after{content:"";position:fixed;inset:0;z-index:50;pointer-events:none;background:repeating-linear-gradient(0deg,rgba(255,255,255,.03) 0 1px,transparent 1px 3px)}
+html body:not(.hunter-preauth) h1{animation:cpGlitch 6s infinite}
+@keyframes cpGlitch{0%,92%,100%{text-shadow:0 0 14px rgba(var(--sk),.5)}94%{text-shadow:2px 0 #00e5ff,-2px 0 #ff2bd6}96%{text-shadow:-2px 0 #00e5ff,2px 0 #ff2bd6}}
+
+/* 5 · 3D más notorio */
+html body:not(.hunter-preauth) .frame{backdrop-filter:none!important;-webkit-backdrop-filter:none!important;transform:perspective(1700px) rotateX(var(--m-x,0deg)) rotateY(var(--m-y,0deg));transform-style:preserve-3d}
+html body:not(.hunter-preauth) :is(.frame>.flex-1,.cols){transform-style:preserve-3d}
+html body:not(.hunter-preauth) .rail{transform:translateZ(46px)}
+html body:not(.hunter-preauth) :is(#side,.map.panel){transform:translateZ(28px)}
+html body:not(.hunter-preauth) .frame .card:hover{transform:translateZ(24px) translateY(-3px)!important}
+body.hunter-preauth #login-floating-card{transform:perspective(1400px) rotateX(var(--l-x,0deg)) rotateY(var(--l-y,0deg))!important}
+
+/* 6 · Móvil */
+@media(max-width:900px){
+ html body:not(.hunter-preauth){padding:0 0 74px!important}
+ html body:not(.hunter-preauth) .frame{transform:none!important;padding:10px!important;min-height:100svh}
+ html body:not(.hunter-preauth) .rail{display:flex!important;position:fixed;left:0;right:0;bottom:0;top:auto;width:auto;height:auto;flex-direction:row;justify-content:space-evenly;align-items:center;padding:6px 6px calc(6px + env(safe-area-inset-bottom));z-index:300;transform:none!important;overflow-x:auto;gap:2px}
+ html body:not(.hunter-preauth) .rail>div:first-child{display:none}
+ html body:not(.hunter-preauth) .rail .mt-auto{margin:0!important;padding:0!important;flex-direction:row!important}
+ html body:not(.hunter-preauth) .rail button{width:40px;height:40px;flex:none}
+ html body:not(.hunter-preauth) .rail button.on::before{left:20%!important;right:20%;top:auto!important;bottom:-6px;width:auto!important;height:3px}
+ html body:not(.hunter-preauth) .cols{flex-direction:column!important;gap:10px!important;min-height:0!important}
+ html body:not(.hunter-preauth) :is(#side,.map.panel){transform:none!important;overflow:visible!important;flex:none!important;width:100%!important}
+ html body:not(.hunter-preauth) :is(#results-container,#tech-body,#maint-body,#price-body,#view-noc>.overflow-y-auto,#view-rafi>.overflow-y-auto){overflow:visible!important;flex:none!important;max-height:none!important}
+ html body:not(.hunter-preauth) #map-canvas{height:62vh!important;min-height:62vh!important;flex:none!important}
+ html body:not(.hunter-preauth) .toast{bottom:84px}
+ html,body{overflow-x:hidden}
+}
+@media(max-width:620px){
+ body.hunter-preauth #hunter-auth-modal{padding:70px 10px 70px!important}
+ body.hunter-preauth #login-floating-card{width:94vw!important;height:auto!important;aspect-ratio:auto!important;border-radius:26px!important;padding:26px 18px!important;border:1px solid rgba(var(--t1rgb),.5)!important;background:rgba(6,9,20,.62)!important}
+ body.hunter-preauth #login-floating-card::before,body.hunter-preauth #login-floating-card::after{display:none!important}
+ body.hunter-preauth #login-floating-card form .grid.grid-cols-2{grid-template-columns:1fr!important}
+ #hunter-theme-picker{top:auto!important;bottom:10px;right:50%;transform:translateX(50%)!important;flex-direction:row!important}
+}
+</style>
+
+<script id="hunter-patch-js">
+(() => {
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* ---------- Skins del dashboard ---------- */
+  const SK = {
+    crimson:{n:'Carmesí',hex:'#ff2a4e',rgb:'255,42,78',b:'255,112,74',t:'#fff'},
+    cyan:{n:'Cian',hex:'#00e5ff',rgb:'0,229,255',b:'255,43,214',t:'#02060c'},
+    magenta:{n:'Magenta',hex:'#ff2bd6',rgb:'255,43,214',b:'0,229,255',t:'#fff'},
+    lime:{n:'Ácido',hex:'#a6ff00',rgb:'166,255,0',b:'0,229,255',t:'#02060c'},
+    amber:{n:'Ámbar',hex:'#ffb000',rgb:'255,176,0',b:'255,60,60',t:'#02060c'},
+    violet:{n:'Violeta',hex:'#9d6bff',rgb:'157,107,255',b:'0,229,255',t:'#fff'}
+  };
+  const order = Object.keys(SK);
+  let cur = 'crimson';
+  try { cur = localStorage.getItem('HUNTER_SKIN') || cur; } catch (e) {}
+  if (!SK[cur]) cur = 'crimson';
+
+  function applySkin(k, notify) {
+    cur = k; const S = SK[k], st = document.body.style;
+    st.setProperty('--sk', S.rgb); st.setProperty('--sk2', S.b); st.setProperty('--skt', S.t);
+    try { localStorage.setItem('HUNTER_SKIN', k); } catch (e) {}
+    if (notify) {
+      showToast('Color: ' + S.n);
+      if (!$('view-tech').classList.contains('ui-hidden') && excelData.length) renderTech();
+      if (!$('view-noc').classList.contains('ui-hidden')) nocRecalculate();
+    }
+  }
+  window.toggleAccent = () => applySkin(order[(order.indexOf(cur) + 1) % order.length], true);
+  applySkin(cur, false);
+
+  /* ---------- Gráficos cyberpunk (barras angulares, neón, sin donuts) ---------- */
+  const ORIG = window.Chart;
+  if (ORIG) {
+    ORIG.defaults.font.family = '"JetBrains Mono",monospace';
+    ORIG.defaults.color = '#9fb3c8';
+    const hexA = (h, a) => /^#[0-9a-f]{6}$/i.test(h) ? h + Math.round(a * 255).toString(16).padStart(2, '0') : h;
+    const cyber = cfg => {
+      const S = SK[cur], pal = [S.hex, '#00e5ff', '#ff2bd6', '#a6ff00', '#ffb000', '#9d6bff', '#ff5a36'];
+      const recol = c => Array.isArray(c) ? (c[0] === '#38bdf8' ? c.map((_, i) => pal[i % pal.length]) : c) : (c === '#38bdf8' ? S.hex : c);
+      if (cfg.type === 'doughnut') {
+        const d = cfg.data.datasets[0];
+        cfg = { type: 'bar', data: { labels: cfg.data.labels, datasets: [{ data: d.data, backgroundColor: d.backgroundColor }] },
+          options: { indexAxis: 'y', plugins: { legend: { display: false }, datalabels: { color: '#fff', anchor: 'end', align: 'start', clamp: true, font: { weight: 'bold', size: 10 } } } } };
+      }
+      cfg.data.datasets.forEach(ds => {
+        const c = recol(ds.backgroundColor);
+        ds.backgroundColor = Array.isArray(c) ? c.map(x => hexA(x, .28)) : hexA(c, .28);
+        ds.borderColor = c; ds.borderWidth = 1.5; ds.borderRadius = 0; ds.borderSkipped = false;
+      });
+      const o = cfg.options = cfg.options || {}; o.scales = o.scales || {};
+      ['x', 'y'].forEach(a => {
+        const s = o.scales[a] = o.scales[a] || {};
+        s.grid = (s.grid && s.grid.display === false) ? s.grid : { color: 'rgba(' + S.rgb + ',.12)' };
+        s.border = { color: 'rgba(' + S.rgb + ',.6)' };
+        s.ticks = Object.assign({}, s.ticks, { font: { size: 10 } });
+      });
+      return cfg;
+    };
+    function CyberChart(ctx, cfg) { return new ORIG(ctx, cyber(cfg)); }
+    Object.setPrototypeOf(CyberChart, ORIG);
+    CyberChart.prototype = ORIG.prototype;
+    window.Chart = CyberChart;
+    ORIG.register({
+      id: 'neonGlow',
+      beforeDatasetsDraw(c) { c.ctx.save(); c.ctx.shadowColor = 'rgba(' + SK[cur].rgb + ',.55)'; c.ctx.shadowBlur = 14; },
+      afterDatasetsDraw(c) { c.ctx.restore(); }
+    });
+  }
+
+  /* ---------- Consola NOC también puede exportar Excel ---------- */
+  const canExport = () => isDevRole() || isNocOnlyRole();
+  const _apply = window.applySessionRoleUI;
+  window.applySessionRoleUI = function (s) {
+    _apply(s);
+    const b = $('btnNocExportExcel');
+    if (b) b.classList.toggle('ui-hidden', !canExport());
+  };
+  window.nocExportExcelEjecutivo = function () {
+    if (!canExport() || !nocState.dfEval.length) return;
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet([
+      ['Grupo', 'Total', 'Bajas', 'Activa', 'Verde', 'Amarillo', 'Rojo', '% Estricta', '% Ponderada'],
+      ...[...nocState.resumenGrupos, nocState.resumenTotal].map(g => [g.grupo, g.total, g.bajas, g.activa, g.verde, g.amarillo, g.rojo, +(g.dispEstricta * 100).toFixed(2), +(g.dispPonderada * 100).toFixed(2)])
+    ]), 'Resumen');
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet([
+      ['Grupo', 'ID', 'Punto', 'Último Reporte', 'Horas', 'Estado'],
+      ...nocState.dfEval.map(r => [r.GRUPO, r.ID, r.NOMBRE, r.CONECTIVIDAD_DT ? nocFmtDt(r.CONECTIVIDAD_DT) : '', r.HORAS ?? '', r.ESTADO])
+    ]), 'Base de Datos');
+    XLSX.writeFile(wb, `Dashboard_NOC_${new Date().toISOString().slice(0, 10)}.xlsx`);
+    nocShowAlert('Excel generado', 'success');
+  };
+  if (hunterSession) window.applySessionRoleUI(hunterSession);
+
+  /* ---------- Movimiento 3D amplio y suave (mouse + deriva automática) ---------- */
+  if (!reduce) {
+    const login = document.getElementById('login-floating-card');
+    let tx = 0, ty = 0, cx = 0, cy = 0;
+    addEventListener('pointermove', e => {
+      if (e.pointerType === 'touch') return;
+      tx = (e.clientX / innerWidth - .5) * 2; ty = (e.clientY / innerHeight - .5) * 2;
+    }, { passive: true });
+    const loop = t => {
+      cx += ((tx + Math.sin(t / 2600) * .45) - cx) * .07;
+      cy += ((ty + Math.cos(t / 3200) * .45) - cy) * .07;
+      const fr = document.querySelector('.frame');
+      if (document.body.classList.contains('hunter-preauth')) {
+        if (login) { login.style.setProperty('--l-y', (cx * 9).toFixed(2) + 'deg'); login.style.setProperty('--l-x', (-cy * 7).toFixed(2) + 'deg'); }
+      } else if (fr && innerWidth > 900) {
+        fr.style.setProperty('--m-y', (cx * 3.6).toFixed(2) + 'deg'); fr.style.setProperty('--m-x', (-cy * 2.6).toFixed(2) + 'deg');
+      }
+      requestAnimationFrame(loop);
+    };
+    requestAnimationFrame(loop);
+  }
+})();
+</script>
