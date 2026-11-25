@@ -117,12 +117,13 @@
     body:not(.hunter-preauth) #hunter-auth-modal { display: none !important; }
 
     /* =======================================================
-       LOGIN PLANETARIO + LIQUID GLASS DINÁMICO AL CENTRO
+       LOGIN 3D + MORPHING DE FORMA + LIQUID GLASS
        ======================================================= */
     #hunter-auth-modal {
       position: fixed;
       inset: 0;
       z-index: 100;
+      perspective: 1100px;
     }
 
     #canvas-container {
@@ -139,56 +140,91 @@
     }
 
     .glass-panel {
-      border: 1px solid rgba(var(--accent-a), 0.28);
+      border: 1px solid rgba(var(--accent-a), 0.30);
       background:
-        radial-gradient(circle at 18% 12%, rgba(var(--accent-a), 0.16), transparent 55%),
-        radial-gradient(circle at 85% 88%, rgba(var(--accent-b), 0.16), transparent 58%),
-        linear-gradient(145deg, rgba(255, 255, 255, 0.09), rgba(255, 255, 255, 0.02)),
-        rgba(5, 10, 22, 0.44);
+        radial-gradient(circle at 18% 12%, rgba(var(--accent-a), 0.18), transparent 55%),
+        radial-gradient(circle at 85% 88%, rgba(var(--accent-b), 0.18), transparent 58%),
+        linear-gradient(145deg, rgba(255, 255, 255, 0.10), rgba(255, 255, 255, 0.02)),
+        rgba(5, 10, 22, 0.46);
       box-shadow:
-        0 24px 70px rgba(0, 0, 0, 0.55),
-        0 0 36px rgba(var(--accent-a), 0.14),
-        inset 0 1px 0 rgba(255, 255, 255, 0.22),
-        inset 0 -1px 18px rgba(var(--accent-b), 0.12);
+        0 24px 70px rgba(0, 0, 0, 0.58),
+        0 0 38px rgba(var(--accent-a), 0.16),
+        inset 0 1px 0 rgba(255, 255, 255, 0.24),
+        inset 0 -1px 18px rgba(var(--accent-b), 0.14);
       backdrop-filter: blur(22px) saturate(165%);
       -webkit-backdrop-filter: blur(22px) saturate(165%);
       transition: border-color 700ms ease, box-shadow 700ms ease, background 900ms ease;
     }
 
-    .liquid-glass-center {
+    .liquid-card-3d {
       position: fixed;
       top: 50%;
       left: 50%;
-      transform: translate(-50%, -50%);
+      transform-style: preserve-3d;
+      transform: translate(-50%, -50%) rotateX(0deg) rotateY(0deg);
       z-index: 6;
-      width: min(378px, calc(100vw - 28px));
-      border-radius: 26px;
+      width: min(382px, calc(100vw - 28px));
+      border-radius: 28px;
       padding: 22px 24px;
       user-select: text;
       -webkit-user-select: text;
       overflow: hidden;
+      transition:
+        border-radius 650ms cubic-bezier(0.22, 1, 0.36, 1),
+        transform 180ms ease-out,
+        box-shadow 700ms ease,
+        border-color 700ms ease;
     }
 
-    .liquid-glass-center::before {
+    /* Cambios de forma según el planeta seleccionado */
+    .liquid-card-3d.shape-0 { border-radius: 30px; }
+    .liquid-card-3d.shape-1 { border-radius: 14px 36px 14px 36px; }
+    .liquid-card-3d.shape-2 { border-radius: 44px 18px 44px 18px; }
+    .liquid-card-3d.shape-3 { border-radius: 18px 18px 40px 40px; }
+
+    /* Barrido de transición al cambiar de forma/mundo */
+    .liquid-card-3d.is-morphing::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        115deg,
+        transparent 15%,
+        rgba(var(--accent-a), 0.36) 45%,
+        rgba(var(--accent-b), 0.32) 55%,
+        transparent 85%
+      );
+      animation: cardSweep 750ms cubic-bezier(0.22, 1, 0.36, 1);
+      pointer-events: none;
+      z-index: 5;
+    }
+    @keyframes cardSweep {
+      0% { transform: translateX(-110%) skewX(-18deg); opacity: 0; }
+      40% { opacity: 1; }
+      100% { transform: translateX(120%) skewX(-18deg); opacity: 0; }
+    }
+
+    .liquid-card-3d::before {
       content: "";
       position: absolute;
       inset: -45%;
       background: conic-gradient(
         from 0deg,
         transparent 0deg,
-        rgba(var(--accent-a), 0.14) 75deg,
+        rgba(var(--accent-a), 0.16) 75deg,
         transparent 150deg,
-        rgba(var(--accent-b), 0.16) 240deg,
+        rgba(var(--accent-b), 0.18) 240deg,
         transparent 360deg
       );
-      animation: liquidSwirl 16s linear infinite;
+      animation: liquidSwirl 14s linear infinite;
       pointer-events: none;
       z-index: 0;
     }
 
-    .liquid-glass-center > * {
+    .liquid-card-3d > * {
       position: relative;
-      z-index: 1;
+      z-index: 2;
+      transform: translateZ(16px);
     }
 
     @keyframes liquidSwirl {
@@ -197,13 +233,13 @@
     }
 
     .liquid-input {
-      background: rgba(6, 12, 24, 0.52);
-      border: 1px solid rgba(var(--accent-a), 0.24);
+      background: rgba(6, 12, 24, 0.54);
+      border: 1px solid rgba(var(--accent-a), 0.25);
       box-shadow: inset 0 1px 4px rgba(0, 0, 0, 0.45);
       transition: border-color 300ms ease, box-shadow 300ms ease;
     }
     .liquid-input:focus {
-      border-color: rgba(var(--accent-a), 0.85);
+      border-color: rgba(var(--accent-a), 0.9);
       box-shadow: 0 0 0 2px rgba(var(--accent-a), 0.22);
       outline: none;
     }
@@ -572,7 +608,7 @@
 </head>
 <body class="hunter-preauth">
   <!-- =========================================================
-       LOGIN PLANETARIO + LIQUID GLASS CENTRADO
+       LOGIN 3D + MORPHING DE FORMA + SATÉLITES Y METEORITOS
        ========================================================= -->
   <div id="hunter-auth-modal">
     <div id="canvas-container" aria-hidden="true"></div>
@@ -602,12 +638,12 @@
       </div>
     </section>
 
-    <!-- TARJETA LIQUID GLASS AL CENTRO DEL PLANETA -->
-    <div id="login-floating-card" class="glass-panel liquid-glass-center fade">
+    <!-- TARJETA LIQUID GLASS CON EFECTO TILT 3D Y MORPHING -->
+    <div id="login-floating-card" class="glass-panel liquid-card-3d shape-0 fade">
       <div class="flex items-center justify-between mb-3.5">
         <div class="flex items-center gap-2.5">
           <div class="w-9 h-9 rounded-xl bg-white/5 border border-white/15 flex items-center justify-center">
-            <i class="fa-solid fa-satellite-dish text-sm" style="color: rgb(var(--accent-a));"></i>
+            <i class="fa-solid fa-satellite text-sm" style="color: rgb(var(--accent-a));"></i>
           </div>
           <div>
             <h3 class="text-sm font-extrabold text-white tracking-wide">HAWKS SKYNET</h3>
@@ -709,7 +745,6 @@
       </header>
 
       <div class="cols flex-1 flex gap-3 min-h-0">
-        <!-- SIDEBAR DE BÚSQUEDA -->
         <aside id="side" class="side panel p-4 w-[320px] shrink-0 overflow-y-auto scroll flex flex-col">
           <h2 class="text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-2.5">Búsqueda de Puntos</h2>
           <div class="relative">
@@ -736,7 +771,6 @@
           </div>
         </aside>
 
-        <!-- VISTA 1: BÚSQUEDA -->
         <section id="view-filter" class="map panel flex-1 min-w-0 flex flex-col overflow-hidden">
           <div class="flex items-center justify-between px-5 pt-4 pb-3 gap-3 flex-wrap">
             <h2 class="text-base font-bold text-white">Resultados</h2>
@@ -751,7 +785,6 @@
           <div id="results-container" class="flex-1 overflow-y-auto scroll px-5 pb-5 space-y-3"></div>
         </section>
 
-        <!-- VISTA 2: MAPA DESPEJADO + PUNTO GPS PROPIO -->
         <section id="view-map" class="view ui-hidden map panel flex-1 min-w-0 flex flex-col overflow-hidden">
           <div class="flex flex-wrap items-center gap-2 px-4 pt-3.5 pb-2 border-b border-white/5">
             <h2 class="text-base font-bold text-white mr-auto">Mapa Táctico</h2>
@@ -824,7 +857,6 @@
           </div>
         </section>
 
-        <!-- VISTA 3: ANALIZADOR DE TECNOLOGÍAS -->
         <section id="view-tech" class="view ui-hidden map panel flex-1 min-w-0 flex flex-col overflow-hidden">
           <div class="flex flex-col xl:flex-row xl:items-center justify-between gap-3 px-5 pt-4 pb-3 border-b border-white/5">
             <div>
@@ -841,7 +873,6 @@
           <div id="tech-body" class="flex-1 overflow-y-auto scroll px-5 py-4"></div>
         </section>
 
-        <!-- VISTA 4: PLAN DE MANTENIMIENTO -->
         <section id="view-maint" class="view ui-hidden map panel flex-1 min-w-0 flex flex-col overflow-hidden">
           <div class="flex flex-col md:flex-row items-center gap-3 px-5 pt-4 pb-3 border-b border-white/5">
             <h2 class="text-base font-bold text-white mr-auto"><i class="fa-solid fa-calendar-check text-[var(--accent)] mr-2"></i>Plan de Mantenimiento</h2>
@@ -857,7 +888,6 @@
           <div id="maint-body" class="flex-1 overflow-y-auto scroll px-5 py-4 space-y-5 fade"></div>
         </section>
 
-        <!-- VISTA 5: ANALIZADOR DE PRECIOS -->
         <section id="view-price" class="view ui-hidden map panel flex-1 min-w-0 flex flex-col overflow-hidden">
           <div class="flex flex-wrap items-center gap-3 px-5 pt-4 pb-3 border-b border-white/5">
             <h2 class="text-base font-bold text-white mr-auto">Analizador de Precios</h2>
@@ -867,7 +897,6 @@
           <div id="price-body" class="flex-1 overflow-y-auto scroll px-5 py-4 space-y-4"></div>
         </section>
 
-        <!-- VISTA 6: CONSOLA NOC -->
         <section id="view-noc" class="view ui-hidden map panel flex-1 min-w-0 flex flex-col overflow-hidden">
           <div class="flex flex-wrap items-center justify-between gap-3 px-5 pt-4 pb-3 border-b border-white/10">
             <div>
@@ -976,7 +1005,6 @@
           </div>
         </section>
 
-        <!-- VISTA 7: MÓDULO RAFI -->
         <section id="view-rafi" class="view ui-hidden map panel flex-1 min-w-0 flex flex-col overflow-hidden">
           <div class="flex flex-wrap items-center justify-between gap-3 px-5 pt-4 pb-3 border-b border-white/10">
             <div>
@@ -1148,6 +1176,29 @@
     }
     setInterval(updateTotpCountdown, 1000);
     updateTotpCountdown();
+
+    // Efecto Tilt 3D interactivo en la tarjeta de login
+    (function initCardTilt3D() {
+      const card = $("login-floating-card");
+      if (!card) return;
+      let tiltX = 0, tiltY = 0;
+
+      window.applyCard3DTransform = () => {
+        card.style.transform = `translate(-50%, -50%) rotateX(${tiltX.toFixed(2)}deg) rotateY(${tiltY.toFixed(2)}deg)`;
+      };
+
+      window.addEventListener("mousemove", (e) => {
+        if (!document.body.classList.contains("hunter-preauth")) return;
+        const rect = card.getBoundingClientRect();
+        const cx = rect.left + rect.width / 2;
+        const cy = rect.top + rect.height / 2;
+        const dx = (e.clientX - cx) / (window.innerWidth * 0.5);
+        const dy = (e.clientY - cy) / (window.innerHeight * 0.5);
+        tiltY = Math.max(-9, Math.min(9, dx * 8));
+        tiltX = Math.max(-8, Math.min(8, -dy * 7));
+        window.applyCard3DTransform();
+      }, { passive: true });
+    })();
 
     function fallbackCopy(text) {
       const a = document.createElement("textarea");
@@ -2231,7 +2282,7 @@
   </script>
 
   <!-- =========================================================
-       MÓDULO THREE.JS: PLANETA COMPACTO + ANTENAS + METEORITOS
+       THREE.JS: PLANETAS + SATÉLITES CON ANTENA + METEORITOS
        ========================================================= -->
   <script type="module">
     import * as THREE from 'three';
@@ -2242,10 +2293,10 @@
     import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 
     const PLANETS = [
-      { name: 'Aethera', kicker: 'Oceanic dreamworld', description: 'A luminous water planet whose equatorial currents fold into violet auroras and suspended atmospheric rivers.', accentA: '84, 226, 255', accentB: '160, 88, 255' },
-      { name: 'Pyra', kicker: 'Living furnace world', description: 'A carbon-black planet split by molten tectonic calligraphy, with incandescent matter breathing through every fracture.', accentA: '255, 132, 44', accentB: '255, 45, 86' },
-      { name: 'Orison', kicker: 'Sacred ring architecture', description: 'A pearl-and-teal giant encircled by a vast luminous archive: billions of particles arranged like celestial sheet music.', accentA: '255, 220, 142', accentB: '74, 232, 210' },
-      { name: 'Vesper', kicker: 'Crystalline night engine', description: 'A faceted violet world that stores starlight inside geometric continents and releases it through cyan polar seams.', accentA: '177, 116, 255', accentB: '76, 230, 255' }
+      { name: 'Aethera', kicker: 'Oceanic dreamworld', description: 'A luminous water planet whose equatorial currents fold into violet auroras and suspended atmospheric rivers.', accentA: '84, 226, 255', accentB: '160, 88, 255', hex: 0x54e2ff },
+      { name: 'Pyra', kicker: 'Living furnace world', description: 'A carbon-black planet split by molten tectonic calligraphy, with incandescent matter breathing through every fracture.', accentA: '255, 132, 44', accentB: '255, 45, 86', hex: 0xff842c },
+      { name: 'Orison', kicker: 'Sacred ring architecture', description: 'A pearl-and-teal giant encircled by a vast luminous archive: billions of particles arranged like celestial sheet music.', accentA: '255, 220, 142', accentB: '74, 232, 210', hex: 0xffdc8e },
+      { name: 'Vesper', kicker: 'Crystalline night engine', description: 'A faceted violet world that stores starlight inside geometric continents and releases it through cyan polar seams.', accentA: '177, 116, 255', accentB: '76, 230, 255', hex: 0xb174ff }
     ];
 
     const TAU = Math.PI * 2;
@@ -2253,6 +2304,7 @@
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
     const container = document.getElementById('canvas-container');
+    const loginCard = document.getElementById('login-floating-card');
     const planetButtons = Array.from(document.querySelectorAll('[data-planet]'));
     const planetName = document.getElementById('planet-name');
     const planetKicker = document.getElementById('planet-kicker');
@@ -2263,12 +2315,11 @@
 
     const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false, powerPreference: 'high-performance' });
     function responsivePixelRatio() { return Math.min(window.devicePixelRatio || 1, isCompact ? 1.45 : 1.85); }
-    // Cámara más alejada para que el planeta quede compacto y enmarcado alrededor del cristal central
     function responsiveCameraZ() {
       const aspect = window.innerWidth / window.innerHeight;
-      if (aspect < 0.66) return 13.4;
-      if (aspect < 0.95) return 11.8;
-      return 10.6;
+      if (aspect < 0.66) return 13.8;
+      if (aspect < 0.95) return 12.2;
+      return 10.8;
     }
 
     renderer.setPixelRatio(responsivePixelRatio());
@@ -2276,7 +2327,7 @@
     renderer.setClearColor(0x02030a, 1);
     renderer.outputColorSpace = THREE.SRGBColorSpace;
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.08;
+    renderer.toneMappingExposure = 1.12;
     container.appendChild(renderer.domElement);
 
     const scene = new THREE.Scene();
@@ -2291,8 +2342,8 @@
     controls.enablePan = false;
     controls.enableZoom = true;
     controls.zoomSpeed = 0.72;
-    controls.minDistance = 7.4;
-    controls.maxDistance = 15.0;
+    controls.minDistance = 7.6;
+    controls.maxDistance = 15.2;
     controls.minPolarAngle = Math.PI * 0.16;
     controls.maxPolarAngle = Math.PI * 0.84;
     controls.autoRotate = !prefersReducedMotion;
@@ -2312,15 +2363,14 @@
 
     const composer = new EffectComposer(renderer);
     composer.addPass(new RenderPass(scene, camera));
-    const bloomPass = new UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 0.50, 0.30, 0.50);
+    const bloomPass = new UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 0.56, 0.34, 0.48);
     composer.addPass(bloomPass);
     composer.addPass(new OutputPass());
 
-    // Iluminación para los modelos 3D de antenas, satélites y meteoritos SpaceX
-    scene.add(new THREE.AmbientLight(0x94a3b8, 1.35));
-    const dirLight = new THREE.DirectionalLight(0x38bdf8, 2.2);
-    dirLight.position.set(8, 10, 7);
-    scene.add(dirLight);
+    scene.add(new THREE.AmbientLight(0xcbd5e1, 1.5));
+    const keyLight = new THREE.PointLight(0x54e2ff, 18, 28);
+    keyLight.position.set(6, 5, 6);
+    scene.add(keyLight);
 
     const noiseGLSL = `
       vec3 mod289(vec3 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
@@ -2582,20 +2632,20 @@
     ringMesh.renderOrder = 1;
     planetGroup.add(ringMesh);
 
-    const arcCount = isCompact ? 1200 : 2200;
+    const arcCount = isCompact ? 1400 : 2400;
     const arcGeo = new THREE.BufferGeometry();
     const arcPos = new Float32Array(arcCount * 3), arcRnd = new Float32Array(arcCount * 2);
     for (let i = 0; i < arcCount; i++) {
-      const a = Math.random() * TAU, rad = THREE.MathUtils.lerp(3.9, 5.8, Math.pow(Math.random(), 0.72));
-      arcPos[i * 3] = Math.cos(a) * rad; arcPos[i * 3 + 1] = THREE.MathUtils.randFloatSpread(0.45); arcPos[i * 3 + 2] = Math.sin(a) * rad;
+      const a = Math.random() * TAU, rad = THREE.MathUtils.lerp(3.85, 5.9, Math.pow(Math.random(), 0.72));
+      arcPos[i * 3] = Math.cos(a) * rad; arcPos[i * 3 + 1] = THREE.MathUtils.randFloatSpread(0.5); arcPos[i * 3 + 2] = Math.sin(a) * rad;
       arcRnd[i * 2] = Math.random(); arcRnd[i * 2 + 1] = Math.random();
     }
     arcGeo.setAttribute('position', new THREE.BufferAttribute(arcPos, 3));
     arcGeo.setAttribute('aRandom', new THREE.BufferAttribute(arcRnd, 2));
     const arcMat = new THREE.ShaderMaterial({
       uniforms: { uTime: { value: 0 }, uPixelRatio: { value: renderer.getPixelRatio() }, uTransitionEnergy: { value: 0 } },
-      vertexShader: `uniform float uTime; uniform float uPixelRatio; uniform float uTransitionEnergy; attribute vec2 aRandom; varying float vAlpha; varying vec3 vColor; void main() { vec3 p = position; float ang = uTime * (0.035 + aRandom.x * 0.055); float s = sin(ang); float c = cos(ang); p.xz = mat2(c, -s, s, c) * p.xz; p.y += sin(uTime * 0.45 + aRandom.y * 13.0 + length(p.xz)) * 0.13; p *= 1.0 + uTransitionEnergy * 0.035; vec4 mv = modelViewMatrix * vec4(p, 1.0); gl_Position = projectionMatrix * mv; gl_PointSize = (0.7 + aRandom.x * 1.5) * uPixelRatio * (25.0 / max(1.0, -mv.z)); vAlpha = (0.06 + aRandom.y * 0.16) * (1.0 - uTransitionEnergy * 0.52); vColor = mix(vec3(0.24, 0.48, 1.0), vec3(0.85, 0.35, 1.0), aRandom.x); }`,
-      fragmentShader: `varying float vAlpha; varying vec3 vColor; void main() { float d = length(gl_PointCoord - 0.5); if (d > 0.5) discard; float g = exp(-d * 7.0); gl_FragColor = vec4(vColor * g, vAlpha * g); }`,
+      vertexShader: `uniform float uTime; uniform float uPixelRatio; uniform float uTransitionEnergy; attribute vec2 aRandom; varying float vAlpha; varying vec3 vColor; void main() { vec3 p = position; float ang = uTime * (0.04 + aRandom.x * 0.06); float s = sin(ang); float c = cos(ang); p.xz = mat2(c, -s, s, c) * p.xz; p.y += sin(uTime * 0.5 + aRandom.y * 13.0 + length(p.xz)) * 0.15; p *= 1.0 + uTransitionEnergy * 0.04; vec4 mv = modelViewMatrix * vec4(p, 1.0); gl_Position = projectionMatrix * mv; gl_PointSize = (0.8 + aRandom.x * 1.6) * uPixelRatio * (26.0 / max(1.0, -mv.z)); vAlpha = (0.08 + aRandom.y * 0.18) * (1.0 - uTransitionEnergy * 0.45); vColor = mix(vec3(0.32, 0.88, 1.0), vec3(0.75, 0.35, 1.0), aRandom.x); }`,
+      fragmentShader: `varying float vAlpha; varying vec3 vColor; void main() { float d = length(gl_PointCoord - 0.5); if (d > 0.5) discard; float g = exp(-d * 6.8); gl_FragColor = vec4(vColor * g, vAlpha * g); }`,
       transparent: true, blending: THREE.AdditiveBlending, depthWrite: false
     });
     const orbitalArcs = new THREE.Points(arcGeo, arcMat);
@@ -2603,49 +2653,66 @@
     planetGroup.add(orbitalArcs);
 
     // =======================================================
-    // SATÉLITES, ANTENAS SPACEX Y METEORITOS EN ÓRBITA
+    // SATÉLITES CON ANTENA + ANILLO DE SEÑAL + METEORITOS CON ESTELA
     // =======================================================
     const techOrbitGroup = new THREE.Group();
     scene.add(techOrbitGroup);
 
-    const satMatBody = new THREE.MeshStandardMaterial({ color: 0xe2e8f0, metalness: 0.75, roughness: 0.25 });
-    const satMatPanel = new THREE.MeshStandardMaterial({ color: 0x38bdf8, emissive: 0x0ea5e9, emissiveIntensity: 0.45, metalness: 0.5, roughness: 0.3 });
-    const satMatDish = new THREE.MeshStandardMaterial({ color: 0xf8fafc, metalness: 0.6, roughness: 0.3, side: THREE.DoubleSide });
+    const satHullMat = new THREE.MeshStandardMaterial({ color: 0xf1f5f9, metalness: 0.85, roughness: 0.2 });
+    const satSolarMat = new THREE.MeshStandardMaterial({ color: 0x38bdf8, emissive: 0x38bdf8, emissiveIntensity: 0.65, metalness: 0.6, roughness: 0.2 });
+    const satBeaconMat = new THREE.MeshBasicMaterial({ color: 0x54e2ff });
 
     const satellites = [];
-    for (let s = 0; s < 3; s++) {
+    for (let s = 0; s < 4; s++) {
       const sat = new THREE.Group();
-      const bus = new THREE.Mesh(new THREE.BoxGeometry(0.24, 0.12, 0.14), satMatBody);
-      const panelL = new THREE.Mesh(new THREE.BoxGeometry(0.45, 0.02, 0.14), satMatPanel);
-      panelL.position.x = -0.36;
-      const panelR = new THREE.Mesh(new THREE.BoxGeometry(0.45, 0.02, 0.14), satMatPanel);
-      panelR.position.x = 0.36;
-      // Antena parabólica / mástil de telemetría
-      const dish = new THREE.Mesh(new THREE.ConeGeometry(0.11, 0.12, 16, 1, true), satMatDish);
-      dish.position.set(0, 0.11, 0);
+      const body = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.08, 0.34, 12), satHullMat);
+      body.rotation.z = Math.PI * 0.5;
+      const wingL = new THREE.Mesh(new THREE.BoxGeometry(0.55, 0.015, 0.18), satSolarMat);
+      wingL.position.set(-0.44, 0, 0);
+      const wingR = new THREE.Mesh(new THREE.BoxGeometry(0.55, 0.015, 0.18), satSolarMat);
+      wingR.position.set(0.44, 0, 0);
+      // Antena parabólica y aro de transmisión
+      const dish = new THREE.Mesh(new THREE.ConeGeometry(0.14, 0.14, 20, 1, true), satHullMat);
+      dish.position.set(0, 0.14, 0);
       dish.rotation.x = Math.PI;
-      const mast = new THREE.Mesh(new THREE.CylinderGeometry(0.012, 0.012, 0.16, 8), satMatBody);
-      mast.position.set(0.06, 0.13, 0);
-      sat.add(bus, panelL, panelR, dish, mast);
+      const waveRing = new THREE.Mesh(new THREE.TorusGeometry(0.22, 0.01, 8, 28), satBeaconMat);
+      waveRing.position.set(0, 0.22, 0);
+      waveRing.rotation.x = Math.PI * 0.5;
+
+      sat.add(body, wingL, wingR, dish, waveRing);
       techOrbitGroup.add(sat);
-      satellites.push({ mesh: sat, radius: 4.35 + s * 0.55, speed: 0.22 - s * 0.04, phase: s * 2.1, tiltY: (s - 1) * 0.45 });
+      satellites.push({
+        mesh: sat,
+        waveRing,
+        radius: 4.1 + s * 0.52,
+        speed: (0.24 - s * 0.03) * (s % 2 === 0 ? 1 : -1),
+        phase: s * 1.57,
+        yWave: (s - 1.5) * 0.42
+      });
     }
 
-    // Meteoritos rocosos con brillo sutil en órbita
-    const meteorMat = new THREE.MeshStandardMaterial({ color: 0x64748b, roughness: 0.85, metalness: 0.2, flatShading: true });
+    // Meteoritos con estela luminosa
+    const meteorRockMat = new THREE.MeshStandardMaterial({ color: 0x475569, emissive: 0x38bdf8, emissiveIntensity: 0.25, roughness: 0.75, metalness: 0.35, flatShading: true });
     const meteors = [];
-    for (let m = 0; m < 10; m++) {
-      const r = 0.05 + Math.random() * 0.08;
-      const geo = new THREE.DodecahedronGeometry(r, 0);
-      const mesh = new THREE.Mesh(geo, meteorMat);
-      techOrbitGroup.add(mesh);
+    for (let m = 0; m < 12; m++) {
+      const r = 0.055 + Math.random() * 0.075;
+      const rock = new THREE.Mesh(new THREE.DodecahedronGeometry(r, 0), meteorRockMat);
+      const trailGeo = new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(0, 0, 0), new THREE.Vector3(-0.9, 0.12, -0.3)]);
+      const trailMat = new THREE.LineBasicMaterial({ color: 0x54e2ff, transparent: true, opacity: 0.65 });
+      const trail = new THREE.Line(trailGeo, trailMat);
+      const mGroup = new THREE.Group();
+      mGroup.add(rock, trail);
+      techOrbitGroup.add(mGroup);
+
       meteors.push({
-        mesh,
-        orbitR: 3.85 + Math.random() * 2.5,
-        speed: (0.28 + Math.random() * 0.25) * (m % 2 === 0 ? 1 : -1),
+        group: mGroup,
+        rock,
+        trailMat,
+        orbitR: 3.5 + Math.random() * 2.9,
+        speed: (0.34 + Math.random() * 0.28) * (m % 2 === 0 ? 1 : -1),
         phase: Math.random() * TAU,
-        yOffset: (Math.random() - 0.5) * 1.6,
-        rotSpeed: 0.8 + Math.random() * 1.4
+        yBase: (Math.random() - 0.5) * 2.1,
+        rotSpeed: 1.1 + Math.random() * 1.8
       });
     }
 
@@ -2653,7 +2720,25 @@
     function smootherStep(v) { const x = THREE.MathUtils.clamp(v, 0, 1); return x * x * x * (x * (x * 6 - 15) + 10); }
     function cinematicEase(v) { const x = THREE.MathUtils.clamp(v, 0, 1); return x < 0.5 ? 0.5 * Math.pow(x * 2, 1.22) : 1 - 0.5 * Math.pow((1 - x) * 2, 1.22); }
     function transitionEnergy(e) { const p = THREE.MathUtils.clamp(e, 0, 1), en = Math.pow(Math.max(0, Math.sin(Math.PI * p)), 1.35); return Number.isFinite(en) ? en : 0; }
-    function setDocumentAccent(i) { const p = PLANETS[i]; document.documentElement.style.setProperty('--accent-a', p.accentA); document.documentElement.style.setProperty('--accent-b', p.accentB); }
+
+    function setDocumentAccent(i) {
+      const p = PLANETS[i];
+      document.documentElement.style.setProperty('--accent-a', p.accentA);
+      document.documentElement.style.setProperty('--accent-b', p.accentB);
+      keyLight.color.setHex(p.hex);
+      satSolarMat.color.setHex(p.hex);
+      satSolarMat.emissive.setHex(p.hex);
+      satBeaconMat.color.setHex(p.hex);
+      meteorRockMat.emissive.setHex(p.hex);
+      meteors.forEach(mt => mt.trailMat.color.setHex(p.hex));
+
+      if (loginCard) {
+        loginCard.classList.remove('shape-0', 'shape-1', 'shape-2', 'shape-3', 'is-morphing');
+        loginCard.classList.add(`shape-${i}`, 'is-morphing');
+        setTimeout(() => loginCard.classList.remove('is-morphing'), 780);
+      }
+    }
+
     function updatePlanetCopy(i, tr = false) { const p = PLANETS[i]; planetKicker.textContent = tr ? `Phasing into ${p.kicker.toLowerCase()}` : p.kicker; planetName.textContent = p.name; planetDescription.textContent = p.description; }
     function updateButtonState(cur, tgt = null) { planetButtons.forEach(b => { const i = Number(b.dataset.planet), isC = i === cur && tgt === null, isT = tgt !== null && i === tgt; b.classList.toggle('is-active', isC); b.classList.toggle('is-target', isT); b.setAttribute('aria-pressed', String(isC || isT)); }); }
 
@@ -2726,30 +2811,36 @@
       const toHasRing = transitionState.active ? Number(transitionState.to === 2) : fromHasRing;
       ringMat.uniforms.uOpacity.value = THREE.MathUtils.lerp(fromHasRing, toHasRing, transitionState.active ? smootherStep(transitionState.eased) : 0);
 
-      planetGroup.rotation.y += (0.035 + energy * 0.12) * delta;
+      planetGroup.rotation.y += (0.035 + energy * 0.14) * delta;
       planetGroup.rotation.x = Math.sin(time * 0.12) * 0.025;
-      orbitalArcs.rotation.y = time * 0.018;
+      orbitalArcs.rotation.y = time * 0.02;
       orbitalArcs.rotation.z = -0.28 + Math.sin(time * 0.09) * 0.055;
       stars.rotation.y = time * 0.0016;
       nebula.rotation.y = -time * 0.00045;
 
-      // Movimiento de satélites/antenas y meteoritos
-      satellites.forEach(s => {
-        const ang = time * s.speed + s.phase;
-        s.mesh.position.set(Math.cos(ang) * s.radius, Math.sin(ang * 1.4) * 0.55 + s.tiltY, Math.sin(ang) * s.radius);
+      satellites.forEach((s, idx) => {
+        const ang = time * (s.speed + energy * 0.18) + s.phase;
+        s.mesh.position.set(Math.cos(ang) * s.radius, Math.sin(ang * 1.3 + idx) * 0.65 + s.yWave, Math.sin(ang) * s.radius);
         s.mesh.lookAt(0, 0, 0);
+        const pulse = 0.8 + 0.45 * Math.sin(time * 4.5 + idx);
+        s.waveRing.scale.setScalar(pulse);
       });
 
-      meteors.forEach(mt => {
-        const ang = time * mt.speed + mt.phase;
-        mt.mesh.position.set(Math.cos(ang) * mt.orbitR, mt.yOffset + Math.sin(ang * 2.0) * 0.25, Math.sin(ang) * mt.orbitR);
-        mt.mesh.rotation.x += mt.rotSpeed * delta;
-        mt.mesh.rotation.y += mt.rotSpeed * 0.7 * delta;
+      meteors.forEach((mt, idx) => {
+        const ang = time * (mt.speed + energy * 0.22) + mt.phase;
+        const x = Math.cos(ang) * mt.orbitR;
+        const y = mt.yBase + Math.sin(ang * 2.0 + idx) * 0.35;
+        const z = Math.sin(ang) * mt.orbitR;
+        mt.group.position.set(x, y, z);
+        const dirSign = mt.speed >= 0 ? 1 : -1;
+        mt.group.lookAt(x - Math.sin(ang) * dirSign, y, z + Math.cos(ang) * dirSign);
+        mt.rock.rotation.x += mt.rotSpeed * delta;
+        mt.rock.rotation.y += mt.rotSpeed * 0.8 * delta;
       });
 
-      bloomPass.strength = 0.50 + energy * 0.055;
-      bloomPass.radius = 0.30 + energy * 0.025;
-      bloomPass.threshold = 0.50 + energy * 0.025;
+      bloomPass.strength = 0.56 + energy * 0.08;
+      bloomPass.radius = 0.34 + energy * 0.03;
+      bloomPass.threshold = 0.48 + energy * 0.02;
 
       if (autoCycleInput.checked && !transitionState.active && time - transitionState.settledAt > AUTO_HOLD_SECONDS) {
         beginTransition(transitionState.current + 1, time);
