@@ -604,6 +604,72 @@
       .cols { flex-direction: column; }
       .side { width: 100% !important; }
     }
+  /* ===== HAWKS SKYNET · LOGIN ROJO + TARJETA 3D =====
+   Pega este bloque AL FINAL de tu <style> existente. */
+
+:root {
+  --accent-a: 255, 58, 58;
+  --accent-b: 255, 140, 66;
+}
+
+/* Oculta el selector de planetas (ya no se usa) */
+#planet-copy, #planet-ui, #auto-control { display: none !important; }
+
+body.hunter-preauth::before {
+  background:
+    radial-gradient(circle at 50% 50%, rgba(255, 40, 40, .14), transparent 38%),
+    radial-gradient(circle at 82% 8%, rgba(255, 120, 60, .08), transparent 34%),
+    linear-gradient(180deg, rgba(20, 3, 5, .30), rgba(0, 0, 0, .35));
+}
+
+/* ---- Tarjeta: losa 3D con grosor, bisel y reflejo ---- */
+.liquid-card-3d.glass-panel {
+  transform-style: preserve-3d;
+  overflow: visible;
+  backdrop-filter: none;            /* el blur aplana el 3D, por eso se quita */
+  -webkit-backdrop-filter: none;
+  border-radius: 22px;
+  border: 1px solid rgba(255, 110, 110, .38);
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, .09), rgba(255, 255, 255, 0) 40%),
+    linear-gradient(160deg, rgba(62, 8, 12, .93), rgba(14, 2, 4, .97));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, .30),
+    inset 0 0 0 1px rgba(255, 60, 60, .08),
+    inset 0 -24px 44px rgba(255, 40, 40, .08),
+    0 0 54px rgba(255, 40, 40, .24),
+    0 44px 90px rgba(0, 0, 0, .75);
+}
+
+/* Placa trasera: da profundidad real cuando la tarjeta se inclina */
+.liquid-card-3d::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  animation: none;
+  transform: translateZ(-16px);
+  background: #34060a;
+  border: 1px solid rgba(255, 90, 90, .32);
+  box-shadow: 0 0 34px rgba(255, 40, 40, .38);
+}
+
+/* Reflejo especular que sigue al mouse */
+.liquid-card-3d::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  border-radius: inherit;
+  pointer-events: none;
+  transform: translateZ(18px);
+  mix-blend-mode: screen;
+  background: radial-gradient(420px circle at var(--gx, 30%) var(--gy, 0%), rgba(255, 255, 255, .16), transparent 55%);
+}
+
+.liquid-input { background: rgba(30, 4, 7, .65); }
+
   </style>
 </head>
 <body class="hunter-preauth">
@@ -2285,577 +2351,221 @@
        THREE.JS: PLANETAS + SATÉLITES CON ANTENA + METEORITOS
        ========================================================= -->
   <script type="module">
-    import * as THREE from 'three';
-    import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-    import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
-    import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
-    import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
-    import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
+// ===== HAWKS SKYNET · ESCENA LOGIN ROJA =====
+// Reemplaza TODO el contenido de tu último <script type="module"> por este archivo.
+import * as THREE from 'three';
+import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 
-    const PLANETS = [
-      { name: 'Aethera', kicker: 'Oceanic dreamworld', description: 'A luminous water planet whose equatorial currents fold into violet auroras and suspended atmospheric rivers.', accentA: '84, 226, 255', accentB: '160, 88, 255', hex: 0x54e2ff },
-      { name: 'Pyra', kicker: 'Living furnace world', description: 'A carbon-black planet split by molten tectonic calligraphy, with incandescent matter breathing through every fracture.', accentA: '255, 132, 44', accentB: '255, 45, 86', hex: 0xff842c },
-      { name: 'Orison', kicker: 'Sacred ring architecture', description: 'A pearl-and-teal giant encircled by a vast luminous archive: billions of particles arranged like celestial sheet music.', accentA: '255, 220, 142', accentB: '74, 232, 210', hex: 0xffdc8e },
-      { name: 'Vesper', kicker: 'Crystalline night engine', description: 'A faceted violet world that stores starlight inside geometric continents and releases it through cyan polar seams.', accentA: '177, 116, 255', accentB: '76, 230, 255', hex: 0xb174ff }
-    ];
+const container = document.getElementById('canvas-container');
+const card = document.getElementById('login-floating-card');
+const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const compact = matchMedia('(max-width: 760px)').matches;
+const R = 2.3, TAU = Math.PI * 2;
 
-    const TAU = Math.PI * 2;
-    const isCompact = window.matchMedia('(max-width: 760px)').matches;
-    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
+renderer.setPixelRatio(Math.min(devicePixelRatio || 1, compact ? 1.4 : 1.8));
+renderer.setSize(innerWidth, innerHeight);
+renderer.setClearColor(0x040102, 1);
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+container.appendChild(renderer.domElement);
 
-    const container = document.getElementById('canvas-container');
-    const loginCard = document.getElementById('login-floating-card');
-    const planetButtons = Array.from(document.querySelectorAll('[data-planet]'));
-    const planetName = document.getElementById('planet-name');
-    const planetKicker = document.getElementById('planet-kicker');
-    const planetDescription = document.getElementById('planet-description');
-    const transitionMeter = document.getElementById('transition-meter');
-    const transitionMeterFill = document.getElementById('transition-meter-fill');
-    const autoCycleInput = document.getElementById('auto-cycle');
+const scene = new THREE.Scene();
+const camZ = () => (innerWidth / innerHeight < 0.8 ? 15 : 11.5);
+const camera = new THREE.PerspectiveCamera(40, innerWidth / innerHeight, 0.1, 220);
+camera.position.set(0, 0.4, camZ());
 
-    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false, powerPreference: 'high-performance' });
-    function responsivePixelRatio() { return Math.min(window.devicePixelRatio || 1, isCompact ? 1.45 : 1.85); }
-    function responsiveCameraZ() {
-      const aspect = window.innerWidth / window.innerHeight;
-      if (aspect < 0.66) return 13.8;
-      if (aspect < 0.95) return 12.2;
-      return 10.8;
-    }
+scene.add(new THREE.AmbientLight(0x6a2a2a, 1.3));
+const sun = new THREE.DirectionalLight(0xffe2d0, 3.2); sun.position.set(-5, 3, 6); scene.add(sun);
+const rim = new THREE.PointLight(0xff2a2a, 40, 30); rim.position.set(5, -2, -4); scene.add(rim);
 
-    renderer.setPixelRatio(responsivePixelRatio());
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    renderer.setClearColor(0x02030a, 1);
-    renderer.outputColorSpace = THREE.SRGBColorSpace;
-    renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.12;
-    container.appendChild(renderer.domElement);
+const composer = new EffectComposer(renderer);
+composer.addPass(new RenderPass(scene, camera));
+composer.addPass(new UnrealBloomPass(new THREE.Vector2(innerWidth, innerHeight), 0.75, 0.55, 0.15));
+composer.addPass(new OutputPass());
 
-    const scene = new THREE.Scene();
-    scene.fog = new THREE.FogExp2(0x02030a, 0.015);
+// ---------- Estrellas ----------
+{
+  const n = compact ? 3000 : 5000, a = new Float32Array(n * 3), v = new THREE.Vector3();
+  for (let i = 0; i < n; i++) { v.randomDirection().multiplyScalar(40 + Math.random() * 60); a.set([v.x, v.y, v.z], i * 3); }
+  const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.BufferAttribute(a, 3));
+  scene.add(new THREE.Points(g, new THREE.PointsMaterial({ color: 0xffd0c8, size: 0.12, transparent: true, opacity: 0.85, depthWrite: false })));
+}
 
-    const camera = new THREE.PerspectiveCamera(39, window.innerWidth / window.innerHeight, 0.08, 90);
-    camera.position.set(0, 0.25, responsiveCameraZ());
+// ---------- Globo ----------
+const globe = new THREE.Group(); scene.add(globe);
+const ll = (lat, lon, r = R) => {
+  const p = (90 - lat) * Math.PI / 180, t = (lon + 180) * Math.PI / 180;
+  return new THREE.Vector3(-r * Math.sin(p) * Math.cos(t), r * Math.cos(p), r * Math.sin(p) * Math.sin(t));
+};
 
-    const controls = new OrbitControls(camera, renderer.domElement);
-    controls.enableDamping = true;
-    controls.dampingFactor = 0.045;
-    controls.enablePan = false;
-    controls.enableZoom = true;
-    controls.zoomSpeed = 0.72;
-    controls.minDistance = 7.6;
-    controls.maxDistance = 15.2;
-    controls.minPolarAngle = Math.PI * 0.16;
-    controls.maxPolarAngle = Math.PI * 0.84;
-    controls.autoRotate = !prefersReducedMotion;
-    controls.autoRotateSpeed = 0.24;
-    controls.target.set(0, 0.02, 0);
-    controls.update();
+globe.add(new THREE.Mesh(new THREE.SphereGeometry(R, 64, 48), new THREE.MeshStandardMaterial({ color: 0x0c0204, roughness: 0.85, metalness: 0.2 })));
 
-    const guardedCameraOffset = new THREE.Vector3();
-    let intendedOrbitRadius = THREE.MathUtils.clamp(camera.position.distanceTo(controls.target), controls.minDistance, controls.maxDistance);
+{ // puntos de "continentes"
+  const N = compact ? 4500 : 8000, pos = [];
+  for (let i = 0; i < N; i++) {
+    const y = 1 - 2 * (i + 0.5) / N, r = Math.sqrt(1 - y * y), th = i * 2.399963, x = Math.cos(th) * r, z = Math.sin(th) * r;
+    const m = Math.sin(x * 3.1 + 1.3) * Math.cos(y * 3.7) + Math.sin(z * 4.2 - 0.7) * Math.cos(x * 2.3 + y * 1.9) + Math.sin(y * 5.1 + z * 2.7) * 0.6;
+    if (m > 0.25) pos.push(x * R * 1.004, y * R * 1.004, z * R * 1.004);
+  }
+  const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
+  globe.add(new THREE.Points(g, new THREE.PointsMaterial({ color: 0xff3030, size: 0.024, transparent: true, opacity: 0.95, blending: THREE.AdditiveBlending, depthWrite: false })));
+}
 
-    function guardOrbitRadius() {
-      guardedCameraOffset.copy(camera.position).sub(controls.target);
-      const len = guardedCameraOffset.length();
-      if (!Number.isFinite(len) || len < 1.0e-6) return;
-      intendedOrbitRadius = THREE.MathUtils.clamp(len, controls.minDistance, controls.maxDistance);
-    }
+{ // paralelos y meridianos
+  const s = [], seg = 64;
+  for (let lat = -60; lat <= 60; lat += 30) for (let i = 0; i < seg; i++) { const a = ll(lat, i / seg * 360 - 180, R * 1.001), b = ll(lat, (i + 1) / seg * 360 - 180, R * 1.001); s.push(a.x, a.y, a.z, b.x, b.y, b.z); }
+  for (let lon = -180; lon < 180; lon += 30) for (let i = 0; i < seg; i++) { const a = ll(-90 + i / seg * 180, lon, R * 1.001), b = ll(-90 + (i + 1) / seg * 180, lon, R * 1.001); s.push(a.x, a.y, a.z, b.x, b.y, b.z); }
+  const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(s, 3));
+  globe.add(new THREE.LineSegments(g, new THREE.LineBasicMaterial({ color: 0xff2a2a, transparent: true, opacity: 0.13 })));
+}
 
-    const composer = new EffectComposer(renderer);
-    composer.addPass(new RenderPass(scene, camera));
-    const bloomPass = new UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 0.56, 0.34, 0.48);
-    composer.addPass(bloomPass);
-    composer.addPass(new OutputPass());
+// Atmósfera (halo rojo por fresnel)
+scene.add(new THREE.Mesh(new THREE.SphereGeometry(R * 1.05, 64, 48), new THREE.ShaderMaterial({
+  vertexShader: 'varying vec3 vN,vV;void main(){vN=normalize(normalMatrix*normal);vec4 mv=modelViewMatrix*vec4(position,1.);vV=normalize(-mv.xyz);gl_Position=projectionMatrix*mv;}',
+  fragmentShader: 'varying vec3 vN,vV;void main(){float f=pow(1.-abs(dot(vN,vV)),2.6);gl_FragColor=vec4(1.,.16,.12,1.)*f*1.3;}',
+  transparent: true, blending: THREE.AdditiveBlending, depthWrite: false
+})));
 
-    scene.add(new THREE.AmbientLight(0xcbd5e1, 1.5));
-    const keyLight = new THREE.PointLight(0x54e2ff, 18, 28);
-    keyLight.position.set(6, 5, 6);
-    scene.add(keyLight);
+// ---------- Ciudades y conexiones (hub: Lima) ----------
+const LIMA = [-12.05, -77.04];
+const CITIES = [[40.7, -74], [34, -118], [51.5, -0.1], [40.4, -3.7], [-23.5, -46.6], [30, 31.2], [25.2, 55.3], [19, 73], [35.7, 139.7], [-33.9, 151.2], [55.7, 37.6], [-26.2, 28], [6.5, 3.4]];
+const limaPos = ll(...LIMA);
+const arcMat = new THREE.LineBasicMaterial({ color: 0xff4a3a, transparent: true, opacity: 0.55, blending: THREE.AdditiveBlending, depthWrite: false });
+const pulseGeo = new THREE.SphereGeometry(0.035, 10, 10), pulseMat = new THREE.MeshBasicMaterial({ color: 0xffd2c2 });
+const dotGeo = new THREE.SphereGeometry(0.03, 10, 10), dotMat = new THREE.MeshBasicMaterial({ color: 0xffb199 });
+const pulses = [];
 
-    const noiseGLSL = `
-      vec3 mod289(vec3 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
-      vec4 mod289(vec4 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
-      vec4 permute(vec4 x) { return mod289(((x * 34.0) + 1.0) * x); }
-      vec4 taylorInvSqrt(vec4 r) { return 1.79284291400159 - 0.85373472095314 * r; }
-      float saturate(float value) { return clamp(value, 0.0, 1.0); }
-      vec3 safeNormalize(vec3 value) { return value * inversesqrt(max(dot(value, value), 1.0e-12)); }
-      vec2 safeNormalize2(vec2 value) { return value * inversesqrt(max(dot(value, value), 1.0e-12)); }
-      float safeAtan(float y, float x) { return (abs(x) + abs(y) < 1.0e-7) ? 0.0 : atan(y, x); }
-      float sanitizeFloat(float v, float fb) { return (v == v && abs(v) < 1.0e5) ? v : fb; }
-      vec3 sanitizeVec3(vec3 v, vec3 fb) { bool bad = any(notEqual(v, v)) || any(greaterThan(abs(v), vec3(1.0e5))); return bad ? fb : v; }
-      vec3 limitLuminance(vec3 color, float maxLum) {
-        vec3 c = max(sanitizeVec3(color, vec3(0.0)), vec3(0.0));
-        float lum = dot(c, vec3(0.2126, 0.7152, 0.0722));
-        return c * min(1.0, maxLum / max(lum, 1.0e-5));
-      }
-      float snoise(vec3 v) {
-        const vec2 C = vec2(1.0 / 6.0, 1.0 / 3.0);
-        const vec4 D = vec4(0.0, 0.5, 1.0, 2.0);
-        vec3 i = floor(v + dot(v, C.yyy));
-        vec3 x0 = v - i + dot(i, C.xxx);
-        vec3 g = step(x0.yzx, x0.xyz);
-        vec3 l = 1.0 - g;
-        vec3 i1 = min(g.xyz, l.zxy);
-        vec3 i2 = max(g.xyz, l.zxy);
-        vec3 x1 = x0 - i1 + C.xxx;
-        vec3 x2 = x0 - i2 + C.yyy;
-        vec3 x3 = x0 - D.yyy;
-        i = mod289(i);
-        vec4 p = permute(permute(permute(i.z + vec4(0.0, i1.z, i2.z, 1.0)) + i.y + vec4(0.0, i1.y, i2.y, 1.0)) + i.x + vec4(0.0, i1.x, i2.x, 1.0));
-        float n_ = 0.142857142857;
-        vec3 ns = n_ * D.wyz - D.xzx;
-        vec4 j = p - 49.0 * floor(p * ns.z * ns.z);
-        vec4 x_ = floor(j * ns.z);
-        vec4 y_ = floor(j - 7.0 * x_);
-        vec4 x = x_ * ns.x + ns.yyyy;
-        vec4 y = y_ * ns.x + ns.yyyy;
-        vec4 h = 1.0 - abs(x) - abs(y);
-        vec4 b0 = vec4(x.xy, y.xy);
-        vec4 b1 = vec4(x.zw, y.zw);
-        vec4 s0 = floor(b0) * 2.0 + 1.0;
-        vec4 s1 = floor(b1) * 2.0 + 1.0;
-        vec4 sh = -step(h, vec4(0.0));
-        vec4 a0 = b0.xzyw + s0.xzyw * sh.xxyy;
-        vec4 a1 = b1.xzyw + s1.xzyw * sh.zzww;
-        vec3 p0 = vec3(a0.xy, h.x);
-        vec3 p1 = vec3(a0.zw, h.y);
-        vec3 p2 = vec3(a1.xy, h.z);
-        vec3 p3 = vec3(a1.zw, h.w);
-        vec4 norm = taylorInvSqrt(vec4(dot(p0, p0), dot(p1, p1), dot(p2, p2), dot(p3, p3)));
-        p0 *= norm.x; p1 *= norm.y; p2 *= norm.z; p3 *= norm.w;
-        vec4 m = max(0.6 - vec4(dot(x0, x0), dot(x1, x1), dot(x2, x2), dot(x3, x3)), 0.0);
-        m *= m;
-        return 42.0 * dot(m * m, vec4(dot(p0, x0), dot(p1, x1), dot(p2, x2), dot(p3, x3)));
-      }
-      mat2 rotate2D(float a) { float s = sin(a); float c = cos(a); return mat2(c, -s, s, c); }
-      mat3 rotateX3(float a) { float s = sin(a); float c = cos(a); return mat3(1.0, 0.0, 0.0, 0.0, c, -s, 0.0, s, c); }
-      mat3 rotateZ3(float a) { float s = sin(a); float c = cos(a); return mat3(c, -s, 0.0, s, c, 0.0, 0.0, 0.0, 1.0); }
-    `;
+function arc(a, b) {
+  const A = ll(...a), B = ll(...b), d = A.distanceTo(B);
+  const M = A.clone().add(B).multiplyScalar(0.5).normalize().multiplyScalar(R + 0.35 + d * 0.16);
+  const c = new THREE.QuadraticBezierCurve3(A, M, B);
+  globe.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(c.getPoints(60)), arcMat));
+  const p = new THREE.Mesh(pulseGeo, pulseMat); globe.add(p);
+  pulses.push({ c, p, t: Math.random(), s: 0.1 + Math.random() * 0.1 });
+}
+CITIES.forEach(c => { arc(LIMA, c); const m = new THREE.Mesh(dotGeo, dotMat); m.position.copy(ll(...c, R * 1.003)); globe.add(m); });
+[[CITIES[0], CITIES[2]], [CITIES[8], CITIES[9]], [CITIES[6], CITIES[7]], [CITIES[3], CITIES[4]], [CITIES[2], CITIES[5]]].forEach(([a, b]) => arc(a, b));
 
-    const planetFunctionsGLSL = `
-      const float PI = 3.141592653589793;
-      const float TWO_PI = 6.283185307179586;
+const hub = new THREE.Mesh(new THREE.SphereGeometry(0.06, 12, 12), new THREE.MeshBasicMaterial({ color: 0xffffff }));
+hub.position.copy(limaPos.clone().multiplyScalar(1.003)); globe.add(hub);
+const hubRing = new THREE.Mesh(new THREE.RingGeometry(0.09, 0.11, 40), new THREE.MeshBasicMaterial({ color: 0xff3030, side: THREE.DoubleSide, transparent: true, opacity: 0.9, blending: THREE.AdditiveBlending, depthWrite: false }));
+hubRing.position.copy(limaPos.clone().multiplyScalar(1.004)); hubRing.lookAt(limaPos.clone().multiplyScalar(2)); globe.add(hubRing);
 
-      vec3 aetheraPosition(vec3 seed, float time) {
-        vec3 dir = safeNormalize(seed);
-        float lat = asin(clamp(dir.y, -1.0, 1.0));
-        float cont = snoise(dir * 2.45 + vec3(0.0, time * 0.018, 0.0));
-        float curN = snoise(dir * 4.2 + vec3(time * 0.045, -time * 0.018, time * 0.032));
-        float cur = sin(lat * 10.5 + dot(dir, safeNormalize(vec3(0.74, 0.11, 0.66))) * 5.4 + curN * 1.35 - time * 0.18);
-        vec3 p = dir * (2.08 + cont * 0.072 + cur * 0.026);
-        p.y *= 0.975;
-        p.xz = rotate2D(sin(lat * 3.0 + time * 0.08) * 0.018) * p.xz;
-        return p;
-      }
+// ---------- Satélites con antena ----------
+const foil = new THREE.MeshStandardMaterial({ color: 0xb8862f, metalness: 0.9, roughness: 0.35 });
+const silver = new THREE.MeshStandardMaterial({ color: 0xdadada, metalness: 0.85, roughness: 0.25, side: THREE.DoubleSide });
+const panel = new THREE.MeshStandardMaterial({ color: 0x1c0709, emissive: 0x3a0508, metalness: 0.6, roughness: 0.3 });
 
-      vec3 pyraPosition(vec3 seed, float time) {
-        vec3 dir = safeNormalize(seed);
-        float terr = snoise(dir * 3.4 + vec3(time * 0.012, 0.0, 0.0));
-        float sec = snoise(dir * 8.0 - vec3(0.0, time * 0.024, 0.0));
-        float lift = pow(max(sec * 0.5 + 0.5, 0.0), 8.0);
-        return dir * (2.08 + terr * 0.125 + lift * 0.090);
-      }
+function makeSat() {
+  const g = new THREE.Group();
+  g.add(new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.18, 0.28), foil));
+  [-1, 1].forEach(s => {
+    const w = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.012, 0.2), panel); w.position.x = s * 0.38; g.add(w);
+    const arm = new THREE.Mesh(new THREE.CylinderGeometry(0.008, 0.008, 0.14, 6), silver); arm.rotation.z = Math.PI / 2; arm.position.x = s * 0.12; g.add(arm);
+  });
+  const dish = new THREE.Mesh(new THREE.ConeGeometry(0.1, 0.07, 24, 1, true), silver);
+  dish.rotation.x = -Math.PI / 2; dish.position.z = 0.2; g.add(dish);
+  const led = new THREE.Mesh(new THREE.SphereGeometry(0.02, 8, 8), new THREE.MeshBasicMaterial({ color: 0xff2020 }));
+  led.position.set(0.07, 0.1, -0.12); g.add(led); g.userData.led = led;
+  g.scale.setScalar(1.4); return g;
+}
 
-      vec3 orisonBodyPosition(vec3 seed, float time) {
-        vec3 dir = safeNormalize(seed);
-        float lat = asin(clamp(dir.y, -1.0, 1.0));
-        float bandN = snoise(dir * vec3(2.2, 5.8, 2.2) + vec3(time * 0.018, -time * 0.012, time * 0.014));
-        float band = sin(lat * 18.0 + bandN * 1.8 + time * 0.06);
-        float storm = snoise(dir * 4.15 + vec3(-time * 0.021, time * 0.013, time * 0.026));
-        vec3 p = dir * (2.07 + band * 0.020 + storm * 0.038);
-        p.y *= 0.945;
-        return p;
-      }
+const ORBITS = [
+  { r: 3.4, tilt: [0.5, 0, 0.3], sp: 0.22, ph: 0 },
+  { r: 3.9, tilt: [-0.6, 0, 0.5], sp: -0.17, ph: 2 },
+  { r: 4.4, tilt: [0.9, 0, -0.4], sp: 0.13, ph: 4 },
+  { r: 3.7, tilt: [0.1, 0, -0.9], sp: -0.2, ph: 5.5 }
+];
+const sats = ORBITS.map(o => {
+  const grp = new THREE.Group(); grp.rotation.set(...o.tilt); scene.add(grp);
+  const pts = []; for (let i = 0; i < 128; i++) pts.push(new THREE.Vector3(Math.cos(i / 128 * TAU) * o.r, 0, Math.sin(i / 128 * TAU) * o.r));
+  grp.add(new THREE.LineLoop(new THREE.BufferGeometry().setFromPoints(pts), new THREE.LineBasicMaterial({ color: 0xff2a2a, transparent: true, opacity: 0.12 })));
+  const mesh = makeSat(); grp.add(mesh);
+  const bg = new THREE.BufferGeometry(); bg.setAttribute('position', new THREE.BufferAttribute(new Float32Array(6), 3));
+  const beam = new THREE.Line(bg, new THREE.LineBasicMaterial({ color: 0xff5a4a, transparent: true, opacity: 0, blending: THREE.AdditiveBlending, depthWrite: false }));
+  beam.frustumCulled = false; scene.add(beam);
+  return { ...o, mesh, beam };
+});
 
-      vec3 orisonRingPosition(vec4 rnd, float time) {
-        float radius = mix(2.18, 3.62, pow(rnd.x, 0.74));
-        float angle = rnd.y * TWO_PI + time * (0.018 + rnd.w * 0.012);
-        float lane = floor(rnd.z * 11.0) / 11.0;
-        radius *= (0.92 + 0.08 * sin(lane * 71.0 + rnd.w * 16.0));
-        float vert = (rnd.z - 0.5) * 0.115 + snoise(vec3(cos(angle) * 2.1, sin(angle) * 2.1, radius * 1.7)) * 0.035;
-        return rotateZ3(0.34) * rotateX3(0.20) * vec3(cos(angle) * radius, vert, sin(angle) * radius);
-      }
+// ---------- Astronauta flotando (amarrado a un satélite) ----------
+function makeAstronaut() {
+  const g = new THREE.Group();
+  const suit = new THREE.MeshStandardMaterial({ color: 0xf3f1ef, roughness: 0.55, metalness: 0.05 });
+  const gray = new THREE.MeshStandardMaterial({ color: 0xcfcfd2, roughness: 0.5, metalness: 0.2 });
+  const visor = new THREE.MeshStandardMaterial({ color: 0x1a0a05, metalness: 1, roughness: 0.08, emissive: 0x3a0505 });
+  const red = new THREE.MeshBasicMaterial({ color: 0xff2a2a });
+  const add = (geo, mat, x, y, z, rx = 0, rz = 0) => { const m = new THREE.Mesh(geo, mat); m.position.set(x, y, z); m.rotation.set(rx, 0, rz); g.add(m); return m; };
+  add(new THREE.CapsuleGeometry(0.17, 0.26, 6, 12), suit, 0, 0, 0);
+  add(new THREE.SphereGeometry(0.19, 20, 16), suit, 0, 0.4, 0);
+  const v = add(new THREE.SphereGeometry(0.15, 20, 16), visor, 0, 0.4, 0.09); v.scale.set(1, 0.85, 0.7);
+  add(new THREE.BoxGeometry(0.3, 0.38, 0.16), gray, 0, 0.02, -0.17);
+  add(new THREE.BoxGeometry(0.12, 0.05, 0.02), red, 0, 0.08, 0.17);
+  add(new THREE.CapsuleGeometry(0.06, 0.24, 4, 8), suit, -0.26, 0.05, 0.08, 0.5, 0.5);
+  add(new THREE.CapsuleGeometry(0.06, 0.24, 4, 8), suit, 0.26, 0.1, 0.1, 0.8, -0.7);
+  add(new THREE.CapsuleGeometry(0.075, 0.28, 4, 8), suit, -0.1, -0.42, 0.04, 0.3, 0);
+  add(new THREE.CapsuleGeometry(0.075, 0.28, 4, 8), suit, 0.1, -0.46, -0.02, -0.2, 0);
+  g.scale.setScalar(0.9); return g;
+}
+const astro = makeAstronaut(); scene.add(astro);
+const tetherGeo = new THREE.BufferGeometry(); tetherGeo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(6), 3));
+const tether = new THREE.Line(tetherGeo, new THREE.LineBasicMaterial({ color: 0xffd0c8, transparent: true, opacity: 0.55 }));
+tether.frustumCulled = false; scene.add(tether);
 
-      vec3 vesperPosition(vec3 seed) {
-        vec3 dir = safeNormalize(seed);
-        vec3 stepped = floor(dir * 7.0 + 0.5) / 7.0;
-        vec3 fdir = safeNormalize(mix(dir, stepped, 0.68));
-        float cell = snoise(fdir * 4.8);
-        float lat = sin(dot(fdir, safeNormalize(vec3(0.82, 0.31, 0.48))) * 18.0) - sin(dot(fdir, safeNormalize(vec3(-0.24, 0.91, 0.34))) * 16.0) - sin(dot(fdir, safeNormalize(vec3(0.41, -0.17, 0.90))) * 14.0);
-        vec3 p = fdir * (2.06 + cell * 0.145 + pow(abs(lat), 5.5) * 0.070);
-        p.y *= 1.018;
-        return p;
-      }
+// ---------- Interacción ----------
+const mouse = { x: 0, y: 0 };
+addEventListener('mousemove', e => {
+  mouse.x = e.clientX / innerWidth * 2 - 1; mouse.y = e.clientY / innerHeight * 2 - 1;
+  if (card) { const r = card.getBoundingClientRect(); card.style.setProperty('--gx', ((e.clientX - r.left) / r.width * 100) + '%'); card.style.setProperty('--gy', ((e.clientY - r.top) / r.height * 100) + '%'); }
+}, { passive: true });
 
-      vec3 planetPosition(float preset, vec3 seed, vec4 rnd, float kind, float time) {
-        if (preset < 0.5) return aetheraPosition(seed, time);
-        if (preset < 1.5) return pyraPosition(seed, time);
-        if (preset < 2.5) return (kind > 0.5) ? orisonRingPosition(rnd, time) : orisonBodyPosition(seed, time);
-        return vesperPosition(seed);
-      }
+addEventListener('resize', () => {
+  camera.aspect = innerWidth / innerHeight; camera.position.z = camZ(); camera.updateProjectionMatrix();
+  renderer.setSize(innerWidth, innerHeight); composer.setSize(innerWidth, innerHeight);
+}, { passive: true });
 
-      vec3 aetheraColor(vec3 seed, float time) {
-        vec3 dir = safeNormalize(seed);
-        float lat = asin(clamp(dir.y, -1.0, 1.0));
-        float cur = snoise(dir * 3.65 + vec3(-time * 0.055, time * 0.025, time * 0.04));
-        float ribN = snoise(dir * 6.8 + vec3(time * 0.025, -time * 0.06, time * 0.015));
-        float aurora = pow(max(0.0, sin(lat * 8.2 + dot(dir, safeNormalize(vec3(0.71, -0.08, 0.70))) * 7.1 + ribN * 1.8 - time * 0.35)), 5.0);
-        float polar = smoothstep(0.48, 0.93, abs(dir.y));
-        vec3 c = mix(vec3(0.004, 0.028, 0.13), vec3(0.012, 0.34, 0.78), cur * 0.5 + 0.5);
-        c = mix(c, vec3(0.05, 0.95, 1.25), smoothstep(0.22, 0.80, cur) * 0.55);
-        c += mix(vec3(0.05, 0.95, 1.25), vec3(0.58, 0.08, 1.05), polar) * aurora * (0.28 + polar * 0.62);
-        return limitLuminance(c, 1.38);
-      }
+// ---------- Loop ----------
+const clock = new THREE.Clock(), v1 = new THREE.Vector3(), v2 = new THREE.Vector3(), v3 = new THREE.Vector3(), zero = new THREE.Vector3();
 
-      vec3 pyraColor(vec3 seed, float time) {
-        vec3 dir = safeNormalize(seed);
-        float crust = snoise(dir * 3.2 + vec3(time * 0.018, 0.0, 0.0));
-        float crack = (1.0 - smoothstep(0.035, 0.18, abs(snoise(dir * 9.5 - vec3(0.0, time * 0.05, 0.0))))) * smoothstep(-0.32, 0.5, crust);
-        float ember = pow(max(0.0, snoise(dir * 17.0 + time * 0.08)), 7.0);
-        vec3 c = mix(vec3(0.012, 0.006, 0.012), vec3(0.18, 0.028, 0.018), crust * 0.5 + 0.5);
-        c += mix(vec3(1.45, 0.035, 0.002), vec3(1.55, 0.72, 0.055), crack) * crack * 1.58;
-        c += vec3(1.35, 0.23, 0.025) * ember * 0.72;
-        return limitLuminance(c, 1.70);
-      }
+function animate() {
+  requestAnimationFrame(animate);
+  if (!document.body.classList.contains('hunter-preauth')) return;
+  const dt = Math.min(clock.getDelta(), 0.04), t = clock.elapsedTime, k = reduce ? 0.3 : 1;
 
-      vec3 orisonColor(vec3 p, vec3 seed, vec4 rnd, float kind, float time) {
-        if (kind > 0.5) {
-          float rr = length(p.xz);
-          float lane = sin(rr * 27.0 + rnd.w * 7.0);
-          float dust = snoise(vec3(cos(rnd.y * TWO_PI) * 2.2, sin(rnd.y * TWO_PI) * 2.2, rr * 3.7));
-          vec3 c = mix(vec3(0.95, 0.52, 0.12), vec3(0.05, 0.76, 0.66), lane * 0.5 + 0.5);
-          c = mix(c, vec3(0.33, 0.08, 0.55), smoothstep(0.50, 0.88, dust) * 0.42);
-          return limitLuminance(c, 1.12);
-        }
-        vec3 dir = safeNormalize(seed);
-        float lat = asin(clamp(dir.y, -1.0, 1.0));
-        float latM = abs(lat) / (PI * 0.5);
-        float bFlow = snoise(dir * 2.45 + vec3(time * 0.014, -time * 0.01, time * 0.018));
-        float fFlow = snoise(dir * 7.2 + vec3(-time * 0.032, time * 0.012, time * 0.024));
-        float band = sin(lat * 18.0 + bFlow * 2.4 + fFlow * 0.55 + time * 0.045);
-        vec3 c = mix(vec3(0.012, 0.028, 0.085), vec3(0.58, 0.25, 0.055), bFlow * 0.5 + 0.5);
-        c = mix(c, vec3(0.82, 0.76, 0.50), smoothstep(-0.30, 0.88, band) * 0.48);
-        c = mix(c, vec3(0.012, 0.38, 0.46), smoothstep(0.06, 0.74, fFlow) * 0.62);
-        c *= mix(1.0, 0.78, smoothstep(0.65, 1.0, latM));
-        return limitLuminance(c, 1.32);
-      }
+  globe.rotation.y += dt * 0.06 * k;
+  globe.updateMatrixWorld(true);
+  hubRing.scale.setScalar(1 + ((t * 0.8) % 1) * 2.2); hubRing.material.opacity = 0.9 * (1 - ((t * 0.8) % 1));
+  pulses.forEach(p => { p.t = (p.t + dt * p.s * k) % 1; p.p.position.copy(p.c.getPoint(p.t)); });
 
-      vec3 vesperColor(vec3 seed, float time) {
-        vec3 dir = safeNormalize(seed);
-        float facet = floor((snoise(dir * 4.7) * 0.5 + 0.5) * 7.0) / 7.0;
-        float polar = smoothstep(0.48, 0.96, abs(dir.y));
-        float seam = 1.0 - smoothstep(0.025, 0.14, abs(snoise(dir * 10.0 + vec3(0.0, time * 0.025, 0.0))));
-        vec3 c = mix(vec3(0.018, 0.006, 0.12), vec3(0.45, 0.045, 0.92), facet);
-        c = mix(c, vec3(0.98, 0.18, 1.38), smoothstep(0.60, 0.96, facet) * 0.72);
-        c += vec3(0.03, 1.08, 1.48) * seam * (0.38 + polar * 1.15) + vec3(0.03, 1.08, 1.48) * pow(polar, 5.0) * 0.50;
-        return limitLuminance(c, 1.56);
-      }
+  const limaW = globe.localToWorld(limaPos.clone()), nrm = limaW.clone().normalize();
+  sats.forEach((s, i) => {
+    const a = t * s.sp * k + s.ph;
+    s.mesh.position.set(Math.cos(a) * s.r, 0, Math.sin(a) * s.r);
+    s.mesh.lookAt(zero);
+    s.mesh.userData.led.visible = Math.sin(t * 5 + i * 2) > 0;
+    s.mesh.getWorldPosition(v1);
+    const vis = nrm.dot(v2.copy(v1).sub(limaW).normalize());
+    const pa = s.beam.geometry.attributes.position;
+    pa.setXYZ(0, v1.x, v1.y, v1.z); pa.setXYZ(1, limaW.x, limaW.y, limaW.z); pa.needsUpdate = true;
+    s.beam.material.opacity = vis > 0.2 ? 0.35 + 0.35 * Math.sin(t * 6 + i) : 0;
+  });
 
-      vec3 planetColor(float preset, vec3 p, vec3 seed, vec4 rnd, float kind, float time) {
-        if (preset < 0.5) return aetheraColor(seed, time);
-        if (preset < 1.5) return pyraColor(seed, time);
-        if (preset < 2.5) return orisonColor(p, seed, rnd, kind, time);
-        return vesperColor(seed, time);
-      }
-    `;
+  const asp = innerWidth / innerHeight;
+  astro.position.set((asp > 1 ? 4.6 : 2.6) + Math.sin(t * 0.4) * 0.25, 1.4 + Math.sin(t * 0.55) * 0.3, 1.6);
+  astro.rotation.set(Math.sin(t * 0.3) * 0.5, t * 0.25 * k, Math.sin(t * 0.2) * 0.4);
+  astro.localToWorld(v3.set(0, 0, -0.2));
+  sats[0].mesh.getWorldPosition(v1);
+  const ta = tether.geometry.attributes.position; ta.setXYZ(0, v3.x, v3.y, v3.z); ta.setXYZ(1, v1.x, v1.y, v1.z); ta.needsUpdate = true;
 
-    const nebulaMaterial = new THREE.ShaderMaterial({
-      uniforms: { uTime: { value: 0 } },
-      vertexShader: `varying vec3 vDir; void main() { vDir = normalize(position); gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }`,
-      fragmentShader: `${noiseGLSL} uniform float uTime; varying vec3 vDir; void main() { vec3 d = safeNormalize(vDir); float b = snoise(d * 1.7 + vec3(0.0, uTime * 0.006, 0.0)); float f = snoise(d * 4.0 - vec3(uTime * 0.004, 0.0, 0.0)); float cloud = smoothstep(0.12, 0.88, b * 0.7 + f * 0.3); float hor = pow(max(1.0 - abs(d.y), 0.0), 4.0); gl_FragColor = vec4(vec3(0.0015, 0.002, 0.009) + mix(vec3(0.018, 0.038, 0.10), vec3(0.055, 0.018, 0.10), f * 0.5 + 0.5) * cloud * hor * 0.62, 1.0); }`,
-      side: THREE.BackSide, depthWrite: false, fog: false
-    });
-    const nebula = new THREE.Mesh(new THREE.SphereGeometry(45, 48, 32), nebulaMaterial);
-    scene.add(nebula);
+  camera.position.x += (mouse.x * 0.6 - camera.position.x) * 0.03;
+  camera.position.y += (0.4 - mouse.y * 0.4 - camera.position.y) * 0.03;
+  camera.lookAt(0, 0, 0);
+  composer.render();
+}
+animate();
 
-    const starCount = isCompact ? 4500 : 7500;
-    const starGeo = new THREE.BufferGeometry();
-    const starPos = new Float32Array(starCount * 3), starSz = new Float32Array(starCount), starSd = new Float32Array(starCount);
-    for (let i = 0; i < starCount; i++) {
-      const r = THREE.MathUtils.lerp(12, 43, Math.pow(Math.random(), 0.62)), y = THREE.MathUtils.randFloatSpread(2), th = Math.random() * TAU, rad = Math.sqrt(Math.max(0, 1 - y * y));
-      starPos[i * 3] = Math.cos(th) * rad * r; starPos[i * 3 + 1] = y * r; starPos[i * 3 + 2] = Math.sin(th) * rad * r;
-      starSz[i] = 0.65 + Math.pow(Math.random(), 5) * 4.4; starSd[i] = Math.random();
-    }
-    starGeo.setAttribute('position', new THREE.BufferAttribute(starPos, 3));
-    starGeo.setAttribute('aSize', new THREE.BufferAttribute(starSz, 1));
-    starGeo.setAttribute('aSeed', new THREE.BufferAttribute(starSd, 1));
-
-    const starMat = new THREE.ShaderMaterial({
-      uniforms: { uTime: { value: 0 }, uPixelRatio: { value: renderer.getPixelRatio() }, uTransitionEnergy: { value: 0 } },
-      vertexShader: `uniform float uTime; uniform float uPixelRatio; uniform float uTransitionEnergy; attribute float aSize; attribute float aSeed; varying float vAlpha; varying vec3 vColor; void main() { vec3 p = position; float dr = uTime * (0.003 + aSeed * 0.004); p.xz = rotate2D(dr) * p.xz; vec4 mv = modelViewMatrix * vec4(p, 1.0); gl_Position = projectionMatrix * mv; gl_PointSize = aSize * uPixelRatio * (18.0 / max(1.0, -mv.z)) * (1.0 + uTransitionEnergy * 0.12); vAlpha = (0.22 + aSeed * 0.58) * (0.55 + 0.45 * sin(uTime * (0.8 + aSeed * 2.0) + aSeed * 31.0)); vColor = mix(vec3(0.48, 0.65, 1.0), vec3(1.0, 0.82, 0.64), aSeed * aSeed); }`,
-      fragmentShader: `varying float vAlpha; varying vec3 vColor; void main() { float d = length(gl_PointCoord - 0.5); if (d > 0.5) discard; float g = exp(-d * 12.0) + exp(-d * 4.5) * 0.3; gl_FragColor = vec4(vColor * g, vAlpha * g); }`,
-      transparent: true, blending: THREE.AdditiveBlending, depthWrite: false, fog: false
-    });
-    const stars = new THREE.Points(starGeo, starMat);
-    scene.add(stars);
-
-    const planetGroup = new THREE.Group();
-    planetGroup.rotation.z = -0.055;
-    scene.add(planetGroup);
-
-    const sharedUniforms = { uTime: { value: 0 }, uFromPreset: { value: 0 }, uToPreset: { value: 0 }, uTransition: { value: 0 }, uTransitionEnergy: { value: 0 } };
-
-    const surfaceMat = new THREE.ShaderMaterial({
-      uniforms: sharedUniforms,
-      vertexShader: `${noiseGLSL} ${planetFunctionsGLSL} uniform float uTime; uniform float uFromPreset; uniform float uToPreset; uniform float uTransition; varying vec3 vWorldPos; varying vec3 vObjPos; varying vec3 vSeed; varying vec3 vNorm; varying float vMorph; varying float vFront; varying float vSweep;
-        float phaseCoord(vec3 s, float t) { return dot(s, safeNormalize(vec3(0.82, 0.25, 0.52))) + sin(dot(s, safeNormalize(vec3(-0.18, 0.93, 0.32))) * 6.2 - t * 0.72) * 0.055 + snoise(s * 3.4 + vec3(0.0, t * 0.10, 0.0)) * 0.035; }
-        void main() { vec3 s = safeNormalize(position); vec4 rnd = vec4(fract(sin(dot(s.xy, vec2(12.9898, 78.233))) * 43758.5453), fract(sin(dot(s.yz, vec2(39.3468, 11.135))) * 24634.6345), fract(sin(dot(s.zx, vec2(73.156, 52.235))) * 56445.234), fract(sin(dot(s.xyz, vec3(19.19, 7.17, 41.73))) * 9531.317)); vec3 p0 = sanitizeVec3(planetPosition(uFromPreset, s, rnd, 0.0, uTime), s * 2.08); vec3 p1 = sanitizeVec3(planetPosition(uToPreset, s, rnd, 0.0, uTime), s * 2.08); float coord = phaseCoord(s, uTime); float scan = mix(-1.24, 1.24, uTransition); float m = 1.0 - smoothstep(scan - 0.115, scan + 0.115, coord); float fr = exp(-abs(coord - scan) * 19.0); vec3 pos = sanitizeVec3(mix(p0, p1, m) + safeNormalize(mix(p0, p1, m)) * fr * 0.05, s * 2.08); vec4 wp = modelMatrix * vec4(pos, 1.0); gl_Position = projectionMatrix * viewMatrix * wp; vWorldPos = wp.xyz; vObjPos = pos; vSeed = s; vNorm = safeNormalize(mat3(modelMatrix) * pos); vMorph = m; vFront = fr; vSweep = coord; }`,
-      fragmentShader: `${noiseGLSL} ${planetFunctionsGLSL} uniform float uTime; uniform float uFromPreset; uniform float uToPreset; varying vec3 vWorldPos; varying vec3 vObjPos; varying vec3 vSeed; varying vec3 vNorm; varying float vMorph; varying float vFront; varying float vSweep;
-        void main() { vec4 rnd = vec4(fract(sin(dot(vSeed.xy, vec2(12.9898, 78.233))) * 43758.5453), fract(sin(dot(vSeed.yz, vec2(39.3468, 11.135))) * 24634.6345), fract(sin(dot(vSeed.zx, vec2(73.156, 52.235))) * 56445.234), fract(sin(dot(vSeed.xyz, vec3(19.19, 7.17, 41.73))) * 9531.317)); vec3 base = mix(planetColor(uFromPreset, vObjPos, vSeed, rnd, 0.0, uTime), planetColor(uToPreset, vObjPos, vSeed, rnd, 0.0, uTime), vMorph); vec3 n = safeNormalize(vNorm); vec3 vDir = safeNormalize(cameraPosition - vWorldPos); vec3 kDir = safeNormalize(vec3(-0.70, 0.55, 0.85)); float ndl = dot(n, kDir); float fres = pow(max(1.0 - saturate(dot(n, vDir)), 0.0), 3.0); vec3 col = base * (0.28 + saturate(ndl) * 1.05) * mix(0.50, 1.0, smoothstep(-0.34, 0.56, ndl)) + mix(vec3(0.10, 0.48, 1.05), base, 0.46) * fres * 0.65; vec3 pCol = mix(vec3(0.025, 0.92, 1.32), vec3(1.02, 0.055, 1.18), smoothstep(-0.78, 0.78, vSweep)); col = mix(col, pCol, vFront * 0.35); gl_FragColor = vec4(clamp(limitLuminance(col, 1.75), vec3(0.0), vec3(2.0)), 1.0); }`,
-      transparent: false, depthWrite: true, depthTest: true, side: THREE.FrontSide
-    });
-    const surfaceMesh = new THREE.Mesh(new THREE.IcosahedronGeometry(1, isCompact ? 5 : 6), surfaceMat);
-    surfaceMesh.renderOrder = 2;
-    planetGroup.add(surfaceMesh);
-
-    const atmoMat = new THREE.ShaderMaterial({
-      uniforms: sharedUniforms,
-      vertexShader: `${noiseGLSL} ${planetFunctionsGLSL} uniform float uTime; uniform float uFromPreset; uniform float uToPreset; uniform float uTransition; varying vec3 vWorldPos; varying vec3 vNorm; varying float vMorph; varying float vFront;
-        void main() { vec3 s = safeNormalize(position); vec4 rnd = vec4(0.17, 0.42, 0.73, 0.91); vec3 p0 = sanitizeVec3(planetPosition(uFromPreset, s, rnd, 0.0, uTime), s * 2.08); vec3 p1 = sanitizeVec3(planetPosition(uToPreset, s, rnd, 0.0, uTime), s * 2.08); float coord = dot(s, safeNormalize(vec3(0.82, 0.25, 0.52))); float scan = mix(-1.24, 1.24, uTransition); float m = 1.0 - smoothstep(scan - 0.14, scan + 0.14, coord); vec3 pos = sanitizeVec3(mix(p0, p1, m) * 1.065, s * 2.20); vec4 wp = modelMatrix * vec4(pos, 1.0); gl_Position = projectionMatrix * viewMatrix * wp; vWorldPos = wp.xyz; vNorm = safeNormalize(mat3(modelMatrix) * pos); vMorph = m; vFront = exp(-abs(coord - scan) * 17.0); }`,
-      fragmentShader: `${noiseGLSL} uniform float uFromPreset; uniform float uToPreset; varying vec3 vWorldPos; varying vec3 vNorm; varying float vMorph; varying float vFront;
-        vec3 atmoC(float pr) { if (pr < 0.5) return vec3(0.055, 0.42, 0.72); if (pr < 1.5) return vec3(0.72, 0.10, 0.018); if (pr < 2.5) return vec3(0.035, 0.40, 0.36); return vec3(0.30, 0.08, 0.68); }
-        void main() { vec3 n = safeNormalize(vNorm); float fres = pow(max(1.0 - saturate(dot(n, safeNormalize(cameraPosition - vWorldPos))), 0.0), 2.4); vec3 col = mix(atmoC(uFromPreset), atmoC(uToPreset), vMorph); gl_FragColor = vec4(limitLuminance(col, 1.02) * fres * 0.92, clamp(fres * (0.24 + vFront * 0.04), 0.0, 0.35)); }`,
-      transparent: true, blending: THREE.AdditiveBlending, side: THREE.BackSide, depthWrite: false
-    });
-    const atmoMesh = new THREE.Mesh(new THREE.IcosahedronGeometry(1, isCompact ? 4 : 5), atmoMat);
-    atmoMesh.renderOrder = 3;
-    planetGroup.add(atmoMesh);
-
-    const ringMat = new THREE.ShaderMaterial({
-      uniforms: { ...sharedUniforms, uOpacity: { value: 0 } },
-      vertexShader: `${noiseGLSL} uniform float uTime; varying vec2 vLocal; void main() { vec3 p = position; float r = length(p.xy); float a = safeAtan(p.y, p.x); p.z += snoise(vec3(cos(a), sin(a), r * 1.7 + uTime * 0.035)) * 0.032; p.xy = rotate2D(uTime * 0.004) * p.xy; vLocal = p.xy; gl_Position = projectionMatrix * modelViewMatrix * vec4(p, 1.0); }`,
-      fragmentShader: `${noiseGLSL} uniform float uTime; uniform float uOpacity; varying vec2 vLocal; void main() { float r = length(vLocal); vec2 dir = safeNormalize2(vLocal + vec2(0.00001)); float lane = sin(r * 47.0 + sin(r * 8.0) * 2.0); float fine = sin(r * 126.0 + (dir.x * dir.y) * 7.5); float gaps = smoothstep(-0.50, 0.16, snoise(vec3(dir * 2.35, r * 4.8 + uTime * 0.03)) + lane * 0.28); float edge = smoothstep(2.16, 2.31, r) * (1.0 - smoothstep(3.48, 3.68, r)); vec3 col = mix(vec3(0.92, 0.49, 0.10), vec3(0.035, 0.73, 0.65), lane * 0.5 + 0.5); col = mix(col, vec3(0.34, 0.055, 0.55), smoothstep(0.72, 0.98, fine) * 0.40); gl_FragColor = vec4(limitLuminance(col, 1.05), clamp(edge * gaps * (0.12 + abs(lane) * 0.14 + abs(fine) * 0.06) * uOpacity, 0.0, 0.40)); }`,
-      transparent: true, blending: THREE.NormalBlending, depthWrite: false, side: THREE.DoubleSide
-    });
-    const ringMesh = new THREE.Mesh(new THREE.RingGeometry(2.16, 3.68, 320, 12), ringMat);
-    ringMesh.rotation.set(Math.PI * 0.5 + 0.20, 0.0, 0.34);
-    ringMesh.renderOrder = 1;
-    planetGroup.add(ringMesh);
-
-    const arcCount = isCompact ? 1400 : 2400;
-    const arcGeo = new THREE.BufferGeometry();
-    const arcPos = new Float32Array(arcCount * 3), arcRnd = new Float32Array(arcCount * 2);
-    for (let i = 0; i < arcCount; i++) {
-      const a = Math.random() * TAU, rad = THREE.MathUtils.lerp(3.85, 5.9, Math.pow(Math.random(), 0.72));
-      arcPos[i * 3] = Math.cos(a) * rad; arcPos[i * 3 + 1] = THREE.MathUtils.randFloatSpread(0.5); arcPos[i * 3 + 2] = Math.sin(a) * rad;
-      arcRnd[i * 2] = Math.random(); arcRnd[i * 2 + 1] = Math.random();
-    }
-    arcGeo.setAttribute('position', new THREE.BufferAttribute(arcPos, 3));
-    arcGeo.setAttribute('aRandom', new THREE.BufferAttribute(arcRnd, 2));
-    const arcMat = new THREE.ShaderMaterial({
-      uniforms: { uTime: { value: 0 }, uPixelRatio: { value: renderer.getPixelRatio() }, uTransitionEnergy: { value: 0 } },
-      vertexShader: `uniform float uTime; uniform float uPixelRatio; uniform float uTransitionEnergy; attribute vec2 aRandom; varying float vAlpha; varying vec3 vColor; void main() { vec3 p = position; float ang = uTime * (0.04 + aRandom.x * 0.06); float s = sin(ang); float c = cos(ang); p.xz = mat2(c, -s, s, c) * p.xz; p.y += sin(uTime * 0.5 + aRandom.y * 13.0 + length(p.xz)) * 0.15; p *= 1.0 + uTransitionEnergy * 0.04; vec4 mv = modelViewMatrix * vec4(p, 1.0); gl_Position = projectionMatrix * mv; gl_PointSize = (0.8 + aRandom.x * 1.6) * uPixelRatio * (26.0 / max(1.0, -mv.z)); vAlpha = (0.08 + aRandom.y * 0.18) * (1.0 - uTransitionEnergy * 0.45); vColor = mix(vec3(0.32, 0.88, 1.0), vec3(0.75, 0.35, 1.0), aRandom.x); }`,
-      fragmentShader: `varying float vAlpha; varying vec3 vColor; void main() { float d = length(gl_PointCoord - 0.5); if (d > 0.5) discard; float g = exp(-d * 6.8); gl_FragColor = vec4(vColor * g, vAlpha * g); }`,
-      transparent: true, blending: THREE.AdditiveBlending, depthWrite: false
-    });
-    const orbitalArcs = new THREE.Points(arcGeo, arcMat);
-    orbitalArcs.rotation.set(0.18, 0.0, -0.28);
-    planetGroup.add(orbitalArcs);
-
-    // =======================================================
-    // SATÉLITES CON ANTENA + ANILLO DE SEÑAL + METEORITOS CON ESTELA
-    // =======================================================
-    const techOrbitGroup = new THREE.Group();
-    scene.add(techOrbitGroup);
-
-    const satHullMat = new THREE.MeshStandardMaterial({ color: 0xf1f5f9, metalness: 0.85, roughness: 0.2 });
-    const satSolarMat = new THREE.MeshStandardMaterial({ color: 0x38bdf8, emissive: 0x38bdf8, emissiveIntensity: 0.65, metalness: 0.6, roughness: 0.2 });
-    const satBeaconMat = new THREE.MeshBasicMaterial({ color: 0x54e2ff });
-
-    const satellites = [];
-    for (let s = 0; s < 4; s++) {
-      const sat = new THREE.Group();
-      const body = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.08, 0.34, 12), satHullMat);
-      body.rotation.z = Math.PI * 0.5;
-      const wingL = new THREE.Mesh(new THREE.BoxGeometry(0.55, 0.015, 0.18), satSolarMat);
-      wingL.position.set(-0.44, 0, 0);
-      const wingR = new THREE.Mesh(new THREE.BoxGeometry(0.55, 0.015, 0.18), satSolarMat);
-      wingR.position.set(0.44, 0, 0);
-      // Antena parabólica y aro de transmisión
-      const dish = new THREE.Mesh(new THREE.ConeGeometry(0.14, 0.14, 20, 1, true), satHullMat);
-      dish.position.set(0, 0.14, 0);
-      dish.rotation.x = Math.PI;
-      const waveRing = new THREE.Mesh(new THREE.TorusGeometry(0.22, 0.01, 8, 28), satBeaconMat);
-      waveRing.position.set(0, 0.22, 0);
-      waveRing.rotation.x = Math.PI * 0.5;
-
-      sat.add(body, wingL, wingR, dish, waveRing);
-      techOrbitGroup.add(sat);
-      satellites.push({
-        mesh: sat,
-        waveRing,
-        radius: 4.1 + s * 0.52,
-        speed: (0.24 - s * 0.03) * (s % 2 === 0 ? 1 : -1),
-        phase: s * 1.57,
-        yWave: (s - 1.5) * 0.42
-      });
-    }
-
-    // Meteoritos con estela luminosa
-    const meteorRockMat = new THREE.MeshStandardMaterial({ color: 0x475569, emissive: 0x38bdf8, emissiveIntensity: 0.25, roughness: 0.75, metalness: 0.35, flatShading: true });
-    const meteors = [];
-    for (let m = 0; m < 12; m++) {
-      const r = 0.055 + Math.random() * 0.075;
-      const rock = new THREE.Mesh(new THREE.DodecahedronGeometry(r, 0), meteorRockMat);
-      const trailGeo = new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(0, 0, 0), new THREE.Vector3(-0.9, 0.12, -0.3)]);
-      const trailMat = new THREE.LineBasicMaterial({ color: 0x54e2ff, transparent: true, opacity: 0.65 });
-      const trail = new THREE.Line(trailGeo, trailMat);
-      const mGroup = new THREE.Group();
-      mGroup.add(rock, trail);
-      techOrbitGroup.add(mGroup);
-
-      meteors.push({
-        group: mGroup,
-        rock,
-        trailMat,
-        orbitR: 3.5 + Math.random() * 2.9,
-        speed: (0.34 + Math.random() * 0.28) * (m % 2 === 0 ? 1 : -1),
-        phase: Math.random() * TAU,
-        yBase: (Math.random() - 0.5) * 2.1,
-        rotSpeed: 1.1 + Math.random() * 1.8
-      });
-    }
-
-    const transitionState = { active: false, from: 0, to: 0, queued: null, startTime: 0, duration: prefersReducedMotion ? 0.82 : 1.28, raw: 0, eased: 0, energy: 0, current: 0, settledAt: 0 };
-    function smootherStep(v) { const x = THREE.MathUtils.clamp(v, 0, 1); return x * x * x * (x * (x * 6 - 15) + 10); }
-    function cinematicEase(v) { const x = THREE.MathUtils.clamp(v, 0, 1); return x < 0.5 ? 0.5 * Math.pow(x * 2, 1.22) : 1 - 0.5 * Math.pow((1 - x) * 2, 1.22); }
-    function transitionEnergy(e) { const p = THREE.MathUtils.clamp(e, 0, 1), en = Math.pow(Math.max(0, Math.sin(Math.PI * p)), 1.35); return Number.isFinite(en) ? en : 0; }
-
-    function setDocumentAccent(i) {
-      const p = PLANETS[i];
-      document.documentElement.style.setProperty('--accent-a', p.accentA);
-      document.documentElement.style.setProperty('--accent-b', p.accentB);
-      keyLight.color.setHex(p.hex);
-      satSolarMat.color.setHex(p.hex);
-      satSolarMat.emissive.setHex(p.hex);
-      satBeaconMat.color.setHex(p.hex);
-      meteorRockMat.emissive.setHex(p.hex);
-      meteors.forEach(mt => mt.trailMat.color.setHex(p.hex));
-
-      if (loginCard) {
-        loginCard.classList.remove('shape-0', 'shape-1', 'shape-2', 'shape-3', 'is-morphing');
-        loginCard.classList.add(`shape-${i}`, 'is-morphing');
-        setTimeout(() => loginCard.classList.remove('is-morphing'), 780);
-      }
-    }
-
-    function updatePlanetCopy(i, tr = false) { const p = PLANETS[i]; planetKicker.textContent = tr ? `Phasing into ${p.kicker.toLowerCase()}` : p.kicker; planetName.textContent = p.name; planetDescription.textContent = p.description; }
-    function updateButtonState(cur, tgt = null) { planetButtons.forEach(b => { const i = Number(b.dataset.planet), isC = i === cur && tgt === null, isT = tgt !== null && i === tgt; b.classList.toggle('is-active', isC); b.classList.toggle('is-target', isT); b.setAttribute('aria-pressed', String(isC || isT)); }); }
-
-    function beginTransition(targetIndex, nowSeconds) {
-      const normalizedTarget = (targetIndex + PLANETS.length) % PLANETS.length;
-      if (transitionState.active) { transitionState.queued = normalizedTarget; return; }
-      if (normalizedTarget === transitionState.current) return;
-      transitionState.active = true; transitionState.from = transitionState.current; transitionState.to = normalizedTarget; transitionState.startTime = nowSeconds; transitionState.raw = 0; transitionState.eased = 0; transitionState.energy = 0;
-      sharedUniforms.uFromPreset.value = transitionState.from; sharedUniforms.uToPreset.value = transitionState.to; sharedUniforms.uTransition.value = 0; sharedUniforms.uTransitionEnergy.value = 0;
-      updatePlanetCopy(normalizedTarget, true); updateButtonState(transitionState.current, normalizedTarget); setDocumentAccent(normalizedTarget);
-      transitionMeter.classList.add('is-active'); transitionMeterFill.style.width = '0%';
-    }
-
-    function settleTransition(nowSeconds) {
-      transitionState.current = transitionState.to; transitionState.active = false; transitionState.raw = 1; transitionState.eased = 1; transitionState.energy = 0; transitionState.settledAt = nowSeconds;
-      sharedUniforms.uFromPreset.value = transitionState.current; sharedUniforms.uToPreset.value = transitionState.current; sharedUniforms.uTransition.value = 0; sharedUniforms.uTransitionEnergy.value = 0;
-      updatePlanetCopy(transitionState.current, false); updateButtonState(transitionState.current, null); setDocumentAccent(transitionState.current);
-      transitionMeter.classList.remove('is-active'); transitionMeterFill.style.width = '100%';
-      if (transitionState.queued !== null) { const q = transitionState.queued; transitionState.queued = null; if (q !== transitionState.current) beginTransition(q, nowSeconds + 0.001); }
-    }
-
-    function updateTransition(nowSeconds) {
-      if (!transitionState.active) return;
-      const raw = THREE.MathUtils.clamp((nowSeconds - transitionState.startTime) / transitionState.duration, 0, 1);
-      const eased = cinematicEase(raw), energy = transitionEnergy(eased);
-      transitionState.raw = raw; transitionState.eased = eased; transitionState.energy = energy;
-      sharedUniforms.uTransition.value = eased; sharedUniforms.uTransitionEnergy.value = energy;
-      transitionMeterFill.style.width = `${(raw * 100).toFixed(2)}%`;
-      if (raw >= 1) settleTransition(nowSeconds);
-    }
-
-    let latestTime = 0;
-    planetButtons.forEach(btn => btn.addEventListener('click', () => beginTransition(Number(btn.dataset.planet), latestTime)));
-
-    window.addEventListener('keydown', (event) => {
-      if (!document.body.classList.contains('hunter-preauth')) return;
-      const tag = document.activeElement?.tagName?.toLowerCase();
-      if (tag === 'input' || tag === 'textarea') return;
-      if (event.key === 'ArrowRight' || event.key === 'ArrowDown') { event.preventDefault(); beginTransition((transitionState.active ? transitionState.to : transitionState.current) + 1, latestTime); }
-      else if (event.key === 'ArrowLeft' || event.key === 'ArrowUp') { event.preventDefault(); beginTransition((transitionState.active ? transitionState.to : transitionState.current) - 1, latestTime); }
-    });
-
-    function handleResize() {
-      const w = window.innerWidth, h = window.innerHeight, pr = responsivePixelRatio();
-      camera.aspect = w / h; camera.updateProjectionMatrix();
-      renderer.setPixelRatio(pr); renderer.setSize(w, h); composer.setPixelRatio(pr); composer.setSize(w, h);
-      starMat.uniforms.uPixelRatio.value = pr; arcMat.uniforms.uPixelRatio.value = pr;
-    }
-    window.addEventListener('resize', handleResize, { passive: true });
-
-    const clock = new THREE.Clock();
-    const AUTO_HOLD_SECONDS = prefersReducedMotion ? 6.0 : 4.2;
-
-    function animate() {
-      requestAnimationFrame(animate);
-      if (!document.body.classList.contains('hunter-preauth')) return;
-
-      const delta = Math.min(clock.getDelta(), 0.04);
-      const time = clock.elapsedTime;
-      latestTime = time;
-      updateTransition(time);
-
-      const energy = transitionState.energy;
-      sharedUniforms.uTime.value = time;
-      nebulaMaterial.uniforms.uTime.value = time;
-      starMat.uniforms.uTime.value = time; starMat.uniforms.uTransitionEnergy.value = energy;
-      arcMat.uniforms.uTime.value = time; arcMat.uniforms.uTransitionEnergy.value = energy;
-
-      const fromHasRing = transitionState.active ? Number(transitionState.from === 2) : Number(transitionState.current === 2);
-      const toHasRing = transitionState.active ? Number(transitionState.to === 2) : fromHasRing;
-      ringMat.uniforms.uOpacity.value = THREE.MathUtils.lerp(fromHasRing, toHasRing, transitionState.active ? smootherStep(transitionState.eased) : 0);
-
-      planetGroup.rotation.y += (0.035 + energy * 0.14) * delta;
-      planetGroup.rotation.x = Math.sin(time * 0.12) * 0.025;
-      orbitalArcs.rotation.y = time * 0.02;
-      orbitalArcs.rotation.z = -0.28 + Math.sin(time * 0.09) * 0.055;
-      stars.rotation.y = time * 0.0016;
-      nebula.rotation.y = -time * 0.00045;
-
-      satellites.forEach((s, idx) => {
-        const ang = time * (s.speed + energy * 0.18) + s.phase;
-        s.mesh.position.set(Math.cos(ang) * s.radius, Math.sin(ang * 1.3 + idx) * 0.65 + s.yWave, Math.sin(ang) * s.radius);
-        s.mesh.lookAt(0, 0, 0);
-        const pulse = 0.8 + 0.45 * Math.sin(time * 4.5 + idx);
-        s.waveRing.scale.setScalar(pulse);
-      });
-
-      meteors.forEach((mt, idx) => {
-        const ang = time * (mt.speed + energy * 0.22) + mt.phase;
-        const x = Math.cos(ang) * mt.orbitR;
-        const y = mt.yBase + Math.sin(ang * 2.0 + idx) * 0.35;
-        const z = Math.sin(ang) * mt.orbitR;
-        mt.group.position.set(x, y, z);
-        const dirSign = mt.speed >= 0 ? 1 : -1;
-        mt.group.lookAt(x - Math.sin(ang) * dirSign, y, z + Math.cos(ang) * dirSign);
-        mt.rock.rotation.x += mt.rotSpeed * delta;
-        mt.rock.rotation.y += mt.rotSpeed * 0.8 * delta;
-      });
-
-      bloomPass.strength = 0.56 + energy * 0.08;
-      bloomPass.radius = 0.34 + energy * 0.03;
-      bloomPass.threshold = 0.48 + energy * 0.02;
-
-      if (autoCycleInput.checked && !transitionState.active && time - transitionState.settledAt > AUTO_HOLD_SECONDS) {
-        beginTransition(transitionState.current + 1, time);
-      }
-
-      controls.update();
-      guardOrbitRadius();
-      composer.render();
-    }
-
-    setDocumentAccent(0);
-    updatePlanetCopy(0, false);
-    updateButtonState(0, null);
-    handleResize();
-    animate();
   </script>
 </body>
 </html>
