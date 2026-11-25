@@ -1123,8 +1123,9 @@
   <!-- =========================================================
        DASHBOARD PRINCIPAL HAWKS SKYNET
        ========================================================= -->
-  <div class="frame">
-<div class="w-10 h-10 rounded-xl bg-rose-500/15 border border-rose-400/40 flex items-center justify-center mb-1 shadow-[0_0_16px_rgba(255,34,77,0.35)]" title="HUNTER™ CORE">
+<div class="frame">
+    <nav class="rail" aria-label="Navegación Principal">
+      <div class="w-10 h-10 rounded-xl bg-rose-500/15 border border-rose-400/40 flex items-center justify-center mb-1 shadow-[0_0_16px_rgba(255,34,77,0.35)]" title="HUNTER™ CORE">
         <svg viewBox="0 0 100 100" class="w-7 h-7" xmlns="http://www.w3.org/2000/svg">
           <circle cx="50" cy="47" r="42" fill="rgba(45,6,18,0.75)" stroke="#ff355e" stroke-width="4.5"/>
           <path d="M31 62 Q22 72 28 77 M41 64 Q38 75 43 79 M59 64 Q62 75 57 79 M69 62 Q78 72 72 77" fill="none" stroke="#ff2a55" stroke-width="6.5" stroke-linecap="round"/>
@@ -1139,6 +1140,18 @@
         </svg>
       </div>
 
+      <button id="nav-filter" class="on" data-v="filter" onclick="setView('filter')" title="Búsqueda de Puntos"><i class="fa-solid fa-crosshairs"></i></button>
+      <button id="nav-map" data-v="map" onclick="setView('map')" title="Mapa y Cobertura"><i class="fa-solid fa-location-dot"></i></button>
+      <button id="nav-tech" data-v="tech" onclick="setView('tech')" title="Analizador de Tecnologías"><i class="fa-solid fa-microchip"></i></button>
+      <button id="nav-maint" data-v="maint" onclick="setView('maint')" title="Plan de Mantenimiento"><i class="fa-solid fa-calendar-check"></i></button>
+      <button id="nav-price" data-v="price" onclick="setView('price')" title="Analizador de Precios"><i class="fa-solid fa-coins"></i></button>
+      <button id="nav-noc" data-v="noc" onclick="setView('noc')" title="Consola NOC"><i class="fa-solid fa-chart-line"></i></button>
+      <button id="nav-rafi" data-v="rafi" onclick="setView('rafi')" title="Módulo RAFI · Consola"><i class="fa-solid fa-brain"></i></button>
+
+      <div class="mt-auto flex flex-col gap-2 pb-1">
+        <button onclick="toggleAccent()" title="Alternar Acento Carmesí / Solar"><i class="fa-solid fa-palette"></i></button>
+        <button onclick="toggleTheme()" title="Día / Noche"><i id="theme-icon" class="fa-solid fa-moon"></i></button>
+      </div>
     </nav>
 
     <div class="flex-1 flex flex-col gap-3 min-w-0">
