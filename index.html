@@ -1422,6 +1422,18 @@ html,body{max-width:100%;overflow-x:hidden}
 #rafi-pop.on{display:block}#rafi-pop textarea{width:100%;background:#000a;border:1px solid #fff2;color:#fff;border-radius:8px;padding:6px;margin-top:6px}
 #rafi-pop button.rb{background:var(--accent,#38bdf8);color:#000;border-radius:8px;padding:5px 10px;font-weight:700;margin-top:6px}
 </style>
+<style>
+body:not(.theme-day):not(.hunter-preauth) .panel,body:not(.theme-day):not(.hunter-preauth) .card{background:linear-gradient(145deg,rgba(24,17,25,.72),rgba(9,7,12,.72))!important}
+#hc-h3,#hc-p{display:block;transform-style:preserve-3d;will-change:transform}
+.hc-ch{display:inline-block;transform-style:preserve-3d;white-space:pre}
+#rafi-btn{background:transparent!important;border:0!important;width:84px!important;height:84px!important;padding:0}
+#rafi-btn canvas{width:84px;height:84px;display:block;filter:drop-shadow(0 6px 10px rgba(0,0,0,.5))}
+.lt-btn{position:absolute;right:12px;top:8px;z-index:6;padding:4px 10px;font-size:11px;font-weight:700;border-radius:8px;background:#ffffff14;border:1px solid #ffffff30;color:#e2e8f0;cursor:pointer}
+#lt-o{position:fixed;inset:0;z-index:10000;background:#000b;display:flex;align-items:center;justify-content:center;padding:10px}
+#lt-o .bx{background:#0f172a;color:#e2e8f0;border:1px solid #fff3;border-radius:14px;width:min(1000px,100%);max-height:90vh;display:flex;flex-direction:column;font-size:12px}
+#lt-o .sc{overflow:auto;padding:10px}#lt-o table{border-collapse:collapse;width:100%}#lt-o td,#lt-o th{border:1px solid #fff2;padding:2px}
+#lt-o input{width:100%;min-width:90px;background:#0008;color:#fff;padding:4px;border:0;outline:0}#lt-o button{padding:4px 10px;border-radius:8px;background:#ffffff18;color:#fff;font-weight:700;margin:2px}
+</style>
 </head>
 <body class="hunter-preauth">
   <!-- =========================================================
@@ -1479,7 +1491,8 @@ html,body{max-width:100%;overflow-x:hidden}
       <div class="flex items-center justify-between mb-3.5">
         <div class="flex items-center gap-2.5">
                     <div>
-            <svg viewBox="0 0 280 78" class="hc-arc" aria-label="HUNTER CORE · Acceso al sistema"><defs><path id="hc-a1" d="M6 56 Q140 -2 274 56"/><path id="hc-a2" d="M34 74 Q140 40 246 74"/></defs><text class="hc-t1" text-anchor="middle"><textPath href="#hc-a1" startOffset="50%">HUNTER CORE</textPath></text><text class="hc-t2" text-anchor="middle"><textPath href="#hc-a2" startOffset="50%">ACCESO AL SISTEMA</textPath></text></svg>
+            <h3 id="hc-h3" class="text-sm font-extrabold text-white tracking-wide">HUNTER<sup class="text-[9px] text-rose-300">™</sup> CORE</h3>
+            <p id="hc-p" class="text-[10px] text-slate-300/80">Acceso al sistema · mdzhunter</p>
           </div>
         </div>
         <span class="px-2 py-0.5 rounded-full bg-white/5 border border-white/15 text-[10px] text-slate-200 font-semibold">2FA</span>
@@ -2297,6 +2310,9 @@ html,body{max-width:100%;overflow-x:hidden}
         return;
       }
 
+      const _tk = "mdz_trust_" + String(authData.user.email).toLowerCase();
+      let _tr = false; try { _tr = Number(localStorage.getItem(_tk) || 0) > Date.now(); } catch (e) {}
+      if (_tr && !codeVal) { await completeLoginWithSession(authData.session); return; }
       if (!/^\d{6}$/.test(codeVal)) {
         errEl.textContent = "Ingresa el código 2FA de 6 dígitos.";
         errEl.classList.remove("ui-hidden");
@@ -2312,6 +2328,7 @@ html,body{max-width:100%;overflow-x:hidden}
         return;
       }
 
+      try { localStorage.setItem(_tk, String(Date.now() + 10 * 864e5)); } catch (e) {}
       const { data: { session } } = await hunterSbClient.auth.getSession();
       await completeLoginWithSession(session || authData.session);
     }
@@ -4265,6 +4282,47 @@ if(!ok){const l=JSON.parse(localStorage.getItem('rafi_consultas_local')||'[]');l
 f.querySelector('#rafi-cq').value='';showToast(ok?'Consulta enviada':'Consulta guardada localmente');inbox()};}
 async function inbox(){const box=f.querySelector('#rafi-inbox');box.innerHTML='';if(!(typeof isDevRole==='function'&&isDevRole()&&hunterSbClient))return;const{data}=await hunterSbClient.from('rafi_consultas').select('*').order('creado',{ascending:false}).limit(15);box.innerHTML='<b>Consultas recibidas</b>'+(data||[]).map(r=>'<p style="border-top:1px solid #fff2;padding:4px 0">'+escapeHtml(r.texto)+'<br><small style="color:#94a3b8">'+escapeHtml(r.usuario||'')+'</small></p>').join('')}
 const t=setInterval(()=>{if(typeof hunterSession!=='undefined'&&hunterSession){clearInterval(t);mount()}},800)})();
+</script>
+<script>
+(function(){
+/* Texto del login pegado al planeta (3D esférico + parallax) */
+function sph(el){const n=el.childNodes;const chars=[];[...n].forEach(nd=>{if(nd.nodeType===3){const f=document.createDocumentFragment();[...nd.textContent].forEach(ch=>{const sp=document.createElement('span');sp.className='hc-ch';sp.textContent=ch;f.appendChild(sp);chars.push(sp)});nd.replaceWith(f)}else chars.push(nd)});
+const c=(chars.length-1)/2;chars.forEach((sp,i)=>{sp.style.display='inline-block';sp.style.transform='rotateY('+((i-c)*(el.id==='hc-h3'?5.5:3.2))+'deg) translateZ(0px)';sp.style.transformOrigin='50% 50% -'+(el.id==='hc-h3'?90:120)+'px'})}
+function initSph(){const a=document.getElementById('hc-h3'),b=document.getElementById('hc-p');if(!a||a.dataset.s)return;a.dataset.s=1;sph(a);sph(b);
+let tx=0,ty=0,cx=0,cy=0;addEventListener('mousemove',e=>{tx=(e.clientX/innerWidth-.5)*2;ty=(e.clientY/innerHeight-.5)*2});
+(function loop(){cx+=(tx-cx)*.07;cy+=(ty-cy)*.07;const t='perspective(520px) rotateY('+(cx*7)+'deg) rotateX('+(-cy*5)+'deg)';a.style.transform=t;b.style.transform=t;requestAnimationFrame(loop)})()}
+document.addEventListener('DOMContentLoaded',initSph);setTimeout(initSph,600);
+/* Tablas libres editables por módulo */
+const MODS={'view-tech':['tech','Tecnologías',['Punto','Dato','Valor']],'view-maint':['maint','Mantenimiento / costos',['Zona','Costo','Días','Detalle']],'view-price':['price','Costos de tecnología',['Equipo','Código','Precio','Proveedor','Almacén']],'view-noc':['noc','NOC',['Fecha','Porcentaje','Nota']],'view-rast':['rast','Rastreadores',['Unidad','Batería %','Observación']]};
+const dev=()=>typeof isDevRole==='function'&&isDevRole();
+async function load(m,def){let d=null;try{const r=await hunterSbClient.from('tablas_libres').select('*').eq('modulo',m).maybeSingle();if(r.data)d=r.data}catch(e){}
+if(!d){try{d=JSON.parse(localStorage.getItem('tl_'+m))}catch(e){}}return d||{columnas:def,filas:[]}}
+async function save(m,d){let ok=false;try{const r=await hunterSbClient.from('tablas_libres').upsert({modulo:m,columnas:d.columnas,filas:d.filas},{onConflict:'modulo'});ok=!r.error}catch(e){}
+if(!ok)localStorage.setItem('tl_'+m,JSON.stringify(d));showToast(ok?'Guardado':'Guardado local (falta tabla en Supabase)')}
+async function open(m,title,def){const d=await load(m,def),ed=dev();const o=document.createElement('div');o.id='lt-o';
+function draw(){const sum=d.columnas.map((c,j)=>/precio|costo|monto/i.test(c)?d.filas.reduce((a,f)=>a+(parseFloat(String(f[j]).replace(/[^0-9.\-]/g,''))||0),0):null);
+o.innerHTML='<div class="bx"><div style="padding:10px;display:flex;justify-content:space-between;flex-wrap:wrap"><b>'+escapeHtml(title)+' · tabla editable</b><span>'+(ed?'<button id="lt-c">＋ Columna</button><button id="lt-r">＋ Fila</button><button id="lt-s">Guardar</button>':'')+'<button id="lt-x">Cerrar</button></span></div><div class="sc"><table><tr>'+d.columnas.map((c,j)=>'<th>'+escapeHtml(c)+(ed?' <a data-dc="'+j+'" style="cursor:pointer;color:#f87171">✕</a>':'')+'</th>').join('')+(ed?'<th></th>':'')+'</tr>'+d.filas.map((f,i)=>'<tr>'+d.columnas.map((c,j)=>'<td><input data-i="'+i+'" data-j="'+j+'" '+(ed?'':'disabled')+' value="'+escapeHtml(f[j]??'')+'"></td>').join('')+(ed?'<td><a data-dr="'+i+'" style="cursor:pointer;color:#f87171">✕</a></td>':'')+'</tr>').join('')+(sum.some(v=>v!==null)?'<tr style="font-weight:700">'+sum.map((v,j)=>'<td>'+(v!==null?'Total: '+v.toLocaleString():(j?'':'TOTAL'))+'</td>').join('')+(ed?'<td></td>':'')+'</tr>':'')+'</table></div></div>';
+o.querySelector('#lt-x').onclick=()=>o.remove();if(!ed)return;
+o.querySelectorAll('input').forEach(x=>x.onchange=()=>{d.filas[x.dataset.i][x.dataset.j]=x.value;draw()});
+o.querySelectorAll('[data-dc]').forEach(a=>a.onclick=()=>{const j=+a.dataset.dc;d.columnas.splice(j,1);d.filas.forEach(f=>f.splice(j,1));draw()});
+o.querySelectorAll('[data-dr]').forEach(a=>a.onclick=()=>{d.filas.splice(+a.dataset.dr,1);draw()});
+o.querySelector('#lt-c').onclick=()=>{const n=prompt('Nombre de la nueva columna:');if(n){d.columnas.push(n);d.filas.forEach(f=>f.push(''));draw()}};
+o.querySelector('#lt-r').onclick=()=>{d.filas.push(d.columnas.map(()=>''));draw()};o.querySelector('#lt-s').onclick=()=>save(m,d)}
+draw();document.body.appendChild(o)}
+setInterval(()=>{if(typeof hunterSession==='undefined'||!hunterSession)return;for(const id in MODS){const v=document.getElementById(id);if(v&&!v.querySelector('.lt-btn')){const b=document.createElement('button');b.className='lt-btn';b.textContent='▦ Tabla / columnas';const[m,t,def]=MODS[id];b.onclick=()=>open(m,t,def);v.appendChild(b)}}},1500);
+/* Cohete 3D de RAFI */
+const w=setInterval(async()=>{const btn=document.getElementById('rafi-btn');if(!btn)return;clearInterval(w);
+try{const T=await import('three');const cv=document.createElement('canvas');const r=new T.WebGLRenderer({canvas:cv,alpha:true,antialias:true});r.setPixelRatio(Math.min(2,devicePixelRatio));r.setSize(84,84,false);cv.style.width=cv.style.height='84px';
+const sc=new T.Scene(),cam=new T.PerspectiveCamera(32,1,.1,50);cam.position.set(0,0,7);sc.add(new T.AmbientLight(0xffffff,.8));const dl=new T.DirectionalLight(0xffffff,2.2);dl.position.set(3,4,5);sc.add(dl);
+const M=(c,m=.5,ro=.35)=>new T.MeshStandardMaterial({color:c,metalness:m,roughness:ro});const g=new T.Group(),a=(m,x,y,z)=>{m.position.set(x,y,z);g.add(m);return m};
+a(new T.Mesh(new T.CylinderGeometry(.5,.5,1.8,28),M(0xf1f5f9)),0,0,0);a(new T.Mesh(new T.ConeGeometry(.5,.95,28),M(0xef4444)),0,1.37,0);
+a(new T.Mesh(new T.SphereGeometry(.2,20,20),M(0x38bdf8,.9,.1)),0,.35,.46);a(new T.Mesh(new T.TorusGeometry(.22,.04,10,24),M(0x94a3b8)),0,.35,.47);
+for(let i=0;i<3;i++){const an=i*Math.PI*2/3,f=new T.Mesh(new T.BoxGeometry(.08,.8,.55),M(0xef4444));f.position.set(Math.sin(an)*.6,-.8,Math.cos(an)*.6);f.rotation.y=an;g.add(f)}
+const fl=a(new T.Mesh(new T.ConeGeometry(.3,.9,20),new T.MeshBasicMaterial({color:0xfb923c})),0,-1.35,0);fl.rotation.x=Math.PI;sc.add(g);g.rotation.z=-.5;
+let mx=0;addEventListener('mousemove',e=>mx=(e.clientX/innerWidth-.5));
+(function loop(t){t*=.001;g.rotation.y=t*1.1+mx*1.5;g.position.y=Math.sin(t*2)*.18;fl.scale.set(1,.8+Math.sin(t*22)*.25,1);r.render(sc,cam);requestAnimationFrame(loop)})(0);
+btn.textContent='';btn.appendChild(cv)}catch(e){}},700);
+})();
 </script>
 </body>
 </html>
