@@ -9752,6 +9752,12 @@ body.theme-day #view-fusion .fx-drop b { color: #0f172a; }
   async function readFile(file) {
     if (!window.XLSX) throw new Error('No se cargó la librería de Excel (SheetJS).');
     if (file.size > 40 * 1024 * 1024) throw new Error('El archivo supera 40 MB.');
+    if (window.__mdzPerf) { // v17: se lee en segundo plano (Web Worker) para no congelar la pantalla
+      const [f] = await window.__mdzPerf.loadFiles([file]);
+      const b = await window.__mdzPerf.runJob('parse', [f]);
+      if (!b.rows.length) throw new Error(`"${file.name}" no tiene filas.`);
+      return { name: file.name, sheet: b.sheet, rows: b.rows, cols: b.cols };
+    }
     const buf = await file.arrayBuffer();
     const wb = XLSX.read(buf, { type: 'array', cellDates: true, dense: true });
     let best = null;
@@ -9944,9 +9950,9 @@ body.theme-day #view-fusion .fx-drop b { color: #0f172a; }
       const far = ub.filter(l => l.dist != null).reduce((m, l) => (!m || l.dist > m.dist ? l : m), null);
       return {
         antena: nombre, color: PALETA[idx % PALETA.length], psd: [...new Set(L.map(l => l.psd))].join(', '),
-        n: L.length, nUb: ub.length, max: Math.max(...R), min: Math.min(...R), avg: R.reduce((s, x) => s + x, 0) / R.length, med,
-        nStar: R.filter(x => x >= P.star).length, best, dMin: D.length ? Math.min(...D) : null, dAvg: D.length ? D.reduce((s, x) => s + x, 0) / D.length : null,
-        dMax: D.length ? Math.max(...D) : null, far, A, t0: L[0].t, t1: L[L.length - 1].t
+        n: L.length, nUb: ub.length, max: R.reduce((m, x) => x > m ? x : m, -Infinity), min: R.reduce((m, x) => x < m ? x : m, Infinity), avg: R.reduce((s, x) => s + x, 0) / R.length, med,
+        nStar: R.filter(x => x >= P.star).length, best, dMin: D.length ? D.reduce((m, x) => x < m ? x : m, Infinity) : null, dAvg: D.length ? D.reduce((s, x) => s + x, 0) / D.length : null,
+        dMax: D.length ? D.reduce((m, x) => x > m ? x : m, -Infinity) : null, far, A, t0: L[0].t, t1: L[L.length - 1].t
       };
     });
     const conPos = lect.filter(l => l.lat != null);
@@ -9973,24 +9979,33 @@ body.theme-day #view-fusion .fx-drop b { color: #0f172a; }
       ctx.fillStyle = '#000'; ctx.fillRect(0, 0, s.x, s.y);
       ctx.globalCompositeOperation = 'lighten';
       const lat0 = m.getCenter().lat, mpp = 40075016.686 * Math.cos(lat0 * Math.PI / 180) / Math.pow(2, m.getZoom() + 8);
-      const r = Math.max(o.minPx, Math.min(o.maxPx, o.radiusM / mpp));
+      const r = Math.round(Math.max(o.minPx, Math.min(o.maxPx, o.radiusM / mpp)));
+      // v17: degradados pre-dibujados (32 niveles) y un solo punto por celda de 3 px → miles de lecturas sin trabarse
+      if (this._sr !== r) {
+        this._sr = r; this._spr = [];
+        for (let k = 0; k < 32; k++) {
+          const v = Math.round((k + .5) / 32 * 255), cv = document.createElement('canvas'); cv.width = cv.height = r * 2;
+          const x = cv.getContext('2d'), g = x.createRadialGradient(r, r, 0, r, r, r);
+          g.addColorStop(0, `rgb(${v},255,0)`); g.addColorStop(.45, `rgb(${Math.round(v * .7)},178,0)`); g.addColorStop(1, 'rgb(0,0,0)');
+          x.fillStyle = g; x.fillRect(0, 0, r * 2, r * 2); this._spr.push(cv);
+        }
+      }
+      const cells = new Map();
       for (const p of this._pts) {
         const pt = m.latLngToContainerPoint([p[0], p[1]]);
         if (pt.x < -r || pt.y < -r || pt.x > s.x + r || pt.y > s.y + r) continue;
-        const v = Math.round(Math.max(.02, p[2]) * 255);
-        const g = ctx.createRadialGradient(pt.x, pt.y, 0, pt.x, pt.y, r);
-        g.addColorStop(0, `rgb(${v},255,0)`); g.addColorStop(.45, `rgb(${Math.round(v * .7)},178,0)`); g.addColorStop(1, 'rgb(0,0,0)');
-        ctx.fillStyle = g; ctx.beginPath(); ctx.arc(pt.x, pt.y, r, 0, Math.PI * 2); ctx.fill();
+        const key = ((pt.x / 3) | 0) * 100000 + ((pt.y / 3) | 0), prev = cells.get(key);
+        if (!prev || p[2] > prev[2]) cells.set(key, [pt.x, pt.y, p[2]]);
       }
+      for (const [x, y, w] of cells.values()) ctx.drawImage(this._spr[Math.min(31, Math.max(0, Math.floor(Math.max(.02, w) * 32)))], x - r, y - r);
       ctx.globalCompositeOperation = 'source-over';
-      const img = ctx.getImageData(0, 0, s.x, s.y), d = img.data;
+      if (!HeatLayer.LUT) { const L_ = new Uint8ClampedArray(768); for (let i = 0; i < 256; i++) { const x = i / 255, [a1, b1, f] = x < .5 ? [[239, 68, 68], [250, 204, 21], x / .5] : [[250, 204, 21], [34, 197, 94], (x - .5) / .5]; L_[i * 3] = a1[0] + (b1[0] - a1[0]) * f; L_[i * 3 + 1] = a1[1] + (b1[1] - a1[1]) * f; L_[i * 3 + 2] = a1[2] + (b1[2] - a1[2]) * f; } HeatLayer.LUT = L_; }
+      const LUT = HeatLayer.LUT, img = ctx.getImageData(0, 0, s.x, s.y), d = img.data, op = o.opacity * 1.15;
       for (let i = 0; i < d.length; i += 4) {
         const cov = d[i + 1];
         if (cov < 6) { d[i + 3] = 0; continue; }
-        const val = Math.min(1, d[i] / cov), x = val;
-        const [a, b, f] = x < .5 ? [[239, 68, 68], [250, 204, 21], x / .5] : [[250, 204, 21], [34, 197, 94], (x - .5) / .5];
-        d[i] = a[0] + (b[0] - a[0]) * f; d[i + 1] = a[1] + (b[1] - a[1]) * f; d[i + 2] = a[2] + (b[2] - a[2]) * f;
-        d[i + 3] = Math.min(255, cov * o.opacity * 1.15);
+        const j = Math.min(255, (d[i] * 255 / cov) | 0) * 3;
+        d[i] = LUT[j]; d[i + 1] = LUT[j + 1]; d[i + 2] = LUT[j + 2]; d[i + 3] = Math.min(255, cov * op);
       }
       ctx.putImageData(img, 0, 0);
     }
@@ -10040,7 +10055,7 @@ body.theme-day #view-fusion .fx-drop b { color: #0f172a; }
     }
     const se = (p, txt, bg, tip) => L.marker(p, { icon: L.divIcon({ className: '', iconSize: [22, 22], iconAnchor: [11, 11], html: `<div class="fx-se" style="background:${bg}">${txt}</div>` }) }).bindTooltip(tip).addTo(lay.rec);
     se(ruta[0], 'I', '#16a34a', 'Inicio ' + fmtH(R.gps[0].t)); se(ruta[ruta.length - 1], 'F', '#dc2626', 'Fin ' + fmtH(R.gps[R.gps.length - 1].t));
-    R.gps.forEach(g => L.circleMarker([g.lat, g.lon], { radius: 3, color: '#0ea5e9', weight: 1, fillColor: '#e0f2fe', fillOpacity: .9 }).bindTooltip('GPS ' + fmtH(g.t)).addTo(lay.gpsPts));
+    lay.gpsPts.once('add', () => { const st_ = Math.max(1, Math.ceil(R.gps.length / 4000)); for (let i = 0; i < R.gps.length; i += st_) { const g = R.gps[i]; L.circleMarker([g.lat, g.lon], { radius: 3, color: '#0ea5e9', weight: 1, fillColor: '#e0f2fe', fillOpacity: .9 }).bindTooltip(() => 'GPS ' + fmtH(g.t)).addTo(lay.gpsPts); } });
     // antenas
     R.stats.forEach(s => {
       if (!s.A) return;
@@ -10049,17 +10064,18 @@ body.theme-day #view-fusion .fx-drop b { color: #0f172a; }
       L.circle([s.A.lat, s.A.lon], { radius: 60, color: s.color, weight: 2, fillOpacity: .12 }).addTo(lay.ant);
     });
     // lecturas
-    const pocas = R.conPos.length <= 1500;
+    const pocas = R.conPos.length <= 400;   // v17: con muchas lecturas se dibujan en canvas (mucho más fluido)
     R.conPos.forEach(l => {
       const st = stBy[l.antena], col = st ? st.color : '#94a3b8', c = colorRssi(l.rssi);
       let mk;
-      if (l.rssi >= R.P.star) mk = L.marker([l.lat, l.lon], { zIndexOffset: 500, icon: L.divIcon({ className: '', iconSize: [30, 30], iconAnchor: [15, 15], html: `<div class="fx-starwrap"><div class="fx-star" style="background:${c}">${n0(l.rssi)}</div></div>` }) });
+      if (!pocas) mk = L.circleMarker([l.lat, l.lon], l.rssi >= R.P.star ? { radius: 8, color: '#fff', weight: 2.5, fillColor: c, fillOpacity: 1 } : { radius: 6, color: col, weight: 2, fillColor: c, fillOpacity: .95 });
+      else if (l.rssi >= R.P.star) mk = L.marker([l.lat, l.lon], { zIndexOffset: 500, icon: L.divIcon({ className: '', iconSize: [30, 30], iconAnchor: [15, 15], html: `<div class="fx-starwrap"><div class="fx-star" style="background:${c}">${n0(l.rssi)}</div></div>` }) });
       else if (pocas) mk = L.marker([l.lat, l.lon], { icon: L.divIcon({ className: '', iconSize: [24, 24], iconAnchor: [12, 12], html: `<div class="fx-pin" style="background:${c};border-color:${col}">${n0(l.rssi)}</div>` }) });
       else mk = L.circleMarker([l.lat, l.lon], { radius: 6, color: col, weight: 2, fillColor: c, fillOpacity: .95 });
-      mk.bindTooltip(`${esc(l.antena)} · RSSI ${n0(l.rssi)} · ${fmtH(l.t)}`).bindPopup(popupLect(l, st)).addTo(lay.lect);
+      mk.bindTooltip(() => `${esc(l.antena)} · RSSI ${n0(l.rssi)} · ${fmtH(l.t)}`).bindPopup(() => popupLect(l, st)).addTo(lay.lect);
       mk.on('click', () => { if (st && st.A) { if (RULE.ant !== l.antena) { RULE.ant = l.antena; $f('fx-rule-ant').value = l.antena; } setRule(l); } });
-      if (st && st.A) L.polyline([[l.lat, l.lon], [st.A.lat, st.A.lon]], { color: col, weight: 1.3, opacity: .5, dashArray: '4 6', interactive: false }).addTo(lay.lin);
     });
+    lay.lin.once('add', () => R.conPos.forEach(l => { const st = stBy[l.antena]; if (st && st.A) L.polyline([[l.lat, l.lon], [st.A.lat, st.A.lon]], { color: st.color, weight: 1.3, opacity: .5, dashArray: '4 6', interactive: false }).addTo(lay.lin); }));
     lay.rec.addTo(S.map); lay.heat.addTo(S.map); lay.ant.addTo(S.map); lay.lect.addTo(S.map);
     S.layers = lay;
     S.ctrl = L.control.layers(null, {
@@ -10077,9 +10093,9 @@ body.theme-day #view-fusion .fx-drop b { color: #0f172a; }
     const tick = getComputedStyle(document.body).color || '#cbd5e1', grid = 'rgba(148,163,184,.15)';
     const noLabels = { datalabels: { display: false } };
     const base = { responsive: true, maintainAspectRatio: false, animation: false, plugins: { ...noLabels, legend: { labels: { color: tick, boxWidth: 10, font: { size: 11 } } } } };
-    const dsDist = R.stats.filter(s => s.A).map(s => ({ label: s.antena, data: R.conPos.filter(l => l.antena === s.antena && l.dist != null).map(l => ({ x: Math.round(l.dist), y: l.rssi })), backgroundColor: s.color, borderColor: s.color, pointRadius: 4 }));
+    const dsDist = R.stats.filter(s => s.A).map(s => ({ label: s.antena, data: (window.__mdzPerf ? window.__mdzPerf.decimate : (x => x))(R.conPos.filter(l => l.antena === s.antena && l.dist != null).map(l => ({ x: Math.round(l.dist), y: l.rssi })).sort((a, b) => a.x - b.x), 1500), backgroundColor: s.color, borderColor: s.color, pointRadius: 4 }));
     S.charts.push(new Chart($f('fx-ch-dist'), { type: 'scatter', data: { datasets: dsDist }, options: { ...base, scales: { x: { title: { display: true, text: 'Distancia a la antena (m)', color: tick }, ticks: { color: tick }, grid: { color: grid } }, y: { min: 0, max: 255, title: { display: true, text: 'RSSI', color: tick }, ticks: { color: tick }, grid: { color: grid } } } } }));
-    const dsTime = R.stats.map(s => ({ label: s.antena, data: R.lect.filter(l => l.antena === s.antena).map(l => ({ x: l.t, y: l.rssi })), borderColor: s.color, backgroundColor: s.color, pointRadius: 3, borderWidth: 1.5, tension: .2, showLine: true }));
+    const dsTime = R.stats.map(s => ({ label: s.antena, data: (window.__mdzPerf ? window.__mdzPerf.decimate : (x => x))(R.lect.filter(l => l.antena === s.antena).map(l => ({ x: l.t, y: l.rssi })), 1200), borderColor: s.color, backgroundColor: s.color, pointRadius: 3, borderWidth: 1.5, tension: .2, showLine: true }));
     S.charts.push(new Chart($f('fx-ch-time'), { type: 'scatter', data: { datasets: dsTime }, options: { ...base, scales: { x: { ticks: { color: tick, callback: v => fmtH(v).slice(0, 5) }, grid: { color: grid } }, y: { min: 0, max: 255, ticks: { color: tick }, grid: { color: grid } } }, plugins: { ...base.plugins, tooltip: { callbacks: { label: c => `${c.dataset.label}: ${c.parsed.y} · ${fmtH(c.parsed.x)}` } } } } }));
     if (!dsDist.length) $f('fx-ch-dist').parentElement.insertAdjacentHTML('beforeend', '<p class="text-[11px] text-slate-500 mt-1">Asigna la antena del PSD para ver la distancia.</p>');
   }
@@ -10119,16 +10135,25 @@ body.theme-day #view-fusion .fx-drop b { color: #0f172a; }
     const k = [
       ['Puntos GPS', n0(R.gps.length), 'var(--accent)'], ['Lecturas RSSI', n0(R.lect.length), '#e2e8f0'],
       ['Con posición', n0(R.conPos.length), '#22c55e'], ['Sin GPS cerca', n0(sinPos), sinPos ? '#f59e0b' : '#64748b'],
-      ['RSSI máximo', n0(Math.max(...all)), colorRssi(Math.max(...all))], ['RSSI promedio', n1(all.reduce((s, x) => s + x, 0) / all.length), '#e2e8f0'],
+      ['RSSI máximo', n0(all.reduce((m, x) => x > m ? x : m, 0)), colorRssi(all.reduce((m, x) => x > m ? x : m, 0))], ['RSSI promedio', n1(all.reduce((s, x) => s + x, 0) / all.length), '#e2e8f0'],
       ['Antenas', n0(R.stats.length), '#a78bfa'], ['Mejor punto ubicado', best ? `${n0(best.rssi)}${best.dist != null ? ` · ${n0(best.dist)} m` : ''}` : '—', '#38bdf8']
     ];
     $f('fx-kpis').innerHTML = k.map(([l, v, c]) => `<div class="chip fx-kpi"><p style="color:${c}">${v}</p><p>${l}</p></div>`).join('');
     $f('fx-stats').innerHTML = `<table class="fx-tbl"><thead><tr><th>Antena</th><th>PSD</th><th>Lecturas</th><th>Ubicadas</th><th>RSSI máx</th><th>Prom.</th><th>Mediana</th><th>Mín</th><th>% prom. /255</th><th>≥ ${R.P.star}</th><th>Máx. ubicado</th><th>Dist. en máx. (m)</th><th>Dist. mín (m)</th><th>Dist. prom (m)</th><th>Dist. máx (m)</th><th>Desde</th><th>Hasta</th></tr></thead><tbody>${R.stats.map(s => `<tr><td><span style="display:inline-block;width:9px;height:9px;border-radius:50%;background:${s.color};margin-right:6px"></span><b>${esc(s.antena)}</b></td><td>${esc(s.psd)}</td><td>${s.n}</td><td>${s.nUb}</td><td style="color:${colorRssi(s.max)}"><b>${n0(s.max)}</b></td><td>${n1(s.avg)}</td><td>${n1(s.med)}</td><td>${n0(s.min)}</td><td>${n1(s.avg / RSSI_MAX * 100)} %</td><td>${s.nStar}</td><td>${n0(s.best.rssi)} · ${fmtH(s.best.t)}</td><td>${n0(s.best.dist)}</td><td>${n0(s.dMin)}</td><td>${n0(s.dAvg)}</td><td>${n0(s.dMax)}</td><td>${fmtH(s.t0)}</td><td>${fmtH(s.t1)}</td></tr>`).join('')}</tbody></table>`;
     pintarFilas(R);
     $f('fx-desc-card').classList.toggle('hidden', !R.desc.length);
-    $f('fx-desc').innerHTML = `<table class="fx-tbl"><thead><tr><th>Archivo</th><th>Fila</th><th>Motivo</th><th>Valor</th></tr></thead><tbody>${R.desc.slice(0, 1000).map(d => `<tr><td>${esc(d[0])}</td><td>${esc(d[1])}</td><td style="white-space:normal">${esc(d[2])}</td><td>${esc(d[3])}</td></tr>`).join('')}</tbody></table>`;
+    if (window.__mdzPerf) window.__mdzPerf.pagedTable($f('fx-desc'), R.desc.map(d => ({ a: d[0], f: d[1], m: d[2], v: d[3] })), [{ k: 'a', t: 'Archivo' }, { k: 'f', t: 'Fila' }, { k: 'm', t: 'Motivo', wrap: true }, { k: 'v', t: 'Valor' }], { search: R.desc.length > 20 });
+    else $f('fx-desc').innerHTML = `<table class="fx-tbl"><thead><tr><th>Archivo</th><th>Fila</th><th>Motivo</th><th>Valor</th></tr></thead><tbody>${R.desc.slice(0, 1000).map(d => `<tr><td>${esc(d[0])}</td><td>${esc(d[1])}</td><td style="white-space:normal">${esc(d[2])}</td><td>${esc(d[3])}</td></tr>`).join('')}</tbody></table>`;
   }
   function pintarFilas(R) {
+    if (window.__mdzPerf) { // v17: tabla paginada (100 filas por página) con búsqueda y orden
+      $f('fx-q').style.display = 'none';
+      window.__mdzPerf.pagedTable($f('fx-rows'), R.lect.map(l => ({ fh: fmtT(l.t, true), t: l.t, antena: l.antena, rssi: l.rssi, pct: +l.pct.toFixed(1), lat: l.lat != null ? +l.lat.toFixed(6) : null, lon: l.lon != null ? +l.lon.toFixed(6) : null, met: l.met, des: l.des != null ? +l.des.toFixed(1) : null, dist: l.dist != null ? Math.round(l.dist) : null })), [
+        { k: 'fh', t: 'Fecha-hora' }, { k: 'antena', t: 'Antena' }, { k: 'rssi', t: 'RSSI', f: r => `<b style="color:${colorRssi(r.rssi)}">${n0(r.rssi)}</b>` }, { k: 'pct', t: '%' },
+        { k: 'lat', t: 'Latitud' }, { k: 'lon', t: 'Longitud' }, { k: 'met', t: 'Método' }, { k: 'des', t: 'Desfase (s)' }, { k: 'dist', t: 'Dist. antena (m)' }
+      ], { sort: 't', dir: 1, bad: r => r.lat == null });
+      return;
+    }
     const q = U($f('fx-q').value);
     const rows = R.lect.filter(l => !q || U(`${fmtT(l.t, true)} ${l.antena} ${l.met} ${l.psdRaw} ${l.rssi}`).includes(q));
     $f('fx-rows').innerHTML = `<table class="fx-tbl"><thead><tr><th>Fecha-hora</th><th>Antena</th><th>RSSI</th><th>%</th><th>Latitud</th><th>Longitud</th><th>Método</th><th>Desfase (s)</th><th>Dist. antena (m)</th></tr></thead><tbody>${rows.slice(0, 2000).map(l => `<tr class="${l.lat == null ? 'sin' : ''}"><td>${fmtT(l.t, true)}</td><td>${esc(l.antena)}</td><td style="color:${colorRssi(l.rssi)}"><b>${n0(l.rssi)}</b></td><td>${n1(l.pct)}</td><td>${l.lat != null ? l.lat.toFixed(6) : '—'}</td><td>${l.lon != null ? l.lon.toFixed(6) : '—'}</td><td>${l.met}</td><td>${n1(l.des)}</td><td>${n0(l.dist)}</td></tr>`).join('')}</tbody></table>${rows.length > 2000 ? `<p class="text-[11px] text-slate-500 p-2">Mostrando 2.000 de ${rows.length.toLocaleString('es-PE')} (el Excel trae todas).</p>` : ''}`;
@@ -10412,6 +10437,683 @@ body.theme-day #view-fusion .fx-drop b { color: #0f172a; }
   if (typeof _ar === 'function') window.applySessionRoleUI = function () { const r = _ar.apply(this, arguments); syncRole(); return r; };
   setInterval(syncRole, 1000);
   syncRole();
+})();
+</script>
+
+
+<style id="hunter-v17-css">
+#view-milton .mp-s2hero { display:flex; flex-wrap:wrap; gap:12px; align-items:stretch; padding:12px 14px; border-radius:14px; border:1px solid rgba(56,189,248,.55); background:linear-gradient(135deg, rgba(56,189,248,.16), rgba(14,165,233,.05)); box-shadow:0 0 0 1px rgba(56,189,248,.08) inset, 0 6px 24px -12px rgba(56,189,248,.6); }
+#view-milton .mp-s2hero.none { border-color:rgba(250,204,21,.5); background:linear-gradient(135deg, rgba(250,204,21,.12), rgba(250,204,21,.03)); box-shadow:none; }
+#view-milton .mp-s2big { min-width:110px; display:flex; flex-direction:column; justify-content:center; padding:4px 10px; border-right:1px solid rgba(148,163,184,.2); }
+#view-milton .mp-s2big p:first-child { font-size:30px; font-weight:900; line-height:1; color:#38bdf8; }
+#view-milton .mp-s2hero.none .mp-s2big p:first-child { color:#facc15; }
+#view-milton .mp-s2big p:last-child { font-size:10.5px; text-transform:uppercase; letter-spacing:.05em; color:#94a3b8; margin-top:4px; }
+#view-milton .mp-s2body { flex:1 1 280px; min-width:0; display:flex; flex-direction:column; gap:6px; }
+#view-milton .mp-s2body h3 { font-size:12px; font-weight:800; text-transform:uppercase; letter-spacing:.05em; color:#e2e8f0; }
+#view-milton .mp-s2body > p { font-size:11.5px; color:#94a3b8; }
+#view-milton .mp-s2chips { display:flex; flex-wrap:wrap; gap:6px; max-height:120px; overflow:auto; }
+#view-milton .mp-s2chips button { display:inline-flex; gap:6px; align-items:center; padding:3px 9px; border-radius:999px; border:1px solid rgba(56,189,248,.45); background:rgba(15,23,42,.55); color:#e0f2fe; font-size:12px; cursor:pointer; }
+#view-milton .mp-s2chips button:hover { background:rgba(56,189,248,.22); }
+#view-milton .mp-s2chips button span { font-size:10.5px; color:#7dd3fc; }
+#view-milton .mp-tabs .mp-tab-s2 { border-color:rgba(56,189,248,.6) !important; color:#7dd3fc; }
+#view-milton .mp-s2mx { overflow:auto; max-height:520px; }
+#view-milton .mp-s2mx table { border-collapse:collapse; font-size:11.5px; }
+#view-milton .mp-s2mx th, #view-milton .mp-s2mx td { padding:4px 7px; border:1px solid rgba(148,163,184,.15); text-align:center; white-space:nowrap; }
+#view-milton .mp-s2mx th { position:sticky; top:0; background:#0f172a; color:#94a3b8; font-weight:700; }
+#view-milton .mp-s2mx td:first-child, #view-milton .mp-s2mx th:first-child { position:sticky; left:0; background:#0f172a; text-align:left; }
+@media (max-width:640px){ #view-milton .mp-s2big { min-width:0; flex:1 1 40%; border-right:0; } }
+/* ===== HUNTER CORE v17 · MiltonPro (solo dev) + utilidades de rendimiento ===== */
+#view-milton h2 > span { flex: 0 0 24px; }
+#view-milton h2 > span .hud-ico, #view-fusion h2 > span .hud-ico { width: 100%; height: 100%; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+#view-milton .mp-drop { position: relative; display: flex; flex-direction: column; gap: 4px; padding: 16px; border-radius: 14px; border: 1.5px dashed rgba(148,163,184,.35); background: rgba(0,0,0,.22); cursor: pointer; min-height: 96px; transition: border-color .2s, background .2s; }
+#view-milton .mp-drop:hover, #view-milton .mp-drop.drag { border-color: var(--accent, #38bdf8); background: rgba(56,189,248,.07); }
+#view-milton .mp-drop input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+#view-milton .mp-drop b { font-size: 13px; color: #f1f5f9; }
+#view-milton .mp-drop span { font-size: 11px; color: #94a3b8; line-height: 1.4; }
+#view-milton .mp-files { display: flex; flex-wrap: wrap; gap: 6px; }
+#view-milton .mp-file { display: inline-flex; align-items: center; gap: 6px; padding: 4px 9px; border-radius: 999px; font-size: 11px; background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.12); color: #e2e8f0; max-width: 100%; }
+#view-milton .mp-file button { all: unset; cursor: pointer; color: #fca5a5; font-weight: 800; }
+#view-milton .mp-par { display: grid; gap: 3px; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #94a3b8; }
+#view-milton .mp-par input, #view-milton .mp-in { width: 100%; padding: 7px 9px; border-radius: 9px; background: rgba(0,0,0,.4); border: 1px solid rgba(255,255,255,.14); color: #fff; font-size: 12px; outline: none; font-weight: 600; letter-spacing: 0; text-transform: none; }
+#view-milton .mp-par small { font-weight: 500; text-transform: none; letter-spacing: 0; color: #64748b; }
+#view-milton .mp-tabs { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 2px; scrollbar-width: thin; }
+#view-milton .mp-tabs button { flex: 0 0 auto; padding: 7px 12px; border-radius: 10px; font-size: 11.5px; font-weight: 700; color: #cbd5e1; background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.1); cursor: pointer; white-space: nowrap; }
+#view-milton .mp-tabs button.on { color: #0b1220; background: var(--accent, #38bdf8); border-color: transparent; }
+#view-milton .mp-kpi { padding: 10px 12px; }
+#view-milton .mp-kpi p:first-child { font-size: 20px; font-weight: 800; line-height: 1.1; }
+#view-milton .mp-kpi p:last-child { font-size: 10.5px; color: #94a3b8; text-transform: uppercase; letter-spacing: .04em; margin-top: 2px; }
+#view-milton .mp-chart { position: relative; height: 270px; }
+#view-milton .mp-ins { display: grid; gap: 8px; }
+#view-milton .mp-ins > div { padding: 11px 13px; border-radius: 12px; background: rgba(0,0,0,.25); border-left: 3px solid var(--c, #38bdf8); }
+#view-milton .mp-ins h4 { margin: 0 0 4px; font-size: 12.5px; font-weight: 800; color: #f8fafc; }
+#view-milton .mp-ins p { margin: 0; font-size: 12px; line-height: 1.5; color: #cbd5e1; white-space: pre-line; }
+#view-milton .mp-ins small { display: block; margin-top: 5px; font-size: 11px; color: #94a3b8; }
+#view-milton .mp-ins small i { color: #fbbf24; font-style: normal; }
+#view-milton .mp-msg { padding: 9px 12px; border-radius: 10px; font-size: 12px; line-height: 1.45; }
+#view-milton .mp-msg.warn { background: rgba(245,158,11,.12); border: 1px solid rgba(245,158,11,.4); color: #fde68a; }
+#view-milton .mp-msg.err { background: rgba(239,68,68,.12); border: 1px solid rgba(239,68,68,.45); color: #fecaca; }
+#view-milton .mp-msg.ok { background: rgba(34,197,94,.1); border: 1px solid rgba(34,197,94,.4); color: #bbf7d0; }
+#view-milton .mp-bar { height: 6px; border-radius: 3px; background: rgba(255,255,255,.08); overflow: hidden; min-width: 60px; }
+#view-milton .mp-bar i { display: block; height: 100%; border-radius: 3px; }
+/* Tabla paginada (compartida por MiltonPro y Fusión RF) */
+.pg-wrap { display: grid; gap: 8px; }
+.pg-top { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: space-between; }
+.pg-top input { max-width: 260px; padding: 6px 9px; border-radius: 9px; background: rgba(0,0,0,.4); border: 1px solid rgba(255,255,255,.14); color: #fff; font-size: 12px; outline: none; }
+.pg-scroll { max-height: 460px; overflow: auto; border-radius: 12px; border: 1px solid rgba(255,255,255,.08); }
+.pg-tbl { width: 100%; border-collapse: collapse; font-size: 11.5px; }
+.pg-tbl th { position: sticky; top: 0; z-index: 1; background: rgba(15,23,42,.97); color: #cbd5e1; font-weight: 700; text-align: left; padding: 7px 8px; white-space: nowrap; border-bottom: 1px solid rgba(255,255,255,.12); cursor: pointer; user-select: none; }
+.pg-tbl th.s-asc::after { content: " ▲"; color: var(--accent, #38bdf8); }
+.pg-tbl th.s-desc::after { content: " ▼"; color: var(--accent, #38bdf8); }
+.pg-tbl td { padding: 6px 8px; border-bottom: 1px solid rgba(255,255,255,.06); color: #e2e8f0; white-space: nowrap; }
+.pg-tbl td.wrap { white-space: normal; min-width: 220px; }
+.pg-tbl tr.bad td { color: #fca5a5; }
+.pg-nav { display: flex; gap: 6px; align-items: center; font-size: 11px; color: #94a3b8; }
+.pg-nav button { padding: 4px 10px; border-radius: 8px; background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.12); color: #e2e8f0; cursor: pointer; font-weight: 700; }
+.pg-nav button:disabled { opacity: .35; cursor: default; }
+body.theme-day .pg-tbl th { background: #f1f5f9; color: #0f172a; }
+body.theme-day .pg-tbl td { color: #0f172a; }
+body.theme-day #view-milton .mp-ins h4 { color: #0f172a; }
+body.theme-day #view-milton .mp-ins p { color: #1e293b; }
+</style>
+
+<script id="hunter-v17-js">
+/* =====================================================================
+   HUNTER CORE v17
+   A) Utilidades de rendimiento compartidas (window.__mdzPerf):
+      - Lectura de Excel/CSV en un Web Worker (la pantalla no se congela)
+      - Tabla paginada con búsqueda y orden (solo dibuja 100 filas a la vez)
+      - Decimación de series para gráficos (máx. ~1.200 puntos por serie)
+   B) Módulo "MiltonPro" (solo rol dev): consolida varios REPORTE MILTONPRO
+      y muestra todo el reporte consolidado + descarga en Excel.
+      Todo ocurre en el navegador; nada se guarda en Supabase.
+   ===================================================================== */
+(() => {
+  if (!document.getElementById('nav-noc')) return;
+  const esc = escapeHtml;
+  const dev = () => typeof isDevRole === 'function' && isDevRole();
+  const logged = () => !!(typeof hunterSession !== 'undefined' && hunterSession) && !document.body.classList.contains('hunter-preauth');
+  const XLSX_URL = (document.querySelector('script[src*="xlsx"]') || {}).src || '';
+
+  /* ======================= MOTOR (se ejecuta dentro del worker) ======================= */
+  // Debe ser autocontenido: no usa nada del DOM ni variables externas.
+  function MP_CORE() {
+    const pad = (n, l = 2) => String(n).padStart(l, '0');
+    const fmtT = (ms, withMs) => { if (ms == null || !isFinite(ms)) return ''; const d = new Date(ms); return `${d.getUTCFullYear()}-${pad(d.getUTCMonth() + 1)}-${pad(d.getUTCDate())} ${pad(d.getUTCHours())}:${pad(d.getUTCMinutes())}:${pad(d.getUTCSeconds())}${withMs ? '.' + pad(d.getUTCMilliseconds(), 3) : ''}`; };
+    const fmtDur = s => { s = Math.round(s); const d = Math.floor(s / 86400), h = Math.floor(s % 86400 / 3600), m = Math.floor(s % 3600 / 60), x = s % 60; return (d ? d + 'd ' : '') + `${pad(h)}:${pad(m)}:${pad(x)}`; };
+    function parseFecha(v) {
+      if (v == null || v === '') return null;
+      if (v instanceof Date) return isNaN(v) ? null : Date.UTC(v.getFullYear(), v.getMonth(), v.getDate(), v.getHours(), v.getMinutes(), v.getSeconds(), v.getMilliseconds());
+      if (typeof v === 'number' && v > 20000 && v < 80000) return Math.round((v - 25569) * 86400000);
+      const s = String(v).trim();
+      let m = s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})[ _T]+(\d{1,2}):?(\d{2}):?(\d{2})(?:[.,](\d+))?/);
+      if (m) return Date.UTC(+m[1], +m[2] - 1, +m[3], +m[4], +m[5], +m[6], m[7] ? Math.round(+('0.' + m[7]) * 1000) : 0);
+      m = s.match(/^(\d{1,2})[\/-](\d{1,2})[\/-](\d{4})[ _T]+(\d{1,2}):(\d{2})(?::(\d{2}))?(?:[.,](\d+))?\s*(AM|PM|A\.?\s?M\.?|P\.?\s?M\.?)?$/i);
+      if (m) { let h = +m[4]; const ap = (m[8] || '').toUpperCase().replace(/[.\s]/g, ''); if (ap === 'PM' && h < 12) h += 12; if (ap === 'AM' && h === 12) h = 0; return Date.UTC(+m[3], +m[2] - 1, +m[1], h, +m[5], +(m[6] || 0), m[7] ? Math.round(+('0.' + m[7]) * 1000) : 0); }
+      return null;
+    }
+    function readBook(buf, name) {
+      const isCsv = /\.csv$/i.test(name);
+      let wb;
+      if (isCsv) {
+        const bytes = new Uint8Array(buf); let txt;
+        try { txt = new TextDecoder('utf-8', { fatal: true }).decode(bytes); } catch (e) { txt = new TextDecoder('windows-1252').decode(bytes); }
+        wb = XLSX.read(txt, { type: 'string', dense: true, raw: true }); // raw: códigos como 25E696 no se convierten en número
+      } else wb = XLSX.read(buf, { type: 'array', cellDates: true, dense: true });
+      let best = null;
+      for (const n of wb.SheetNames) { const rows = XLSX.utils.sheet_to_json(wb.Sheets[n], { defval: '', raw: true }); if (!best || rows.length > best.rows.length) best = { sheet: n, rows }; }
+      return best || { sheet: '', rows: [] };
+    }
+    const median = a => { if (!a.length) return null; const s = [...a].sort((x, y) => x - y), k = s.length >> 1; return s.length % 2 ? s[k] : (s[k - 1] + s[k]) / 2; };
+    const moda = a => { const c = new Map(); let b = null, bn = 0; a.forEach(v => { const n = (c.get(v) || 0) + 1; c.set(v, n); if (n > bn) { bn = n; b = v; } }); return b; };
+    const std = a => { if (a.length < 2) return 0; const m = a.reduce((s, x) => s + x, 0) / a.length; return Math.sqrt(a.reduce((s, x) => s + (x - m) ** 2, 0) / (a.length - 1)); };
+    const r1 = x => x == null || !isFinite(x) ? null : Math.round(x * 10) / 10, r2 = x => x == null || !isFinite(x) ? null : Math.round(x * 100) / 100;
+    const normMovil = v => { if (typeof v === 'number') return String(Math.trunc(v)); let s = String(v == null ? '' : v).replace(/\s+/g, '').toUpperCase(); if (/^\d+\.0+$/.test(s)) s = s.replace(/\.0+$/, ''); return s; };
+
+    function analizar(files, P) {
+      const avisos = [], arch = [];
+      let all = [];
+      for (const f of files) {
+        try {
+          const { sheet, rows } = readBook(f.buf, f.name);
+          if (!rows.length) { arch.push({ archivo: f.name, hoja: sheet, estado: 'Vacío', filas: 0, validas: 0, psd: '' }); continue; }
+          const cols = Object.keys(rows[0]), N = c => String(c).trim().toUpperCase().replace(/\s+/g, ' ');
+          const find = name => cols.find(c => N(c) === name);
+          const cF = find('FECHA INGRESO'), cR = find('RSSI'), cM = find('MOVIL') || find('MÓVIL'), cC = find('COMANDO'), cP = find('PSD'), cCod = find('CODIGO') || find('CÓDIGO');
+          const falta = [['FECHA INGRESO', cF], ['RSSI', cR], ['MOVIL', cM], ['COMANDO', cC]].filter(x => !x[1]).map(x => x[0]);
+          if (falta.length) { arch.push({ archivo: f.name, hoja: sheet, estado: 'Omitido: faltan ' + falta.join(', '), filas: rows.length, validas: 0, psd: '' }); continue; }
+          const psdDef = f.name.replace(/\.[^.]+$/, '').toUpperCase();
+          let ok = 0, bad = 0; const psds = new Set();
+          for (const r of rows) {
+            const t = parseFecha(r[cF]); if (t == null) { bad++; continue; }
+            const rs = parseFloat(String(r[cR]).replace(',', '.'));
+            const psd = cP ? String(r[cP]).trim().toUpperCase() || psdDef : psdDef;
+            psds.add(psd);
+            all.push({ psd, mov: normMovil(r[cM]), cmd: String(r[cC]).trim().toUpperCase(), cod: cCod ? String(r[cCod]).trim() : '', t, rssi: isFinite(rs) ? rs : null, f: f.name });
+            ok++;
+          }
+          arch.push({ archivo: f.name, hoja: sheet, estado: bad ? `OK (${bad} filas sin fecha)` : 'OK', filas: rows.length, validas: ok, psd: [...psds].join(', ') });
+        } catch (e) { arch.push({ archivo: f.name, hoja: '', estado: 'Error: ' + (e && e.message || e), filas: 0, validas: 0, psd: '' }); }
+      }
+      if (!all.length) return { error: 'Ningún archivo tiene datos válidos (se necesitan FECHA INGRESO, RSSI, MOVIL y COMANDO).', archivos: arch };
+      // --- duplicados entre archivos (ej. el mismo reporte en .xls y .xlsx) ---
+      let dups = 0;
+      if (P.dedup) {
+        const seen = new Set(), out = [];
+        for (const r of all) { const k = r.psd + '|' + r.mov + '|' + r.cmd + '|' + r.t + '|' + r.rssi; if (seen.has(k)) { dups++; continue; } seen.add(k); out.push(r); }
+        all = out;
+        if (dups) avisos.push(`Se quitaron ${dups.toLocaleString("es-PE")} lecturas repetidas (mismo PSD, móvil, comando, hora y RSSI; por ejemplo el mismo reporte subido en .xls y .xlsx, o filas duplicadas dentro de un archivo).`);
+      }
+      const CAIDA = P.caidaMin * 60000, LOGS = P.logSeg * 1000, CRIT = P.critico, SALTO = P.salto, VSALTO = P.ventanaSalto * 1000, VREB = P.ventanaRebote * 1000;
+      const isJ = r => r.cmd === 'JAMM';
+      // --- agrupar por PSD ---
+      const byPsd = new Map();
+      all.forEach(r => { let a = byPsd.get(r.psd); if (!a) byPsd.set(r.psd, a = []); a.push(r); });
+      const psdRows = [], cortes = [], cortesKpi = [];
+      const dias = new Set(all.map(r => fmtT(r.t).slice(0, 10)));
+      for (const [psd, L] of byPsd) {
+        L.sort((a, b) => a.t - b.t);
+        let down = 0, caidas = 0, jam = 0, crit = 0; const movs = new Set();
+        for (let i = 0; i < L.length; i++) {
+          const r = L[i]; movs.add(r.mov); if (isJ(r)) jam++; if (r.rssi != null && r.rssi < CRIT) crit++;
+          if (i) { const g = r.t - L[i - 1].t;
+            if (g > CAIDA) { caidas++; down += g; cortesKpi.push({ psd, desde: L[i - 1].t, hasta: r.t, seg: g / 1000 }); }
+            if (g > LOGS) cortes.push({ psd, desde: L[i - 1].t, hasta: r.t, seg: g / 1000, kpi: g > CAIDA }); }
+        }
+        const total = Math.max(1000, L[L.length - 1].t - L[0].t), ef = Math.min(100, Math.max(0, (1 - down / total) * 100));
+        // tag testigo: el móvil más leído con RSSI casi siempre saturado (equipo fijo junto a la antena)
+        const cnt = new Map(); L.forEach(r => cnt.set(r.mov, (cnt.get(r.mov) || 0) + 1));
+        let testigo = null;
+        [...cnt.entries()].sort((a, b) => b[1] - a[1]).slice(0, 3).some(([m, n]) => {
+          const R = L.filter(r => r.mov === m); if (n < 200) return false;
+          const sat = R.filter(r => r.rssi >= 250).length / R.length; if (sat < .9) return false;
+          let dn = 0, cd = 0; for (let i = 1; i < R.length; i++) { const g = R[i].t - R[i - 1].t; if (g > CAIDA) { dn += g; cd++; } }
+          const span = Math.max(1000, R[R.length - 1].t - R[0].t);
+          testigo = { mov: m, ef: r2((1 - dn / span) * 100), caidas: cd, desde: R[0].t, hasta: R[R.length - 1].t, horas: r1(span / 3600000) };
+          return true;
+        });
+        psdRows.push({
+          psd, moviles: movs.size, lecturas: L.length, jamm: jam, criticos: crit, caidas, downSeg: Math.round(down / 1000), totalSeg: Math.round(total / 1000),
+          ef: r2(ef), mtbf: caidas ? r1((total - down) / caidas / 60000) : null, mttr: caidas ? r1(down / caidas / 1000) : null,
+          pctCrit: r2(crit / L.length * 100), desde: L[0].t, hasta: L[L.length - 1].t, testigo,
+          sustento: `(1 − (${Math.round(down / 1000).toLocaleString('es-PE')} s sin lecturas / ${Math.round(total / 1000).toLocaleString('es-PE')} s totales)) × 100`
+        });
+      }
+      psdRows.sort((a, b) => b.ef - a.ef || b.lecturas - a.lecturas);
+      cortes.sort((a, b) => b.seg - a.seg);
+      // --- por PSD + MÓVIL ---
+      const byPM = new Map();
+      all.forEach(r => { const k = r.psd + '\u0001' + r.mov; let a = byPM.get(k); if (!a) byPM.set(k, a = []); a.push(r); });
+      const tags = [], saltos = [], rebotes = [];
+      for (const [k, L] of byPM) {
+        L.sort((a, b) => a.t - b.t);
+        const [psd, mov] = k.split('\u0001'), R = L.map(r => r.rssi).filter(v => v != null);
+        let jam = 0, crit = 0, nS = 0, nR = 0; const last = new Map();  // último RSSI por tipo de COMANDO
+        const seq = [];
+        for (const r of L) {
+          if (isJ(r)) jam++; if (r.rssi != null && r.rssi < CRIT) crit++;
+          const p = last.get(r.cmd);
+          if (p && r.rssi != null && p.rssi != null) {
+            const dt = r.t - p.t, d = r.rssi - p.rssi;
+            if (dt > 0 && dt < VSALTO && Math.abs(d) >= SALTO) { nS++; saltos.push({ psd, mov, cmd: r.cmd, t0: p.t, r0: p.rssi, t1: r.t, r1: r.rssi, salto: Math.abs(d), seg: Math.round(dt / 1000) }); }
+          }
+          if (r.rssi != null) last.set(r.cmd, r);
+          if (r.rssi != null) seq.push(r);
+        }
+        // rebote real = sube/baja ≥ SALTO y vuelve (ida y vuelta) en menos de VREB
+        for (let i = 2; i < seq.length; i++) {
+          const a = seq[i - 2], b = seq[i - 1], c = seq[i];
+          if (a.cmd !== b.cmd || b.cmd !== c.cmd) continue;
+          const d1 = b.rssi - a.rssi, d2 = c.rssi - b.rssi;
+          if (Math.abs(d1) >= SALTO && Math.abs(d2) >= SALTO && Math.sign(d1) !== Math.sign(d2) && c.t - a.t <= VREB) { nR++; rebotes.push({ psd, mov, cmd: b.cmd, t0: a.t, r0: a.rssi, t1: b.t, r1: b.rssi, t2: c.t, r2: c.rssi, seg: Math.round((c.t - a.t) / 1000) }); }
+        }
+        const cmds = {}; L.forEach(r => cmds[r.cmd] = (cmds[r.cmd] || 0) + 1);
+        tags.push({
+          psd, mov, primer: L[0].t, ultimo: L[L.length - 1].t, lecturas: L.length, jamm: jam, ratioJ: r2(jam / L.length * 100),
+          media: r1(R.reduce((s, x) => s + x, 0) / (R.length || 1)), moda: moda(R), max: R.length ? R.reduce((m, x) => x > m ? x : m, -Infinity) : null, min: R.length ? R.reduce((m, x) => x < m ? x : m, Infinity) : null,
+          inest: r1(std(R)), pctSat: r1(R.filter(x => x >= 255).length / (R.length || 1) * 100), criticos: crit, pctCrit: r2(crit / L.length * 100),
+          saltos: nS, tasaS: r2(nS / L.length * 100), rebotes: nR, tasaR: r2(nR / L.length * 100), cmds: Object.entries(cmds).map(([c, n]) => `${c}:${n}`).join(' · ')
+        });
+      }
+      tags.sort((a, b) => a.psd.localeCompare(b.psd) || b.lecturas - a.lecturas);
+      saltos.sort((a, b) => b.salto - a.salto); rebotes.sort((a, b) => a.seg - b.seg);
+      // --- patrones horarios ---
+      const horas = Array.from({ length: 24 }, (_, h) => ({ h, msgs: 0, jamm: 0, caidas: 0, crit: 0 }));
+      all.forEach(r => { const h = new Date(r.t).getUTCHours(); horas[h].msgs++; if (isJ(r)) horas[h].jamm++; if (r.rssi != null && r.rssi < CRIT) horas[h].crit++; });
+      cortesKpi.forEach(c => horas[new Date(c.desde).getUTCHours()].caidas++);
+      const psdHora = new Map(); cortesKpi.forEach(c => { const k = c.psd + '|' + new Date(c.desde).getUTCHours(); psdHora.set(k, (psdHora.get(k) || 0) + 1); });
+      const fallasPH = [...psdHora.entries()].map(([k, n]) => { const [psd, h] = k.split('|'); return { psd, h: +h, n }; }).sort((a, b) => b.n - a.n);
+      // mapa de calor PSD × hora (mensajes) y serie temporal por hora
+      const heat = {}; all.forEach(r => { const h = new Date(r.t).getUTCHours(); (heat[r.psd] = heat[r.psd] || Array(24).fill(0))[h]++; });
+      const serie = new Map(); all.forEach(r => { const k = Math.floor(r.t / 3600000) * 3600000; const o = serie.get(k) || { t: k, msgs: 0, jamm: 0 }; o.msgs++; if (isJ(r)) o.jamm++; serie.set(k, o); });
+      let tmin = Infinity, tmax = -Infinity; for (const r of all) { if (r.t < tmin) tmin = r.t; if (r.t > tmax) tmax = r.t; }
+      const serieArr = []; for (let k = Math.floor(tmin / 3600000) * 3600000; k <= tmax; k += 3600000) serieArr.push(serie.get(k) || { t: k, msgs: 0, jamm: 0 });
+      // --- JAMM ---
+      const jamPsd = [];
+      for (const [psd, L] of byPsd) {
+        const J = L.filter(isJ); if (!J.length) continue;
+        const c = new Map(); J.forEach(r => c.set(r.mov, (c.get(r.mov) || 0) + 1));
+        const top = [...c.entries()].sort((a, b) => b[1] - a[1]);
+        jamPsd.push({ psd, n: J.length, pct: r2(J.length / L.length * 100), rssi: r1(J.reduce((s, r) => s + (r.rssi || 0), 0) / J.length), equipos: top.length, top: top.slice(0, 5).map(([m, n]) => `${m} (${n})`).join(', '), primer: J[0].t, ultimo: J[J.length - 1].t });
+      }
+      jamPsd.sort((a, b) => b.n - a.n);
+      const jamTags = tags.filter(t => t.jamm > 0).sort((a, b) => b.jamm - a.jamm);
+      const jamPerm = jamTags.filter(t => t.ratioJ >= 95 && t.lecturas >= 50), jamPermU = [...new Set(jamPerm.map(t => t.mov))];
+      // --- Serie 2 y cobertura por código (cuántas antenas ven cada código) ---
+      const esS2 = m => /^2[0-9A-Z]{5}$/.test(m); // Serie 2: 6 caracteres alfanuméricos que empiezan con 2 (ej. 25H696, 259863)
+      const byMov = new Map();
+      all.forEach(r => { let o = byMov.get(r.mov); if (!o) byMov.set(r.mov, o = { mov: r.mov, n: 0, psd: new Map(), primer: r, ult: r, sum: 0, cnt: 0 }); o.n++; if (r.t < o.primer.t) o.primer = r; if (r.t > o.ult.t) o.ult = r; if (r.rssi != null) { o.sum += r.rssi; o.cnt++; } const p = o.psd.get(r.psd) || { n: 0, max: -1 }; p.n++; if (r.rssi != null && r.rssi > p.max) p.max = r.rssi; o.psd.set(r.psd, p); });
+      const cobertura = [...byMov.values()].map(o => ({ mov: o.mov, s2: esS2(o.mov), lecturas: o.n, antenas: o.psd.size, lista: [...o.psd.entries()].sort((a, b) => b[1].n - a[1].n).map(([p, v]) => `${p} (${v.n} · máx ${v.max})`).join(', '), media: r1(o.sum / (o.cnt || 1)), max: [...o.psd.values()].reduce((m, v) => Math.max(m, v.max), -1), primerPsd: o.primer.psd, primer: o.primer.t, ultPsd: o.ult.psd, ultimo: o.ult.t, porPsd: esS2(o.mov) ? [...o.psd.entries()].map(([p, v]) => [p, v.n, v.max]) : null })).sort((a, b) => b.antenas - a.antenas || b.lecturas - a.lecturas);
+      const s2 = cobertura.filter(c => c.s2);
+      const s2Antenas = new Set(); all.forEach(r => { if (esS2(r.mov)) s2Antenas.add(r.psd); });
+      const s2PorPsd = [...byPsd.keys()].map(psd => { const L = byPsd.get(psd).filter(r => esS2(r.mov)); return { psd, codigos: new Set(L.map(r => r.mov)).size, lecturas: L.length }; }).filter(x => x.codigos).sort((a, b) => b.codigos - a.codigos);
+      // --- resumen ejecutivo ---
+      const nPsd = psdRows.length, efG = r2(psdRows.reduce((s, p) => s + p.ef, 0) / nPsd);
+      const efPond = r2((1 - psdRows.reduce((s, p) => s + p.downSeg, 0) / Math.max(1, psdRows.reduce((s, p) => s + p.totalSeg, 0))) * 100);
+      const conC = psdRows.filter(p => p.caidas);
+      const mtbfG = conC.length ? r1(conC.reduce((s, p) => s + p.mtbf, 0) / conC.length) : null, mttrG = conC.length ? r1(conC.reduce((s, p) => s + p.mttr, 0) / conC.length) : null;
+      const volMin = tags.reduce((s, t) => s + t.lecturas, 0) / (tags.length || 1) * .3, val = tags.filter(t => t.lecturas >= volMin);
+      const V = val.length ? val : tags;
+      const ins = [];
+      const li = a => a.length ? a.join('\n') : '';
+      ins.push({ k: 'ef', c: efG >= 95 ? '#22c55e' : '#f59e0b', t: 'Efectividad de la red', p: `Promedio de las ${nPsd} antena${nPsd === 1 ? '' : 's'} (PSD): ${efG}%. Ponderado por tiempo: ${efPond}%.` + (psdRows.some(p => p.testigo) ? `\nCon tag testigo: ${psdRows.filter(p => p.testigo).map(p => `${p.psd} ${p.testigo.ef}% (tag ${p.testigo.mov}, ${p.testigo.horas} h)`).join(' · ')}.` : ''), a: efG >= 95 ? 'Nivel óptimo.' : 'Revisar energía/GSM de las antenas con más caídas. Ojo: "sin lecturas" también puede ser falta de tránsito; compara con el tag testigo.', f: `Caída = más de ${P.caidaMin} min sin NINGUNA lectura en el PSD. Efectividad = (1 − tiempo sin lecturas / tiempo evaluado) × 100.` });
+      ins.push({ k: 'best', c: '#22c55e', t: '🥇 Antenas más estables', p: li(psdRows.slice(0, 5).map(p => `• ${p.psd}: ${p.ef}% con ${p.lecturas.toLocaleString('es-PE')} lecturas y ${p.moviles} móviles.`)), a: 'Usar su configuración como referencia.', f: 'Orden por efectividad y volumen.' });
+      const peores = [...conC].sort((a, b) => b.caidas - a.caidas || a.ef - b.ef).slice(0, 5);
+      ins.push({ k: 'worst', c: '#ef4444', t: '⚠️ Antenas con más caídas', p: peores.length ? li(peores.map(p => `• ${p.psd}: ${p.caidas} caídas > ${P.caidaMin} min (${fmtDur(p.downSeg)} en total) → ${p.ef}%.`)) : `Ninguna antena tuvo cortes > ${P.caidaMin} min.`, a: peores.length ? 'Inspección prioritaria de router, energía y red GSM.' : 'Mantener.', f: `Conteo de huecos > ${P.caidaMin * 60} s entre lecturas consecutivas del mismo PSD.` });
+      ins.push({ k: 'hor', c: '#a78bfa', t: '⏱️ Patrones horarios de caída', p: fallasPH.length ? li(fallasPH.slice(0, 5).map(x => `• ${x.psd}: ${x.n} caídas que empezaron entre ${pad(x.h)}:00 y ${pad(x.h)}:59`)) : 'No hay caídas concentradas en una hora.', a: fallasPH.length ? 'Auditar cortes de energía o interferencias programadas en esas horas.' : 'Sin síntomas de sabotaje horario.', f: 'Hora en que empieza cada caída, sumada en todos los días analizados.' });
+      const mej = [...V].sort((a, b) => b.media - a.media || a.inest - b.inest).slice(0, 5);
+      ins.push({ k: 'tbest', c: '#22c55e', t: '✅ Tags con mejor señal', p: li(mej.map(t => `• ${t.mov} en ${t.psd}: RSSI medio ${t.media}, inestabilidad ${t.inest}${t.pctSat >= 90 ? ' (saturado en 255: equipo muy cerca o testigo)' : ''}.`)), a: 'Instalación correcta; tomar como ejemplo.', f: 'Mayor RSSI medio y menor desviación estándar (solo tags con volumen ≥ 30% del promedio).' });
+      const pe = V.filter(t => t.pctCrit > 0).sort((a, b) => b.pctCrit - a.pctCrit).slice(0, 5);
+      ins.push({ k: 'tworst', c: '#f97316', t: '❌ Tags con peor señal', p: pe.length ? li(pe.map(t => `• ${t.mov} en ${t.psd}: ${t.pctCrit}% de lecturas débiles (RSSI < ${CRIT}).`)) : `Ningún tag con lecturas bajo ${CRIT}.`, a: pe.length ? 'Reemplazar tag o reubicar su antena.' : 'Flota en buen estado.', f: `(lecturas con RSSI < ${CRIT} / lecturas del tag) × 100.` });
+      const reb = V.filter(t => t.rebotes > 0).sort((a, b) => b.tasaR - a.tasaR).slice(0, 5), sal = V.filter(t => t.saltos > 0).sort((a, b) => b.tasaS - a.tasaS).slice(0, 5);
+      ins.push({ k: 'reb', c: '#ef4444', t: '📉 Rebotes y saltos de señal', p: (reb.length ? 'Rebotes reales (sube y baja, o baja y sube, en menos de ' + P.ventanaRebote + ' s):\n' + li(reb.map(t => `• ${t.mov} en ${t.psd}: ${t.rebotes} rebotes (${t.tasaR}%).`)) : 'Sin rebotes reales (ida y vuelta).') + (sal.length ? '\nSaltos ≥ ' + SALTO + ' pts (criterio anterior):\n' + li(sal.slice(0, 3).map(t => `• ${t.mov} en ${t.psd}: ${t.saltos} saltos (${t.tasaS}%).`)) : ''), a: reb.length ? 'Revisar bloqueo metálico entre tag y antena o falla del chip.' : 'Propagación normal.', f: `Salto = cambio ≥ ${SALTO} pts entre dos lecturas del mismo tipo de comando en < ${P.ventanaSalto} s. Rebote real = dos saltos opuestos seguidos en ≤ ${P.ventanaRebote} s. Un vehículo que se acerca y se aleja produce saltos normales; el rebote real es la señal sospechosa.` });
+      ins.push({ k: 'jam', c: '#dc2626', t: '🚨 Alertas JAMM (inhibidores)', p: jamPsd.length ? li(jamPsd.slice(0, 5).map(j => `• ${j.psd}: ${j.n.toLocaleString('es-PE')} alertas (${j.pct}% del tráfico), RSSI medio ${j.rssi} | ${j.equipos} equipo${j.equipos === 1 ? '' : 's'}: ${j.top}`)) + (jamPermU.length ? `\n${jamPermU.length} equipo${jamPermU.length === 1 ? '' : 's'} solo envía${jamPermU.length === 1 ? '' : 'n'} JAMM (≥ 95%): ${jamPermU.slice(0, 5).join(', ')}. Puede ser alarma permanente del equipo y no un ataque.` : '') : 'Sin alertas JAMM.', a: jamPsd.length ? 'Activar protocolo de seguridad en esas zonas y revisar los equipos en alarma permanente.' : 'Sin acciones.', f: 'Registros con COMANDO = JAMM.' });
+      ins.unshift({ k: 's2', c: '#38bdf8', t: '🔍 Dispositivos Serie 2 (código 2)', p: s2.length ? `${s2.length} código${s2.length === 1 ? '' : 's'} Serie 2, vistos por ${s2Antenas.size} antena${s2Antenas.size === 1 ? '' : 's'} distinta${s2Antenas.size === 1 ? '' : 's'}.\n` + li(s2.slice(0, 5).map(c => `• ${c.mov}: ${c.antenas} antena${c.antenas === 1 ? '' : 's'} (${c.lista}) · ${c.lecturas} lecturas, RSSI medio ${c.media}`)) : 'No se detectaron dispositivos Serie 2 (6 caracteres alfanuméricos que empiezan con 2, ej. 25H696 o 259863).', a: s2.length ? 'Validar que pertenezcan al lote actualizado.' : '—', f: 'MÓVIL de 6 caracteres alfanuméricos (letras o números, sin distinguir mayúsculas) con primer carácter "2". Antenas = PSD distintos que lo leyeron.' });
+      return {
+        ok: true, avisos, archivos: arch, dups, dias: dias.size, total: all.length, tmin, tmax, nPsd, nMov: byMov.size,
+        kpi: { efG, efPond, mtbfG, mttrG, jamm: all.filter(isJ).length, crit: all.filter(r => r.rssi != null && r.rssi < CRIT).length, caidas: cortesKpi.length, saltos: saltos.length, rebotes: rebotes.length, s2: s2.length, s2Antenas: s2Antenas.size },
+        psd: psdRows, tags, saltos, rebotes, cortes, horas, fallasPH, heat, serie: serieArr, jamPsd, jamTags, jamPerm: jamPermU, cobertura, s2, s2PorPsd, ins, P
+      };
+    }
+    return { analizar, readBook, parseFecha, fmtT, fmtDur };
+  }
+
+  /* ======================= Worker ======================= */
+  let worker = null, wid = 0; const pend = new Map();
+  function getWorker() {
+    if (worker || !window.Worker || !XLSX_URL) return worker;
+    try {
+      const src = `importScripts(${JSON.stringify(XLSX_URL)});\nconst MP = (${MP_CORE.toString()})();\n` +
+        `self.onmessage = e => { const { id, op, files, P } = e.data; try {\n` +
+        `  if (op === 'parse') { const f = files[0]; const b = MP.readBook(f.buf, f.name); self.postMessage({ id, ok: true, res: { sheet: b.sheet, rows: b.rows, cols: b.rows.length ? Object.keys(b.rows[0]) : [] } }); }\n` +
+        `  else if (op === 'milton') self.postMessage({ id, ok: true, res: MP.analizar(files, P) });\n` +
+        `} catch (err) { self.postMessage({ id, ok: false, err: String(err && err.message || err) }); } };`;
+      worker = new Worker(URL.createObjectURL(new Blob([src], { type: 'text/javascript' })));
+      worker.onmessage = e => { const p = pend.get(e.data.id); if (!p) return; pend.delete(e.data.id); e.data.ok ? p.res(e.data.res) : p.rej(new Error(e.data.err)); };
+      worker.onerror = e => { e.preventDefault && e.preventDefault(); pend.forEach(p => p.rej(new Error('worker'))); pend.clear(); try { worker.terminate(); } catch (x) {} worker = null; window.__mdzNoWorker = true; };
+    } catch (e) { worker = null; window.__mdzNoWorker = true; }
+    return worker;
+  }
+  let MP_LOCAL = null;
+  async function runJob(op, files, P) {
+    const w = !window.__mdzNoWorker && getWorker();
+    if (w) {
+      try {
+        return await new Promise((res, rej) => { const id = ++wid; pend.set(id, { res, rej }); w.postMessage({ id, op, files, P }, files.map(f => f.buf)); });
+      } catch (e) { if (e.message !== 'worker') throw e; /* el worker no pudo iniciar: seguimos en la página */ files = await Promise.all(files.map(async f => ({ name: f.name, buf: await f.file.arrayBuffer() }))); }
+    }
+    MP_LOCAL = MP_LOCAL || MP_CORE();
+    await new Promise(r => setTimeout(r, 30));
+    if (op === 'parse') { const b = MP_LOCAL.readBook(files[0].buf, files[0].name); return { sheet: b.sheet, rows: b.rows, cols: b.rows.length ? Object.keys(b.rows[0]) : [] }; }
+    return MP_LOCAL.analizar(files, P);
+  }
+  const loadFiles = list => Promise.all(list.map(async f => ({ name: f.name, file: f, buf: await f.arrayBuffer() })));
+
+  /* ======================= Tabla paginada ======================= */
+  // cols: [{k, t, f?(row)->html, w?, num?, wrap?}]
+  function pagedTable(host, rows, cols, opt = {}) {
+    const st = { q: '', page: 0, sort: opt.sort || null, dir: opt.dir || -1, size: opt.size || 100 };
+    host.innerHTML = `<div class="pg-wrap"><div class="pg-top">${opt.search === false ? '<span></span>' : '<input placeholder="Buscar en la tabla…">'}<div class="pg-nav"><button data-p="-1">‹</button><span data-i></span><button data-p="1">›</button></div></div><div class="pg-scroll"><table class="pg-tbl"><thead><tr>${cols.map(c => `<th data-k="${c.k}">${esc(c.t)}</th>`).join('')}</tr></thead><tbody></tbody></table></div></div>`;
+    const tb = host.querySelector('tbody'), info = host.querySelector('[data-i]'), inp = host.querySelector('input');
+    const txt = r => cols.map(c => r[c.k]).join(' ').toLowerCase();
+    let view = rows;
+    function apply() {
+      const q = st.q.toLowerCase();
+      view = q ? rows.filter(r => txt(r).includes(q)) : rows.slice();
+      if (st.sort) { const k = st.sort, d = st.dir; view.sort((a, b) => { const x = a[k], y = b[k]; if (x == null) return 1; if (y == null) return -1; return (typeof x === 'number' && typeof y === 'number' ? x - y : String(x).localeCompare(String(y), 'es', { numeric: true })) * d; }); }
+      host.querySelectorAll('th').forEach(th => { th.classList.toggle('s-asc', th.dataset.k === st.sort && st.dir === 1); th.classList.toggle('s-desc', th.dataset.k === st.sort && st.dir === -1); });
+      draw();
+    }
+    function draw() {
+      const pages = Math.max(1, Math.ceil(view.length / st.size)); st.page = Math.min(st.page, pages - 1);
+      const sl = view.slice(st.page * st.size, (st.page + 1) * st.size);
+      tb.innerHTML = sl.map(r => `<tr class="${opt.bad && opt.bad(r) ? 'bad' : ''}">${cols.map(c => `<td class="${c.wrap ? 'wrap' : ''}">${c.f ? c.f(r) : esc(r[c.k] == null ? '—' : r[c.k])}</td>`).join('')}</tr>`).join('') || `<tr><td colspan="${cols.length}" style="color:#64748b">Sin registros.</td></tr>`;
+      info.textContent = view.length ? `${(st.page * st.size + 1).toLocaleString('es-PE')}–${Math.min(view.length, (st.page + 1) * st.size).toLocaleString('es-PE')} de ${view.length.toLocaleString('es-PE')}` : '0';
+      host.querySelector('[data-p="-1"]').disabled = st.page === 0; host.querySelector('[data-p="1"]').disabled = st.page >= pages - 1;
+    }
+    host.querySelector('thead').addEventListener('click', e => { const th = e.target.closest('th'); if (!th) return; if (st.sort === th.dataset.k) st.dir *= -1; else { st.sort = th.dataset.k; st.dir = -1; } apply(); });
+    host.querySelectorAll('[data-p]').forEach(b => b.onclick = () => { st.page += +b.dataset.p; draw(); host.querySelector('.pg-scroll').scrollTop = 0; });
+    let tmr; if (inp) inp.addEventListener('input', () => { clearTimeout(tmr); tmr = setTimeout(() => { st.q = inp.value.trim(); st.page = 0; apply(); }, 160); });
+    apply();
+    return { update(r) { rows = r; apply(); } };
+  }
+
+  /* ======================= Decimación (máx/mín por tramo) ======================= */
+  function decimate(pts, max = 1200, key = 'y') {
+    if (!pts || pts.length <= max) return pts;
+    const b = Math.ceil(pts.length / (max / 2)), out = [];
+    for (let i = 0; i < pts.length; i += b) {
+      let lo = null, hi = null;
+      for (let j = i; j < Math.min(pts.length, i + b); j++) { const p = pts[j]; if (!lo || p[key] < lo[key]) lo = p; if (!hi || p[key] > hi[key]) hi = p; }
+      if (lo === hi) out.push(lo); else if (lo.x <= hi.x) out.push(lo, hi); else out.push(hi, lo);
+    }
+    return out;
+  }
+  window.__mdzPerf = { runJob, loadFiles, pagedTable, decimate };
+
+  /* ======================= UI MiltonPro ======================= */
+  const ICON = '<svg class="hud-ico" viewBox="0 0 24 24"><rect x="3" y="3.5" width="18" height="17" rx="2.5"/><path d="M7 16v-4M11 16V8M15 16v-6M19 16v-2"/><path d="M3 8h3"/></svg>';
+  const nav = document.createElement('button');
+  nav.id = 'nav-milton'; nav.dataset.v = 'milton'; nav.title = 'MiltonPro · Reporte consolidado (dev)'; nav.className = 'ui-hidden'; nav.innerHTML = ICON;
+  nav.addEventListener('click', () => window.setView('milton'));
+  (document.getElementById('nav-fusion') || document.getElementById('nav-noc')).after(nav);
+  const sec = document.createElement('section');
+  sec.id = 'view-milton';
+  sec.className = 'view ui-hidden map panel flex-1 min-w-0 flex flex-col overflow-hidden';
+  sec.innerHTML = `
+  <div class="flex flex-wrap items-center justify-between gap-3 px-5 pt-4 pb-3 border-b border-white/10">
+    <div><h2 class="text-base font-bold text-white flex items-center gap-2"><span class="text-[var(--accent)] inline-block" style="width:24px;height:24px">${ICON}</span>MiltonPro · Reporte consolidado</h2>
+    <p class="text-[11px] text-slate-400">Sube uno o varios REPORTE MILTONPRO (.xls, .xlsx, .csv) · se procesan en tu navegador, sin subir nada</p></div>
+    <div class="flex gap-2 flex-wrap">
+      <button id="mp-run" class="btn px-4 py-1.5 text-xs font-bold text-white cursor-pointer" disabled><i class="fa-solid fa-bolt mr-1"></i>Procesar</button>
+      <button id="mp-xlsx" class="chip px-3 py-1.5 text-xs font-semibold text-emerald-300 cursor-pointer" disabled><i class="fa-solid fa-file-excel mr-1"></i>Descargar consolidado</button>
+      <button id="mp-reset" class="chip px-3 py-1.5 text-xs font-semibold text-slate-300 cursor-pointer"><i class="fa-solid fa-rotate-left mr-1"></i>Limpiar</button>
+    </div>
+  </div>
+  <div class="flex-1 overflow-y-auto scroll px-5 py-4 space-y-4">
+    <div class="grid grid-cols-1 lg:grid-cols-[1.1fr_1.4fr] gap-3">
+      <div class="space-y-2">
+        <label class="mp-drop" id="mp-drop"><input type="file" multiple accept=".xls,.xlsx,.csv"><b><i class="fa-solid fa-folder-open mr-1 text-[var(--accent)]"></i>Reportes MiltonPro</b><span>Arrastra aquí varios archivos a la vez o haz clic para elegirlos. Puedes sumar más después.</span></label>
+        <div id="mp-files" class="mp-files"></div>
+      </div>
+      <div class="card p-3 grid grid-cols-2 sm:grid-cols-3 gap-2.5">
+        <label class="mp-par">Caída de red (min)<input id="mp-caida" type="number" min="1" max="1440" value="10"><small>Sin lecturas más de este tiempo</small></label>
+        <label class="mp-par">Bitácora de cortes (s)<input id="mp-log" type="number" min="5" max="86400" value="60"><small>Antes 15 s: llenaba de ruido</small></label>
+        <label class="mp-par">Señal crítica: RSSI &lt;<input id="mp-crit" type="number" min="1" max="255" value="51"><small>Lectura débil</small></label>
+        <label class="mp-par">Salto (pts)<input id="mp-salto" type="number" min="1" max="255" value="75"><small>Cambio brusco de RSSI</small></label>
+        <label class="mp-par">Ventana salto (s)<input id="mp-vsalto" type="number" min="1" max="86400" value="600"><small>Criterio anterior: 10 min</small></label>
+        <label class="mp-par">Rebote real (s)<input id="mp-vreb" type="number" min="1" max="3600" value="60"><small>Sube y baja en este lapso</small></label>
+        <label class="mp-par col-span-2 sm:col-span-3" style="flex-direction:row;display:flex;align-items:center;gap:8px;text-transform:none;font-size:11.5px;color:#cbd5e1"><input id="mp-dedup" type="checkbox" checked style="width:auto"> Quitar lecturas repetidas entre archivos (recomendado)</label>
+      </div>
+    </div>
+    <div id="mp-msgs" class="space-y-2"></div>
+    <div id="mp-out" class="hidden space-y-4">
+      <div id="mp-s2hero"></div>
+      <div id="mp-kpis" class="grid grid-cols-2 sm:grid-cols-4 xl:grid-cols-7 gap-2"></div>
+      <div class="mp-tabs" id="mp-tabs">
+        <button data-t="res" class="on">Resumen ejecutivo</button><button data-t="s2" class="mp-tab-s2">Serie 2 (código 2)</button><button data-t="psd">Salud por antena (PSD)</button><button data-t="tags">Tags (móviles)</button>
+        <button data-t="reb">Saltos y rebotes</button><button data-t="cai">Caídas de red</button><button data-t="hor">Patrones horarios</button>
+        <button data-t="jam">JAMM</button><button data-t="cob">Cobertura de códigos</button><button data-t="arc">Archivos</button>
+      </div>
+      <div id="mp-tab" class="space-y-4"></div>
+    </div>
+  </div>`;
+  (document.getElementById('view-fusion') || document.getElementById('view-noc')).after(sec);
+  const $m = id => document.getElementById(id);
+  const S = { files: [], R: null, tab: 'res', charts: [] };
+  const n0 = v => v == null || !isFinite(v) ? '—' : Math.round(v).toLocaleString('es-PE');
+  const n1 = v => v == null || !isFinite(v) ? '—' : (Math.round(v * 10) / 10).toLocaleString('es-PE');
+  const pct = v => v == null ? '—' : n1(v) + ' %';
+  const MPf = MP_CORE(); const fmtT = MPf.fmtT, fmtDur = MPf.fmtDur;
+  const pad = n => String(n).padStart(2, '0');
+  const colorEf = v => v >= 95 ? '#22c55e' : v >= 80 ? '#facc15' : v >= 60 ? '#fb923c' : '#ef4444';
+  const bar = (v, max, c) => `<div class="mp-bar" title="${n1(v)}"><i style="width:${Math.max(2, Math.min(100, v / (max || 1) * 100))}%;background:${c}"></i></div>`;
+  const setMsgs = l => $m('mp-msgs').innerHTML = l.map(([t, m]) => `<div class="mp-msg ${t}">${m}</div>`).join('');
+
+  function paintFiles() {
+    $m('mp-files').innerHTML = S.files.map((f, i) => `<span class="mp-file"><i class="fa-solid fa-file-excel text-emerald-400"></i>${esc(f.name)} · ${(f.size / 1024).toFixed(0)} KB<button data-i="${i}" title="Quitar">✕</button></span>`).join('');
+    $m('mp-run').disabled = !S.files.length;
+  }
+  function addFiles(list) {
+    const ok = [...list].filter(f => /\.(xlsx?|csv)$/i.test(f.name));
+    if (ok.length < list.length) showToast('Solo se aceptan .xls, .xlsx o .csv');
+    ok.forEach(f => { if (f.size > 60 * 1024 * 1024) { showToast(f.name + ' supera 60 MB'); return; } if (!S.files.some(x => x.name === f.name && x.size === f.size)) S.files.push(f); });
+    paintFiles();
+  }
+  $m('mp-files').addEventListener('click', e => { const b = e.target.closest('button[data-i]'); if (!b) return; S.files.splice(+b.dataset.i, 1); paintFiles(); });
+  const drop = $m('mp-drop'), inp = drop.querySelector('input');
+  inp.addEventListener('change', () => { addFiles(inp.files); inp.value = ''; });
+  drop.addEventListener('dragover', e => { e.preventDefault(); drop.classList.add('drag'); });
+  drop.addEventListener('dragleave', () => drop.classList.remove('drag'));
+  drop.addEventListener('drop', e => { e.preventDefault(); drop.classList.remove('drag'); addFiles(e.dataTransfer.files || []); });
+
+  function params() {
+    const g = (id, d, lo, hi) => { const v = parseFloat($m(id).value); return isFinite(v) ? Math.min(hi, Math.max(lo, v)) : d; };
+    return { caidaMin: g('mp-caida', 10, 1, 1440), logSeg: g('mp-log', 60, 5, 86400), critico: g('mp-crit', 51, 1, 255), salto: g('mp-salto', 75, 1, 255), ventanaSalto: g('mp-vsalto', 600, 1, 86400), ventanaRebote: g('mp-vreb', 60, 1, 3600), dedup: $m('mp-dedup').checked };
+  }
+  async function run() {
+    if (!dev()) { showToast('Módulo solo para dev'); return; }
+    if (!S.files.length) return;
+    const b = $m('mp-run'); b.disabled = true; b.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-1"></i>Procesando…';
+    setMsgs([['ok', `Leyendo ${S.files.length} archivo${S.files.length === 1 ? '' : 's'}… la pantalla sigue disponible mientras tanto.`]]);
+    const t0 = performance.now();
+    try {
+      const files = await loadFiles(S.files);
+      const R = await runJob('milton', files, params());
+      if (R.error) { setMsgs([['err', esc(R.error)]]); S.R = null; $m('mp-out').classList.add('hidden'); return; }
+      S.R = R;
+      const omit = R.archivos.filter(a => !/^OK/.test(a.estado));
+      setMsgs([...R.avisos.map(a => ['warn', esc(a)]), ...omit.map(a => ['warn', `${esc(a.archivo)}: ${esc(a.estado)}`]),
+        ['ok', `Listo en ${((performance.now() - t0) / 1000).toFixed(1)} s: ${R.total.toLocaleString('es-PE')} lecturas de ${R.nPsd} antena${R.nPsd === 1 ? '' : 's'} y ${R.nMov} móviles, del ${fmtT(R.tmin).slice(0, 16)} al ${fmtT(R.tmax).slice(0, 16)} (${R.dias} día${R.dias === 1 ? '' : 's'}).`]]);
+      paintKpis(); $m('mp-out').classList.remove('hidden'); showTab(S.tab);
+      $m('mp-xlsx').disabled = false;
+    } catch (e) { console.error(e); setMsgs([['err', 'Error: ' + esc(e.message || e)]]); }
+    finally { b.disabled = !S.files.length; b.innerHTML = '<i class="fa-solid fa-bolt mr-1"></i>Procesar'; }
+  }
+  function paintKpis() {
+    const R = S.R, k = R.kpi;
+    $m('mp-kpis').innerHTML = [
+      ['Lecturas', n0(R.total), 'var(--accent)'], ['Antenas (PSD)', n0(R.nPsd), '#e2e8f0'], ['Móviles', n0(R.nMov), '#e2e8f0'], ['Efectividad', pct(k.efG), colorEf(k.efG)],
+      ['Caídas > ' + R.P.caidaMin + ' min', n0(k.caidas), k.caidas ? '#f97316' : '#64748b'], ['Alertas JAMM', n0(k.jamm), k.jamm ? '#ef4444' : '#64748b'],
+      ['Rebotes reales', n0(k.rebotes), k.rebotes ? '#facc15' : '#64748b']
+    ].map(([l, v, c]) => `<div class="chip mp-kpi"><p style="color:${c}">${v}</p><p>${l}</p></div>`).join('');
+    paintS2Hero();
+  }
+  function paintS2Hero() {
+    const R = S.R, k = R.kpi, el = $m('mp-s2hero'); if (!el) return;
+    const crit = 'Criterio: MÓVIL de 6 caracteres alfanuméricos que empieza con 2 (ej. 25H696, 259863).';
+    if (!k.s2) {
+      el.innerHTML = `<div class="mp-s2hero none"><div class="mp-s2big"><p>0</p><p>dispositivos Serie 2</p></div><div class="mp-s2body"><h3>Sin dispositivos Serie 2 en estos archivos</h3><p>${crit} Se revisaron ${n0(R.nMov)} móviles de ${n0(R.nPsd)} antena${R.nPsd === 1 ? '' : 's'}. Para saber cuántas antenas pueden ver un código 2, sube juntos los reportes de varias antenas del mismo periodo.</p></div></div>`;
+      return;
+    }
+    const top = R.s2.slice(0, 30);
+    el.innerHTML = `<div class="mp-s2hero"><div class="mp-s2big"><p>${n0(k.s2)}</p><p>dispositivo${k.s2 === 1 ? '' : 's'} Serie 2</p></div>
+      <div class="mp-s2big"><p>${n0(k.s2Antenas)}</p><p>antena${k.s2Antenas === 1 ? '' : 's'} los ven</p></div>
+      <div class="mp-s2body"><h3>Dispositivos Serie 2 (código 2) · cuántas antenas ven a cada uno</h3>
+        <div class="mp-s2chips">${top.map(c => `<button type="button" data-s2="${esc(c.mov)}" title="${esc(c.lista)}"><b class="mono">${esc(c.mov)}</b><span>${c.antenas} ant.</span></button>`).join('')}${R.s2.length > top.length ? `<button type="button" data-s2="">+${R.s2.length - top.length} más</button>` : ''}</div>
+        <p>${crit} Toca un código para ver el detalle.</p></div></div>`;
+  }
+  $m('mp-s2hero').addEventListener('click', e => { const b = e.target.closest('button[data-s2]'); if (!b) return; S.s2Focus = b.dataset.s2 || ''; showTab('s2'); const t = $m('mp-tabs'); if (t) t.scrollIntoView({ block: 'start', behavior: 'smooth' }); });
+  $m('mp-tabs').addEventListener('click', e => { const b = e.target.closest('button[data-t]'); if (b) showTab(b.dataset.t); });
+
+  const chartBase = () => {
+    const tick = '#94a3b8', grid = 'rgba(148,163,184,.15)';
+    return { tick, grid, opt: { responsive: true, maintainAspectRatio: false, animation: false, normalized: true, plugins: { datalabels: { display: false }, legend: { labels: { color: tick, boxWidth: 10, font: { size: 11 } } } }, scales: { x: { ticks: { color: tick, maxRotation: 0, autoSkip: true }, grid: { color: grid } }, y: { ticks: { color: tick }, grid: { color: grid }, beginAtZero: true } } } };
+  };
+  function chart(id, cfg) { if (!window.Chart) return; const el = $m(id); if (!el) return; S.charts.push(new Chart(el, cfg)); }
+  const card = (title, body, sub) => `<div class="card p-3 space-y-2"><div class="flex flex-wrap items-baseline justify-between gap-2"><h3 class="text-xs font-bold uppercase tracking-wider text-slate-300">${title}</h3>${sub ? `<span class="text-[11px] text-slate-500">${sub}</span>` : ''}</div>${body}</div>`;
+  const tH = t => `${pad(t)}:00–${pad(t)}:59`;
+
+  function showTab(t) {
+    S.tab = t; const R = S.R; if (!R) return;
+    $m('mp-tabs').querySelectorAll('button').forEach(b => b.classList.toggle('on', b.dataset.t === t));
+    S.charts.forEach(c => { try { c.destroy(); } catch (e) {} }); S.charts = [];
+    const H = $m('mp-tab'), { opt } = chartBase();
+    if (t === 'res') {
+      H.innerHTML = `<div class="grid grid-cols-1 xl:grid-cols-[1.25fr_1fr] gap-3">
+        ${card('Síntesis ejecutiva', `<div class="mp-ins">${R.ins.map(i => `<div style="--c:${i.c}"><h4>${esc(i.t)}</h4><p>${esc(i.p)}</p><small><i>Acción:</i> ${esc(i.a)}<br>Cálculo: ${esc(i.f)}</small></div>`).join('')}</div>`)}
+        <div class="space-y-3">${card('Efectividad por antena (%)', '<div class="mp-chart"><canvas id="mp-c1"></canvas></div>')}${card('Mensajes por hora (todo el periodo)', '<div class="mp-chart"><canvas id="mp-c2"></canvas></div>', 'línea roja = JAMM')}</div></div>`;
+      const P = R.psd.slice(0, 60);
+      chart('mp-c1', { type: 'bar', data: { labels: P.map(p => p.psd), datasets: [{ label: 'Efectividad', data: P.map(p => p.ef), backgroundColor: P.map(p => colorEf(p.ef)) }, ...(P.some(p => p.testigo) ? [{ label: 'Con tag testigo', data: P.map(p => p.testigo ? p.testigo.ef : null), backgroundColor: 'rgba(56,189,248,.55)' }] : [])] }, options: { ...opt, scales: { ...opt.scales, y: { ...opt.scales.y, max: 100 } } } });
+      const ser = R.serie.map(s => ({ x: s.t, y: s.msgs, j: s.jamm }));
+      const d1 = decimate(ser, 900), d2 = decimate(ser.map(s => ({ x: s.x, y: s.j })), 900);
+      chart('mp-c2', { type: 'line', data: { datasets: [{ label: 'Mensajes', data: d1, borderColor: '#38bdf8', backgroundColor: 'rgba(56,189,248,.15)', fill: true, pointRadius: 0, borderWidth: 1.4, tension: .2 }, { label: 'JAMM', data: d2, borderColor: '#ef4444', pointRadius: 0, borderWidth: 1.2 }] }, options: { ...opt, parsing: false, scales: { ...opt.scales, x: { type: 'linear', ticks: { color: '#94a3b8', callback: v => fmtT(v).slice(5, 13) + 'h', maxTicksLimit: 8 }, grid: { color: 'rgba(148,163,184,.15)' } } }, plugins: { ...opt.plugins, tooltip: { callbacks: { title: c => fmtT(c[0].parsed.x).slice(0, 13) + ':00' } } } } });
+    }
+    if (t === 'psd') {
+      const mx = R.psd.reduce((m, p) => Math.max(m, p.lecturas), 1);
+      H.innerHTML = card('Salud y rendimiento por antena receptora (PSD)', '<div id="mp-t-psd"></div>', 'Toca un encabezado para ordenar') + card('Caídas y JAMM por antena', '<div class="mp-chart"><canvas id="mp-c3"></canvas></div>');
+      pagedTable($m('mp-t-psd'), R.psd.map(p => ({ ...p, testigoTxt: p.testigo ? `${p.testigo.ef}% (${p.testigo.mov})` : '—', periodo: `${fmtT(p.desde).slice(0, 16)} → ${fmtT(p.hasta).slice(0, 16)}`, down: fmtDur(p.downSeg) })), [
+        { k: 'psd', t: 'PSD', f: r => `<b>${esc(r.psd)}</b>` }, { k: 'moviles', t: 'Móviles' }, { k: 'lecturas', t: 'Lecturas', f: r => `<div style="display:flex;gap:6px;align-items:center">${n0(r.lecturas)}${bar(r.lecturas, mx, 'var(--accent)')}</div>` },
+        { k: 'jamm', t: 'JAMM', f: r => n0(r.jamm) }, { k: 'caidas', t: `Caídas > ${R.P.caidaMin} min` }, { k: 'down', t: 'Tiempo sin lecturas' },
+        { k: 'ef', t: 'Efectividad', f: r => `<b style="color:${colorEf(r.ef)}">${pct(r.ef)}</b>` }, { k: 'testigoTxt', t: 'Efect. tag testigo' },
+        { k: 'mtbf', t: 'MTBF (min)', f: r => r.mtbf == null ? 'sin caídas' : n1(r.mtbf) }, { k: 'mttr', t: 'Duración media caída', f: r => r.mttr == null ? '—' : fmtDur(r.mttr) },
+        { k: 'pctCrit', t: 'Señal crítica', f: r => pct(r.pctCrit) }, { k: 'periodo', t: 'Periodo' }, { k: 'sustento', t: 'Cálculo', wrap: true }
+      ], { sort: 'ef', dir: -1, search: R.psd.length > 8 });
+      const P = R.psd.slice(0, 60);
+      chart('mp-c3', { type: 'bar', data: { labels: P.map(p => p.psd), datasets: [{ label: 'Caídas', data: P.map(p => p.caidas), backgroundColor: '#f97316' }, { label: 'JAMM', data: P.map(p => p.jamm), backgroundColor: '#ef4444', yAxisID: 'y1' }] }, options: { ...opt, scales: { ...opt.scales, y1: { position: 'right', ticks: { color: '#fca5a5' }, grid: { display: false }, beginAtZero: true } } } });
+    }
+    if (t === 'tags') {
+      H.innerHTML = card('Calidad de emisión RF por vehículo (tag)', '<div id="mp-t-tags"></div>', `${R.tags.length.toLocaleString('es-PE')} combinaciones antena–móvil`) + card('RSSI medio vs. inestabilidad (cada punto es un tag)', '<div class="mp-chart"><canvas id="mp-c4"></canvas></div>');
+      pagedTable($m('mp-t-tags'), R.tags.map(r => ({ ...r, p: fmtT(r.primer).slice(0, 16), u: fmtT(r.ultimo).slice(0, 16) })), [
+        { k: 'psd', t: 'PSD' }, { k: 'mov', t: 'Móvil', f: r => `<b class="mono">${esc(r.mov)}</b>` }, { k: 'p', t: 'Primer aviso' }, { k: 'u', t: 'Último aviso' }, { k: 'lecturas', t: 'Lecturas', f: r => n0(r.lecturas) },
+        { k: 'jamm', t: 'JAMM' }, { k: 'ratioJ', t: 'Ratio JAMM', f: r => pct(r.ratioJ) }, { k: 'media', t: 'RSSI medio' }, { k: 'moda', t: 'Moda' }, { k: 'min', t: 'Mín' }, { k: 'max', t: 'Máx' },
+        { k: 'inest', t: 'Inestabilidad' }, { k: 'pctSat', t: '% en 255', f: r => pct(r.pctSat) }, { k: 'pctCrit', t: 'Señal crítica', f: r => pct(r.pctCrit) },
+        { k: 'saltos', t: `Saltos ≥${R.P.salto}` }, { k: 'rebotes', t: 'Rebotes reales' }, { k: 'tasaR', t: 'Tasa rebotes', f: r => pct(r.tasaR) }, { k: 'cmds', t: 'Comandos' }
+      ], { sort: 'lecturas', dir: -1, bad: r => r.pctCrit >= 5 || r.tasaR >= 5 });
+      const pts = R.tags.map(t => ({ x: t.media, y: t.inest, r: Math.max(3, Math.min(14, Math.sqrt(t.lecturas) / 3)), l: `${t.mov} (${t.psd})`, j: t.ratioJ }));
+      chart('mp-c4', { type: 'bubble', data: { datasets: [{ label: 'Tags', data: pts.slice(0, 1500), backgroundColor: pts.slice(0, 1500).map(p => p.j >= 50 ? 'rgba(239,68,68,.6)' : 'rgba(56,189,248,.55)') }] }, options: { ...opt, plugins: { ...opt.plugins, legend: { display: false }, tooltip: { callbacks: { label: c => `${c.raw.l}: RSSI ${c.raw.x}, inestab. ${c.raw.y}` } } }, scales: { x: { ...opt.scales.x, min: 0, max: 260, title: { display: true, text: 'RSSI medio', color: '#94a3b8' } }, y: { ...opt.scales.y, title: { display: true, text: 'Inestabilidad (desv. estándar)', color: '#94a3b8' } } } } });
+    }
+    if (t === 'reb') {
+      H.innerHTML = `<div class="mp-msg warn">Un vehículo que se acerca y se aleja produce <b>saltos</b> normales (por ejemplo de 255 a 80). Lo sospechoso es el <b>rebote real</b>: la señal sube y vuelve a bajar (o al revés) en menos de ${R.P.ventanaRebote} s. ${R.saltos.length ? Math.round(R.saltos.filter(s => s.r0 >= 255 || s.r1 >= 255).length / R.saltos.length * 100) + '% de los saltos involucran 255 (señal saturada).' : ''}</div>` +
+        card(`Rebotes reales (${R.rebotes.length.toLocaleString('es-PE')})`, '<div id="mp-t-reb"></div>') + card(`Saltos ≥ ${R.P.salto} pts en < ${R.P.ventanaSalto} s (${R.saltos.length.toLocaleString('es-PE')}, criterio anterior)`, '<div id="mp-t-sal"></div>');
+      pagedTable($m('mp-t-reb'), R.rebotes.map(r => ({ ...r, a: fmtT(r.t0), b: fmtT(r.t1).slice(11), c: fmtT(r.t2).slice(11) })), [
+        { k: 'psd', t: 'PSD' }, { k: 'mov', t: 'Móvil' }, { k: 'cmd', t: 'Comando' }, { k: 'a', t: 'Inicio' }, { k: 'r0', t: 'RSSI 1' }, { k: 'b', t: 'Hora 2' }, { k: 'r1', t: 'RSSI 2', f: r => `<b>${r.r1}</b>` }, { k: 'c', t: 'Hora 3' }, { k: 'r2', t: 'RSSI 3' }, { k: 'seg', t: 'Segundos' }
+      ], { sort: 'seg', dir: 1 });
+      pagedTable($m('mp-t-sal'), R.saltos.map(r => ({ ...r, a: fmtT(r.t0), b: fmtT(r.t1), sus: `Diferencia de ${r.salto} pts en ${r.seg} s` })), [
+        { k: 'psd', t: 'PSD' }, { k: 'mov', t: 'Móvil' }, { k: 'cmd', t: 'Comando' }, { k: 'a', t: 'Fecha/hora anterior' }, { k: 'r0', t: 'RSSI anterior' }, { k: 'b', t: 'Fecha/hora actual' }, { k: 'r1', t: 'RSSI actual' }, { k: 'salto', t: 'Salto (pts)' }, { k: 'seg', t: 'Tiempo (s)' }, { k: 'sus', t: 'Justificación' }
+      ], { sort: 'salto', dir: -1 });
+    }
+    if (t === 'cai') {
+      const kpi = R.cortes.filter(c => c.kpi);
+      H.innerHTML = card(`Bitácora de cortes > ${R.P.logSeg} s (${R.cortes.length.toLocaleString('es-PE')})`, '<div id="mp-t-cai"></div>', `${kpi.length} superan ${R.P.caidaMin} min (cuentan como caída)`) + card('Duración de las caídas (min)', '<div class="mp-chart"><canvas id="mp-c5"></canvas></div>');
+      pagedTable($m('mp-t-cai'), R.cortes.map(c => ({ ...c, dur: fmtDur(c.seg), d: fmtT(c.desde), h: fmtT(c.hasta), tipo: c.kpi ? 'CAÍDA' : 'corte', sus: `Sin lecturas durante ${fmtDur(c.seg)} (> ${c.kpi ? R.P.caidaMin + ' min' : R.P.logSeg + ' s'})` })), [
+        { k: 'psd', t: 'PSD' }, { k: 'tipo', t: 'Tipo', f: r => r.kpi ? '<b style="color:#f97316">CAÍDA</b>' : 'corte' }, { k: 'seg', t: 'Duración', f: r => r.dur }, { k: 'd', t: 'Desde' }, { k: 'h', t: 'Hasta' }, { k: 'sus', t: 'Criterio', wrap: true }
+      ], { sort: 'seg', dir: -1 });
+      const pts = decimate(kpi.map(c => ({ x: c.desde, y: Math.round(c.seg / 60) })).sort((a, b) => a.x - b.x), 800);
+      chart('mp-c5', { type: 'bar', data: { datasets: [{ label: 'Minutos sin lecturas', data: pts, backgroundColor: '#f97316', barThickness: 4 }] }, options: { ...opt, parsing: false, scales: { ...opt.scales, x: { type: 'linear', ticks: { color: '#94a3b8', callback: v => fmtT(v).slice(5, 13) + 'h', maxTicksLimit: 8 }, grid: { color: 'rgba(148,163,184,.15)' } } }, plugins: { ...opt.plugins, tooltip: { callbacks: { title: c => fmtT(c[0].parsed.x).slice(0, 16) } } } } });
+    }
+    if (t === 'hor') {
+      const psds = Object.keys(R.heat).slice(0, 40), mx = psds.reduce((m, p) => Math.max(m, ...R.heat[p]), 1);
+      const cell = v => { const a = v / mx; return `<td title="${v}" style="background:rgba(56,189,248,${(.06 + a * .85).toFixed(2)});color:${a > .55 ? '#0b1220' : '#cbd5e1'};text-align:center;padding:4px 2px;font-size:10px">${v || ''}</td>`; };
+      H.innerHTML = card('Tráfico por hora del día (todos los días sumados)', '<div class="mp-chart"><canvas id="mp-c6"></canvas></div>', `${R.dias} día${R.dias === 1 ? '' : 's'} analizados`) +
+        card('Mapa de calor: mensajes por antena y hora', `<div class="pg-scroll"><table class="pg-tbl"><thead><tr><th>PSD</th>${Array.from({ length: 24 }, (_, h) => `<th style="text-align:center">${pad(h)}</th>`).join('')}</tr></thead><tbody>${psds.map(p => `<tr><td><b>${esc(p)}</b></td>${R.heat[p].map(cell).join('')}</tr>`).join('')}</tbody></table></div>`) +
+        card('Fallas recurrentes por antena y hora', '<div id="mp-t-ph"></div>') + card('Detalle por franja horaria', '<div id="mp-t-hor"></div>');
+      chart('mp-c6', { type: 'bar', data: { labels: R.horas.map(h => pad(h.h)), datasets: [{ label: 'Mensajes', data: R.horas.map(h => h.msgs), backgroundColor: 'rgba(56,189,248,.65)' }, { label: 'JAMM', data: R.horas.map(h => h.jamm), backgroundColor: 'rgba(239,68,68,.75)' }, { type: 'line', label: 'Caídas', data: R.horas.map(h => h.caidas), borderColor: '#f97316', backgroundColor: '#f97316', yAxisID: 'y1', pointRadius: 3 }] }, options: { ...opt, scales: { ...opt.scales, y1: { position: 'right', ticks: { color: '#fdba74', precision: 0 }, grid: { display: false }, beginAtZero: true } } } });
+      pagedTable($m('mp-t-ph'), R.fallasPH.map(x => ({ ...x, franja: tH(x.h), sus: `${x.n} caídas que empezaron entre las ${pad(x.h)}:00 y ${pad(x.h)}:59` })), [{ k: 'psd', t: 'PSD' }, { k: 'franja', t: 'Franja' }, { k: 'n', t: `Caídas > ${R.P.caidaMin} min` }, { k: 'sus', t: 'Justificación' }], { sort: 'n', dir: -1, search: false });
+      pagedTable($m('mp-t-hor'), R.horas.map(h => ({ ...h, franja: tH(h.h), prom: n1(h.msgs / R.dias) })), [{ k: 'franja', t: 'Franja' }, { k: 'msgs', t: 'Mensajes' }, { k: 'prom', t: 'Promedio por día' }, { k: 'jamm', t: 'JAMM' }, { k: 'crit', t: 'Señal crítica' }, { k: 'caidas', t: 'Caídas' }], { search: false, size: 24 });
+    }
+    if (t === 'jam') {
+      H.innerHTML = (R.jamPerm.length ? `<div class="mp-msg warn"><b>${R.jamPerm.length}</b> equipo${R.jamPerm.length === 1 ? '' : 's'} envía${R.jamPerm.length === 1 ? '' : 'n'} casi solo JAMM (≥ 95% de sus mensajes): ${R.jamPerm.slice(0, 10).map(esc).join(', ')}. Eso suele ser un equipo en alarma permanente más que un ataque; conviene revisarlo en campo.</div>` : '') +
+        card('Alertas JAMM por antena', '<div id="mp-t-jp"></div>') + card('Equipos con JAMM', '<div id="mp-t-jt"></div>') + card('JAMM por hora del día', '<div class="mp-chart"><canvas id="mp-c7"></canvas></div>');
+      pagedTable($m('mp-t-jp'), R.jamPsd.map(j => ({ ...j, p: fmtT(j.primer).slice(0, 16), u: fmtT(j.ultimo).slice(0, 16) })), [{ k: 'psd', t: 'PSD' }, { k: 'n', t: 'Alertas', f: r => `<b style="color:#f87171">${n0(r.n)}</b>` }, { k: 'pct', t: '% del tráfico', f: r => pct(r.pct) }, { k: 'rssi', t: 'RSSI medio' }, { k: 'equipos', t: 'Equipos' }, { k: 'top', t: 'Principales equipos', wrap: true }, { k: 'p', t: 'Primera' }, { k: 'u', t: 'Última' }], { sort: 'n', dir: -1, search: false });
+      pagedTable($m('mp-t-jt'), R.jamTags.map(t => ({ ...t, perm: t.ratioJ >= 95 && t.lecturas >= 50 ? 'Alarma permanente' : '' })), [{ k: 'mov', t: 'Móvil' }, { k: 'psd', t: 'PSD' }, { k: 'jamm', t: 'JAMM' }, { k: 'lecturas', t: 'Lecturas' }, { k: 'ratioJ', t: 'Ratio JAMM', f: r => pct(r.ratioJ) }, { k: 'media', t: 'RSSI medio' }, { k: 'perm', t: 'Observación' }], { sort: 'jamm', dir: -1 });
+      chart('mp-c7', { type: 'bar', data: { labels: R.horas.map(h => pad(h.h)), datasets: [{ label: 'JAMM', data: R.horas.map(h => h.jamm), backgroundColor: 'rgba(239,68,68,.75)' }] }, options: opt });
+    }
+    if (t === 's2') {
+      const k = R.kpi;
+      const psds = [...new Set(R.s2.flatMap(c => c.porPsd.map(x => x[0])))].sort();
+      H.innerHTML = `<div class="mp-msg ${k.s2 ? 'ok' : 'warn'}">${k.s2 ? `<b>${k.s2}</b> dispositivo${k.s2 === 1 ? '' : 's'} Serie 2, vistos por <b>${k.s2Antenas}</b> antena${k.s2Antenas === 1 ? '' : 's'} distinta${k.s2Antenas === 1 ? '' : 's'}.` : 'En estos archivos no hay dispositivos Serie 2 (MÓVIL de 6 caracteres alfanuméricos que empieza con 2, ej. 25H696 o 259863).'} Para saber cuántas antenas pueden ver un código, sube juntos los reportes de varias antenas del mismo periodo.</div>` +
+        (R.s2.length ? card('Serie 2: antenas que ven cada dispositivo', '<div id="mp-t-s2"></div>', 'ordenado por número de antenas') +
+          `<div class="grid grid-cols-1 xl:grid-cols-2 gap-3">${card('Antenas por dispositivo Serie 2', `<div class="mp-chart" style="height:${Math.min(560, 60 + Math.min(R.s2.length, 40) * 18)}px"><canvas id="mp-c-s2"></canvas></div>`, R.s2.length > 40 ? 'primeros 40' : '')}${card('Serie 2 por antena', '<div id="mp-t-s2p"></div>')}</div>` +
+          (psds.length <= 40 ? card('Matriz Serie 2 × antena (RSSI máximo)', '<div id="mp-s2mx" class="mp-s2mx"></div>', 'vacío = esa antena no lo vio') : '') : '');
+      if (!R.s2.length) return;
+      const cols = [{ k: 'mov', t: 'Código', f: r => `<b class="mono" style="color:#38bdf8">${esc(r.mov)}</b>` }, { k: 'antenas', t: 'Antenas que lo ven', f: r => `<b>${r.antenas}</b>` }, { k: 'lista', t: 'Antenas (lecturas · RSSI máx)', wrap: true }, { k: 'lecturas', t: 'Lecturas' }, { k: 'media', t: 'RSSI medio' }, { k: 'max', t: 'RSSI máx' }, { k: 'primerPsd', t: '1ra antena' }, { k: 'pt', t: '1ra vez' }, { k: 'ultPsd', t: 'Última antena' }, { k: 'ut', t: 'Última vez' }];
+      const rows = R.s2.map(r => ({ ...r, pt: fmtT(r.primer).slice(0, 16), ut: fmtT(r.ultimo).slice(0, 16) }));
+      const foc = S.s2Focus; S.s2Focus = '';
+      pagedTable($m('mp-t-s2'), foc ? [...rows.filter(r => r.mov === foc), ...rows.filter(r => r.mov !== foc)] : rows, cols, foc ? { search: true } : { sort: 'antenas', dir: -1 });
+      pagedTable($m('mp-t-s2p'), R.s2PorPsd, [{ k: 'psd', t: 'PSD' }, { k: 'codigos', t: 'Dispositivos Serie 2' }, { k: 'lecturas', t: 'Lecturas' }], { sort: 'codigos', dir: -1, search: false });
+      const C = R.s2.slice(0, 40);
+      chart('mp-c-s2', { type: 'bar', data: { labels: C.map(c => c.mov), datasets: [{ label: 'Antenas que lo ven', data: C.map(c => c.antenas), backgroundColor: '#38bdf8' }] }, options: { ...opt, indexAxis: 'y', plugins: { ...opt.plugins, legend: { display: false } }, scales: { x: { ...opt.scales.x, beginAtZero: true, ticks: { ...opt.scales.x.ticks, precision: 0 } }, y: { ...opt.scales.y, ticks: { ...opt.scales.y.ticks, autoSkip: false, font: { size: 10 } } } } } });
+      const mx = $m('mp-s2mx');
+      if (mx) {
+        const MR = R.s2.slice(0, 300), col = v => v < 0 ? '' : `background:hsla(${Math.round(v / 255 * 130)},75%,45%,.55)`;
+        mx.innerHTML = `<table><thead><tr><th>Código</th><th>Antenas</th>${psds.map(p => `<th>${esc(p)}</th>`).join('')}</tr></thead><tbody>${MR.map(c => { const m = new Map(c.porPsd.map(x => [x[0], x])); return `<tr><td class="mono"><b>${esc(c.mov)}</b></td><td><b>${c.antenas}</b></td>${psds.map(p => { const x = m.get(p); return x ? `<td style="${col(x[2])}" title="${esc(p)}: ${x[1]} lecturas, RSSI máx ${x[2]}">${x[2] < 0 ? '·' : x[2]}</td>` : '<td></td>'; }).join('')}</tr>`; }).join('')}</tbody></table>${R.s2.length > MR.length ? `<p class="text-[11px] text-slate-500 mt-1">Se muestran 300 de ${R.s2.length}; el Excel trae todos.</p>` : ''}`;
+      }
+    }
+    if (t === 'cob') {
+      H.innerHTML = card('Cobertura de todos los códigos (cuántas antenas ven cada móvil)', '<div id="mp-t-cob"></div>', 'ordenado por número de antenas');
+      const cols = [{ k: 'mov', t: 'Código', f: r => `<b class="mono">${esc(r.mov)}</b>${r.s2 ? ' <span style="color:#38bdf8;font-size:10px;font-weight:800">SERIE 2</span>' : ''}` }, { k: 'antenas', t: 'Antenas que lo ven', f: r => `<b>${r.antenas}</b>` }, { k: 'lista', t: 'Antenas (lecturas · RSSI máx)', wrap: true }, { k: 'lecturas', t: 'Lecturas' }, { k: 'media', t: 'RSSI medio' }, { k: 'primerPsd', t: '1ra antena' }, { k: 'pt', t: '1ra vez' }];
+      pagedTable($m('mp-t-cob'), R.cobertura.map(r => ({ ...r, pt: fmtT(r.primer).slice(0, 16) })), cols, { sort: 'antenas', dir: -1 });
+    }
+    if (t === 'arc') {
+      H.innerHTML = card('Archivos procesados', '<div id="mp-t-arc"></div>', R.dups ? `${R.dups.toLocaleString('es-PE')} lecturas repetidas quitadas` : '') + card('Parámetros usados', `<div class="mp-ins"><div><p>Caída de red: más de ${R.P.caidaMin} min sin lecturas · Bitácora: cortes de más de ${R.P.logSeg} s · Señal crítica: RSSI < ${R.P.critico} · Salto: ≥ ${R.P.salto} pts en < ${R.P.ventanaSalto} s · Rebote real: ida y vuelta en ≤ ${R.P.ventanaRebote} s · Quitar repetidos: ${R.P.dedup ? 'sí' : 'no'}.</p></div></div>`);
+      pagedTable($m('mp-t-arc'), R.archivos, [{ k: 'archivo', t: 'Archivo' }, { k: 'hoja', t: 'Hoja' }, { k: 'psd', t: 'PSD' }, { k: 'filas', t: 'Filas' }, { k: 'validas', t: 'Válidas' }, { k: 'estado', t: 'Estado', wrap: true }], { search: false, bad: r => !/^OK/.test(r.estado) });
+    }
+  }
+
+  /* ---------------- Excel consolidado ---------------- */
+  function excel() {
+    const R = S.R; if (!R || !window.XLSX) return;
+    const wb = XLSX.utils.book_new();
+    const add = (name, rows, title) => {
+      const aoa = [];
+      if (title) aoa.push([title], []);
+      const keys = rows.length ? Object.keys(rows[0]) : ['(sin registros)'];
+      aoa.push(keys); rows.forEach(r => aoa.push(keys.map(k => r[k] == null ? '' : r[k])));
+      const ws = XLSX.utils.aoa_to_sheet(aoa);
+      ws['!cols'] = keys.map(k => ({ wch: Math.min(70, Math.max(String(k).length, ...rows.slice(0, 300).map(r => String(r[k] ?? '').length)) + 2) }));
+      if (title) ws['!merges'] = [{ s: { r: 0, c: 0 }, e: { r: 0, c: Math.max(0, keys.length - 1) } }];
+      ws['!autofilter'] = { ref: XLSX.utils.encode_range({ s: { r: title ? 2 : 0, c: 0 }, e: { r: aoa.length - 1, c: keys.length - 1 } }) };
+      XLSX.utils.book_append_sheet(wb, ws, name.slice(0, 31));
+    };
+    add('Resumen Ejecutivo (Global)', R.ins.map(i => ({ 'MÉTRICA CLAVE': i.t, 'RESULTADO / CONCLUSIÓN (TOP 5)': i.p, 'ACCIÓN SUGERIDA': i.a, 'FÓRMULA / SUSTENTO': i.f })), `SÍNTESIS EJECUTIVA DE RADIOFRECUENCIA (${R.nPsd} ANTENAS/PSD · ${R.total} LECTURAS · ${fmtT(R.tmin).slice(0, 16)} a ${fmtT(R.tmax).slice(0, 16)})`);
+    add('Serie 2', R.s2.map(c => ({ 'CÓDIGO': c.mov, 'ANTENAS QUE LO VEN': c.antenas, 'ANTENAS (LECTURAS · RSSI MÁX)': c.lista, 'LECTURAS': c.lecturas, 'RSSI MEDIO': c.media, 'RSSI MÁX': c.max, '1RA ANTENA': c.primerPsd, '1RA VEZ': fmtT(c.primer), 'ÚLTIMA ANTENA': c.ultPsd, 'ÚLTIMA VEZ': fmtT(c.ultimo) })), R.kpi.s2 ? `DISPOSITIVOS SERIE 2 (CÓDIGO 2): ${R.kpi.s2} VISTOS POR ${R.kpi.s2Antenas} ANTENAS` : 'SIN DISPOSITIVOS SERIE 2 (6 CARACTERES ALFANUMÉRICOS QUE EMPIEZAN CON 2) EN ESTOS ARCHIVOS');
+    { const ps = [...new Set(R.s2.flatMap(c => c.porPsd.map(x => x[0])))].sort();
+      add('Serie 2 x Antena', R.s2.map(c => { const m = new Map(c.porPsd.map(x => [x[0], x])), o = { 'CÓDIGO': c.mov, 'ANTENAS QUE LO VEN': c.antenas }; ps.forEach(p => { const x = m.get(p); o[p] = x ? (x[2] < 0 ? 'sí' : x[2]) : ''; }); return o; }), 'MATRIZ SERIE 2 × ANTENA (RSSI MÁXIMO; VACÍO = NO LO VIO)'); }
+    add('Salud de Red (PSD)', R.psd.map(p => ({ 'PSD': p.psd, 'MÓVILES DISTINTOS': p.moviles, 'LECTURAS': p.lecturas, 'ALERTAS JAMM': p.jamm, [`CAÍDAS (>${R.P.caidaMin}m)`]: p.caidas, 'TIEMPO SIN LECTURAS': fmtDur(p.downSeg), 'EFECTIVIDAD (%)': p.ef, 'TAG TESTIGO': p.testigo ? p.testigo.mov : '', 'EFECTIVIDAD TESTIGO (%)': p.testigo ? p.testigo.ef : '', 'MTBF (min)': p.mtbf ?? 'sin caídas', 'DURACIÓN MEDIA CAÍDA (s)': p.mttr ?? '', 'SEÑAL CRÍTICA (%)': p.pctCrit, 'DESDE': fmtT(p.desde), 'HASTA': fmtT(p.hasta), 'CÁLCULO': p.sustento })), 'SALUD Y RENDIMIENTO DE LA RED POR ANTENA RECEPTORA (PSD)');
+    add('Métricas de Tags (Móvil)', R.tags.map(t => ({ 'PSD': t.psd, 'MÓVIL': t.mov, 'PRIMER AVISO': fmtT(t.primer), 'ÚLTIMO AVISO': fmtT(t.ultimo), 'LECTURAS': t.lecturas, 'ALERTAS JAMM': t.jamm, 'RATIO JAMM (%)': t.ratioJ, 'RSSI MEDIA': t.media, 'RSSI MODA': t.moda, 'RSSI MÍN': t.min, 'RSSI MÁX': t.max, 'INESTABILIDAD': t.inest, '% EN 255': t.pctSat, 'SEÑAL CRÍTICA (%)': t.pctCrit, [`SALTOS (>=${R.P.salto})`]: t.saltos, 'REBOTES REALES': t.rebotes, 'TASA REBOTES (%)': t.tasaR, 'COMANDOS': t.cmds })), 'EVALUACIÓN DE CALIDAD DE EMISIÓN RF POR VEHÍCULO (TAG)');
+    add('Rebotes Reales', R.rebotes.map(r => ({ 'PSD': r.psd, 'MÓVIL': r.mov, 'COMANDO': r.cmd, 'HORA 1': fmtT(r.t0), 'RSSI 1': r.r0, 'HORA 2': fmtT(r.t1), 'RSSI 2': r.r1, 'HORA 3': fmtT(r.t2), 'RSSI 3': r.r2, 'SEGUNDOS': r.seg })), `REBOTES REALES: LA SEÑAL SUBE Y BAJA (O AL REVÉS) >= ${R.P.salto} PTS EN <= ${R.P.ventanaRebote} S`);
+    add('Detalle Saltos RF', R.saltos.map(r => ({ 'PSD': r.psd, 'MÓVIL': r.mov, 'COMANDO': r.cmd, 'FECHA/HORA ANTERIOR': fmtT(r.t0), 'RSSI ANTERIOR': r.r0, 'FECHA/HORA ACTUAL': fmtT(r.t1), 'RSSI ACTUAL': r.r1, 'SALTO (PTS)': r.salto, 'TIEMPO (s)': r.seg, 'JUSTIFICACIÓN': `Diferencia de ${r.salto} pts en ${r.seg} s` })), `SALTOS DE SEÑAL >= ${R.P.salto} PTS EN < ${R.P.ventanaSalto} S (MISMO TIPO DE COMANDO)`);
+    add(`Log Cortes (>${R.P.logSeg}s)`, R.cortes.map(c => ({ 'PSD': c.psd, 'TIPO': c.kpi ? 'CAÍDA' : 'corte', 'DURACIÓN': fmtDur(c.seg), 'SEGUNDOS': Math.round(c.seg), 'DESDE': fmtT(c.desde), 'HASTA': fmtT(c.hasta) })), `BITÁCORA: CORTES DE LECTURA DE LA ANTENA MAYORES A ${R.P.logSeg} SEGUNDOS`);
+    add('Patrones Horarios', R.horas.map(h => ({ 'FRANJA HORARIA': tH(h.h), 'MENSAJES': h.msgs, 'PROMEDIO POR DÍA': Math.round(h.msgs / R.dias * 10) / 10, 'ALERTAS JAMM': h.jamm, 'SEÑAL CRÍTICA': h.crit, [`CAÍDAS (>${R.P.caidaMin}m)`]: h.caidas })), 'TRÁFICO POR HORA DEL DÍA (GLOBAL)');
+    add('Fallas PSD x Hora', R.fallasPH.map(x => ({ 'PSD': x.psd, 'FRANJA': tH(x.h), 'CAÍDAS': x.n })), 'FALLAS RECURRENTES POR ANTENA Y HORA');
+    add('Mapa Calor PSD x Hora', Object.entries(R.heat).map(([p, a]) => Object.assign({ 'PSD': p }, ...a.map((v, h) => ({ [pad(h) + 'h']: v })))), 'MENSAJES POR ANTENA Y HORA DEL DÍA');
+    add('JAMM por PSD', R.jamPsd.map(j => ({ 'PSD': j.psd, 'ALERTAS': j.n, '% DEL TRÁFICO': j.pct, 'RSSI MEDIO': j.rssi, 'EQUIPOS': j.equipos, 'PRINCIPALES': j.top, 'PRIMERA': fmtT(j.primer), 'ÚLTIMA': fmtT(j.ultimo) })), 'ALERTAS JAMM (INHIBIDORES) POR ANTENA');
+    add('JAMM por Equipo', R.jamTags.map(t => ({ 'MÓVIL': t.mov, 'PSD': t.psd, 'JAMM': t.jamm, 'LECTURAS': t.lecturas, 'RATIO JAMM (%)': t.ratioJ, 'RSSI MEDIO': t.media, 'OBSERVACIÓN': t.ratioJ >= 95 && t.lecturas >= 50 ? 'Alarma permanente (revisar equipo)' : '' })), 'EQUIPOS CON ALERTAS JAMM');
+    add('Cobertura por Código', R.cobertura.map(c => ({ 'CÓDIGO': c.mov, 'SERIE 2': c.s2 ? 'SÍ' : '', 'ANTENAS QUE LO VEN': c.antenas, 'ANTENAS (LECTURAS · RSSI MÁX)': c.lista, 'LECTURAS': c.lecturas, 'RSSI MEDIO': c.media, '1RA ANTENA': c.primerPsd, '1RA VEZ': fmtT(c.primer) })), 'CUÁNTAS ANTENAS VEN CADA CÓDIGO');
+    add('Archivos y Parámetros', [...R.archivos.map(a => ({ 'ARCHIVO / PARÁMETRO': a.archivo, 'DETALLE': `${a.estado} · hoja ${a.hoja} · ${a.validas}/${a.filas} filas · PSD ${a.psd}` })),
+      { 'ARCHIVO / PARÁMETRO': 'Lecturas repetidas quitadas', 'DETALLE': R.dups }, { 'ARCHIVO / PARÁMETRO': 'Caída de red', 'DETALLE': `> ${R.P.caidaMin} min sin lecturas` }, { 'ARCHIVO / PARÁMETRO': 'Bitácora', 'DETALLE': `> ${R.P.logSeg} s` },
+      { 'ARCHIVO / PARÁMETRO': 'Señal crítica', 'DETALLE': `RSSI < ${R.P.critico}` }, { 'ARCHIVO / PARÁMETRO': 'Salto', 'DETALLE': `>= ${R.P.salto} pts en < ${R.P.ventanaSalto} s` }, { 'ARCHIVO / PARÁMETRO': 'Rebote real', 'DETALLE': `ida y vuelta en <= ${R.P.ventanaRebote} s` },
+      { 'ARCHIVO / PARÁMETRO': 'Generado', 'DETALLE': fmtT(Date.now() - 5 * 3600000) + ' (hora Lima) · HUNTER CORE · MiltonPro' }]);
+    XLSX.writeFile(wb, `REPORTE_CONSOLIDADO_MILTONPRO_${fmtT(R.tmin).slice(0, 10)}_${fmtT(R.tmax).slice(0, 10)}.xlsx`);
+  }
+  $m('mp-run').addEventListener('click', run);
+  $m('mp-xlsx').addEventListener('click', excel);
+  $m('mp-reset').addEventListener('click', () => { S.files = []; S.R = null; paintFiles(); setMsgs([]); $m('mp-out').classList.add('hidden'); $m('mp-xlsx').disabled = true; S.charts.forEach(c => { try { c.destroy(); } catch (e) {} }); S.charts = []; });
+
+  /* ---------------- navegación y rol ---------------- */
+  const OTHER = ['map', 'tech', 'maint', 'price', 'noc', 'rafi', 'rast', 'fusion'];
+  const _sv = window.setView;
+  window.setView = function (v) {
+    if (v === 'milton') {
+      if (!dev()) { showToast('Módulo solo para dev'); return; }
+      document.querySelectorAll('.rail button[data-v]').forEach(b => b.classList.toggle('on', b.dataset.v === 'milton'));
+      $('side').classList.add('ui-hidden'); $('view-filter').classList.add('ui-hidden');
+      OTHER.forEach(x => { const el = $('view-' + x); if (el) el.classList.add('ui-hidden'); });
+      sec.classList.remove('ui-hidden');
+      return;
+    }
+    sec.classList.add('ui-hidden');
+    return _sv.apply(this, arguments);
+  };
+  function syncRole() {
+    const ok = logged() && dev();
+    nav.classList.toggle('ui-hidden', !ok);
+    if (!ok && !sec.classList.contains('ui-hidden')) { sec.classList.add('ui-hidden'); try { _sv('filter'); } catch (e) {} }
+    if (!logged() && S.R) { S.R = null; S.files = []; paintFiles(); $m('mp-out').classList.add('hidden'); }
+  }
+  const _ar = window.applySessionRoleUI;
+  if (typeof _ar === 'function') window.applySessionRoleUI = function () { const r = _ar.apply(this, arguments); syncRole(); return r; };
+  setInterval(syncRole, 1000); syncRole();
 })();
 </script>
 
