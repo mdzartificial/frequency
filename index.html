@@ -5998,7 +5998,7 @@ o.querySelector('#lt-r').onclick=()=>{d.filas.push(d.columnas.map(()=>''));draw(
 draw();document.body.appendChild(o)}
 setInterval(()=>{if(typeof hunterSession==='undefined'||!hunterSession)return;for(const id in MODS){const v=document.getElementById(id);if(v&&!v.querySelector('.lt-btn')){const b=document.createElement('button');b.className='lt-btn';b.textContent='▦ Tabla / columnas';const[m,t,def]=MODS[id];b.onclick=()=>open(m,t,def);v.appendChild(b)}}},1500);
 /* Cohete 3D de RAFI */
-/* v11 · RAFI = copia del astronauta verde del login, que aparece y desaparece (antes era un cohete) */
+/* v16 · RAFI = solo el casco con el pulpo, con animación de querer escapar. v11 · RAFI = copia del astronauta verde del login, que aparece y desaparece (antes era un cohete) */
 const w=setInterval(()=>{const btn=document.getElementById('rafi-btn');if(!btn)return;clearInterval(w);mdzRafiAstro(btn)},700);
 async function mdzRafiAstro(btn){
   btn.classList.add('rafi-astro');btn.setAttribute('aria-label','Abrir asistente RAFI');
@@ -6013,32 +6013,45 @@ async function mdzRafiAstro(btn){
     sc.add(new T.AmbientLight(0xffffff,1.15));
     const dl=new T.DirectionalLight(0xffffff,2.3);dl.position.set(2,3,4);sc.add(dl);
     const rim=new T.DirectionalLight(0x6dffb0,1.4);rim.position.set(-3,1,-2);sc.add(rim);
-    const a=window.__mdzAstroFactory();a.scale.setScalar(1);a.updateMatrixWorld(true);
-    const bb=new T.Box3().setFromObject(a),c=bb.getCenter(new T.Vector3()),sz=bb.getSize(new T.Vector3());
-    a.position.sub(c);const wrap=new T.Group();wrap.add(a);const base=1.45/Math.max(sz.x,sz.y,sz.z);wrap.scale.setScalar(base);sc.add(wrap);
+    const a=window.__mdzAstroFactory();a.scale.setScalar(1);
+    // v16: RAFI = SOLO el casco con el pulpo (sin traje). Se ocultan torso, mochila y extremidades de esta COPIA; el astronauta del login no cambia.
     const u=a.userData||{};
+    a.children.forEach(ch=>{if(ch!==u.head)ch.visible=false});
+    a.updateMatrixWorld(true);
+    const bb=new T.Box3().setFromObject(u.head||a),c=bb.getCenter(new T.Vector3()),sz=bb.getSize(new T.Vector3());
+    a.position.sub(c);const wrap=new T.Group();wrap.add(a);const base=1.25/Math.max(sz.x,sz.y,sz.z);wrap.scale.setScalar(base);sc.add(wrap);
+    const octo=u.octo,oy0=octo?octo.position.y:0;
     btn.textContent='';btn.appendChild(cv);
-    // Ciclo: visible 8 s → se desvanece → oculto 4 s → reaparece. Al pasar el mouse o con el panel abierto, siempre visible.
-    const CYCLE=14,fab=document.getElementById('rafi-fab');let hover=false,vis=1;
+    // Ciclo de 16 s: flota → se sacude dentro del casco → intenta escapar por el borde de la pantalla (y lo jala de vuelta)
+    // → se esconde bajo el borde → asoma mirando a los lados → vuelve. Con el mouse encima o el panel abierto, se queda quieto y visible.
+    const CYCLE=16;let hover=false,calm=0;
     btn.addEventListener('pointerenter',()=>hover=true);btn.addEventListener('pointerleave',()=>hover=false);
     const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const ease=x=>x<0?0:x>1?1:x*x*(3-2*x), elastic=x=>x<=0?0:x>=1?1:1-Math.cos(x*Math.PI*3.2)*Math.exp(-x*5.5);
     (function loop(ms){
       requestAnimationFrame(loop);
       if(document.hidden||document.body.classList.contains('hunter-preauth'))return;
       const t=ms*.001,ph=t%CYCLE,pop=document.getElementById('rafi-pop');
-      let target=ph<8?1:ph<9?1-(ph-8):ph<13?0:ph-13;
-      if(hover||reduce||(pop&&pop.classList.contains('on')))target=1;
-      vis+=(target-vis)*.12;
-      cv.style.opacity=vis.toFixed(3);
-      btn.classList.toggle('rafi-hidden',vis<.08);
-      if(vis<.02)return;
-      wrap.scale.setScalar(base*(.55+.45*vis));
-      wrap.rotation.set(.12+Math.sin(t*.6)*.08,-.45+Math.sin(t*.5)*.35,Math.sin(t*.4)*.1+(1-vis)*1.2);
-      wrap.position.y=Math.sin(t*1.6)*.06;
-      if(u.armL){u.armL.hip.rotation.set(-.55+Math.sin(t*.9)*.18,.15,-.62+Math.sin(t)*.16);u.armR.hip.rotation.set(-.35+Math.cos(t*.8)*.2,-.18,.45+Math.sin(t*.9)*.12);
-        u.legL.hip.rotation.set(-.28+Math.sin(t*.7)*.14,0,-.06);u.legR.hip.rotation.set(-.08+Math.cos(t*.7)*.14,0,.08);}
-      if(u.packLed)u.packLed.visible=Math.sin(t*4.2)>.25;
-      if(u.mantle)u.mantle.scale.set(.96+Math.sin(t*2.4)*.04,1.12-Math.sin(t*2.4)*.05,1+Math.sin(t*2.4)*.04);
+      const quiet=hover||reduce||(pop&&pop.classList.contains('on'));
+      calm+=((quiet?1:0)-calm)*.1;
+      let tx=0,ty=0,rot=0,shake=0,press=0,look=Math.sin(t*.7)*.5,op=1;
+      if(ph>=3&&ph<5){shake=Math.sin((ph-3)*Math.PI/2);press=shake}                                   // se sacude
+      else if(ph>=5&&ph<7.2){const k=(ph-5)/2.2;const out=k<.55?ease(k/.55):1-elastic((k-.55)/.45);    // intenta escapar hacia el borde
+        tx=26*out;ty=10*out;rot=18*out;press=out;look=1.1*out}
+      else if(ph>=8.5&&ph<10){const k=ease((ph-8.5)/1.5);ty=78*k;op=1-.85*k}                           // se esconde bajo el borde
+      else if(ph>=10&&ph<13.5){const k=(ph-10)/3.5;ty=78-40*ease(Math.min(1,k*3));op=.15+.85*ease(Math.min(1,k*3));look=Math.sin(k*Math.PI*4)*1.2} // asoma y mira
+      else if(ph>=13.5&&ph<14.6){const k=(ph-13.5)/1.1;ty=38*(1-elastic(k))}                           // salta de vuelta
+      const q=1-calm;tx*=q;ty*=q;rot*=q;shake*=q;press*=q;look*=q;op=op*q+calm;
+      cv.style.transform=`translate(${tx.toFixed(1)}px,${ty.toFixed(1)}px) rotate(${rot.toFixed(1)}deg)`;
+      cv.style.opacity=op.toFixed(3);
+      btn.classList.toggle('rafi-hidden',op<.3);
+      wrap.rotation.set(.1+Math.sin(t*.6)*.06+press*.25,-.35+look*.55,Math.sin(t*.4)*.08+Math.sin(t*38)*.07*shake);
+      wrap.position.set(Math.sin(t*41)*.045*shake,Math.sin(t*1.6)*.05*q,0);
+      if(octo){
+        octo.position.y=oy0+.035*press+Math.sin(t*2.2)*.008;                    // el pulpo empuja el cristal
+        octo.rotation.set(-.25*press,Math.sin(t*1.3)*.35*q+look*.4,Math.sin(t*24)*.12*shake);
+      }
+      if(u.mantle){const b=2.4+press*5;u.mantle.scale.set(.96+Math.sin(t*b)*.05,1.12-Math.sin(t*b)*.06,1+Math.sin(t*b)*.05)}
       r.render(sc,cam);
     })(0);
   }catch(e){btn.textContent='🧑‍🚀'}
@@ -9546,6 +9559,19 @@ body:not(.theme-day) #fx-map .leaflet-tile-pane { filter: invert(1) hue-rotate(1
 .fx-popup b.t { display: block; font-size: 13px; margin-bottom: 3px; }
 .fx-popup .k { color: #94a3b8; }
 canvas.fx-heat { pointer-events: none; }
+/* v16 · Regla y estimación */
+.leaflet-overlay-pane path.fx-ray { animation: v12dash 1.1s linear infinite; }
+@keyframes v12dash { to { stroke-dashoffset: -22; } }
+.fx-rule-lbl { position: absolute; left: 0; top: 0; transform: translate(-50%, -150%); white-space: nowrap; padding: 4px 9px; border-radius: 9px; font: 600 11.5px Arial, sans-serif; color: #fef3c7; background: rgba(8,12,20,.92); border: 1px solid rgba(251,191,36,.7); box-shadow: 0 4px 14px rgba(0,0,0,.5); pointer-events: none; }
+.fx-rule-lbl b { color: #fff; }
+.fx-car { font-size: 26px; line-height: 34px; text-align: center; cursor: grab; filter: drop-shadow(0 0 4px #fbbf24) drop-shadow(0 3px 4px rgba(0,0,0,.6)); }
+#view-fusion .fx-est-row { display: grid; grid-template-columns: minmax(0, 1fr) 110px 34px; gap: 8px; align-items: end; }
+#view-fusion .fx-est-row button { height: 33px; }
+#view-fusion .fx-est-res { padding: 10px 12px; border-radius: 10px; background: rgba(0,0,0,.25); border-left: 3px solid var(--c, #38bdf8); font-size: 12.5px; line-height: 1.5; color: #e2e8f0; }
+#view-fusion .fx-est-res b { color: #fff; }
+#view-fusion .fx-est-res small { color: #94a3b8; display: block; margin-top: 3px; }
+body.theme-day #view-fusion .fx-est-res { color: #0f172a; background: rgba(15,23,42,.05); }
+body.theme-day #view-fusion .fx-est-res b { color: #0f172a; }
 /* Tema ejecutivo / día: suaviza los fondos */
 body.theme-day #view-fusion .fx-tbl th { background: #f1f5f9; color: #0f172a; }
 body.theme-day #view-fusion .fx-tbl td { color: #0f172a; }
@@ -9676,10 +9702,36 @@ body.theme-day #view-fusion .fx-drop b { color: #0f172a; }
     </div>
     <div id="fx-out" class="hidden space-y-4">
       <div id="fx-kpis" class="grid grid-cols-2 sm:grid-cols-4 xl:grid-cols-8 gap-2"></div>
-      <div class="card p-3 space-y-2">
+    </div>
+    <div id="fx-est-card" class="card p-3 space-y-3">
+      <div class="flex flex-wrap items-center justify-between gap-2"><h3 class="text-xs font-bold uppercase tracking-wider text-slate-300"><i class="fa-solid fa-crosshairs mr-1 text-[var(--accent)]"></i>Estimar ubicación por RSSI</h3>
+      <span class="text-[11px] text-slate-500">Ej.: "la antena lo ve con 92". Usa tus referencias guardadas. Con 2 o más antenas, la zona probable es donde se cruzan los anillos.</span></div>
+      <div id="fx-est-rows" class="space-y-2"></div>
+      <div class="flex flex-wrap gap-2"><button id="fx-est-add" class="chip px-3 py-1.5 text-[11px] font-semibold text-sky-300 cursor-pointer">＋ Agregar otra antena</button>
+      <button id="fx-est-go" class="btn px-4 py-1.5 text-xs font-bold text-white cursor-pointer"><i class="fa-solid fa-location-dot mr-1"></i>Estimar</button>
+      <button id="fx-est-clear" class="chip px-3 py-1.5 text-[11px] font-semibold text-slate-300 cursor-pointer">Quitar del mapa</button></div>
+      <div id="fx-est-out" class="space-y-2"></div>
+    </div>
+    <div id="fx-mapcard" class="hidden card p-3 space-y-2">
         <div class="fx-legend"><span><b>RSSI</b> 0<span class="fx-grad"></span>255</span><span>● burbuja = lectura (número = RSSI)</span><span>★ = RSSI alto</span><span>Borde = color de la antena</span><span style="color:#38bdf8">━ ➤ recorrido GPS</span></div>
         <div id="fx-map"></div>
+    </div>
+    <div id="fx-rule-card" class="hidden card p-3 space-y-3">
+      <div class="flex flex-wrap items-center justify-between gap-2"><h3 class="text-xs font-bold uppercase tracking-wider text-slate-300"><i class="fa-solid fa-ruler mr-1 text-amber-300"></i>Regla · antena → punto con potencia</h3>
+      <span class="text-[11px] text-slate-500">Arrastra el carrito 🚗 en el mapa hasta una lectura (se engancha sola) o toca una lectura.</span></div>
+      <div class="grid grid-cols-1 md:grid-cols-[220px_1fr] gap-3 items-start">
+        <label class="fx-par">Antena<select id="fx-rule-ant" class="sel w-full max-w-none"></select></label>
+        <div id="fx-rule-info" class="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-6 gap-2"></div>
       </div>
+      <div class="flex flex-wrap gap-2 items-center">
+        <button id="fx-rule-last" class="chip px-3 py-1.5 text-[11px] font-semibold text-white cursor-pointer">Último punto con potencia</button>
+        <button id="fx-rule-max" class="chip px-3 py-1.5 text-[11px] font-semibold text-white cursor-pointer">Punto de RSSI máximo</button>
+        <input id="fx-rule-nota" class="fx-in" style="flex:1 1 180px;max-width:320px" maxlength="500" placeholder="Nota (opcional): calle, clima, prueba...">
+        <button id="fx-rule-save" class="btn px-4 py-1.5 text-xs font-bold text-white cursor-pointer"><i class="fa-solid fa-floppy-disk mr-1"></i>Guardar referencia</button>
+        <button id="fx-rule-saveall" class="chip px-3 py-1.5 text-[11px] font-semibold text-emerald-300 cursor-pointer">Guardar todas las lecturas de esta antena</button>
+      </div>
+    </div>
+    <div id="fx-out2" class="hidden space-y-4">
       <div class="grid grid-cols-1 xl:grid-cols-2 gap-3">
         <div class="card p-3"><h3 class="text-xs font-bold uppercase tracking-wider text-slate-300 mb-2">RSSI vs. distancia a la antena</h3><div class="fx-chart"><canvas id="fx-ch-dist"></canvas></div></div>
         <div class="card p-3"><h3 class="text-xs font-bold uppercase tracking-wider text-slate-300 mb-2">RSSI en el tiempo</h3><div class="fx-chart"><canvas id="fx-ch-time"></canvas></div></div>
@@ -9952,12 +10004,21 @@ body.theme-day #view-fusion .fx-drop b { color: #0f172a; }
       <span class="k">PSD:</span> ${esc(l.psdRaw)}<br><span class="k">Coordenadas:</span> ${l.lat.toFixed(6)}, ${l.lon.toFixed(6)}</div>`;
   }
 
-  function dibujarMapa(R) {
-    if (!window.L) { setMsgs([['err', 'No se cargó Leaflet (mapa).']]); return; }
+  function ensureMap() {
+    if (!window.L) return false;
+    $f('fx-mapcard').classList.remove('hidden');
     if (!S.map) {
       S.map = L.map('fx-map', { preferCanvas: true, zoomControl: true });
+      S.svgR = L.svg({ padding: .5 });
       L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap', maxZoom: 19 }).addTo(S.map);
+      S.map.setView([-12.05, -77.0], 11);
     }
+    setTimeout(() => S.map.invalidateSize(), 60);
+    return true;
+  }
+
+  function dibujarMapa(R) {
+    if (!ensureMap()) { setMsgs([['err', 'No se cargó Leaflet (mapa).']]); return; }
     if (S.ctrl) { S.ctrl.remove(); S.ctrl = null; }
     if (S.layers) Object.values(S.layers).forEach(l => S.map.removeLayer(l));
     const stBy = Object.fromEntries(R.stats.map(s => [s.antena, s]));
@@ -9996,6 +10057,7 @@ body.theme-day #view-fusion .fx-drop b { color: #0f172a; }
       else if (pocas) mk = L.marker([l.lat, l.lon], { icon: L.divIcon({ className: '', iconSize: [24, 24], iconAnchor: [12, 12], html: `<div class="fx-pin" style="background:${c};border-color:${col}">${n0(l.rssi)}</div>` }) });
       else mk = L.circleMarker([l.lat, l.lon], { radius: 6, color: col, weight: 2, fillColor: c, fillOpacity: .95 });
       mk.bindTooltip(`${esc(l.antena)} · RSSI ${n0(l.rssi)} · ${fmtH(l.t)}`).bindPopup(popupLect(l, st)).addTo(lay.lect);
+      mk.on('click', () => { if (st && st.A) { if (RULE.ant !== l.antena) { RULE.ant = l.antena; $f('fx-rule-ant').value = l.antena; } setRule(l); } });
       if (st && st.A) L.polyline([[l.lat, l.lon], [st.A.lat, st.A.lon]], { color: col, weight: 1.3, opacity: .5, dashArray: '4 6', interactive: false }).addTo(lay.lin);
     });
     lay.rec.addTo(S.map); lay.heat.addTo(S.map); lay.ant.addTo(S.map); lay.lect.addTo(S.map);
@@ -10051,7 +10113,7 @@ body.theme-day #view-fusion .fx-drop b { color: #0f172a; }
   });
 
   function pintarResultado(R) {
-    $f('fx-out').classList.remove('hidden');
+    $f('fx-out').classList.remove('hidden'); $f('fx-out2').classList.remove('hidden');
     const sinPos = R.lect.length - R.conPos.length, all = R.lect.map(l => l.rssi);
     const best = R.conPos.length ? R.conPos.reduce((m, l) => l.rssi > m.rssi ? l : m) : null;
     const k = [
@@ -10112,6 +10174,186 @@ body.theme-day #view-fusion .fx-drop b { color: #0f172a; }
     XLSX.writeFile(wb, `fusion_potencia_posicion_${d.getUTCFullYear()}${pad(d.getUTCMonth() + 1)}${pad(d.getUTCDate())}.xlsx`);
   }
 
+  /* ---------------------------- v16 · REGLA antena → punto ---------------------------- */
+  const RT_REF = 'mdz_rf_referencias';
+  const RULE = { ant: null, pt: null, l: null, layer: null, car: null, lines: null, lbl: null };
+  const fmtDist = d => d == null || !isFinite(d) ? '—' : d < 1000 ? `${Math.round(d)} m` : `${(d / 1000).toFixed(2).replace('.', ',')} km`;
+  const stOf = ant => S.result && S.result.stats.find(s => s.antena === ant && s.A);
+  const lectOf = ant => S.result ? S.result.conPos.filter(l => l.antena === ant) : [];
+  function clearRule() { if (RULE.layer && S.map) S.map.removeLayer(RULE.layer); Object.assign(RULE, { layer: null, car: null, lines: null, lbl: null, pt: null, l: null }); }
+  function initRule(R) {
+    const ants = R.stats.filter(s => s.A), sel = $f('fx-rule-ant');
+    $f('fx-rule-card').classList.toggle('hidden', !ants.length);
+    sel.innerHTML = ants.map(s => `<option value="${esc(s.antena)}">${esc(s.antena)} · ${esc(s.psd)}</option>`).join('');
+    clearRule();
+    if (!ants.length) return;
+    RULE.ant = ants.some(s => s.antena === RULE.ant) ? RULE.ant : ants[0].antena; sel.value = RULE.ant;
+    ruleTo('last');
+  }
+  function ruleTo(kind) {
+    const L_ = lectOf(RULE.ant); if (!L_.length) { showToast('Esta antena no tiene lecturas ubicadas'); return; }
+    setRule(kind === 'max' ? L_.reduce((m, l) => l.rssi > m.rssi ? l : m) : L_[L_.length - 1]);
+  }
+  function setRule(l, free) {
+    const st = stOf(RULE.ant); if (!st || !S.map) return;
+    RULE.l = free ? null : l; RULE.pt = [l.lat, l.lon];
+    const a = [st.A.lat, st.A.lon];
+    if (!RULE.layer) {
+      RULE.layer = L.layerGroup().addTo(S.map);
+      RULE.lines = [L.polyline([a, RULE.pt], { renderer: S.svgR, color: '#000', weight: 7, opacity: .35, interactive: false }).addTo(RULE.layer),
+                    L.polyline([a, RULE.pt], { renderer: S.svgR, color: '#fbbf24', weight: 3, dashArray: '10 8', className: 'fx-ray', interactive: false }).addTo(RULE.layer)];
+      RULE.lbl = L.marker(a, { interactive: false, zIndexOffset: 1300, icon: L.divIcon({ className: '', iconSize: [0, 0], html: '' }) }).addTo(RULE.layer);
+      RULE.car = L.marker(RULE.pt, { draggable: true, autoPan: true, zIndexOffset: 1400, title: 'Arrástrame hasta una lectura', icon: L.divIcon({ className: '', iconSize: [34, 34], iconAnchor: [17, 17], html: '<div class="fx-car">🚗</div>' }) }).addTo(RULE.layer);
+      RULE.car.on('drag', e => { RULE.pt = [e.latlng.lat, e.latlng.lng]; RULE.l = null; updRule(); });
+      RULE.car.on('dragend', () => {
+        const p = S.map.latLngToContainerPoint(RULE.pt); let best = null;
+        lectOf(RULE.ant).forEach(l => { const q = S.map.latLngToContainerPoint([l.lat, l.lon]), d = Math.hypot(q.x - p.x, q.y - p.y); if (d <= 36 && (!best || d < best.d)) best = { l, d }; });
+        if (best) setRule(best.l); else updRule();
+      });
+    }
+    RULE.car.setLatLng(RULE.pt);
+    updRule();
+  }
+  function updRule() {
+    const st = stOf(RULE.ant); if (!st || !RULE.layer) return;
+    const a = [st.A.lat, st.A.lon], p = RULE.pt, d = hav(a[0], a[1], p[0], p[1]);
+    RULE.lines.forEach(x => x.setLatLngs([a, p]));
+    RULE.lbl.setLatLng([(a[0] + p[0]) / 2, (a[1] + p[1]) / 2]);
+    RULE.lbl.setIcon(L.divIcon({ className: '', iconSize: [0, 0], html: `<div class="fx-rule-lbl">📏 ${esc(st.antena)}${RULE.l ? ` · RSSI <b>${n0(RULE.l.rssi)}</b>` : ''} · <b>${fmtDist(d)}</b></div>` }));
+    const l = RULE.l, chip = (k, v, c) => `<div class="chip fx-kpi"><p style="color:${c || '#e2e8f0'};font-size:15px">${v}</p><p>${k}</p></div>`;
+    $f('fx-rule-info').innerHTML = chip('Antena', esc(st.antena), st.color) + chip('RSSI', l ? `${n0(l.rssi)} <span style="font-size:11px;color:#94a3b8">/255</span>` : '—', l ? colorRssi(l.rssi) : '#64748b') +
+      chip('Distancia', fmtDist(d), '#fbbf24') + chip('Hora', l ? fmtH(l.t) : 'punto libre') + chip('Posición', l ? l.met : 'manual') + chip('Coordenadas', `<span style="font-size:11px">${p[0].toFixed(5)}, ${p[1].toFixed(5)}</span>`);
+    $f('fx-rule-save').disabled = !l;
+    $f('fx-rule-save').title = l ? '' : 'Lleva el carrito hasta una lectura para guardar';
+  }
+  async function saveRefs(list, origen) {
+    if (!dev()) { showToast('Solo el rol dev puede guardar referencias'); return; }
+    const st = stOf(RULE.ant); if (!st || !list.length) return;
+    const nota = ($f('fx-rule-nota').value || '').trim().slice(0, 500) || null;
+    const rows = list.map(l => ({
+      antena: st.antena.slice(0, 200), psd: String(l.psdRaw || st.psd).slice(0, 100), rssi: l.rssi,
+      distancia_m: +hav(st.A.lat, st.A.lon, l.lat, l.lon).toFixed(2), lat_antena: st.A.lat, lon_antena: st.A.lon,
+      lat_punto: +l.lat.toFixed(7), lon_punto: +l.lon.toFixed(7), fecha_lectura: fmtT(l.t, true), metodo: l.met, origen,
+      archivo_potencia: String(S.result.files.pot).slice(0, 255), archivo_posicion: String(S.result.files.pos).slice(0, 255), nota
+    }));
+    let nuevas = 0;
+    for (let i = 0; i < rows.length; i += 500) {
+      const { data, error } = await hunterSbClient.from(RT_REF).upsert(rows.slice(i, i + 500), { onConflict: 'antena,fecha_lectura,rssi', ignoreDuplicates: true }).select('id');
+      if (error) {
+        const falta = /does not exist|relation|schema cache|42P01|PGRST205/i.test((error.code || '') + ' ' + error.message);
+        showToast(falta ? 'Falta crear la tabla: corre supabase_v16_referencias_rf.sql en Supabase' : 'No se guardó: ' + error.message); return;
+      }
+      nuevas += (data || []).length;
+    }
+    delete REFS[st.antena];
+    showToast(nuevas === rows.length ? `${nuevas} referencia${nuevas === 1 ? '' : 's'} guardada${nuevas === 1 ? '' : 's'}` : `${nuevas} nuevas · ${rows.length - nuevas} ya estaban guardadas`);
+  }
+  $f('fx-rule-ant').addEventListener('change', e => { RULE.ant = e.target.value; clearRule(); ruleTo('last'); });
+  $f('fx-rule-last').addEventListener('click', () => ruleTo('last'));
+  $f('fx-rule-max').addEventListener('click', () => ruleTo('max'));
+  $f('fx-rule-save').addEventListener('click', async e => { if (!RULE.l) return; e.currentTarget.disabled = true; await saveRefs([RULE.l], 'regla'); e.currentTarget.disabled = !RULE.l; });
+  $f('fx-rule-saveall').addEventListener('click', async e => {
+    const L_ = lectOf(RULE.ant); if (!L_.length) return;
+    if (!confirm(`¿Guardar las ${L_.length} lecturas ubicadas de ${RULE.ant} como referencias?`)) return;
+    e.currentTarget.disabled = true; await saveRefs(L_, 'lote'); e.currentTarget.disabled = false;
+  });
+
+  /* ---------------------------- v16 · ESTIMACIÓN por RSSI ---------------------------- */
+  const REFS = {};   // caché por antena
+  async function loadRefs(ant) {
+    if (REFS[ant]) return REFS[ant];
+    let rows = [];
+    if (hunterSbClient && dev()) {
+      const { data, error } = await hunterSbClient.from(RT_REF).select('antena,rssi,distancia_m,fecha_lectura,nota,lat_antena,lon_antena').eq('antena', ant).limit(10000);
+      if (!error && data) rows = data.map(r => ({ rssi: +r.rssi, d: +r.distancia_m, key: String(r.fecha_lectura || '').replace('T', ' ').slice(0, 23) + '|' + (+r.rssi), fecha: r.fecha_lectura, nota: r.nota, src: 'guardada', la: r.lat_antena, lo: r.lon_antena }));
+      else if (error && !/does not exist|relation|schema cache|42P01|PGRST205/i.test((error.code || '') + ' ' + error.message)) showToast('Referencias: ' + error.message);
+    }
+    return (REFS[ant] = rows);
+  }
+  const quant = (a, q) => { if (!a.length) return null; const p = (a.length - 1) * q, i = Math.floor(p); return a[i] + (a[Math.min(a.length - 1, i + 1)] - a[i]) * (p - i); };
+  function ring(c, r1, r2, n = 72) {
+    const pt = (r, k) => { const b = k / n * 2 * Math.PI, la = c[0] * Math.PI / 180, dr = r / 6371000;
+      const lat2 = Math.asin(Math.sin(la) * Math.cos(dr) + Math.cos(la) * Math.sin(dr) * Math.cos(b));
+      const lon2 = c[1] * Math.PI / 180 + Math.atan2(Math.sin(b) * Math.sin(dr) * Math.cos(la), Math.cos(dr) - Math.sin(la) * Math.sin(lat2));
+      return [lat2 * 180 / Math.PI, lon2 * 180 / Math.PI]; };
+    const out = [], inn = []; for (let k = 0; k <= n; k++) { out.push(pt(r2, k)); inn.push(pt(Math.max(1, r1), k)); }
+    return [out, inn];
+  }
+  function estOptions() {
+    const cat = catalogo(), names = new Map();
+    if (S.result) S.result.stats.filter(s => s.A).forEach(s => names.set(U(s.antena), s.antena));
+    [...cat.values()].sort((a, b) => a.antena.localeCompare(b.antena)).forEach(a => { if (!names.has(U(a.antena))) names.set(U(a.antena), a.antena); });
+    return [...names.values()];
+  }
+  function addEstRow(ant, rssi) {
+    const opts = estOptions(), row = document.createElement('div'); row.className = 'fx-est-row';
+    row.innerHTML = `<label class="fx-par">Antena<select class="sel w-full max-w-none" data-e="ant">${opts.map(n => `<option value="${esc(n)}" ${ant && U(ant) === U(n) ? 'selected' : ''}>${esc(n)}</option>`).join('')}</select></label>
+      <label class="fx-par">RSSI visto<input data-e="rssi" type="number" min="0" max="255" value="${rssi != null ? rssi : 92}"></label>
+      <button class="chip text-red-300 cursor-pointer" data-e="x" title="Quitar">✕</button>`;
+    row.querySelector('[data-e="x"]').onclick = () => { if ($f('fx-est-rows').children.length > 1) row.remove(); };
+    $f('fx-est-rows').appendChild(row);
+  }
+  function estFromResult(R) { // al procesar, propone la antena del archivo
+    const ants = R.stats.filter(s => s.A); if (!ants.length) return;
+    $f('fx-est-rows').innerHTML = ''; ants.forEach(s => addEstRow(s.antena, 92));
+  }
+  async function estimar() {
+    const rows = [...$f('fx-est-rows').children].map(r => ({ ant: r.querySelector('[data-e="ant"]').value, rssi: num(r.querySelector('[data-e="rssi"]').value) }));
+    if (!rows.length) return;
+    if (!ensureMap()) return;
+    if (S.estLayer) S.map.removeLayer(S.estLayer);
+    S.estLayer = L.layerGroup().addTo(S.map);
+    const cat = catalogo(), html = [], bounds = [];
+    for (const [i, q] of rows.entries()) {
+      if (q.rssi == null || q.rssi < 0 || q.rssi > 255) { html.push(`<div class="fx-est-res" style="--c:#ef4444">RSSI inválido para ${esc(q.ant)} (usa 0–255).</div>`); continue; }
+      const st = S.result && S.result.stats.find(s => U(s.antena) === U(q.ant) && s.A);
+      const co = st ? st.A : (cat.get(U(q.ant)) || null);
+      const color = st ? st.color : PALETA[(i + 3) % PALETA.length];
+      let refs = await loadRefs(q.ant);
+      if (st) { // suma las lecturas del archivo actual que aún no estén guardadas
+        const ks = new Set(refs.map(r => r.key));
+        refs = refs.concat(lectOf(st.antena).filter(l => l.dist != null).map(l => ({ rssi: l.rssi, d: l.dist, key: fmtT(l.t, true) + '|' + l.rssi, fecha: fmtT(l.t), src: 'archivo actual' })).filter(r => !ks.has(r.key)));
+      }
+      const center = co ? [co.lat, co.lon] : (refs.find(r => isFinite(r.la)) ? [refs.find(r => isFinite(r.la)).la, refs.find(r => isFinite(r.la)).lo] : null);
+      if (!center) { html.push(`<div class="fx-est-res" style="--c:#ef4444"><b>${esc(q.ant)}</b>: no tengo sus coordenadas.</div>`); continue; }
+      if (!refs.length) { html.push(`<div class="fx-est-res" style="--c:${color}"><b>${esc(q.ant)}</b>: todavía no hay referencias de esta antena. Procesa un recorrido y usa <b>Guardar todas las lecturas</b> en la regla para empezar a construirlas.</div>`); continue; }
+      let w = 8, near = [];
+      while (w <= 40) { near = refs.filter(r => Math.abs(r.rssi - q.rssi) <= w); if (near.length >= 3) break; w += 4; }
+      // modelo log-distancia: RSSI = A + B·log10(d)
+      let model = null;
+      if (refs.length >= 5) {
+        const X = refs.map(r => Math.log10(Math.max(5, r.d))), Y = refs.map(r => r.rssi), n = X.length;
+        const mx = X.reduce((s, x) => s + x, 0) / n, my = Y.reduce((s, y) => s + y, 0) / n;
+        const sxy = X.reduce((s, x, k) => s + (x - mx) * (Y[k] - my), 0), sxx = X.reduce((s, x) => s + (x - mx) ** 2, 0), syy = Y.reduce((s, y) => s + (y - my) ** 2, 0);
+        if (sxx > 0 && syy > 0) { const B = sxy / sxx, A = my - B * mx, r2 = sxy * sxy / (sxx * syy); if (B < -1) model = { A, B, r2, d: Math.min(100000, Math.max(5, Math.pow(10, (q.rssi - A) / B))) }; }
+      }
+      let med, lo, hi, basis;
+      if (near.length) {
+        const D = near.map(r => r.d).sort((a, b) => a - b);
+        med = quant(D, .5); lo = D.length >= 4 ? quant(D, .25) : D[0]; hi = D.length >= 4 ? quant(D, .75) : D[D.length - 1];
+        basis = `${near.length} referencia${near.length === 1 ? '' : 's'} con RSSI entre ${n0(q.rssi - w)} y ${n0(q.rssi + w)}`;
+      } else if (model) { med = model.d; lo = med * .7; hi = med * 1.3; basis = 'el modelo (no hay referencias con RSSI parecido)'; }
+      else { html.push(`<div class="fx-est-res" style="--c:${color}"><b>${esc(q.ant)}</b>: hay ${refs.length} referencias, pero ninguna con RSSI cercano a ${n0(q.rssi)}. Guarda más recorridos de esta antena.</div>`); continue; }
+      if (hi - lo < 40) { lo = Math.max(0, med - 20); hi = med + 20; }
+      const [out, inn] = ring(center, lo, hi);
+      L.polygon([out, inn], { renderer: S.svgR, color, weight: 1.5, fillColor: color, fillOpacity: .22, dashArray: '5 5' }).bindTooltip(`${esc(q.ant)} · RSSI ${n0(q.rssi)} → ${fmtDist(lo)} a ${fmtDist(hi)}`).addTo(S.estLayer);
+      L.circle(center, { renderer: S.svgR, radius: med, color, weight: 2.5, fill: false }).addTo(S.estLayer);
+      L.marker(center, { zIndexOffset: 900, icon: L.divIcon({ className: '', iconSize: [30, 30], iconAnchor: [15, 15], html: `<div class="fx-tower" style="--c:${color}"><i>📡</i><b>${esc(q.ant)}</b></div>` }) }).addTo(S.estLayer);
+      bounds.push(...out);
+      html.push(`<div class="fx-est-res" style="--c:${color}">Con RSSI <b>${n0(q.rssi)}</b>, la antena <b>${esc(q.ant)}</b> suele ver el vehículo a unos <b>${fmtDist(med)}</b> (entre ${fmtDist(lo)} y ${fmtDist(hi)}).
+        <small>Basado en ${basis} · ${refs.length} referencias en total${refs.some(r => r.src === 'archivo actual') ? ' (incluye el archivo actual)' : ''}.${model ? ` Modelo log-distancia: ${fmtDist(model.d)} (ajuste R² ${model.r2.toFixed(2)}).` : ''}</small></div>`);
+    }
+    if (rows.length > 1) html.push('<div class="fx-msg ok">La zona más probable es donde se cruzan los anillos de las antenas.</div>');
+    html.push('<p class="text-[11px] text-slate-500">Es una estimación: el RSSI cambia con edificios, cerros, clima y la antena del vehículo. Mientras más recorridos guardes de cada antena, más angosto y confiable será el anillo.</p>');
+    $f('fx-est-out').innerHTML = html.join('');
+    if (bounds.length) setTimeout(() => { try { S.map.fitBounds(bounds, { padding: [30, 30], maxZoom: 16 }); } catch (e) {} }, 80);
+  }
+  $f('fx-est-add').addEventListener('click', () => addEstRow(null, 92));
+  $f('fx-est-go').addEventListener('click', async e => { const b = e.currentTarget; b.disabled = true; try { await estimar(); } catch (err) { console.error(err); showToast('Error al estimar'); } b.disabled = false; });
+  $f('fx-est-clear').addEventListener('click', () => { if (S.estLayer && S.map) S.map.removeLayer(S.estLayer); S.estLayer = null; $f('fx-est-out').innerHTML = ''; if (!S.result) $f('fx-mapcard').classList.add('hidden'); });
+  let estInit = false;
+  function initEst() { if (estInit) return; if (!$f('fx-est-rows').children.length) addEstRow(null, 92); estInit = true; }
+
   /* ---------------------------- flujo ---------------------------- */
   async function run() {
     if (!dev()) { showToast('Módulo solo para dev'); return; }
@@ -10127,7 +10369,7 @@ body.theme-day #view-fusion .fx-drop b { color: #0f172a; }
       const sinPos = R.lect.length - R.conPos.length;
       msgs.push(['ok', `Listo: ${R.conPos.length} de ${R.lect.length} lecturas quedaron ubicadas${sinPos ? ` · ${sinPos} sin GPS a menos de ${R.P.tol} s (no se inventa su posición)` : ''}.`]);
       setMsgs(msgs);
-      pintarAntenas(R); pintarResultado(R); dibujarMapa(R); dibujarGraficos(R);
+      pintarAntenas(R); pintarResultado(R); dibujarMapa(R); dibujarGraficos(R); initRule(R); estFromResult(R);
       $f('fx-xlsx').disabled = false;
     } catch (e) {
       console.error(e); setMsgs([['err', esc(e.message || String(e))]]);
@@ -10137,8 +10379,10 @@ body.theme-day #view-fusion .fx-drop b { color: #0f172a; }
   $f('fx-xlsx').addEventListener('click', descargarExcel);
   $f('fx-reset').addEventListener('click', () => {
     S.files = { pot: null, pos: null }; S.result = null; paintDrops(); setMsgs([]);
-    $f('fx-out').classList.add('hidden'); $f('fx-ants').classList.add('hidden'); $f('fx-xlsx').disabled = true;
+    $f('fx-out').classList.add('hidden'); $f('fx-out2').classList.add('hidden'); $f('fx-ants').classList.add('hidden'); $f('fx-rule-card').classList.add('hidden'); $f('fx-xlsx').disabled = true;
     if (S.layers && S.map) Object.values(S.layers).forEach(l => S.map.removeLayer(l)); S.layers = null;
+    clearRule(); if (S.ctrl) { S.ctrl.remove(); S.ctrl = null; }
+    if (!S.estLayer) $f('fx-mapcard').classList.add('hidden');
   });
 
   /* ---------------------------- navegación y rol ---------------------------- */
@@ -10152,7 +10396,7 @@ body.theme-day #view-fusion .fx-drop b { color: #0f172a; }
       OTHER.forEach(x => { const el = $('view-' + x); if (el) el.classList.add('ui-hidden'); });
       sec.classList.remove('ui-hidden');
       if (S.map) setTimeout(() => S.map.invalidateSize(), 80);
-      loadPsdMap();
+      loadPsdMap(); initEst();
       return;
     }
     sec.classList.add('ui-hidden');
@@ -10162,7 +10406,7 @@ body.theme-day #view-fusion .fx-drop b { color: #0f172a; }
     const ok = logged() && dev();
     nav.classList.toggle('ui-hidden', !ok);
     if (!ok && !sec.classList.contains('ui-hidden')) { sec.classList.add('ui-hidden'); try { _sv('filter'); } catch (e) {} }
-    if (!logged()) { S.psdLoaded = false; S.psdMap = {}; }
+    if (!logged()) { S.psdLoaded = false; S.psdMap = {}; Object.keys(REFS).forEach(k => delete REFS[k]); }
   }
   const _ar = window.applySessionRoleUI;
   if (typeof _ar === 'function') window.applySessionRoleUI = function () { const r = _ar.apply(this, arguments); syncRole(); return r; };
