@@ -11255,5 +11255,358 @@ html body.hunter-preauth #login-floating-card #sb-remember-wrap span span{ color
   html body.hunter-preauth #login-floating-card form #sb-totp-box.p-3.rounded-xl:focus-within::after{ transition:none !important; }
 }
 </style>
+<style id="hunter-v20-dev-css">
+/* =====================================================================================
+   v20 · MODO DEV "CENTRO DE MANDO" (solo rol dev con tema futurista, sin modo día)
+   Todo cuelga de body.dx, que el script de abajo pone únicamente cuando
+   data-rol="dev" + .tema-futurista + sin .hunter-preauth + sin .theme-day.
+   Gerencia, consola NOC y visor no reciben ninguna de estas reglas.
+   ===================================================================================== */
+html body.dx:not(.hunter-preauth):not(.theme-day){
+  --dx-void:#060a18;
+  --dx-ion:94,225,255;          /* cian de señal */
+  --dx-ok:61,255,168;           /* antena al día */
+  --dx-warn:255,181,71;         /* con observación */
+  --dx-crit:255,77,109;         /* pendiente */
+  --dx-text:#e8f1ff;
+  --dx-glass:rgba(12,18,38,.46);
+  --dx-blur:blur(18px) saturate(160%);
+  --dx-edge:linear-gradient(140deg, rgba(255,255,255,.55), rgba(var(--sk),.32) 18%, rgba(255,255,255,.07) 48%, rgba(var(--dx-ion),.30) 86%, rgba(255,255,255,.25));
+  background:
+    radial-gradient(60vw 50vh at 12% 8%, rgba(var(--dx-ion),.16), transparent 70%),
+    radial-gradient(55vw 55vh at 92% 18%, rgba(150,90,255,.16), transparent 70%),
+    radial-gradient(70vw 60vh at 70% 105%, rgba(var(--sk),.13), transparent 70%),
+    var(--dx-void) !important;
+  background-attachment:fixed !important;
+}
+/* Sin capa de rayas encima de todo: el vidrio ya aporta textura */
+html body.dx:not(.hunter-preauth):not(.theme-day)::after{ opacity:.35; }
+
+/* --- El vidrio necesita ver el fondo: marco transparente y sin aplanado 3D --------- */
+html body.dx:not(.hunter-preauth):not(.theme-day) .frame{
+  background:linear-gradient(160deg, rgba(255,255,255,.035), rgba(255,255,255,.01)) !important;
+  border:1px solid rgba(255,255,255,.08) !important;
+  box-shadow:0 30px 80px -30px rgba(0,0,0,.8) !important;
+  border-radius:26px !important;
+  transform-style:flat !important;
+}
+html body.dx:not(.hunter-preauth):not(.theme-day) :is(.frame>.flex-1,.cols){ transform-style:flat !important; }
+html body.dx:not(.hunter-preauth):not(.theme-day) :is(#side,.map.panel,.rail){ transform:none !important; }
+
+/* --- Vidrio nivel 1: paneles, riel y modales (con desenfoque real) ------------------ */
+html body.dx:not(.hunter-preauth):not(.theme-day) :is(.panel,.rail){
+  border:1px solid transparent !important;
+  border-radius:20px !important;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.075), rgba(255,255,255,.015) 26%, rgba(255,255,255,0) 60%) padding-box,
+    linear-gradient(var(--dx-glass), var(--dx-glass)) padding-box,
+    var(--dx-edge) border-box !important;
+  -webkit-backdrop-filter:var(--dx-blur) !important; backdrop-filter:var(--dx-blur) !important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.16), 0 22px 60px -28px rgba(0,0,0,.85) !important;
+  clip-path:none !important;
+}
+/* las escuadras ámbar se reemplazan por el borde de luz */
+html body.dx:not(.hunter-preauth):not(.theme-day) :is(.panel,.card)::after{ display:none !important; content:none !important; }
+html body.dx:not(.hunter-preauth):not(.theme-day) .rail button{ border-radius:13px !important; clip-path:none !important; }
+html body.dx:not(.hunter-preauth):not(.theme-day) .rail button.on{
+  background:linear-gradient(180deg, rgba(255,255,255,.22), rgba(var(--sk),.22)) !important;
+  border:1px solid rgba(var(--sk),.75) !important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.4), 0 0 18px rgba(var(--sk),.45) !important;
+}
+html body.dx:not(.hunter-preauth):not(.theme-day) .rail button:hover:not(.on){ background:rgba(255,255,255,.07) !important; border-color:rgba(255,255,255,.14) !important; }
+
+/* --- Vidrio nivel 2: tarjetas y chips (sin desenfoque propio: rinde mejor) ---------- */
+html body.dx:not(.hunter-preauth):not(.theme-day) .card{
+  border:1px solid rgba(255,255,255,.10) !important;
+  border-radius:16px !important;
+  background:linear-gradient(180deg, rgba(255,255,255,.07), rgba(255,255,255,.02) 40%), rgba(10,15,32,.38) !important;
+  -webkit-backdrop-filter:none !important; backdrop-filter:none !important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.12) !important;
+}
+html body.dx:not(.hunter-preauth):not(.theme-day) .card:hover{ border-color:rgba(var(--dx-ion),.35) !important; }
+html body.dx:not(.hunter-preauth):not(.theme-day) .chip{
+  position:relative;
+  border:1px solid rgba(255,255,255,.11) !important;
+  border-radius:13px !important;
+  clip-path:none !important;
+  background:linear-gradient(180deg, rgba(255,255,255,.09), rgba(255,255,255,.02) 45%), rgba(10,15,32,.34) !important;
+  -webkit-backdrop-filter:none !important; backdrop-filter:none !important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.14) !important;
+}
+
+/* --- Formularios ------------------------------------------------------------------- */
+html body.dx:not(.hunter-preauth):not(.theme-day) :is(input:not([type=checkbox]):not([type=radio]):not([type=range]):not([type=file]),textarea,select,.sel){
+  border-radius:11px !important;
+  background:linear-gradient(180deg, rgba(0,0,0,.30), rgba(0,0,0,.18)) !important;
+  border:1px solid rgba(255,255,255,.12) !important;
+  box-shadow:inset 0 1px 2px rgba(0,0,0,.45), 0 1px 0 rgba(255,255,255,.05) !important;
+  color:var(--dx-text) !important;
+}
+html body.dx:not(.hunter-preauth):not(.theme-day) :is(input,textarea,select,.sel):focus{
+  border-color:rgba(var(--dx-ion),.7) !important;
+  box-shadow:inset 0 1px 2px rgba(0,0,0,.45), 0 0 0 3px rgba(var(--dx-ion),.18) !important; outline:none !important;
+}
+html body.dx:not(.hunter-preauth):not(.theme-day) .btn{
+  border-radius:12px !important; clip-path:none !important;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.34), rgba(255,255,255,.06) 45%, rgba(255,255,255,0) 52%, rgba(0,0,0,.12)) ,
+    linear-gradient(135deg, rgba(var(--sk),.96), rgba(var(--sk2),.88)) !important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.55), 0 8px 22px -10px rgba(var(--sk),.8) !important;
+}
+html body.dx:not(.hunter-preauth):not(.theme-day) :is(button,a,input,select,textarea):focus-visible{ outline:2px solid rgb(var(--dx-ion)) !important; outline-offset:2px; }
+
+/* --- Tablas ------------------------------------------------------------------------ */
+html body.dx:not(.hunter-preauth):not(.theme-day) table th{
+  background:linear-gradient(180deg, rgba(30,40,72,.82), rgba(16,22,44,.82)) !important;
+  -webkit-backdrop-filter:blur(8px); backdrop-filter:blur(8px);
+  border-color:rgba(255,255,255,.08) !important;
+}
+html body.dx:not(.hunter-preauth):not(.theme-day) table tbody tr:hover > td{ background:rgba(var(--dx-ion),.07) !important; }
+
+/* --- Modales y avisos -------------------------------------------------------------- */
+html body.dx:not(.hunter-preauth):not(.theme-day) #record-editor-modal{ background:rgba(3,6,16,.45) !important; -webkit-backdrop-filter:blur(6px); backdrop-filter:blur(6px); }
+html body.dx:not(.hunter-preauth):not(.theme-day) #record-editor-modal > .panel{
+  --dx-glass:rgba(12,18,38,.66);
+  border:1px solid transparent !important; border-radius:22px !important;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.09), rgba(255,255,255,.015) 22%, rgba(255,255,255,0) 50%) padding-box,
+    linear-gradient(var(--dx-glass), var(--dx-glass)) padding-box,
+    var(--dx-edge) border-box !important;
+  -webkit-backdrop-filter:blur(22px) saturate(160%) !important; backdrop-filter:blur(22px) saturate(160%) !important;
+}
+html body.dx:not(.hunter-preauth):not(.theme-day) .toast{
+  border-radius:14px !important; border:1px solid rgba(255,255,255,.16) !important;
+  background:linear-gradient(180deg, rgba(255,255,255,.12), rgba(255,255,255,.03)), rgba(12,18,38,.62) !important;
+  -webkit-backdrop-filter:var(--dx-blur); backdrop-filter:var(--dx-blur);
+}
+
+/* --- Indicadores vivos ------------------------------------------------------------- */
+.dx-spark{ position:absolute; right:8px; bottom:7px; width:56px; height:16px; pointer-events:none; opacity:.9; overflow:visible; }
+.dx-spark path{ fill:none; stroke-width:1.4; stroke-linecap:round; stroke-linejoin:round; }
+.dx-spark circle{ r:2; }
+html body.dx .dx-bump{ animation:dxBump 1.3s ease-out 1; }
+@keyframes dxBump{
+  0%{ box-shadow:inset 0 1px 0 rgba(255,255,255,.14), 0 0 0 0 rgba(var(--dx-ion),.0); }
+  18%{ box-shadow:inset 0 1px 0 rgba(255,255,255,.3), 0 0 0 2px rgba(var(--dx-ion),.65), 0 0 26px rgba(var(--dx-ion),.45); }
+  100%{ box-shadow:inset 0 1px 0 rgba(255,255,255,.14), 0 0 0 0 rgba(var(--dx-ion),0); }
+}
+
+/* --- Barrido de escaneo al cambiar de módulo ---------------------------------------- */
+#dx-scan{ position:fixed; pointer-events:none; z-index:60; overflow:hidden; border-radius:20px; display:none; }
+#dx-scan.run{ display:block; }
+#dx-scan::before{ content:""; position:absolute; left:0; right:0; top:-40%; height:40%;
+  background:linear-gradient(180deg, transparent, rgba(var(--dx-ion,94,225,255),.10) 70%, rgba(var(--dx-ion,94,225,255),.32) 98%, rgba(255,255,255,.9) 100%);
+  animation:dxScan .52s cubic-bezier(.45,0,.2,1) forwards; }
+@keyframes dxScan{ to{ transform:translateY(350%); } }
+html body.dx .dx-enter{ animation:dxEnter .42s ease-out 1; }
+@keyframes dxEnter{ from{ opacity:.25; filter:brightness(1.6) saturate(.6); } to{ opacity:1; filter:none; } }
+
+/* --- Mapa táctico como centro de mando ------------------------------------------------ */
+html body.dx:not(.hunter-preauth):not(.theme-day) #map-canvas.leaflet-container{ background:#040812 !important; }
+html body.dx:not(.hunter-preauth):not(.theme-day) #map-canvas .leaflet-tile-pane{
+  filter:url(#dx-mapf) !important;   /* calles menores en cian tenue, avenidas en ámbar, todo lo demás oscuro */
+}
+html body.dx:not(.hunter-preauth):not(.theme-day) #map-canvas .leaflet-tile-pane::after{   /* retícula y viñeta, debajo de los marcadores */
+  content:""; position:absolute; inset:-5000px; pointer-events:none;
+  background:
+    linear-gradient(rgba(var(--dx-ion),.06) 1px, transparent 1px) 0 0/48px 48px,
+    linear-gradient(90deg, rgba(var(--dx-ion),.06) 1px, transparent 1px) 0 0/48px 48px;
+}
+html body.dx:not(.hunter-preauth):not(.theme-day) #map-canvas::after{
+  content:""; position:absolute; inset:0; z-index:401; pointer-events:none;
+  background:radial-gradient(120% 90% at 50% 50%, transparent 55%, rgba(2,4,12,.55));
+}
+html body.dx:not(.hunter-preauth):not(.theme-day) #map-canvas .marker-blink{ animation:none !important; }
+/* sin fundido de mosaicos: un mosaico a medio aparecer cambiaría de color con el filtro */
+html body.dx:not(.hunter-preauth):not(.theme-day) #map-canvas .leaflet-tile{ transition:none !important; }
+html body.dx:not(.hunter-preauth):not(.theme-day) #map-canvas .leaflet-tile-loaded{ opacity:1 !important; }
+/* antenas: anillo de radar según estado */
+.dx-halo{ fill:none; pointer-events:none; }
+.dx-halo.ok{ stroke:rgb(61,255,168); }
+.dx-halo.warn{ stroke:rgb(255,181,71); }
+.dx-halo.crit{ stroke:rgb(255,77,109); }
+html body.dx .dx-halo{ stroke-opacity:.55; stroke-width:3; }
+html body.dx .dx-halo.warn{ animation:dxRadar 2.6s ease-out infinite; }
+html body.dx .dx-halo.crit{ animation:dxRadar 1.7s ease-out infinite; }
+@keyframes dxRadar{ 0%{ stroke-width:2; stroke-opacity:.95; } 100%{ stroke-width:26; stroke-opacity:0; } }
+/* estela del carrito */
+.dx-trail-glow{ stroke:rgb(94,225,255); stroke-opacity:.22; filter:blur(3px); }
+.dx-trail-core{ stroke:#bff4ff; stroke-dasharray:2 10; stroke-linecap:round; animation:dxFlow 1.1s linear infinite; }
+@keyframes dxFlow{ to{ stroke-dashoffset:-24; } }
+.dx-trail-dot{ fill:rgb(94,225,255); stroke:none; }
+
+/* --- Celular: menos desenfoque, menos animación ---------------------------------------- */
+@media (max-width:768px), (pointer:coarse){
+  html body.dx:not(.hunter-preauth):not(.theme-day){ --dx-glass:rgba(12,18,38,.74); --dx-blur:blur(8px) saturate(140%); background-attachment:scroll !important; }
+  html body.dx:not(.hunter-preauth):not(.theme-day) .panel{ -webkit-backdrop-filter:none !important; backdrop-filter:none !important; }
+  html body.dx .dx-halo.warn{ animation:none; stroke-opacity:.7; }
+  .dx-trail-glow{ filter:none; }
+}
+@media (prefers-reduced-motion:reduce){
+  html body.dx .dx-halo, html body.dx .dx-trail-core, html body.dx .dx-bump, html body.dx .dx-enter{ animation:none !important; }
+  #dx-scan{ display:none !important; }
+}
+</style>
+<script id="hunter-v20-dev-js">
+(() => {
+  'use strict';
+  const body = document.body;
+  const RM = window.matchMedia ? matchMedia('(prefers-reduced-motion: reduce)') : { matches: false };
+  const MOBILE = window.matchMedia ? matchMedia('(max-width: 768px), (pointer: coarse)') : { matches: false };
+  const on = () => body.classList.contains('dx');
+
+  /* filtro del mapa: separa las calles por luminancia del mosaico OSM y las recolorea */
+  if (!document.getElementById('dx-mapf-svg')) body.insertAdjacentHTML('beforeend', `<svg id="dx-mapf-svg" width="0" height="0" style="position:absolute;width:0;height:0" aria-hidden="true" focusable="false"><filter id="dx-mapf" color-interpolation-filters="sRGB" x="0" y="0" width="100%" height="100%">
+    <feColorMatrix type="matrix" values=".2126 .7152 .0722 0 0  .2126 .7152 .0722 0 0  .2126 .7152 .0722 0 0  0 0 0 1 0"/>
+    <feComponentTransfer><feFuncR type="discrete" tableValues="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.65 0 0 0 0 0.55 0 0 0 0 0.45 0 0 0 0 0 0 0"/><feFuncG type="discrete" tableValues="0.16 0.16 0.16 0.16 0.16 0.16 0.16 0.16 0.16 0.16 0.16 0.16 0.16 0.16 0.16 0.16 0.16 0.16 0.16 0.16 0.16 0.16 0.16 0 0 0 0 0 0 0 0 0 0.12 0 0 0 0 0.12 0 0 0 0 0.12 0 0 0 0 0 0.38 0.3"/><feFuncB type="discrete" tableValues="0.16 0.16 0.16 0.16 0.16 0.16 0.16 0.16 0.16 0.16 0.16 0.16 0.16 0.16 0.16 0.16 0.16 0.16 0.16 0.16 0.16 0.16 0.16 0 0 0 0 0 0 0 0 0 0.12 0 0 0 0 0.12 0 0 0 0 0.12 0 0 0 0 0 0.38 0.3"/></feComponentTransfer>
+    <feColorMatrix type="matrix" values=".95 .18 0 0 .016  .62 .80 0 0 .03  .10 0 .95 0 .075  0 0 0 1 0"/></filter></svg>`);
+
+  /* ---------- 0. Interruptor: solo dev + futurista + sesión iniciada + sin modo día ---------- */
+  function sync() {
+    const want = body.dataset.rol === 'dev' && body.classList.contains('tema-futurista') && !body.classList.contains('hunter-preauth') && !body.classList.contains('theme-day');
+    if (want !== on()) { body.classList.toggle('dx', want); if (!want) clearMapFx(); else setTimeout(refreshMapFx, 50); }
+  }
+  new MutationObserver(sync).observe(body, { attributes: true, attributeFilter: ['class', 'data-rol'] });
+  sync();
+
+  /* ---------- 1. Mapa táctico: radar por estado + estela del vehículo ---------- */
+  let haloLayer = null, trailLayer = null; const trail = [];
+  const getMap = () => { try { return (typeof map !== 'undefined' && map) ? map : null; } catch (e) { return null; } };
+  function estadoDe(r) {
+    const i = info(r); if (!i.ok) return null;
+    return { key: i.lat.toFixed(6) + ',' + i.lon.toFixed(6), st: i.obs ? 'warn' : (i.visitado ? 'ok' : 'crit') };
+  }
+  function clearMapFx() {
+    const m = getMap(); if (!m) return;
+    if (haloLayer) { m.removeLayer(haloLayer); haloLayer = null; }
+    if (trailLayer) { m.removeLayer(trailLayer); trailLayer = null; }
+  }
+  function drawHalos() {
+    const m = getMap(); if (!m || !window.L) return;
+    if (haloLayer) { m.removeLayer(haloLayer); haloLayer = null; }
+    if (!on()) return;
+    let lay = null; try { lay = (typeof layer !== 'undefined') ? layer : null; } catch (e) {}
+    if (!lay || !m.hasLayer(lay)) return;
+    const st = new Map(); (window.excelData || excelData || []).forEach(r => { try { const e = estadoDe(r); if (e) st.set(e.key, e.st); } catch (e) {} });
+    haloLayer = L.layerGroup();
+    lay.eachLayer(mk => {
+      if (!mk.getLatLng || !mk.getRadius) return;
+      const ll = mk.getLatLng(), s = st.get(ll.lat.toFixed(6) + ',' + ll.lng.toFixed(6)) || 'ok';
+      L.circleMarker(ll, { radius: 7.5, interactive: false, fill: false, className: 'dx-halo ' + s }).addTo(haloLayer);
+    });
+    haloLayer.addTo(m);
+    // los halos quedan debajo de los puntos para no tapar los clics
+    haloLayer.eachLayer(h => { try { h.bringToBack(); } catch (e) {} });
+  }
+  function drawTrail() {
+    const m = getMap(); if (!m || !window.L) return;
+    if (trailLayer) { m.removeLayer(trailLayer); trailLayer = null; }
+    if (!on() || trail.length < 2) return;
+    trailLayer = L.layerGroup();
+    const pts = trail.map(p => [p[0], p[1]]);
+    L.polyline(pts, { className: 'dx-trail-glow', weight: 12, interactive: false }).addTo(trailLayer);
+    L.polyline(pts, { className: 'dx-trail-core', weight: 3, interactive: false }).addTo(trailLayer);
+    pts.slice(0, -1).forEach((p, k) => L.circleMarker(p, { radius: 3, interactive: false, className: 'dx-trail-dot', fillOpacity: .25 + .65 * (k + 1) / pts.length }).addTo(trailLayer));
+    trailLayer.addTo(m);
+  }
+  function refreshMapFx() { try { drawHalos(); drawTrail(); } catch (e) { console.warn('[v20] mapa', e); } }
+
+  const _place = window.placeGpsReference;
+  if (typeof _place === 'function') {
+    window.placeGpsReference = function (lat, lon, centerMap) {
+      const r = _place.apply(this, arguments);
+      try {
+        const last = trail[trail.length - 1];
+        if (!last || haversineKm(last[0], last[1], lat, lon) > 0.005) { trail.push([lat, lon]); if (trail.length > 40) trail.shift(); }
+        drawTrail();
+      } catch (e) {}
+      return r;
+    };
+  }
+  const _clear = window.clearGpsReference;
+  if (typeof _clear === 'function') window.clearGpsReference = function () { trail.length = 0; drawTrail(); return _clear.apply(this, arguments); };
+  const _render = window.renderMap;
+  if (typeof _render === 'function') window.renderMap = function () { const r = _render.apply(this, arguments); setTimeout(refreshMapFx, 0); return r; };
+
+  /* ---------- 2. Indicadores vivos: conteo animado, mini tendencia y brillo ---------- */
+  const KPI_SEL = '#globalStatsContent .chip > p.text-lg, #rast-kpis .chip > p:first-child, #maint-kpis .chip > p:first-child, .v10-kpi > b, .fx-kpi > p:first-child, .mp-kpi > p:first-child';
+  const HKEY = 'mdz_dx_kpi_hist_v1';
+  let hist = {}; try { hist = JSON.parse(localStorage.getItem(HKEY) || '{}') || {}; } catch (e) { hist = {}; }
+  const saveHist = () => { try { localStorage.setItem(HKEY, JSON.stringify(hist)); } catch (e) {} };
+  const lastSeen = new Map(), bumpUntil = new Map();
+  const NUM = /-?\d{1,3}(?:,\d{3})+(?:\.\d+)?|-?\d+(?:\.\d+)?/;
+  function keyOf(el) {
+    const box = el.closest('[id]'), lbl = (el.parentElement && el.parentElement.lastElementChild !== el ? el.parentElement.lastElementChild.textContent : (el.previousElementSibling ? el.previousElementSibling.textContent : '')) || '';
+    return ((box && box.id) || 'x') + '|' + lbl.trim().slice(0, 40);
+  }
+  function spark(chip, arr) {
+    let svg = chip.querySelector(':scope > .dx-spark'); if (svg) svg.remove();
+    if (arr.length < 2) return;
+    const W = 56, H = 16, mn = Math.min(...arr), mx = Math.max(...arr), rg = (mx - mn) || 1;
+    const xy = arr.map((v, i) => [i * (W / (arr.length - 1)), H - 2 - ((v - mn) / rg) * (H - 4)]);
+    const up = arr[arr.length - 1] >= arr[0], c = up ? 'rgb(61,255,168)' : 'rgb(255,120,140)';
+    chip.insertAdjacentHTML('beforeend', `<svg class="dx-spark" viewBox="0 0 ${W} ${H}" aria-hidden="true"><path d="M${xy.map(p => p[0].toFixed(1) + ' ' + p[1].toFixed(1)).join(' L')}" stroke="${c}"/><circle cx="${xy[xy.length - 1][0].toFixed(1)}" cy="${xy[xy.length - 1][1].toFixed(1)}" fill="${c}"/></svg>`);
+  }
+  function animate(el, from, to, tok, txt) {
+    const dec = (tok.split('.')[1] || '').length, comma = tok.includes(',');
+    const fmt = v => { const s = v.toFixed(dec); return comma ? Number(s).toLocaleString('en-US', { minimumFractionDigits: dec, maximumFractionDigits: dec }) : s; };
+    if (RM.matches || from === to) return;
+    const t0 = performance.now(), D = 750, idx = txt.indexOf(tok);
+    const node = [...el.childNodes].find(n => n.nodeType === 3 && n.nodeValue.includes(tok));
+    if (!node) return;
+    const pre = node.nodeValue.slice(0, node.nodeValue.indexOf(tok)), post = node.nodeValue.slice(node.nodeValue.indexOf(tok) + tok.length);
+    const step = now => {
+      if (!el.isConnected) return;
+      const k = Math.min(1, (now - t0) / D), e = 1 - Math.pow(1 - k, 3);
+      node.nodeValue = pre + fmt(from + (to - from) * e) + post;
+      if (k < 1) requestAnimationFrame(step); else node.nodeValue = pre + tok + post;
+    };
+    requestAnimationFrame(step);
+  }
+  function processKpi(el) {
+    if (el.__dx) return; el.__dx = 1;
+    const txt = el.textContent || '', m = txt.match(NUM); if (!m) return;
+    const tok = m[0], val = parseFloat(tok.replace(/,/g, '')); if (!isFinite(val)) return;
+    const key = keyOf(el), prev = lastSeen.get(key);
+    const chip = el.closest('.chip, .v10-kpi') || el.parentElement;
+    const h = hist[key] || (hist[key] = []);
+    if (!h.length || h[h.length - 1] !== val) { h.push(val); if (h.length > 16) h.splice(0, h.length - 16); saveHist(); }
+    animate(el, prev == null ? 0 : prev, val, tok, txt);
+    if (prev != null && prev !== val) bumpUntil.set(key, performance.now() + 1300);
+    // si el módulo vuelve a pintar la tarjeta enseguida, el brillo se conserva en la nueva
+    if (chip && !RM.matches && (bumpUntil.get(key) || 0) > performance.now()) { chip.classList.remove('dx-bump'); void chip.offsetWidth; chip.classList.add('dx-bump'); setTimeout(() => chip.classList.remove('dx-bump'), 1400); }
+    lastSeen.set(key, val);
+    if (chip && chip.classList.contains('chip')) spark(chip, h);
+  }
+  let pend = new Set(), raf = 0;
+  const flush = () => { raf = 0; if (!on()) { pend.clear(); return; } pend.forEach(n => { if (!n.isConnected) return; if (n.matches && n.matches(KPI_SEL)) processKpi(n); n.querySelectorAll && n.querySelectorAll(KPI_SEL).forEach(processKpi); }); pend.clear(); };
+  new MutationObserver(ms => {
+    if (!on()) return;
+    for (const m of ms) for (const n of m.addedNodes) if (n.nodeType === 1 && !(n.classList && n.classList.contains('dx-spark'))) pend.add(n);
+    if (pend.size && !raf) raf = requestAnimationFrame(flush);
+  }).observe(document.getElementById('app') || body, { childList: true, subtree: true });
+
+  /* ---------- 3. Barrido de escaneo al cambiar de módulo ---------- */
+  const scan = document.createElement('div'); scan.id = 'dx-scan'; scan.setAttribute('aria-hidden', 'true'); body.appendChild(scan);
+  let lastView = null;
+  function sweep() {
+    if (!on() || RM.matches) return;
+    const host = document.querySelector('.cols') || document.querySelector('.frame'); if (!host) return;
+    const r = host.getBoundingClientRect(); if (!r.width) return;
+    Object.assign(scan.style, { left: r.left + 'px', top: r.top + 'px', width: r.width + 'px', height: r.height + 'px' });
+    scan.classList.remove('run'); void scan.offsetWidth; scan.classList.add('run');
+    clearTimeout(sweep.t); sweep.t = setTimeout(() => scan.classList.remove('run'), 600);
+    const v = [...document.querySelectorAll('.cols > section.panel, .cols section[id^="view-"]')].find(s => !s.classList.contains('ui-hidden') && !s.classList.contains('hidden') && s.offsetParent);
+    if (v) { v.classList.remove('dx-enter'); void v.offsetWidth; v.classList.add('dx-enter'); setTimeout(() => v.classList.remove('dx-enter'), 500); }
+  }
+  // setView puede volver a envolverse por otros módulos: se envuelve al final, con reintento
+  function wrapSetView() {
+    const sv = window.setView; if (typeof sv !== 'function' || sv.__dx) return;
+    const w = function (v) { const r = sv.apply(this, arguments); if (v !== lastView) { lastView = v; requestAnimationFrame(sweep); } return r; };
+    w.__dx = 1; window.setView = w;
+  }
+  wrapSetView(); setTimeout(wrapSetView, 1500); setTimeout(wrapSetView, 4000);
+})();
+</script>
 </body>
 </html>
