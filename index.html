@@ -1405,6 +1405,23 @@ body:not(.hunter-preauth) #map-canvas { background: #4a303a !important; }
 }
 
 </style>
+<style>
+html,body{max-width:100%;overflow-x:hidden}
+.hc-arc{width:100%;max-width:290px;overflow:visible;display:block}
+.hc-t1{font:800 27px system-ui,sans-serif;letter-spacing:3px;fill:#fff;paint-order:stroke;stroke:rgba(0,0,0,.6);stroke-width:3px;filter:drop-shadow(0 0 6px rgba(255,120,120,.55))}
+.hc-t2{font:600 11px system-ui,sans-serif;letter-spacing:3px;fill:#f1f5f9;paint-order:stroke;stroke:rgba(0,0,0,.6);stroke-width:2px}
+.car-gps{position:relative;display:flex;align-items:center;justify-content:center}
+.car-led{position:absolute;top:2px;right:3px;width:9px;height:9px;border-radius:50%;background:#ef4444;box-shadow:0 0 8px 3px #ef4444;animation:carled 1s infinite;z-index:2}
+@keyframes carled{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.25;transform:scale(.6)}}
+#maint-list,#rast-list,#tech-list-grid{grid-template-columns:repeat(auto-fill,minmax(min(100%,260px),1fr))!important}
+@media(max-width:760px){.view,section.panel{min-width:0;max-width:100vw}.view table{display:block;overflow-x:auto}#login-floating-card{max-width:94vw}}
+#rafi-fab{position:fixed;right:14px;bottom:14px;z-index:9999;font-family:system-ui,sans-serif}
+#rafi-fab>button{width:54px;height:54px;border-radius:50%;border:1px solid rgba(255,255,255,.2);background:#111827;font-size:26px;cursor:pointer;animation:rfloat 3s ease-in-out infinite}
+@keyframes rfloat{50%{transform:translateY(-6px)}}
+#rafi-pop{display:none;position:absolute;right:0;bottom:64px;width:min(320px,88vw);max-height:70vh;overflow:auto;background:#0f172a;color:#e2e8f0;border:1px solid rgba(255,255,255,.15);border-radius:14px;padding:12px;font-size:12px}
+#rafi-pop.on{display:block}#rafi-pop textarea{width:100%;background:#000a;border:1px solid #fff2;color:#fff;border-radius:8px;padding:6px;margin-top:6px}
+#rafi-pop button.rb{background:var(--accent,#38bdf8);color:#000;border-radius:8px;padding:5px 10px;font-weight:700;margin-top:6px}
+</style>
 </head>
 <body class="hunter-preauth">
   <!-- =========================================================
@@ -1462,8 +1479,7 @@ body:not(.hunter-preauth) #map-canvas { background: #4a303a !important; }
       <div class="flex items-center justify-between mb-3.5">
         <div class="flex items-center gap-2.5">
                     <div>
-            <h3 class="text-sm font-extrabold text-white tracking-wide">HUNTER<sup class="text-[9px] text-rose-300">™</sup> CORE</h3>
-            <p class="text-[10px] text-slate-300/80">Acceso al sistema · mdzhunter</p>
+            <svg viewBox="0 0 280 78" class="hc-arc" aria-label="HUNTER CORE · Acceso al sistema"><defs><path id="hc-a1" d="M6 56 Q140 -2 274 56"/><path id="hc-a2" d="M34 74 Q140 40 246 74"/></defs><text class="hc-t1" text-anchor="middle"><textPath href="#hc-a1" startOffset="50%">HUNTER CORE</textPath></text><text class="hc-t2" text-anchor="middle"><textPath href="#hc-a2" startOffset="50%">ACCESO AL SISTEMA</textPath></text></svg>
           </div>
         </div>
         <span class="px-2 py-0.5 rounded-full bg-white/5 border border-white/15 text-[10px] text-slate-200 font-semibold">2FA</span>
@@ -2069,7 +2085,7 @@ body:not(.hunter-preauth) #map-canvas { background: #4a303a !important; }
       const metaRole = String(session?.user?.app_metadata?.role || "").toLowerCase().trim();
       if (metaRole === "noc" || email.startsWith("consola@")) return "noc";
       if (metaRole === "viewer" || email.startsWith("visor@")) return "viewer";
-      if (metaRole === "dev" || metaRole === "admin" || email === "mdz@mdz.local" || email.startsWith("mdz@") || email.startsWith("dev@")) return "dev";
+      if (metaRole === "dev" || metaRole === "admin" || email === "mdz@mdz.local") return "dev";
       return "viewer";
     }
 
@@ -2631,7 +2647,7 @@ body:not(.hunter-preauth) #map-canvas { background: #4a303a !important; }
       $("side").classList.toggle("ui-hidden", v !== "filter");
       $("view-filter").classList.toggle("ui-hidden", v !== "filter");
       ["map", "tech", "maint", "price", "noc", "rafi"].forEach(x => { const el = $("view-" + x); if (el) el.classList.toggle("ui-hidden", v !== x); });
-      if (v === "map") renderMap();
+      if (v === "map") { renderMap(); setTimeout(() => { if (map) { map.invalidateSize(); if (window.__mapPts && window.__mapPts.length) map.fitBounds(window.__mapPts, { padding: [36, 36], maxZoom: 16 }); } }, 90); }
       if (v === "tech") renderTech();
       if (v === "maint") renderMaintSetup();
       if (v === "price") renderPrice();
@@ -2709,7 +2725,7 @@ body:not(.hunter-preauth) #map-canvas { background: #4a303a !important; }
       $("gps-active-coord-label").textContent = `GPS: ${lat.toFixed(6)}, ${lon.toFixed(6)}`;
       if (map) {
         if (gpsRefMarker && map.hasLayer(gpsRefMarker)) map.removeLayer(gpsRefMarker);
-        gpsRefMarker = L.circleMarker([lat, lon], { radius: 8, color: "#0b0f17", fillColor: "#38bdf8", fillOpacity: 1, weight: 2.5 }).bindPopup(`<b>Punto GPS</b><br>${lat.toFixed(6)}, ${lon.toFixed(6)}`).addTo(map);
+        gpsRefMarker = L.marker([lat, lon], { icon: L.divIcon({ className: "car-gps", iconSize: [38, 38], iconAnchor: [19, 19], html: '<i class="car-led"></i><svg viewBox="0 0 24 24" width="26" height="26"><path fill="#38bdf8" stroke="#0b0f17" stroke-width="1" d="M5 11l1.6-4.4A2 2 0 018.5 5h7a2 2 0 011.9 1.6L19 11h.5A1.5 1.5 0 0121 12.5V17a1 1 0 01-1 1h-1a2 2 0 01-4 0H9a2 2 0 01-4 0H4a1 1 0 01-1-1v-4.5A1.5 1.5 0 014.5 11z"/><circle cx="7" cy="18" r="1.6" fill="#0b0f17"/><circle cx="17" cy="18" r="1.6" fill="#0b0f17"/></svg>' }) }).bindPopup(`<b>Punto GPS</b><br>${lat.toFixed(6)}, ${lon.toFixed(6)}`).addTo(map);
         if (centerMap) map.setView([lat, lon], 13);
       }
       updateNearestAntennasPanel();
@@ -2791,7 +2807,7 @@ body:not(.hunter-preauth) #map-canvas { background: #4a303a !important; }
       $("map-info").textContent = `${pts.length} puntos · ${miss} sin coord.`;
       const dot = (c, t) => `<span class="chip px-2 py-0.5"><span class="inline-block w-2 h-2 rounded-full mr-1" style="background:${c}"></span>${escapeHtml(t)}</span>`;
       $("map-legend").innerHTML = colorMode === "tec" ? currentTechs.map(t => dot(getTechColor(t), t)).join("") : dot("#38bdf8", "Fija") + dot("#818cf8", "Móvil");
-      if (pts.length && gpsRefLat === null) map.fitBounds(pts, { padding: [36, 36], maxZoom: 16 });
+      window.__mapPts = pts; if (pts.length) map.fitBounds(pts, { padding: [36, 36], maxZoom: 16 });
     }
 
     function setTechGroup(grp) {
@@ -4154,7 +4170,7 @@ function animate() {
 
   // ---- El astronauta se pega a la pantalla si nadie escribe en 10 s ----
   {
-    const idle = isPreauth && (performance.now() - lastActivity) > 90000;
+    const idle = false;
     stick += ((idle ? 1 : 0) - stick) * Math.min(1, dt * (idle ? 1.5 : 3));
     const e = stick * stick * (3 - 2 * stick);
     const base = 0.55;
@@ -4240,6 +4256,16 @@ animate();
 })();
 </script>
 
+<script>
+(function(){const f=document.createElement('div');f.id='rafi-fab';f.innerHTML='<div id="rafi-pop"><b>🚀 ¡Hola, soy RAFI!</b><p style="margin:6px 0">¿Qué buscas?</p><div id="rafi-guide" style="display:grid;gap:4px"></div><textarea id="rafi-cq" rows="2" placeholder="Escribe tu consulta o pregunta..."></textarea><button class="rb" id="rafi-send">Enviar consulta</button><div id="rafi-inbox" style="margin-top:8px"></div></div><button id="rafi-btn" title="RAFI">🚀</button>';
+function mount(){document.body.appendChild(f);const g=f.querySelector('#rafi-guide');[['filter','Buscar puntos / antenas'],['map','Mapa táctico y GPS'],['tech','Analizador de tecnologías'],['maint','Plan de mantenimiento'],['price','Analizador de precios'],['noc','Consola NOC'],['rast','Rastreadores'],['rafi','Centro de consola / FAQ']].forEach(([v,t])=>{const b=document.createElement('button');b.textContent='→ '+t;b.style.cssText='text-align:left;padding:4px 8px;border-radius:8px;background:#ffffff10;color:#e2e8f0;cursor:pointer';b.onclick=()=>{try{setView(v)}catch(e){}f.querySelector('#rafi-pop').classList.remove('on')};g.appendChild(b)});
+f.querySelector('#rafi-btn').onclick=()=>{f.querySelector('#rafi-pop').classList.toggle('on');inbox()};
+f.querySelector('#rafi-send').onclick=async()=>{const t=f.querySelector('#rafi-cq').value.trim();if(!t)return;const row={texto:t,usuario:(hunterSession?.user?.email)||'anon'};let ok=false;try{if(hunterSbClient){const{error}=await hunterSbClient.from('rafi_consultas').insert(row);ok=!error}}catch(e){}
+if(!ok){const l=JSON.parse(localStorage.getItem('rafi_consultas_local')||'[]');l.push({...row,creado:new Date().toISOString()});localStorage.setItem('rafi_consultas_local',JSON.stringify(l))}
+f.querySelector('#rafi-cq').value='';showToast(ok?'Consulta enviada':'Consulta guardada localmente');inbox()};}
+async function inbox(){const box=f.querySelector('#rafi-inbox');box.innerHTML='';if(!(typeof isDevRole==='function'&&isDevRole()&&hunterSbClient))return;const{data}=await hunterSbClient.from('rafi_consultas').select('*').order('creado',{ascending:false}).limit(15);box.innerHTML='<b>Consultas recibidas</b>'+(data||[]).map(r=>'<p style="border-top:1px solid #fff2;padding:4px 0">'+escapeHtml(r.texto)+'<br><small style="color:#94a3b8">'+escapeHtml(r.usuario||'')+'</small></p>').join('')}
+const t=setInterval(()=>{if(typeof hunterSession!=='undefined'&&hunterSession){clearInterval(t);mount()}},800)})();
+</script>
 </body>
 </html>
 <style id="hunter-orbital-login-v2">
@@ -5499,6 +5525,7 @@ body.hunter-preauth::after{content:"";position:fixed;inset:0;z-index:2;pointer-e
 (() => {
   const RT = 'mdz_hunter_rastreadores';
   const ESTADOS = ['ACTIVO', 'SIN_SENAL', 'MANTENIMIENTO', 'INACTIVO'];
+  const LBL = e => e === 'SIN_SENAL' ? 'VEHÍCULOS INTERNOS' : e.replace('_', ' ');
   const EC = { ACTIVO: '#22c55e', SIN_SENAL: '#f59e0b', MANTENIMIENTO: '#00e5ff', INACTIVO: '#ef4444' };
   const FIELDS = [
     ['orden', 'Orden'],
@@ -5535,7 +5562,7 @@ body.hunter-preauth::after{content:"";position:fixed;inset:0;z-index:2;pointer-e
     <div id="rast-body" class="flex-1 overflow-y-auto scroll px-5 py-4 space-y-4">
       <div id="rast-kpis" class="grid grid-cols-2 lg:grid-cols-5 gap-2.5"></div>
       <div class="flex flex-wrap gap-2"><input id="rast-q" placeholder="Unidad, placa, IMEI, Detektor, responsable, zona..." class="flex-1 min-w-[180px] px-3 py-2 text-xs bg-black/40 border border-white/10 text-white outline-none">
-      <select id="rast-estado" class="sel"><option value="ALL">Todos los estados</option>${ESTADOS.map(e => `<option>${e}</option>`).join('')}</select></div>
+      <select id="rast-estado" class="sel"><option value="ALL">Todos los estados</option>${ESTADOS.map(e => `<option value="${e}">${LBL(e)}</option>`).join('')}</select></div>
       <div id="rast-list" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3"></div></div>`;
   $('view-rafi').after(sec);
 
@@ -5546,7 +5573,7 @@ body.hunter-preauth::after{content:"";position:fixed;inset:0;z-index:2;pointer-e
       (!q || normalizeText([r.orden, r.unidad, r.placa, r.imei, r.modelo, r.detektor, r.activacion, r.respuesta, r.detalles, r.responsable, r.zona, r.estado].join(' ')).includes(q))
     );
     $('rast-count').textContent = rows.length;
-    $('rast-kpis').innerHTML = [['Total', rows.length, 'var(--accent)'], ...ESTADOS.map(e => [e.replace('_', ' '), rows.filter(r => r.estado === e).length, EC[e]])]
+    $('rast-kpis').innerHTML = [['Total', rows.length, 'var(--accent)'], ...ESTADOS.map(e => [LBL(e), rows.filter(r => r.estado === e).length, EC[e]])]
       .map(([l, v, c]) => `<div class="chip p-3"><p class="text-xl font-bold" style="color:${c}">${v}</p><p class="text-[11px] text-slate-400 uppercase">${l}</p></div>`).join('');
 
     $('rast-list').innerHTML = list.map(r => {
@@ -5602,7 +5629,7 @@ body.hunter-preauth::after{content:"";position:fixed;inset:0;z-index:2;pointer-e
     const val = k => r ? (r[k] ?? '') : (k === 'estado' ? 'ACTIVO' : '');
     o.innerHTML = `<div class="panel w-full max-w-2xl max-h-[88vh] flex flex-col fade"><div class="px-5 py-3 border-b border-white/10 text-sm font-bold text-white">${r ? 'Editar' : 'Nuevo'} rastreador</div>
       <div class="flex-1 overflow-y-auto scroll p-5 grid grid-cols-1 sm:grid-cols-2 gap-3">${FIELDS.map(([k, l]) => `<label class="block text-[10px] font-bold uppercase text-slate-400">${l}${k === 'estado'
-        ? `<select data-k="${k}" class="sel w-full max-w-none mt-1">${ESTADOS.map(e => `<option ${e === val(k) ? 'selected' : ''}>${e}</option>`).join('')}</select>`
+        ? `<select data-k="${k}" class="sel w-full max-w-none mt-1">${ESTADOS.map(e => `<option value="${e}" ${e === val(k) ? 'selected' : ''}>${LBL(e)}</option>`).join('')}</select>`
         : `<input data-k="${k}" type="${k === 'orden' ? 'number' : 'text'}" value="${esc(val(k))}" class="w-full mt-1 px-3 py-2 text-xs bg-black/40 border border-white/10 text-white outline-none">`}</label>`).join('')}</div>
       <div class="px-5 py-3 border-t border-white/10 flex justify-end gap-2"><button data-m="x" class="chip px-4 py-2 text-xs font-semibold">Cancelar</button><button data-m="ok" class="btn px-5 py-2 text-xs font-bold text-white">Guardar</button></div></div>`;
     o.addEventListener('click', async e => {
@@ -6077,11 +6104,20 @@ html body:not(.hunter-preauth) #maint-list::-webkit-scrollbar-thumb:hover { back
     if (ok) { showToast(`Sector guardado: ${sel.value || 'Sin asignar'}`); renderMaintCards(); }
   }
 
-  function onCardAction(e) {
+  async function onCardAction(e) {
+    const rb = e.target.closest('[data-maint-reset]');
+    if (rb && isDevRole()) { if (confirm('¿Volver este mantenimiento a PENDIENTE?') && await upsertMaint(rb.dataset.maintReset, { estado: 'PENDIENTE' })) { showToast('Vuelto a Pendiente'); renderMaintCards(); } return; }
     const btn = e.target.closest('[data-maint-open]');
     if (!btn) return;
     const item = mergedItems().find(x => x.key === btn.dataset.maintOpen);
     if (item) openMaintModal(item);
+  }
+
+  function maintUrgentHtml(list) {
+    const lim = new Date(Date.now() + 7 * 864e5).toISOString().slice(0, 10);
+    const u = list.filter(x => x.estado !== 'COMPLETADO' && (x.estado === 'CON_OBSERVACIONES' || (x.fecha_programada && x.fecha_programada <= lim)));
+    if (!u.length) return '';
+    return `<div class="col-span-full card p-3 border border-amber-400/40"><h4 class="text-xs font-bold text-amber-300 mb-2"><i class="fa-solid fa-triangle-exclamation"></i> Urgentes / próximos a revisar (${u.length})</h4><div class="flex flex-wrap gap-1.5">${u.map(x => `<button data-maint-open="${esc(x.key)}" class="chip px-2 py-1 text-[11px] text-white cursor-pointer">${esc(x.punto)} <span class="text-amber-300">${x.estado === 'CON_OBSERVACIONES' ? 'obs.' : esc(x.fecha_programada)}</span></button>`).join('')}</div></div>`;
   }
 
   function renderMaintCards() {
@@ -6125,7 +6161,7 @@ html body:not(.hunter-preauth) #maint-list::-webkit-scrollbar-thumb:hover { back
       return true;
     });
 
-    $('maint-list').innerHTML = filtered.map(x => {
+    $('maint-list').innerHTML = maintUrgentHtml(filtered) + filtered.map(x => {
       const c = EC[x.estado] || '#94a3b8';
       const chkPct = Math.round((x.doneChecks / CHECKS.length) * 100);
       const sectorCtrl = dev
@@ -6165,6 +6201,7 @@ html body:not(.hunter-preauth) #maint-list::-webkit-scrollbar-thumb:hover { back
           <button data-maint-open="${esc(x.key)}" class="chip px-2.5 py-1 text-[11px] font-semibold text-white cursor-pointer">
             ${dev ? 'Checklist / Editar' : 'Ver detalle'}
           </button>
+          ${dev && x.estado !== 'PENDIENTE' ? `<button data-maint-reset="${esc(x.punto)}" class="chip px-2 py-1 text-[11px] text-amber-300 cursor-pointer" title="Volver a Pendiente">↺ Pendiente</button>` : ''}
         </div>
       </article>`;
     }).join('') || `<div class="col-span-full">${msg('fa-clipboard-check', 'Sin antenas en este filtro', 'Ajusta los filtros de sector o estado.')}</div>`;
