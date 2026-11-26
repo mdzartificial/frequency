@@ -2,19 +2,26 @@
 <html lang="es">
 <head>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27%3E%3Cdefs%3E%3CradialGradient id=%27g%27 cx=%2735%25%27 cy=%2728%25%27 r=%2770%25%27%3E%3Cstop offset=%270%25%27 stop-color=%27%231c050d%27/%3E%3Cstop offset=%27100%25%27 stop-color=%27%23070104%27/%3E%3C/radialGradient%3E%3C/defs%3E%3Ccircle cx=%2750%27 cy=%2747%27 r=%2742%27 fill=%27url(%23g)%27 stroke=%27%23ff2850%27 stroke-width=%274.2%27/%3E%3Cpath d=%27M30 61 Q21 71 27 77 M41 64 Q37 75 43 79 M59 64 Q63 75 57 79 M70 61 Q79 71 73 77%27 fill=%27none%27 stroke=%27%2318e06c%27 stroke-width=%276.5%27 stroke-linecap=%27round%27/%3E%3Cellipse cx=%2750%27 cy=%2745%27 rx=%2722%27 ry=%2720%27 fill=%27%2318e06c%27/%3E%3Cellipse cx=%2742%27 cy=%2735%27 rx=%276.5%27 ry=%274%27 fill=%27%2380ffb6%27 opacity=%270.65%27/%3E%3Ccircle cx=%2742%27 cy=%2749%27 r=%274.9%27 fill=%27%23ffffff%27/%3E%3Ccircle cx=%2758%27 cy=%2749%27 r=%274.9%27 fill=%27%23ffffff%27/%3E%3Ccircle cx=%2743%27 cy=%2749%27 r=%272.7%27 fill=%27%2306120a%27/%3E%3Ccircle cx=%2759%27 cy=%2749%27 r=%272.7%27 fill=%27%2306120a%27/%3E%3Cpath d=%27M24 29 A34 34 0 0 1 58 14%27 fill=%27none%27 stroke=%27%23ffffff%27 stroke-width=%273.4%27 stroke-linecap=%27round%27 opacity=%270.58%27/%3E%3Crect x=%2724%27 y=%2781%27 width=%2752%27 height=%2711%27 rx=%275.5%27 fill=%27%231c1f29%27 stroke=%27%23ff2850%27 stroke-width=%272.2%27/%3E%3C/svg%3E">  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <!-- SEGURIDAD v10: Content-Security-Policy. Limita desde dónde se cargan scripts y a qué
+       servidores puede enviar datos la página (aunque alguien inyecte código, no puede
+       mandar tus datos a otro servidor). Si agregas un servicio nuevo, añádelo aquí. -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.tailwindcss.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://cdn.sheetjs.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com; font-src 'self' data: https://fonts.gstatic.com https://cdnjs.cloudflare.com; img-src 'self' data: blob: https://tile.openstreetmap.org https://*.tile.openstreetmap.org; connect-src 'self' https://uswtlvzyrujjjmbsbnmj.supabase.co wss://uswtlvzyrujjjmbsbnmj.supabase.co https://open.er-api.com https://cdn.jsdelivr.net; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self'">
   <title>HUNTER™ CORE · Orbital Telemetry</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700&family=Orbitron:wght@500;700;800;900&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=Exo+2:wght@500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
-  <script src="https://kam.software/plugins/holo-orb.cdn.js" defer></script>
+  <!-- SEGURIDAD v10: se quitó holo-orb.cdn.js de kam.software (script de un tercero con acceso total a tu sesión).
+       Si quieres el efecto, descarga el archivo, súbelo a tu repo y cárgalo como <script src="holo-orb.js" defer></script> -->
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+  <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.118.0/dist/umd/supabase.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 
@@ -1502,11 +1509,11 @@ body:not(.theme-day):not(.hunter-preauth) .panel,body:not(.theme-day):not(.hunte
         <div class="grid grid-cols-2 gap-2">
           <div>
             <label class="block text-[10px] font-bold text-slate-300 uppercase mb-1">Usuario</label>
-            <input type="text" id="sb-user-input" required placeholder="MDZ" class="liquid-input w-full px-3 py-2 rounded-xl text-white placeholder-slate-400">
+            <input type="text" id="sb-user-input" required maxlength="120" autocomplete="username" autocapitalize="off" spellcheck="false" placeholder="MDZ" class="liquid-input w-full px-3 py-2 rounded-xl text-white placeholder-slate-400">
           </div>
           <div>
             <label class="block text-[10px] font-bold text-slate-300 uppercase mb-1">Contraseña</label>
-            <input type="password" id="sb-pass-input" required placeholder="••••••••" class="liquid-input w-full px-3 py-2 rounded-xl text-white placeholder-slate-400">
+            <input type="password" id="sb-pass-input" required maxlength="200" autocomplete="current-password" placeholder="••••••••" class="liquid-input w-full px-3 py-2 rounded-xl text-white placeholder-slate-400">
           </div>
         </div>
 
@@ -1515,11 +1522,16 @@ body:not(.theme-day):not(.hunter-preauth) .panel,body:not(.theme-day):not(.hunte
             <span><i class="fa-solid fa-shield-halved mr-1" style="color: rgb(var(--accent-a));"></i>Código Autenticador (6 Dígitos)</span>
             <span id="totp-timer-label" class="mono" style="color: rgb(var(--accent-a));">30s</span>
           </div>
-          <input type="text" id="sb-totp-input" maxlength="6" inputmode="numeric" placeholder="0 0 0 0 0 0" class="w-full py-1.5 rounded-lg bg-black/35 border border-white/10 text-white mono text-center tracking-[0.38em] text-sm outline-none">
+          <input type="text" id="sb-totp-input" maxlength="6" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]*" placeholder="0 0 0 0 0 0" class="w-full py-1.5 rounded-lg bg-black/35 border border-white/10 text-white mono text-center tracking-[0.38em] text-sm outline-none">
           <div class="h-1 w-full bg-white/10 rounded-full mt-2 overflow-hidden">
             <div id="totp-timer-bar" class="h-full transition-all duration-1000" style="width:100%; background: linear-gradient(90deg, rgb(var(--accent-a)), rgb(var(--accent-b)));"></div>
           </div>
         </div>
+
+        <label id="sb-remember-wrap" class="flex items-center gap-2 text-[11px] text-slate-200 cursor-pointer select-none">
+          <input type="checkbox" id="sb-remember" class="w-4 h-4 accent-sky-400">
+          <span>Recordar este dispositivo 10 días <span class="text-slate-400">(no actives en equipos compartidos)</span></span>
+        </label>
 
         <div id="sb-forced-mfa" class="ui-hidden p-3 rounded-xl bg-black/60 border border-white/15 text-center space-y-2"></div>
         <p id="sb-auth-error" class="ui-hidden text-xs text-red-400 text-center"></p>
@@ -1787,7 +1799,7 @@ body:not(.theme-day):not(.hunter-preauth) .panel,body:not(.theme-day):not(.hunte
             <div class="card p-4 space-y-3">
               <div class="flex flex-wrap items-center justify-between gap-2">
                 <span class="text-xs font-bold uppercase tracking-wider text-slate-300">Simular Tablas desde 3 Excels</span>
-                <span id="nocStatusText" class="text-xs text-[var(--accent)]">Carga los 3 reportes o usa Demo.</span>
+                <span id="nocStatusText" class="text-xs text-[var(--accent)]">Carga los 3 reportes o pulsa “Último corte”.</span>
               </div>
               <div class="grid grid-cols-1 md:grid-cols-3 gap-2.5">
                 <div class="chip p-3">
@@ -1949,9 +1961,50 @@ body:not(.theme-day):not(.hunter-preauth) .panel,body:not(.theme-day):not(.hunte
     const HUNTER_TABLE = "mdz_hunter_inventario";
     const RAFI_FAQ_STORAGE_KEY = "MDZ_HAWKS_RAFI_FAQ_V1";
 
+    /* SEGURIDAD v10 · "Recordar este dispositivo 10 días"
+       - Marcado: la sesión se guarda en localStorage (sobrevive al cerrar el navegador).
+       - Sin marcar: se guarda en sessionStorage (se borra al cerrar la pestaña).
+       - El límite de 10 días lo hace cumplir el SERVIDOR (RLS revisa la fecha del 2FA),
+         así que nadie puede "alargarlo" tocando el navegador. */
+    const MDZ_REMEMBER_KEY = "mdz_recordar_dispositivo";
+    const MDZ_MFA_DAYS = 10;
+    const mdzRemember = () => { try { return localStorage.getItem(MDZ_REMEMBER_KEY) === "1"; } catch (e) { return false; } };
+    const mdzAuthStorage = {
+      getItem: k => { try { return (mdzRemember() ? localStorage : sessionStorage).getItem(k); } catch (e) { return null; } },
+      setItem: (k, v) => { try { (mdzRemember() ? localStorage : sessionStorage).setItem(k, v); } catch (e) {} },
+      removeItem: k => { try { localStorage.removeItem(k); sessionStorage.removeItem(k); } catch (e) {} }
+    };
     const hunterSbClient = (window.supabase && HUNTER_SUPABASE_URL.startsWith("https://"))
-      ? window.supabase.createClient(HUNTER_SUPABASE_URL, HUNTER_SUPABASE_KEY)
+      ? window.supabase.createClient(HUNTER_SUPABASE_URL, HUNTER_SUPABASE_KEY, {
+          auth: { storage: mdzAuthStorage, storageKey: "mdz-hunter-auth", persistSession: true, autoRefreshToken: true, detectSessionInUrl: false }
+        })
       : null;
+
+    // Lee la fecha del último 2FA desde el token (solo para la interfaz; el servidor vuelve a validarlo)
+    function mdzMfaAgeDays(session) {
+      try {
+        const part = String(session?.access_token || "").split(".")[1];
+        const payload = JSON.parse(atob(part.replace(/-/g, "+").replace(/_/g, "/")));
+        const totp = (payload.amr || []).filter(a => a && a.method === "totp").map(a => Number(a.timestamp) || 0);
+        if (!totp.length) return Infinity;
+        return (Date.now() / 1000 - Math.max(...totp)) / 86400;
+      } catch (e) { return Infinity; }
+    }
+
+    let hunterPerfil = null;
+    async function mdzLoadPerfil(session) {
+      hunterPerfil = null;
+      if (!hunterSbClient || !session?.user?.id) return null;
+      try {
+        const { data, error } = await hunterSbClient.from("perfiles").select("rol, tema, nombre, activo").eq("user_id", session.user.id).maybeSingle();
+        if (error) { hunterPerfil = { legacy: true }; return hunterPerfil; }   // tabla aún no creada: modo compatibilidad
+        hunterPerfil = data || { rol: null };
+      } catch (e) { hunterPerfil = { legacy: true }; }
+      return hunterPerfil;
+    }
+
+    // Intentos fallidos: espera progresiva (el servidor de Supabase también limita)
+    const mdzLogin = { fails: 0, until: 0 };
 
     let hunterSession = null;
     let hunterRole = "viewer";
@@ -2093,13 +2146,30 @@ body:not(.theme-day):not(.hunter-preauth) .panel,body:not(.theme-day):not(.hunte
       if (!$("view-tech").classList.contains("ui-hidden")) renderTech();
     }
 
+    /* SEGURIDAD v10: el rol sale de la tabla "perfiles" (Supabase), no del texto del correo.
+       Ojo: esto solo decide qué botones se ven. Lo que de verdad protege los datos son
+       las políticas RLS del script SQL. */
     function resolveRoleFromSession(session) {
+      if (!session) return "viewer";
+      const valid = ["dev", "gerencia", "noc", "viewer"];
+      if (hunterPerfil && !hunterPerfil.legacy) {
+        const r = String(hunterPerfil.rol || "").toLowerCase();
+        return valid.includes(r) ? r : "viewer";
+      }
+      // Compatibilidad mientras no ejecutes el SQL v10
       const email = String(session?.user?.email || "").toLowerCase().trim();
       const metaRole = String(session?.user?.app_metadata?.role || "").toLowerCase().trim();
       if (metaRole === "noc" || email.startsWith("consola@")) return "noc";
-      if (metaRole === "viewer" || email.startsWith("visor@")) return "viewer";
       if (metaRole === "dev" || metaRole === "admin" || email === "mdz@mdz.local") return "dev";
-      return "viewer";
+      return valid.includes(metaRole) ? metaRole : "viewer";
+    }
+
+    // Tema por usuario: dev = futurista; gerencia/viewer/noc = ejecutivo (se puede forzar en perfiles.tema)
+    function mdzApplyTheme() {
+      const t = (hunterPerfil && hunterPerfil.tema) || (hunterRole === "dev" ? "futurista" : "ejecutivo");
+      document.body.classList.toggle("tema-ejecutivo", t === "ejecutivo");
+      document.body.classList.toggle("tema-futurista", t !== "ejecutivo");
+      document.body.dataset.rol = hunterRole;
     }
 
     function applySessionRoleUI(session) {
@@ -2108,7 +2178,7 @@ body:not(.theme-day):not(.hunter-preauth) .panel,body:not(.theme-day):not(.hunte
       const dev = isDevRole();
       const nocOnly = isNocOnlyRole();
       const email = session?.user?.email || "mdzhunter";
-      const roleLabel = dev ? "DEV / ADMIN" : (nocOnly ? "CONSOLA NOC" : "VISOR");
+      const roleLabel = dev ? "DEV / ADMIN" : (nocOnly ? "CONSOLA NOC" : (hunterRole === "gerencia" ? "GERENCIA" : "VISOR"));
 
       if ($("role-badge-text")) $("role-badge-text").textContent = roleLabel;
       if ($("user-email-subtitle")) $("user-email-subtitle").textContent = `${email} · ${roleLabel}`;
@@ -2121,6 +2191,7 @@ body:not(.theme-day):not(.hunter-preauth) .panel,body:not(.theme-day):not(.hunte
       if ($("btn-add-point-dev")) $("btn-add-point-dev").classList.toggle("ui-hidden", !dev);
       if ($("btn-export-excel-dev")) $("btn-export-excel-dev").classList.toggle("ui-hidden", !dev);
       if ($("btnNocExportExcel")) $("btnNocExportExcel").classList.toggle("ui-hidden", !dev);
+      mdzApplyTheme();
     }
 
     function stripPlaceholderPrefix(val) {
@@ -2261,28 +2332,51 @@ body:not(.theme-day):not(.hunter-preauth) .panel,body:not(.theme-day):not(.hunte
     }
 
     async function completeLoginWithSession(session) {
+      await mdzLoadPerfil(session);
+      if (hunterPerfil && !hunterPerfil.legacy && (!hunterPerfil.rol || hunterPerfil.activo === false)) {
+        await hunterSbClient.auth.signOut();
+        openHunterAuthModal();
+        const errEl = $("sb-auth-error");
+        errEl.textContent = "Tu usuario no tiene acceso habilitado. Contacta al administrador.";
+        errEl.classList.remove("ui-hidden");
+        return;
+      }
       applySessionRoleUI(session);
       document.body.classList.remove("hunter-preauth");
       await syncFromSupabaseNow();
     }
 
+    function mdzLoginError(text) {
+      const errEl = $("sb-auth-error");
+      errEl.textContent = text;
+      errEl.classList.remove("ui-hidden");
+    }
+
     async function submitHunterSupabaseLogin(e) {
       e.preventDefault();
       if (!hunterSbClient) return;
-      const errEl = $("sb-auth-error");
-      errEl.classList.add("ui-hidden");
+      $("sb-auth-error").classList.add("ui-hidden");
 
-      let emailVal = $("sb-user-input").value.trim();
-      const passVal = $("sb-pass-input").value.trim();
-      const codeVal = $("sb-totp-input").value.replace(/\s+/g, "");
+      // Espera progresiva tras intentos fallidos (frena a quien prueba contraseñas)
+      const wait = Math.ceil((mdzLogin.until - Date.now()) / 1000);
+      if (wait > 0) { mdzLoginError(`Demasiados intentos. Espera ${wait} s.`); return; }
+      const fail = (text) => {
+        mdzLogin.fails++;
+        if (mdzLogin.fails >= 3) mdzLogin.until = Date.now() + Math.min(300, 15 * 2 ** (mdzLogin.fails - 3)) * 1000;
+        mdzLoginError(text);
+      };
+
+      let emailVal = $("sb-user-input").value.trim().slice(0, 120);
+      const passVal = $("sb-pass-input").value.slice(0, 200);          // la contraseña NO se recorta (los espacios cuentan)
+      const codeVal = $("sb-totp-input").value.replace(/\D+/g, "").slice(0, 6);
       if (!emailVal.includes("@")) emailVal = `${emailVal.toLowerCase()}@mdz.local`;
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailVal)) { fail("Usuario o contraseña incorrectos."); return; }
+
+      // Guardar la preferencia ANTES de iniciar sesión, para que la sesión vaya al almacén correcto
+      try { localStorage.setItem(MDZ_REMEMBER_KEY, $("sb-remember")?.checked ? "1" : "0"); } catch (err) {}
 
       const { data: authData, error: authErr } = await hunterSbClient.auth.signInWithPassword({ email: emailVal, password: passVal });
-      if (authErr || !authData.session) {
-        errEl.textContent = "Usuario o contraseña incorrectos.";
-        errEl.classList.remove("ui-hidden");
-        return;
-      }
+      if (authErr || !authData.session) { fail("Usuario o contraseña incorrectos."); return; }
 
       const { data: factors } = await hunterSbClient.auth.mfa.listFactors();
       const verifiedTotp = factors?.totp?.find(f => f.status === "verified");
@@ -2293,42 +2387,40 @@ body:not(.theme-day):not(.hunter-preauth) .panel,body:not(.theme-day):not(.hunte
         }
         const { data: enr, error: enrErr } = await hunterSbClient.auth.mfa.enroll({ factorType: "totp", friendlyName: `Hawks_${Date.now()}` });
         if (enrErr) {
-          errEl.textContent = `Error QR 2FA: ${enrErr.message}`;
-          errEl.classList.remove("ui-hidden");
+          mdzLoginError("No se pudo generar el QR de 2FA. Intenta de nuevo.");
           await hunterSbClient.auth.signOut();
           return;
         }
         hunterPendingMfaId = enr.id;
         const box = $("sb-forced-mfa");
         box.classList.remove("ui-hidden");
-        box.innerHTML = `
-          <p class="font-bold text-sky-300">Configurar 2FA</p>
-          <img src="${enr.totp.qr_code}" alt="QR 2FA" class="mx-auto w-32 h-32 bg-white p-1.5 rounded-lg">
-          <p class="font-mono text-[10px] text-slate-300 break-all">${escapeHtml(enr.totp.secret)}</p>
-          <button type="button" onclick="confirmHunterForcedMfa()" class="px-3 py-1.5 rounded-lg bg-sky-600 text-white font-bold">Validar código</button>
-        `;
+        box.innerHTML = "";
+        const qrSrc = String(enr.totp.qr_code || "");
+        const h = document.createElement("p"); h.className = "font-bold text-sky-300"; h.textContent = "Configurar 2FA";
+        const img = document.createElement("img"); img.alt = "QR 2FA"; img.className = "mx-auto w-32 h-32 bg-white p-1.5 rounded-lg";
+        if (/^data:image\//.test(qrSrc)) img.src = qrSrc;
+        const sec = document.createElement("p"); sec.className = "font-mono text-[10px] text-slate-300 break-all"; sec.textContent = enr.totp.secret || "";
+        const btn = document.createElement("button"); btn.type = "button"; btn.className = "px-3 py-1.5 rounded-lg bg-sky-600 text-white font-bold"; btn.textContent = "Validar código";
+        btn.addEventListener("click", confirmHunterForcedMfa);
+        box.append(h, img, sec, btn);
         return;
       }
 
-      const _tk = "mdz_trust_" + String(authData.user.email).toLowerCase();
-      let _tr = false; try { _tr = Number(localStorage.getItem(_tk) || 0) > Date.now(); } catch (e) {}
-      if (_tr && !codeVal) { await completeLoginWithSession(authData.session); return; }
       if (!/^\d{6}$/.test(codeVal)) {
-        errEl.textContent = "Ingresa el código 2FA de 6 dígitos.";
-        errEl.classList.remove("ui-hidden");
+        mdzLoginError("Ingresa el código 2FA de 6 dígitos.");
         await hunterSbClient.auth.signOut();
         return;
       }
 
       const { error: mfaErr } = await hunterSbClient.auth.mfa.challengeAndVerify({ factorId: verifiedTotp.id, code: codeVal });
       if (mfaErr) {
-        errEl.textContent = "Código 2FA incorrecto o expirado.";
-        errEl.classList.remove("ui-hidden");
         await hunterSbClient.auth.signOut();
+        fail("Código 2FA incorrecto o expirado.");
         return;
       }
 
-      try { localStorage.setItem(_tk, String(Date.now() + 10 * 864e5)); } catch (e) {}
+      mdzLogin.fails = 0; mdzLogin.until = 0;
+      $("sb-pass-input").value = ""; $("sb-totp-input").value = "";
       const { data: { session } } = await hunterSbClient.auth.getSession();
       await completeLoginWithSession(session || authData.session);
     }
@@ -2352,10 +2444,12 @@ body:not(.theme-day):not(.hunter-preauth) .panel,body:not(.theme-day):not(.hunte
       await completeLoginWithSession(session);
     }
 
-    async function signOutHunterSupabase() {
-      if (hunterSbClient) await hunterSbClient.auth.signOut();
+    async function signOutHunterSupabase(everywhere = false) {
+      if (hunterSbClient) await hunterSbClient.auth.signOut(everywhere === true ? { scope: "global" } : undefined);
       hunterSession = null;
+      hunterPerfil = null;
       hunterRole = "viewer";
+      document.body.classList.remove("tema-ejecutivo", "tema-futurista");
       excelData = [];
       lastMatchedItems = [];
       setConnectionStatus(false);
@@ -2367,11 +2461,13 @@ body:not(.theme-day):not(.hunter-preauth) .panel,body:not(.theme-day):not(.hunte
       if (!hunterSbClient) { setConnectionStatus(false); return; }
       const { data: { session } } = await hunterSbClient.auth.getSession();
       const { data: aalData } = await hunterSbClient.auth.mfa.getAuthenticatorAssuranceLevel();
-      if (!session || !aalData || aalData.currentLevel !== "aal2") {
+      if (!session || !aalData || aalData.currentLevel !== "aal2" || mdzMfaAgeDays(session) > MDZ_MFA_DAYS) {
+        if (session) await hunterSbClient.auth.signOut();
         setConnectionStatus(false);
         openHunterAuthModal();
         return;
       }
+      if (!hunterPerfil) await mdzLoadPerfil(session);
       applySessionRoleUI(session);
       document.body.classList.remove("hunter-preauth");
 
@@ -2405,9 +2501,10 @@ body:not(.theme-day):not(.hunter-preauth) .panel,body:not(.theme-day):not(.hunte
       }
       const { data: { session } } = await hunterSbClient.auth.getSession();
       const { data: aalData } = await hunterSbClient.auth.mfa.getAuthenticatorAssuranceLevel();
-      if (!session || !aalData || aalData.currentLevel !== "aal2") {
+      if (!session || !aalData || aalData.currentLevel !== "aal2" || mdzMfaAgeDays(session) > MDZ_MFA_DAYS) {
         if (session) await hunterSbClient.auth.signOut();
         openHunterAuthModal();
+        if (session && aalData?.currentLevel === "aal2") mdzLoginError(`Por seguridad, vuelve a ingresar tu código 2FA (pasaron ${MDZ_MFA_DAYS} días).`);
         return;
       }
       await completeLoginWithSession(session);
@@ -2454,7 +2551,7 @@ body:not(.theme-day):not(.hunter-preauth) .panel,body:not(.theme-day):not(.hunte
       const allBtn = `<button onclick="setSearchTechFilter('ALL')" class="px-2.5 py-1 rounded-lg text-xs font-semibold border transition cursor-pointer ${allActive ? "bg-[var(--accent)] text-slate-950 border-transparent" : "chip text-slate-300"}">Todos ${lastMatchedItems.length}</button>`;
       const badgesHtml = entries.map(([t, n]) => {
         const isAct = activeSearchTechFilter === t, safeT = t.replace(/\\/g, "\\\\").replace(/'/g, "\\'");
-        return `<button onclick="setSearchTechFilter('${safeT}')" class="px-2.5 py-1 rounded-lg text-xs font-semibold border transition cursor-pointer ${isAct ? "bg-[var(--accent)] text-slate-950 border-transparent" : "chip text-slate-300"}">${escapeHtml(t)} <span class="opacity-80 ml-1">${n}</span></button>`;
+        return `<button onclick="setSearchTechFilter('${escapeHtml(safeT)}')" class="px-2.5 py-1 rounded-lg text-xs font-semibold border transition cursor-pointer ${isAct ? "bg-[var(--accent)] text-slate-950 border-transparent" : "chip text-slate-300"}">${escapeHtml(t)} <span class="opacity-80 ml-1">${n}</span></button>`;
       }).join("");
       techBadges.innerHTML = (entries.length > 1 ? allBtn : "") + badgesHtml;
     }
@@ -2575,9 +2672,9 @@ body:not(.theme-day):not(.hunter-preauth) .panel,body:not(.theme-day):not(.hunte
         }).join("") : `<div class="p-3 rounded-xl bg-amber-500/10 border border-amber-400/20 text-xs text-amber-200">Comandos no registrados para IMEI ${escapeHtml(imei)}.</div>`;
 
         const safeCol = c => c ? c.replace(/\\/g, "\\\\").replace(/'/g, "\\'") : "";
-        const titleHtml = dev && pk ? `<input type="text" value="${escapeHtml(punto)}" onchange="updateCardFieldInline(${realIdx}, '${safeCol(pk)}', this.value)" class="inline-dev-input text-lg font-bold mt-1">` : `<h3 class="text-lg font-bold text-white break-words">${escapeHtml(punto)}</h3>`;
+        const titleHtml = dev && pk ? `<input type="text" value="${escapeHtml(punto)}" onchange="updateCardFieldInline(${realIdx}, '${escapeHtml(safeCol(pk))}', this.value)" class="inline-dev-input text-lg font-bold mt-1">` : `<h3 class="text-lg font-bold text-white break-words">${escapeHtml(punto)}</h3>`;
         const obsHtml = dev
-          ? (hasObs ? `<div class="mx-4 mb-3 px-3 py-2 rounded-xl bg-amber-500/10 border-l-2 border-amber-400"><input type="text" value="${escapeHtml(obs)}" onchange="updateCardFieldInline(${realIdx}, '${safeCol(ok)}', this.value)" class="inline-dev-input text-xs"></div>` : `<div class="mx-4 mb-3"><button onclick="addObservationInline(${realIdx})" class="px-2.5 py-1 rounded-lg bg-white/5 border border-dashed border-white/15 text-slate-400 hover:text-white text-[11px]">+ Observación</button></div>`)
+          ? (hasObs ? `<div class="mx-4 mb-3 px-3 py-2 rounded-xl bg-amber-500/10 border-l-2 border-amber-400"><input type="text" value="${escapeHtml(obs)}" onchange="updateCardFieldInline(${realIdx}, '${escapeHtml(safeCol(ok))}', this.value)" class="inline-dev-input text-xs"></div>` : `<div class="mx-4 mb-3"><button onclick="addObservationInline(${realIdx})" class="px-2.5 py-1 rounded-lg bg-white/5 border border-dashed border-white/15 text-slate-400 hover:text-white text-[11px]">+ Observación</button></div>`)
           : (hasObs ? `<div class="mx-4 mb-3 px-3 py-2 rounded-xl bg-amber-500/10 border-l-2 border-amber-400 text-xs text-amber-100">${escapeHtml(obs)}</div>` : "");
         const devFullBtn = dev ? `<button onclick="openRecordEditor(${realIdx})" class="px-2.5 py-1.5 rounded-lg bg-white/5 border border-white/10 hover:border-sky-400 text-sky-300 text-xs font-semibold cursor-pointer">Editar</button>` : "";
 
@@ -2642,11 +2739,11 @@ body:not(.theme-day):not(.hunter-preauth) .panel,body:not(.theme-day):not(.hunte
         if (!dev && isEmpty(v)) return;
         const n = normalizeText(k), safeCol = k.replace(/\\/g, "\\\\").replace(/'/g, "\\'");
         if (n === "vlu") {
-          const vHtml = dev ? `<input type="text" value="${escapeHtml(v ?? "")}" onchange="updateCardFieldInline(${realIdx}, '${safeCol}', this.value, false)" class="inline-dev-input text-sm font-bold text-amber-200 mt-1">` : `<p class="text-sm font-bold text-amber-200 break-words mt-0.5">${escapeHtml(v)}</p>`;
+          const vHtml = dev ? `<input type="text" value="${escapeHtml(v ?? "")}" onchange="updateCardFieldInline(${realIdx}, '${escapeHtml(safeCol)}', this.value, false)" class="inline-dev-input text-sm font-bold text-amber-200 mt-1">` : `<p class="text-sm font-bold text-amber-200 break-words mt-0.5">${escapeHtml(v)}</p>`;
           h += `<div class="col-span-full p-2.5 rounded-xl bg-amber-500/10 border border-amber-400/25"><p class="text-[10px] font-bold text-amber-300 uppercase">VLU</p>${vHtml}</div>`;
           return;
         }
-        const fHtml = dev ? `<input type="text" value="${escapeHtml(v ?? "")}" onchange="updateCardFieldInline(${realIdx}, '${safeCol}', this.value, false)" class="inline-dev-input text-xs font-semibold mt-1">` : `<p class="text-xs font-semibold text-white break-words mt-0.5">${escapeHtml(v)}</p>`;
+        const fHtml = dev ? `<input type="text" value="${escapeHtml(v ?? "")}" onchange="updateCardFieldInline(${realIdx}, '${escapeHtml(safeCol)}', this.value, false)" class="inline-dev-input text-xs font-semibold mt-1">` : `<p class="text-xs font-semibold text-white break-words mt-0.5">${escapeHtml(v)}</p>`;
         h += `<div class="chip px-2.5 py-2"><p class="text-[9px] font-bold uppercase text-slate-400 truncate">${escapeHtml(k)}</p>${fHtml}</div>`;
       });
       return h || `<div class="col-span-full text-xs text-slate-500 italic">Sin datos adicionales.</div>`;
@@ -2752,7 +2849,7 @@ body:not(.theme-day):not(.hunter-preauth) .panel,body:not(.theme-day):not(.hunte
       const panel = $("nearest-antennas-panel"), listEl = $("nearest-antennas-list");
       if (gpsRefLat === null || gpsRefLon === null) { panel.classList.add("ui-hidden"); return; }
       panel.classList.remove("ui-hidden");
-      const candidates = excelData.map(info).filter(i => i.ok).map(i => ({ ...i, distKm: haversineKm(gpsRefLat, gpsRefLon, i.lat, i.lon) })).sort((a, b) => a.distKm - b.distKm).slice(0, 5);
+      const candidates = excelData.map(info).filter(i => i.ok && !i.movil).map(i => ({ ...i, distKm: haversineKm(gpsRefLat, gpsRefLon, i.lat, i.lon) })).sort((a, b) => a.distKm - b.distKm).slice(0, 5);
       listEl.innerHTML = candidates.map((c, idx) => `<div class="p-2.5 rounded-xl bg-black/30 border border-white/10 space-y-1"><div class="flex items-center justify-between gap-2"><span class="font-bold text-white truncate">${idx + 1}. ${escapeHtml(c.punto)}</span><span class="px-1.5 py-0.5 rounded bg-sky-500/20 text-sky-300 font-bold shrink-0">${c.distKm.toFixed(2)} km</span></div><div class="flex items-center justify-between text-[11px] text-slate-400"><span class="truncate">${escapeHtml(c.tec)}</span><a href="https://www.google.com/maps/dir/?api=1&origin=${gpsRefLat},${gpsRefLon}&destination=${c.lat},${c.lon}" target="_blank" class="text-[var(--accent)] hover:underline font-semibold">Ruta</a></div></div>`).join("");
     }
 
@@ -3130,7 +3227,7 @@ let priceSig = "";
     }
     function nocClearAll() { nocState.rawDet = nocState.rawRep = nocState.rawLoj = null; nocState.dfTotal = nocState.dfEval = nocState.incidencias = []; $("nocFileDet").value = $("nocFileRep").value = $("nocFileLoj").value = ""; $("nocBadgeDet").textContent = $("nocBadgeRep").textContent = $("nocBadgeLoj").textContent = "Pendiente"; if ($("btnNocExportExcel")) $("btnNocExportExcel").disabled = true; nocRecalculate(); }
     function nocRecalculate() {
-      if (!nocState.dfTotal.length) { $("nocKpiGlobal").textContent = $("nocKpiPond").textContent = "0.00%"; $("nocKpiPlanta").textContent = $("nocKpiVerde").textContent = $("nocKpiAmarillo").textContent = $("nocKpiRojo").textContent = "0"; $("nocTbodyMatriz").innerHTML = `<tr><td colspan="12" class="py-6 text-center text-slate-500">Carga los 3 archivos o pulsa Demo.</td></tr>`; $("nocTbodyInc").innerHTML = ""; $("nocIncCount").textContent = "0"; return; }
+      if (!nocState.dfTotal.length) { $("nocKpiGlobal").textContent = $("nocKpiPond").textContent = "0.00%"; $("nocKpiPlanta").textContent = $("nocKpiVerde").textContent = $("nocKpiAmarillo").textContent = $("nocKpiRojo").textContent = "0"; $("nocTbodyMatriz").innerHTML = `<tr><td colspan="12" class="py-6 text-center text-slate-500">Carga los 3 archivos o pulsa “Último corte”.</td></tr>`; $("nocTbodyInc").innerHTML = ""; $("nocIncCount").textContent = "0"; return; }
       const cv = $("nocParamCorte").value; if (cv) { const d = new Date(cv); if (!isNaN(d.getTime())) nocState.fechaCorte = d; }
       const meta = (parseFloat($("nocParamSla").value) || 95) / 100, uV = parseFloat($("nocParamVerde").value) || 24, uA = parseFloat($("nocParamAmarillo").value) || 48;
       $("nocBannerCorte").textContent = `Corte: ${nocFmtBanner(nocState.fechaCorte)}`;
@@ -4324,8 +4421,6 @@ let mx=0;addEventListener('mousemove',e=>mx=(e.clientX/innerWidth-.5));
 btn.textContent='';btn.appendChild(cv)}catch(e){}},700);
 })();
 </script>
-</body>
-</html>
 <style id="hunter-orbital-login-v2">
 body.hunter-preauth #hunter-auth-modal { perspective: 1400px; }
 body.hunter-preauth #login-floating-card {
@@ -5582,9 +5677,10 @@ body.hunter-preauth::after{content:"";position:fixed;inset:0;z-index:2;pointer-e
 <script id="hunter-rastreadores-js">
 (() => {
   const RT = 'mdz_hunter_rastreadores';
-  const ESTADOS = ['ACTIVO', 'SIN_SENAL', 'MANTENIMIENTO', 'INACTIVO'];
-  const LBL = e => e === 'SIN_SENAL' ? 'VEHÍCULOS INTERNOS' : e.replace('_', ' ');
-  const EC = { ACTIVO: '#22c55e', SIN_SENAL: '#f59e0b', MANTENIMIENTO: '#00e5ff', INACTIVO: '#ef4444' };
+  // v10: "Sin señal" ahora es "Vehículos internos" (valor INTERNO en la base)
+  const ESTADOS = ['ACTIVO', 'INTERNO', 'MANTENIMIENTO', 'INACTIVO'];
+  const LBL = e => (e === 'INTERNO' || e === 'SIN_SENAL') ? 'VEHÍCULOS INTERNOS' : String(e || '').replace('_', ' ');
+  const EC = { ACTIVO: '#22c55e', INTERNO: '#f59e0b', MANTENIMIENTO: '#00e5ff', INACTIVO: '#ef4444' };
   const FIELDS = [
     ['orden', 'Orden'],
     ['unidad', 'Unidad / Nombre *'],
@@ -5628,7 +5724,7 @@ body.hunter-preauth::after{content:"";position:fixed;inset:0;z-index:2;pointer-e
     const q = normalizeText($('rast-q').value), f = $('rast-estado').value, dev = isDevRole();
     const list = rows.filter(r =>
       (f === 'ALL' || r.estado === f) &&
-      (!q || normalizeText([r.orden, r.unidad, r.placa, r.imei, r.modelo, r.detektor, r.activacion, r.respuesta, r.detalles, r.responsable, r.zona, r.estado].join(' ')).includes(q))
+      (!q || normalizeText([r.orden, r.unidad, r.placa, r.imei, r.modelo, r.detektor, r.activacion, r.respuesta, r.detalles, r.responsable, r.zona, LBL(r.estado), ...Object.entries(r.extras || {}).flat()].join(' ')).includes(q))
     );
     $('rast-count').textContent = rows.length;
     $('rast-kpis').innerHTML = [['Total', rows.length, 'var(--accent)'], ...ESTADOS.map(e => [LBL(e), rows.filter(r => r.estado === e).length, EC[e]])]
@@ -5643,7 +5739,8 @@ body.hunter-preauth::after{content:"";position:fixed;inset:0;z-index:2;pointer-e
         ['Modelo', r.modelo, false],
         ['Detektor', r.detektor, true],
         ['Activación', r.activacion, true],
-        ['Respuesta', r.respuesta, true]
+        ['Respuesta', r.respuesta, true],
+        ...Object.entries(r.extras && typeof r.extras === 'object' ? r.extras : {}).map(([k, v]) => [k, v, false])
       ].filter(([, v]) => hasVal(v));
 
       return `<article class="card p-4 space-y-2.5 fade">
@@ -5652,10 +5749,10 @@ body.hunter-preauth::after{content:"";position:fixed;inset:0;z-index:2;pointer-e
             <h3 class="text-sm font-bold text-white truncate">${esc(titulo)}</h3>
             ${subtitulo ? `<p class="text-[11px] text-slate-400 truncate">${esc(subtitulo)}</p>` : ''}
           </div>
-          <span class="px-2 py-0.5 text-[10px] font-bold shrink-0" style="color:${c};border:1px solid ${c};background:${c}22">${esc((r.estado || 'ACTIVO').replace('_', ' '))}</span>
+          <span class="px-2 py-0.5 text-[10px] font-bold shrink-0" style="color:${c};border:1px solid ${c};background:${c}22">${esc(LBL(r.estado || 'ACTIVO'))}</span>
         </div>
         ${chips.length ? `<div class="grid grid-cols-2 gap-1.5 text-[11px]">${chips.map(([lbl, val, mono]) =>
-          `<div class="chip px-2 py-1.5"><span class="text-slate-400">${lbl}</span><p class="${mono ? 'mono ' : ''}font-bold text-white truncate" title="${esc(val)}">${esc(val)}</p></div>`
+          `<div class="chip px-2 py-1.5"><span class="text-slate-400">${esc(lbl)}</span><p class="${mono ? 'mono ' : ''}font-bold text-white truncate" title="${esc(val)}">${esc(val)}</p></div>`
         ).join('')}</div>` : ''}
         ${hasVal(r.detalles) ? `<p class="text-[11px] text-amber-200 border-l-2 border-amber-400 pl-2">${esc(r.detalles)}</p>` : ''}
         ${dev ? `<div class="flex items-center justify-between gap-2 pt-1">
@@ -5678,8 +5775,11 @@ body.hunter-preauth::after{content:"";position:fixed;inset:0;z-index:2;pointer-e
       .order('id', { ascending: true })
       .limit(2000);
     if (error) { $('rast-list').innerHTML = `<div class="col-span-full">${msg('fa-triangle-exclamation', 'No se pudo cargar', esc(error.message))}</div>`; return; }
-    rows = data || []; render();
+    rows = (data || []).map(r => r.estado === 'SIN_SENAL' ? { ...r, estado: 'INTERNO' } : r);
+    window.__rastRows = rows;
+    render();
   }
+  window.__rastReload = load;
 
   function openForm(r) {
     const o = document.createElement('div');
@@ -5688,13 +5788,24 @@ body.hunter-preauth::after{content:"";position:fixed;inset:0;z-index:2;pointer-e
     o.innerHTML = `<div class="panel w-full max-w-2xl max-h-[88vh] flex flex-col fade"><div class="px-5 py-3 border-b border-white/10 text-sm font-bold text-white">${r ? 'Editar' : 'Nuevo'} rastreador</div>
       <div class="flex-1 overflow-y-auto scroll p-5 grid grid-cols-1 sm:grid-cols-2 gap-3">${FIELDS.map(([k, l]) => `<label class="block text-[10px] font-bold uppercase text-slate-400">${l}${k === 'estado'
         ? `<select data-k="${k}" class="sel w-full max-w-none mt-1">${ESTADOS.map(e => `<option value="${e}" ${e === val(k) ? 'selected' : ''}>${LBL(e)}</option>`).join('')}</select>`
-        : `<input data-k="${k}" type="${k === 'orden' ? 'number' : 'text'}" value="${esc(val(k))}" class="w-full mt-1 px-3 py-2 text-xs bg-black/40 border border-white/10 text-white outline-none">`}</label>`).join('')}</div>
+        : `<input data-k="${k}" type="${k === 'orden' ? 'number' : 'text'}" value="${esc(val(k))}" class="w-full mt-1 px-3 py-2 text-xs bg-black/40 border border-white/10 text-white outline-none">`}</label>`).join('')}
+        ${(window.__rastCampos || []).map(c => `<label class="block text-[10px] font-bold uppercase text-sky-300">${esc(c)}<input data-x="${esc(c)}" type="text" maxlength="200" value="${esc(((r && r.extras) || {})[c] ?? '')}" class="w-full mt-1 px-3 py-2 text-xs bg-black/40 border border-white/10 text-white outline-none"></label>`).join('')}
+        <div class="sm:col-span-2"><button type="button" data-m="campo" class="chip px-3 py-1.5 text-[11px] font-semibold text-sky-300 cursor-pointer">＋ Nuevo campo (ej. Batería %)</button></div></div>
       <div class="px-5 py-3 border-t border-white/10 flex justify-end gap-2"><button data-m="x" class="chip px-4 py-2 text-xs font-semibold">Cancelar</button><button data-m="ok" class="btn px-5 py-2 text-xs font-bold text-white">Guardar</button></div></div>`;
     o.addEventListener('click', async e => {
       const m = e.target.closest('[data-m]');
       if (!m) { if (e.target === o) o.remove(); return; }
       if (m.dataset.m === 'x') { o.remove(); return; }
+      if (m.dataset.m === 'campo') {
+        const name = (prompt('Nombre del nuevo campo (ej. Batería %, Firmware, SIM):') || '').trim().slice(0, 40);
+        if (!name) return;
+        if (typeof window.__rastAddCampo === 'function') await window.__rastAddCampo(name);
+        o.remove(); openForm(r); return;
+      }
       const p = {}; o.querySelectorAll('[data-k]').forEach(i => p[i.dataset.k] = i.value.trim());
+      const ex = Object.assign({}, (r && r.extras) || {});
+      o.querySelectorAll('[data-x]').forEach(i => { const v = i.value.trim(); if (v) ex[i.dataset.x] = v; else delete ex[i.dataset.x]; });
+      p.extras = ex;
       if (!p.unidad && !p.placa) { showToast('Ingresa al menos Unidad o Placa'); return; }
       const ord = parseInt(p.orden, 10);
       p.orden = Number.isFinite(ord) ? ord : null;
@@ -5720,6 +5831,7 @@ body.hunter-preauth::after{content:"";position:fixed;inset:0;z-index:2;pointer-e
     }
   });
   $('rast-add').onclick = () => openForm(null);
+  window.__rastOpenForm = openForm;
   $('rast-refresh').onclick = load;
   $('rast-q').addEventListener('input', render);
   $('rast-estado').onchange = render;
@@ -6062,7 +6174,10 @@ html body:not(.hunter-preauth) #maint-list::-webkit-scrollbar-thumb:hover { back
             ${ESTADOS.map(e => `<option value="${e}">${e.replace('_', ' ')}</option>`).join('')}
           </select>
         </div>
-        <div id="maint-list" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3"></div>
+        <div id="maint-split">
+          <aside id="maint-urgent"></aside>
+          <div id="maint-list" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3"></div>
+        </div>
       </div>`;
 
     $('maint-ciclo').onchange = e => { curCiclo = e.target.value; loadMaint(); };
@@ -6073,6 +6188,12 @@ html body:not(.hunter-preauth) #maint-list::-webkit-scrollbar-thumb:hover { back
     $('maint-f-estado').onchange = renderMaintCards;
     $('maint-list').addEventListener('change', onInlineSectorChange);
     $('maint-list').addEventListener('click', onCardAction);
+    $('maint-urgent').addEventListener('click', onCardAction);
+    $('maint-list').addEventListener('change', async e => {
+      const sp = e.target.closest('select[data-maint-prio]');
+      if (!sp || !isDevRole()) return;
+      if (await upsertMaint(sp.dataset.maintPrio, { prioridad: sp.value })) { showToast('Prioridad: ' + sp.value); renderMaintCards(); }
+    });
   }
 
   function getAllAntennas() {
@@ -6110,6 +6231,7 @@ html body:not(.hunter-preauth) #maint-list::-webkit-scrollbar-thumb:hover { back
         dbId: db.id || null,
         sector: db.sector || '',
         estado: db.estado || 'PENDIENTE',
+        prioridad: db.prioridad || 'NORMAL',
         tipo_mant: db.tipo_mant || 'PREVENTIVO',
         tecnico: db.tecnico || '',
         fecha_programada: db.fecha_programada || '',
@@ -6133,6 +6255,7 @@ html body:not(.hunter-preauth) #maint-list::-webkit-scrollbar-thumb:hover { back
       ciclo: curCiclo,
       sector: patch.sector !== undefined ? (patch.sector || null) : (prev.sector || null),
       estado: patch.estado !== undefined ? patch.estado : (prev.estado || 'PENDIENTE'),
+      prioridad: patch.prioridad !== undefined ? (patch.prioridad || 'NORMAL') : (prev.prioridad || 'NORMAL'),
       tipo_mant: patch.tipo_mant !== undefined ? patch.tipo_mant : (prev.tipo_mant || 'PREVENTIVO'),
       tecnico: patch.tecnico !== undefined ? (patch.tecnico || null) : (prev.tecnico || null),
       fecha_programada: patch.fecha_programada !== undefined ? (patch.fecha_programada || null) : (prev.fecha_programada || null),
@@ -6164,18 +6287,38 @@ html body:not(.hunter-preauth) #maint-list::-webkit-scrollbar-thumb:hover { back
 
   async function onCardAction(e) {
     const rb = e.target.closest('[data-maint-reset]');
-    if (rb && isDevRole()) { if (confirm('¿Volver este mantenimiento a PENDIENTE?') && await upsertMaint(rb.dataset.maintReset, { estado: 'PENDIENTE' })) { showToast('Vuelto a Pendiente'); renderMaintCards(); } return; }
+    if (rb && isDevRole()) {
+      if (confirm('¿Regresar este mantenimiento a PENDIENTE?\nSe limpian el checklist, la fecha de ejecución y la duración (útil cuando fue una prueba o se subió mal la información).')
+          && await upsertMaint(rb.dataset.maintReset, { estado: 'PENDIENTE', fecha_ejecucion: '', duracion_min: '', checklist: Object.fromEntries(CHECKS.map(([k]) => [k, false])) })) {
+        showToast('Regresado a Pendiente'); renderMaintCards();
+      }
+      return;
+    }
     const btn = e.target.closest('[data-maint-open]');
     if (!btn) return;
     const item = mergedItems().find(x => x.key === btn.dataset.maintOpen);
     if (item) openMaintModal(item);
   }
 
+  // v10: columna "Urgentes / Próximos a revisar"
   function maintUrgentHtml(list) {
-    const lim = new Date(Date.now() + 7 * 864e5).toISOString().slice(0, 10);
-    const u = list.filter(x => x.estado !== 'COMPLETADO' && (x.estado === 'CON_OBSERVACIONES' || (x.fecha_programada && x.fecha_programada <= lim)));
-    if (!u.length) return '';
-    return `<div class="col-span-full card p-3 border border-amber-400/40"><h4 class="text-xs font-bold text-amber-300 mb-2"><i class="fa-solid fa-triangle-exclamation"></i> Urgentes / próximos a revisar (${u.length})</h4><div class="flex flex-wrap gap-1.5">${u.map(x => `<button data-maint-open="${esc(x.key)}" class="chip px-2 py-1 text-[11px] text-white cursor-pointer">${esc(x.punto)} <span class="text-amber-300">${x.estado === 'CON_OBSERVACIONES' ? 'obs.' : esc(x.fecha_programada)}</span></button>`).join('')}</div></div>`;
+    const hoy = new Date().toISOString().slice(0, 10);
+    const lim = new Date(Date.now() + 14 * 864e5).toISOString().slice(0, 10);
+    const abiertos = list.filter(x => x.estado !== 'COMPLETADO');
+    const urg = abiertos.filter(x => x.prioridad === 'URGENTE' || x.estado === 'CON_OBSERVACIONES' || (x.fecha_programada && x.fecha_programada < hoy));
+    const urgKeys = new Set(urg.map(x => x.key));
+    const prox = abiertos.filter(x => !urgKeys.has(x.key) && (x.prioridad === 'PROXIMO' || (x.fecha_programada && x.fecha_programada <= lim)))
+      .sort((a, b) => String(a.fecha_programada || '9999').localeCompare(String(b.fecha_programada || '9999')));
+    const item = (x, tone) => {
+      const why = x.prioridad === 'URGENTE' ? 'Urgente' : x.estado === 'CON_OBSERVACIONES' ? 'Con observaciones'
+        : (x.fecha_programada && x.fecha_programada < hoy) ? 'Vencido ' + x.fecha_programada : x.fecha_programada ? 'Programado ' + x.fecha_programada : 'Próximo';
+      return `<button data-maint-open="${esc(x.key)}" class="mu-item ${tone}"><b>${esc(x.punto)}</b><small>${esc(why)}${x.sector ? ' · ' + esc(x.sector) : ''}</small></button>`;
+    };
+    return `<div class="mu-col"><h4 class="mu-h mu-red"><i class="fa-solid fa-triangle-exclamation"></i> Urgentes <span>${urg.length}</span></h4>
+        ${urg.map(x => item(x, 'mu-red')).join('') || '<p class="mu-empty">Sin urgentes 🎉</p>'}
+      <h4 class="mu-h mu-amber"><i class="fa-regular fa-clock"></i> Próximos a revisar <span>${prox.length}</span></h4>
+        ${prox.map(x => item(x, 'mu-amber')).join('') || '<p class="mu-empty">Marca antenas como PRÓXIMO o ponles fecha programada.</p>'}
+    </div>`;
   }
 
   function renderMaintCards() {
@@ -6219,9 +6362,14 @@ html body:not(.hunter-preauth) #maint-list::-webkit-scrollbar-thumb:hover { back
       return true;
     });
 
-    $('maint-list').innerHTML = maintUrgentHtml(filtered) + filtered.map(x => {
+    $('maint-urgent').innerHTML = maintUrgentHtml(all);
+    $('maint-list').innerHTML = filtered.map(x => {
       const c = EC[x.estado] || '#94a3b8';
       const chkPct = Math.round((x.doneChecks / CHECKS.length) * 100);
+      const PC = { URGENTE: '#ef4444', PROXIMO: '#f59e0b', NORMAL: '#64748b' };
+      const prioCtrl = dev
+        ? `<select data-maint-prio="${esc(x.punto)}" class="sel text-[10px] py-0.5 px-1.5 max-w-[110px]" title="Prioridad">${['NORMAL', 'PROXIMO', 'URGENTE'].map(p => `<option value="${p}" ${x.prioridad === p ? 'selected' : ''}>${p === 'PROXIMO' ? 'PRÓXIMO' : p}</option>`).join('')}</select>`
+        : (x.prioridad !== 'NORMAL' ? `<span class="px-2 py-0.5 text-[10px] font-bold" style="color:${PC[x.prioridad]};border:1px solid ${PC[x.prioridad]}">${x.prioridad === 'PROXIMO' ? 'PRÓXIMO' : esc(x.prioridad)}</span>` : '');
       const sectorCtrl = dev
         ? `<select data-maint-sector="${esc(x.punto)}" class="sel text-[10px] py-0.5 px-1.5 max-w-[125px]">
             <option value="">Sin sector</option>
@@ -6238,8 +6386,8 @@ html body:not(.hunter-preauth) #maint-list::-webkit-scrollbar-thumb:hover { back
           <span class="px-2 py-0.5 text-[10px] font-bold shrink-0" style="color:${c};border:1px solid ${c};background:${c}22">${esc(x.estado.replace('_', ' '))}</span>
         </div>
 
-        <div class="flex items-center justify-between gap-2 text-[11px]">
-          ${sectorCtrl}
+        <div class="flex items-center justify-between gap-2 text-[11px] flex-wrap">
+          <span class="flex items-center gap-1.5">${sectorCtrl}${prioCtrl}</span>
           <span class="mono text-[10px] text-slate-300">Checklist: <b class="text-[var(--accent)]">${x.doneChecks}/${CHECKS.length}</b></span>
         </div>
         <div class="h-1.5 bg-white/10"><div class="h-full" style="width:${chkPct}%;background:${c}"></div></div>
@@ -6254,7 +6402,7 @@ html body:not(.hunter-preauth) #maint-list::-webkit-scrollbar-thumb:hover { back
         <div class="flex items-center justify-between gap-2 pt-1 text-[11px]">
           <div class="flex items-center gap-2">
             ${x.ok ? `<a href="https://www.google.com/maps/dir/?api=1&destination=${x.lat},${x.lon}" target="_blank" rel="noopener" class="text-[var(--accent)] font-semibold">Ruta ↗</a>` : ''}
-            ${x.evidencia_url ? `<a href="${esc(x.evidencia_url)}" target="_blank" rel="noopener" class="text-emerald-400 font-semibold">Fotos ↗</a>` : ''}
+            ${/^https:\/\//i.test(x.evidencia_url || '') ? `<a href="${esc(x.evidencia_url)}" target="_blank" rel="noopener noreferrer" class="text-emerald-400 font-semibold">Fotos ↗</a>` : ''}
           </div>
           <button data-maint-open="${esc(x.key)}" class="chip px-2.5 py-1 text-[11px] font-semibold text-white cursor-pointer">
             ${dev ? 'Checklist / Editar' : 'Ver detalle'}
@@ -6310,6 +6458,17 @@ html body:not(.hunter-preauth) #maint-list::-webkit-scrollbar-thumb:hover { back
           </label>
         </div>
 
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <label class="block text-[10px] font-bold uppercase text-slate-400">Prioridad
+            <select data-k="prioridad" ${dis} class="sel w-full max-w-none mt-1">
+              ${['NORMAL', 'PROXIMO', 'URGENTE'].map(p => `<option value="${p}" ${item.prioridad === p ? 'selected' : ''}>${p === 'PROXIMO' ? 'PRÓXIMO A REVISAR' : p}</option>`).join('')}
+            </select>
+          </label>
+          <label class="block text-[10px] font-bold uppercase text-slate-400">Próxima revisión (fecha programada)
+            <input data-k="fecha_programada" ${dis} type="date" value="${esc(item.fecha_programada)}" class="w-full mt-1 px-3 py-2 bg-black/40 border border-white/10 text-white">
+          </label>
+        </div>
+
         <div class="chip p-3 space-y-2">
           <p class="text-[10px] font-bold uppercase text-[var(--accent)]">Checklist Técnico</p>
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
@@ -6357,6 +6516,8 @@ html body:not(.hunter-preauth) #maint-list::-webkit-scrollbar-thumb:hover { back
       TECNOLOGIA: x.tec,
       SECTOR: x.sector || 'SIN ASIGNAR',
       ESTADO: x.estado,
+      PRIORIDAD: x.prioridad,
+      FECHA_PROGRAMADA: x.fecha_programada,
       TIPO: x.tipo_mant,
       TECNICO: x.tecnico,
       FECHA_EJECUCION: x.fecha_ejecucion,
@@ -6452,54 +6613,7 @@ html body:not(.hunter-preauth) #maint-list::-webkit-scrollbar-thumb:hover { back
   }
 </style>
 
-<script id="hunter-mobile-zoom-focus-fix">
-(() => {
-  let vp = document.querySelector('meta[name="viewport"]');
-  if (!vp) {
-    vp = document.createElement('meta');
-    vp.name = 'viewport';
-    document.head.appendChild(vp);
-  }
-  const baseViewport = 'width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover';
-  const lockViewport = 'width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover';
-  vp.setAttribute('content', baseViewport);
-
-  function restoreGeneralView() {
-    if (window.innerWidth > 768) return;
-    window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
-    vp.setAttribute('content', lockViewport);
-    clearTimeout(window.__hunterVpTimer);
-    window.__hunterVpTimer = setTimeout(() => {
-      vp.setAttribute('content', baseViewport);
-    }, 220);
-  }
-
-  document.addEventListener('focusout', (e) => {
-    if (e.target && ['INPUT', 'TEXTAREA', 'SELECT'].includes(e.target.tagName)) {
-      setTimeout(restoreGeneralView, 90);
-    }
-  }, true);
-
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter' && e.target && ['INPUT', 'SELECT'].includes(e.target.tagName)) {
-      e.target.blur();
-      setTimeout(restoreGeneralView, 90);
-    }
-  }, true);
-
-  const refreshSharpness = () => {
-    if (typeof window.syncLoginCardToPlanet === 'function') {
-      window.syncLoginCardToPlanet();
-    }
-    window.dispatchEvent(new Event('resize'));
-  };
-
-  window.addEventListener('resize', () => setTimeout(refreshSharpness, 60), { passive: true });
-  if (window.visualViewport) {
-    window.visualViewport.addEventListener('resize', () => setTimeout(refreshSharpness, 60), { passive: true });
-  }
-})();
-</script>
+<!-- v10: se eliminó hunter-mobile-zoom-focus-fix (disparaba "resize" dentro de "resize": bucle infinito que gastaba batería y trababa el celular) -->
 <style id="hunter-ios-fix-v9">
   @media (max-width: 768px) {
     html, body {
@@ -6596,70 +6710,899 @@ html body:not(.hunter-preauth) #maint-list::-webkit-scrollbar-thumb:hover { back
   }
 </style>
 
-<script id="hunter-ios-zoom-reset-v9">
+<!-- v10: se eliminó hunter-ios-zoom-reset-v9 (bloqueaba el zoom; ya no hace falta porque los campos usan 16px) -->
+<style id="hunter-v10-css">
+/* =====================================================================
+   HUNTER CORE v10 · LAYOUT + RESPONSIVE + TEMA EJECUTIVO + MÓDULOS
+   (Este bloque va al final para que gane sobre los parches anteriores)
+   ===================================================================== */
+
+/* ---------- 1. Pantalla completa en escritorio (el cuadro se adapta al tamaño) ---------- */
+@media (min-width: 901px) {
+  html body:not(.hunter-preauth) { padding: 12px 14px !important; height: 100dvh; overflow: hidden; }
+  html body:not(.hunter-preauth) .frame,
+  html body:not(.hunter-preauth) .frame:has(#view-rast:not(.ui-hidden)),
+  html body:not(.hunter-preauth) .frame:has(#view-maint:not(.ui-hidden)) {
+    width: 100% !important; max-width: none !important; margin: 0 !important;
+    height: calc(100dvh - 24px) !important; min-height: 0 !important;
+  }
+  html body:not(.hunter-preauth) .frame > .flex-1.flex.flex-col { min-height: 0 !important; min-width: 0; }
+  html body:not(.hunter-preauth) .cols { flex: 1 1 0 !important; min-height: 0 !important; }
+  html body:not(.hunter-preauth) .cols > section, html body:not(.hunter-preauth) #side { min-height: 0 !important; }
+  html body:not(.hunter-preauth) #side { width: clamp(250px, 22vw, 320px) !important; }
+}
+
+/* ---------- 2. Celular y tablet ---------- */
+@media (max-width: 900px) {
+  html, body { overflow-x: clip !important; }
+  html body:not(.hunter-preauth) { padding: 0 0 calc(66px + env(safe-area-inset-bottom)) !important; }
+  html body:not(.hunter-preauth) .frame { width: 100% !important; max-width: 100vw !important; margin: 0 !important; transform: none !important; border-left: 0 !important; border-right: 0 !important; padding: 8px !important; }
+  html body:not(.hunter-preauth) .frame, html body:not(.hunter-preauth) .frame :is(.panel, section, aside, .card, .cols, header) { min-width: 0 !important; max-width: 100% !important; }
+  html body:not(.hunter-preauth) .frame > .flex-1 { width: 100%; }
+  /* preserve-3d convierte al cuadro en "contenedor" de los elementos fijos: por eso la barra
+     inferior y RAFI se iban al fondo de la página en el celular. En móvil se desactiva. */
+  html body:not(.hunter-preauth) :is(.frame, .frame > .flex-1, .cols, #side, .map.panel) { transform-style: flat !important; perspective: none !important; will-change: auto !important; }
+  html body:not(.hunter-preauth) header { padding: 4px 4px 0 !important; }
+  html body:not(.hunter-preauth) header h1 { font-size: 17px !important; }
+  html body:not(.hunter-preauth) header > div:last-child { width: 100%; display: grid !important; grid-template-columns: repeat(auto-fit, minmax(96px, 1fr)); }
+  html body:not(.hunter-preauth) header > div:last-child > button { justify-content: center; }
+  html body:not(.hunter-preauth) :is(#side, .map.panel) { padding-left: 12px !important; padding-right: 12px !important; }
+  html body:not(.hunter-preauth) .map.panel > div:first-child { padding-left: 12px !important; padding-right: 12px !important; }
+  html body:not(.hunter-preauth) :is(#tech-body, #maint-body, #price-body, #rast-body, #results-container) { padding-left: 10px !important; padding-right: 10px !important; }
+  html body:not(.hunter-preauth) .rail { box-shadow: 0 -8px 24px rgba(0,0,0,.45); }
+  html body:not(.hunter-preauth) #map-canvas { height: 58vh !important; min-height: 58vh !important; }
+  html body:not(.hunter-preauth) #view-map .flex-1.mx-4 { margin-left: 8px !important; margin-right: 8px !important; }
+  html body:not(.hunter-preauth) table { font-size: 11px; }
+  html body:not(.hunter-preauth) .card.overflow-x-auto, html body:not(.hunter-preauth) .v10-scroll-x { -webkit-overflow-scrolling: touch; }
+  #rafi-fab { right: 8px !important; bottom: calc(70px + env(safe-area-inset-bottom)) !important; }
+  #rafi-btn, #rafi-btn canvas { width: 64px !important; height: 64px !important; }
+  #rafi-pop { bottom: 70px !important; }
+  html body:not(.hunter-preauth) .toast { bottom: calc(80px + env(safe-area-inset-bottom)) !important; }
+}
+/* Login en celular: centrado, completo y sin cortes */
+@media (max-width: 620px) {
+  body.hunter-preauth #planet-copy, body.hunter-preauth #planet-ui, body.hunter-preauth #auto-control { display: none !important; }
+  body.hunter-preauth #brand { top: 12px !important; left: 14px !important; }
+  body.hunter-preauth #hunter-auth-modal { padding-top: max(84px, env(safe-area-inset-top)) !important; }
+  body.hunter-preauth #login-floating-card .orb-ring { display: none !important; }
+}
+@media (max-height: 640px) and (max-width: 900px) {
+  body.hunter-preauth #hunter-auth-modal { align-items: flex-start !important; padding-top: 70px !important; }
+}
+html body #login-floating-card #sb-remember-wrap {
+  display: flex !important; align-items: center !important; gap: 8px !important; margin: 2px 2px 0 !important; padding: 0 !important;
+  background: none !important; border: 0 !important; box-shadow: none !important; clip-path: none !important; min-height: 0 !important; height: auto !important;
+  font: 600 11px/1.3 system-ui, -apple-system, "Segoe UI", sans-serif !important; letter-spacing: 0 !important; text-transform: none !important; color: #dbe4f0 !important;
+}
+html body #login-floating-card #sb-remember-wrap::before, html body #login-floating-card #sb-remember-wrap::after { display: none !important; content: none !important; }
+html body #login-floating-card #sb-remember-wrap span { font: inherit !important; color: inherit !important; text-transform: none !important; letter-spacing: 0 !important; }
+html body #login-floating-card #sb-remember-wrap span span { color: #94a3b8 !important; font-weight: 500 !important; }
+html body #login-floating-card #sb-remember {
+  -webkit-appearance: checkbox !important; appearance: auto !important; flex: none !important;
+  width: 16px !important; height: 16px !important; min-width: 16px !important; max-width: 16px !important; padding: 0 !important; margin: 0 !important;
+  border: 0 !important; background: none !important; box-shadow: none !important; clip-path: none !important; accent-color: rgb(var(--accent-a, 84,226,255)); font-size: 16px !important;
+}
+
+/* ---------- 3. TEMA EJECUTIVO (gerencia / visor / NOC) ----------
+   Minimalista y sobrio. Conserva: movimiento suave de la ventana, animación de
+   entrada de las tarjetas y la tipografía mono para cifras. */
+html body.tema-ejecutivo:not(.hunter-preauth) {
+  --sk: 77, 141, 230; --sk2: 77, 141, 230; --skt: #ffffff; --skc: transparent;
+  --accent: #4d8de6; --accent-soft: rgba(77,141,230,.14); --accent-glow: rgba(77,141,230,.25);
+  background: #0d1117 !important;
+  font-family: "Space Grotesk", Inter, system-ui, -apple-system, "Segoe UI", sans-serif !important;
+}
+html body.tema-ejecutivo:not(.hunter-preauth)::after,
+html body.tema-ejecutivo:not(.hunter-preauth)::before,
+html body.tema-ejecutivo:not(.hunter-preauth) :is(.panel, .card)::after,
+html body.tema-ejecutivo:not(.hunter-preauth) :is(.panel, .card)::before { display: none !important; content: none !important; }
+html body.tema-ejecutivo:not(.hunter-preauth) .frame {
+  background: #11161d !important; border: 1px solid rgba(255,255,255,.07) !important;
+  box-shadow: 0 20px 60px rgba(0,0,0,.35) !important; border-radius: 18px !important;
+}
+html body.tema-ejecutivo:not(.hunter-preauth) :is(.panel, .card) {
+  background: #161c24 !important; border: 1px solid rgba(255,255,255,.06) !important;
+  box-shadow: none !important; border-radius: 14px !important;
+}
+html body.tema-ejecutivo:not(.hunter-preauth) .chip {
+  background: #1b222c !important; border: 1px solid rgba(255,255,255,.06) !important;
+  clip-path: none !important; border-radius: 10px !important;
+}
+html body.tema-ejecutivo:not(.hunter-preauth) :is(.rounded, .rounded-md, .rounded-lg, .rounded-xl, button, input, textarea, select, .sel, .toast, .zone-reset, .zone-tech) { border-radius: 9px !important; }
+html body.tema-ejecutivo:not(.hunter-preauth) .rail { background: #0f141a !important; border: 1px solid rgba(255,255,255,.06) !important; border-radius: 14px !important; }
+html body.tema-ejecutivo:not(.hunter-preauth) .rail button { border-radius: 10px !important; }
+html body.tema-ejecutivo:not(.hunter-preauth) .rail button.on { clip-path: none !important; background: rgba(77,141,230,.16) !important; border-color: rgba(77,141,230,.6) !important; }
+html body.tema-ejecutivo:not(.hunter-preauth) :is(input, textarea, select, .sel) {
+  background: #0f141a !important; border: 1px solid rgba(255,255,255,.10) !important; color: #e6edf3 !important;
+}
+html body.tema-ejecutivo:not(.hunter-preauth) :is(input, textarea, select, .sel):focus { border-color: #4d8de6 !important; outline: none; }
+html body.tema-ejecutivo:not(.hunter-preauth) .btn {
+  background: #4d8de6 !important; color: #fff !important; clip-path: none !important;
+  text-transform: none !important; letter-spacing: .01em !important; font-weight: 600 !important; box-shadow: none !important;
+}
+html body.tema-ejecutivo:not(.hunter-preauth) .btn:hover { background: #3b7bd4 !important; }
+html body.tema-ejecutivo:not(.hunter-preauth) :is(h1, h2, h3, h4, th) {
+  text-transform: none !important; letter-spacing: .01em !important; text-shadow: none !important; animation: none !important;
+  font-family: "Space Grotesk", Inter, system-ui, sans-serif !important;
+}
+html body.tema-ejecutivo:not(.hunter-preauth) h2 { color: #f0f6fc !important; font-weight: 600 !important; }
+html body.tema-ejecutivo:not(.hunter-preauth) .text-rose-300 { color: #8b949e !important; }
+html body.tema-ejecutivo:not(.hunter-preauth) .h-2.rounded-full > div { -webkit-mask: none !important; mask: none !important; border-radius: 99px !important; }
+html body.tema-ejecutivo:not(.hunter-preauth) .h-2.rounded-full { border-radius: 99px !important; }
+html body.tema-ejecutivo:not(.hunter-preauth) .frame .card:hover { transform: translateY(-2px) !important; box-shadow: 0 8px 24px rgba(0,0,0,.25) !important; }
+html body.tema-ejecutivo:not(.hunter-preauth) :is(#side, .map.panel, .rail) { transform: none !important; }
+html body.tema-ejecutivo:not(.hunter-preauth) #view-noc input[type="file"]::file-selector-button { clip-path: none !important; border-radius: 6px !important; }
+html body.tema-ejecutivo:not(.hunter-preauth) #map-canvas .leaflet-tile-pane { filter: grayscale(.35) brightness(.92) !important; }
+html body.tema-ejecutivo:not(.hunter-preauth)::before { background: none !important; }
+html body.tema-ejecutivo:not(.hunter-preauth) :is(.sel, #search-input, input:not([type="checkbox"]), textarea, select) { background-color: #0f141a !important; border-color: rgba(255,255,255,.12) !important; color: #e6edf3 !important; }
+html body.tema-ejecutivo:not(.hunter-preauth) .text-slate-400 { color: #8b949e !important; }
+html body.tema-ejecutivo:not(.hunter-preauth) :is(.text-slate-300, .text-slate-200) { color: #c9d1d9 !important; }
+html body.tema-ejecutivo:not(.hunter-preauth) .rail button.on::before { background: #4d8de6 !important; box-shadow: none !important; }
+html body.tema-ejecutivo:not(.hunter-preauth) .rail button { box-shadow: none !important; }
+html body.tema-ejecutivo:not(.hunter-preauth) .zone-reset, html body.tema-ejecutivo:not(.hunter-preauth) .zone-tech { background: #131920 !important; border-color: rgba(255,255,255,.06) !important; }
+html body.tema-ejecutivo:not(.hunter-preauth) .hud-ico { filter: none !important; }
+
+/* ---------- 4. Mapa: carro con LED palpitante ---------- */
+.v10-car { position: relative; width: 44px; height: 44px; }
+.v10-car svg { position: absolute; inset: 6px; width: 32px; height: 32px; filter: drop-shadow(0 3px 4px rgba(0,0,0,.55)); z-index: 2; }
+.v10-car .led { position: absolute; left: 50%; top: 50%; width: 10px; height: 10px; margin: -5px 0 0 -5px; border-radius: 50%; background: #ff3b3b; box-shadow: 0 0 10px 3px #ff3b3b; z-index: 3; animation: v10led 1s ease-in-out infinite; }
+.v10-car .ring { position: absolute; inset: 0; border-radius: 50%; border: 2px solid rgba(255,59,59,.85); animation: v10ring 1.6s ease-out infinite; z-index: 1; }
+@keyframes v10led { 0%,100% { opacity: 1; transform: scale(1); } 50% { opacity: .35; transform: scale(.65); } }
+@keyframes v10ring { 0% { transform: scale(.35); opacity: .9; } 100% { transform: scale(1.35); opacity: 0; } }
+.v10-mapfit { position: absolute; z-index: 500; right: 10px; top: 10px; padding: 6px 10px; font-size: 11px; font-weight: 700; border-radius: 8px; background: rgba(13,17,23,.88); color: #e6edf3; border: 1px solid rgba(255,255,255,.2); cursor: pointer; }
+#map-canvas { position: relative; }
+
+/* ---------- 5. Mantenimiento: columna Urgentes / Próximos ---------- */
+#maint-split { display: flex; flex-direction: column; gap: 10px; }
+@media (min-width: 1100px) {
+  html body:not(.hunter-preauth) #maint-body > #maint-split { flex: 1 1 0 !important; min-height: 0 !important; display: grid; grid-template-columns: minmax(0, 1fr) 290px; gap: 12px; align-items: stretch; }
+  #maint-urgent { order: 2; overflow-y: auto; min-height: 0; padding-right: 4px; }
+  html body:not(.hunter-preauth) #maint-split > #maint-list { min-height: 0 !important; }
+}
+.mu-col { display: flex; flex-direction: column; gap: 6px; padding: 10px; border-radius: 12px; background: rgba(255,255,255,.03); border: 1px solid rgba(255,255,255,.08); }
+.mu-h { display: flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: .06em; margin: 6px 0 2px; }
+.mu-h span { margin-left: auto; font-family: "JetBrains Mono", monospace; }
+.mu-red { color: #f87171; } .mu-amber { color: #fbbf24; }
+.mu-item { display: flex; flex-direction: column; align-items: flex-start; text-align: left; gap: 1px; padding: 7px 9px; border-radius: 9px; background: rgba(0,0,0,.25); border: 1px solid rgba(255,255,255,.08); border-left: 3px solid currentColor; cursor: pointer; }
+.mu-item b { color: #f1f5f9; font-size: 12px; } .mu-item small { color: #94a3b8; font-size: 10.5px; }
+.mu-item:hover { background: rgba(255,255,255,.06); }
+.mu-empty { font-size: 11px; color: #64748b; padding: 2px 4px 6px; }
+@media (max-width: 1099px) { .mu-col { max-height: 260px; overflow-y: auto; } }
+
+/* ---------- 6. Tablas editables (costos, zonas, historial) ---------- */
+.v10-sec { border-radius: 14px; border: 1px solid rgba(255,255,255,.08); background: rgba(255,255,255,.02); padding: 14px; }
+.v10-sec h3 { font-size: 12px; font-weight: 800; color: #f1f5f9; display: flex; align-items: center; gap: 8px; margin: 0; }
+.v10-sec .v10-sub { font-size: 11px; color: #94a3b8; margin: 2px 0 10px; }
+.v10-tools { display: flex; flex-wrap: wrap; gap: 6px; }
+.v10-b { padding: 5px 10px; font-size: 11px; font-weight: 700; border-radius: 8px; background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.14); color: #e2e8f0; cursor: pointer; white-space: nowrap; }
+.v10-b:hover { background: rgba(255,255,255,.13); }
+.v10-b.pri { background: var(--accent, #38bdf8); color: #06121f; border-color: transparent; }
+.v10-scroll-x { overflow-x: auto; max-width: 100%; border-radius: 10px; border: 1px solid rgba(255,255,255,.08); }
+.v10-t { width: 100%; border-collapse: collapse; font-size: 12px; }
+.v10-t th { position: sticky; top: 0; background: #0d1219; color: #94a3b8; font-size: 10px; text-transform: uppercase; letter-spacing: .05em; text-align: left; padding: 7px 8px; white-space: nowrap; border-bottom: 1px solid rgba(255,255,255,.1); }
+.v10-t td { padding: 3px 4px; border-bottom: 1px solid rgba(255,255,255,.05); color: #e2e8f0; white-space: nowrap; }
+.v10-t td.num { text-align: right; font-family: "JetBrains Mono", monospace; }
+.v10-t input { width: 100%; min-width: 86px; background: transparent !important; border: 1px solid transparent !important; color: #f1f5f9 !important; padding: 5px 6px !important; font-size: 12px !important; border-radius: 6px !important; }
+.v10-t input:focus { border-color: var(--accent, #38bdf8) !important; background: rgba(0,0,0,.3) !important; outline: none; }
+.v10-t input[readonly] { cursor: default; }
+.v10-t tr.tot td { font-weight: 800; color: #fff; background: rgba(255,255,255,.04); padding: 7px 8px; }
+.v10-t .x { color: #f87171; cursor: pointer; font-weight: 800; padding: 0 6px; background: none; border: 0; }
+.v10-kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 8px; margin: 10px 0; }
+.v10-kpi { padding: 10px 12px; border-radius: 12px; background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.08); }
+.v10-kpi b { display: block; font-size: 17px; color: #fff; font-family: "JetBrains Mono", monospace; }
+.v10-kpi span { font-size: 10.5px; color: #94a3b8; text-transform: uppercase; letter-spacing: .04em; }
+.v10-grid2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 360px), 1fr)); gap: 12px; }
+.v10-row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.v10-row select, .v10-row input { padding: 6px 8px; font-size: 12px; background: rgba(0,0,0,.35); border: 1px solid rgba(255,255,255,.12); color: #fff; border-radius: 8px; }
+.v10-pill { display: inline-block; padding: 1px 7px; border-radius: 99px; font-size: 10px; font-weight: 700; border: 1px solid currentColor; }
+.v10-bar { height: 6px; border-radius: 99px; background: rgba(255,255,255,.08); overflow: hidden; }
+.v10-bar > i { display: block; height: 100%; background: var(--accent, #38bdf8); border-radius: 99px; }
+/* El botón flotante genérico "▦ Tabla / columnas" ya no hace falta donde hay módulo propio */
+#view-price > .lt-btn, #view-maint > .lt-btn, #view-noc > .lt-btn, #view-rast > .lt-btn { display: none !important; }
+#view-tech > .lt-btn { top: auto; bottom: 10px; right: auto; left: 12px; }
+
+/* ---------- 7. RAFI flotante ---------- */
+#rafi-nav-hidden { display: none !important; }
+#rafi-hello { position: absolute; right: 70px; bottom: 54px; white-space: nowrap; padding: 6px 11px; border-radius: 14px 14px 2px 14px; background: #f8fafc; color: #0f172a; font: 700 12px system-ui, sans-serif; box-shadow: 0 6px 18px rgba(0,0,0,.35); opacity: 0; transform: translateY(6px) scale(.95); transition: .35s; pointer-events: none; }
+#rafi-hello.on { opacity: 1; transform: none; }
+#rafi-pop.v10 { bottom: 92px; width: min(360px, 92vw); max-height: min(72vh, 620px); padding: 0; display: none; flex-direction: column; overflow: hidden; border-radius: 16px; box-shadow: 0 18px 50px rgba(0,0,0,.5); }
+#rafi-pop.v10.on { display: flex; }
+#rafi-pop .rp-h { padding: 12px 14px; background: linear-gradient(135deg, rgba(56,189,248,.18), rgba(168,85,247,.14)); border-bottom: 1px solid rgba(255,255,255,.1); }
+#rafi-pop .rp-h b { font-size: 14px; }
+#rafi-pop .rp-tabs { display: flex; gap: 4px; padding: 8px 10px 0; }
+#rafi-pop .rp-tabs button { flex: 1; padding: 6px; font-size: 11px; font-weight: 700; border-radius: 8px 8px 0 0; background: rgba(255,255,255,.05); color: #94a3b8; border: 0; cursor: pointer; }
+#rafi-pop .rp-tabs button.on { background: rgba(255,255,255,.12); color: #fff; }
+#rafi-pop .rp-body { padding: 10px 12px 12px; overflow-y: auto; flex: 1; display: grid; gap: 6px; align-content: start; }
+#rafi-pop .rp-link { text-align: left; padding: 7px 9px; border-radius: 9px; background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.07); color: #e2e8f0; cursor: pointer; font-size: 12px; }
+#rafi-pop .rp-link:hover { background: rgba(255,255,255,.1); }
+#rafi-pop .rp-link small { display: block; color: #94a3b8; font-size: 10.5px; margin-top: 1px; }
+#rafi-pop input, #rafi-pop textarea { width: 100%; background: rgba(0,0,0,.4); border: 1px solid rgba(255,255,255,.14); color: #fff; border-radius: 9px; padding: 7px 9px; font-size: 12px; }
+#rafi-pop .rp-q { padding: 8px 9px; border-radius: 10px; background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.08); font-size: 12px; }
+#rafi-pop .rp-q small { color: #94a3b8; }
+#rafi-pop .rp-a { margin-top: 5px; padding: 6px 8px; border-radius: 8px; background: rgba(34,197,94,.1); border-left: 3px solid #22c55e; color: #d1fae5; }
+#rafi-pop .rp-btn { padding: 6px 12px; border-radius: 9px; background: var(--accent, #38bdf8); color: #06121f; font-weight: 800; font-size: 12px; border: 0; cursor: pointer; justify-self: start; }
+
+/* ---------- 8. Rastreadores: análisis ---------- */
+.v10-tabs { display: inline-flex; gap: 4px; padding: 3px; border-radius: 10px; background: rgba(0,0,0,.3); border: 1px solid rgba(255,255,255,.08); }
+.v10-tabs button { padding: 5px 12px; font-size: 11px; font-weight: 700; border-radius: 8px; color: #94a3b8; background: transparent; border: 0; cursor: pointer; }
+.v10-tabs button.on { background: var(--accent, #38bdf8); color: #06121f; }
+#rast-analisis { display: none; }
+#view-rast.v10-an #rast-analisis { display: block; }
+#view-rast.v10-an :is(#rast-kpis, #rast-list), #view-rast.v10-an #rast-body > .flex.flex-wrap.gap-2 { display: none !important; }
+#view-rast.v10-an #rast-body { overflow-y: auto !important; display: block !important; }
+#rast-analisis .v10-sub { font-size: 11px !important; }
+</style>
+
+<script id="hunter-v10-js">
+/* =====================================================================
+   HUNTER CORE v10 · MÓDULOS
+   Mapa (vista general + carro) · Tecnologías (editar + rastreo real)
+   Costos (tecnología y mantenimiento por zona) · NOC (último corte +
+   historial) · RAFI flotante · Rastreadores (campos dinámicos + análisis)
+   Regla de seguridad: todo dato del usuario se escapa con esc() antes de
+   ir a innerHTML, y los permisos reales los decide Supabase (RLS).
+   ===================================================================== */
 (() => {
-  if (window.innerWidth > 768) return;
+  'use strict';
+  const esc = escapeHtml;
+  const sb = () => hunterSbClient;
+  const dev = () => typeof isDevRole === 'function' && isDevRole();
+  const canNoc = () => dev() || (typeof isNocOnlyRole === 'function' && isNocOnlyRole());
+  const logged = () => typeof hunterSession !== 'undefined' && !!hunterSession;
+  const numVal = v => {
+    let t = String(v ?? '').replace(/[^0-9.,\-]/g, '');
+    if (t.includes(',') && t.includes('.')) t = t.replace(/,/g, '');
+    else t = t.replace(',', '.');
+    const n = parseFloat(t); return isFinite(n) ? n : 0;
+  };
+  const soles = n => 'S/ ' + (Number(n) || 0).toLocaleString('es-PE', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  const pct = n => (Number(n) || 0).toFixed(2) + '%';
+  const cleanName = s => String(s || '').replace(/[<>"'`]/g, '').trim().slice(0, 40);
+  const fmtDate = d => { const x = new Date(d); return isNaN(x) ? '-' : x.toLocaleDateString('es-PE', { day: '2-digit', month: '2-digit', year: 'numeric' }); };
 
-  let metaVp = document.querySelector('meta[name="viewport"]');
-  if (!metaVp) {
-    metaVp = document.createElement('meta');
-    metaVp.name = 'viewport';
-    document.head.appendChild(metaVp);
+  /* ------------------------- Tablas libres (Supabase) ------------------------- */
+  async function tlLoad(mod) {
+    if (!sb()) return null;
+    try {
+      const { data, error } = await sb().from('tablas_libres').select('columnas, filas').eq('modulo', mod).maybeSingle();
+      if (!error && data) return { columnas: Array.isArray(data.columnas) ? data.columnas : [], filas: Array.isArray(data.filas) ? data.filas : [] };
+    } catch (e) {}
+    return null;
+  }
+  async function tlSave(mod, d) {
+    if (!dev()) { showToast('Solo el modo dev puede guardar'); return false; }
+    const { error } = await sb().from('tablas_libres').upsert({ modulo: mod, columnas: d.columnas, filas: d.filas }, { onConflict: 'modulo' });
+    if (error) { showToast('No se pudo guardar: ' + error.message); return false; }
+    showToast('Guardado en Supabase'); return true;
   }
 
-  const VP_NORMAL = 'width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover';
-  const VP_RESET  = 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover';
-  metaVp.setAttribute('content', VP_NORMAL);
-
-  let resetTimer = null;
-
-  function forceResetView() {
-    clearTimeout(resetTimer);
-    metaVp.setAttribute('content', VP_RESET);
-
-    const snap = () => {
-      window.scrollTo(0, 0);
-      document.documentElement.scrollLeft = 0;
-      document.body.scrollLeft = 0;
-      if (window.visualViewport) {
-        window.scrollTo(0, 0);
-      }
-    };
-
-    snap();
-    requestAnimationFrame(snap);
-    setTimeout(snap, 60);
-    setTimeout(snap, 180);
-
-    resetTimer = setTimeout(() => {
-      metaVp.setAttribute('content', VP_NORMAL);
-      snap();
-    }, 320);
-  }
-
-  document.addEventListener('focusout', (e) => {
-    if (e.target && ['INPUT', 'TEXTAREA', 'SELECT'].includes(e.target.tagName)) {
-      setTimeout(forceResetView, 60);
+  /* ------------------------- Tabla editable reutilizable ------------------------- */
+  // Columnas y filas libres: el dev agrega/renombra/borra columnas y filas. Los demás solo leen.
+  function EditTable(host, o) {
+    const st = { d: { columnas: o.defCols.slice(), filas: [] }, dirty: false, loaded: false };
+    const isNum = c => o.numRe.test(c);
+    async function load() {
+      let d = await tlLoad(o.mod);
+      if ((!d || !d.filas.length) && o.seedFrom) { const s = await tlLoad(o.seedFrom); if (s && s.filas.length) d = s; }
+      if (d && d.columnas.length) st.d = d;
+      st.loaded = true; draw(); o.onChange && o.onChange(st.d);
     }
-  }, true);
-
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter' && e.target && ['INPUT', 'SELECT'].includes(e.target.tagName)) {
-      e.target.blur();
-      setTimeout(forceResetView, 60);
+    function draw() {
+      const d = st.d, ed = dev();
+      const tot = d.columnas.map((c, j) => isNum(c) ? d.filas.reduce((a, f) => a + numVal(f[j]), 0) : null);
+      host.innerHTML = `<div class="v10-sec">
+        <div class="v10-row" style="justify-content:space-between">
+          <div><h3>${o.icon || ''} ${esc(o.title)}</h3><p class="v10-sub">${esc(o.sub)}</p></div>
+          <div class="v10-tools">
+            ${ed ? `<button class="v10-b" data-a="row">＋ Fila</button><button class="v10-b" data-a="col">＋ Columna</button>
+                    <button class="v10-b pri" data-a="save">${st.dirty ? '● ' : ''}Guardar</button>` : ''}
+            <button class="v10-b" data-a="xls">Excel</button>
+          </div>
+        </div>
+        <div class="v10-scroll-x" style="max-height:420px;overflow-y:auto"><table class="v10-t"><thead><tr>
+          ${d.columnas.map((c, j) => `<th>${esc(c)}${ed ? ` <button class="x" data-a="ren" data-j="${j}" title="Renombrar">✎</button><button class="x" data-a="dcol" data-j="${j}" title="Borrar columna">✕</button>` : ''}</th>`).join('')}${ed ? '<th></th>' : ''}
+        </tr></thead><tbody>
+          ${d.filas.map((f, i) => `<tr>${d.columnas.map((c, j) => `<td class="${isNum(c) ? 'num' : ''}"><input data-i="${i}" data-j="${j}" maxlength="200" ${ed ? '' : 'readonly'} value="${esc(f[j] ?? '')}" ${isNum(c) ? 'inputmode="decimal"' : ''}></td>`).join('')}${ed ? `<td><button class="x" data-a="drow" data-i="${i}" title="Borrar fila">✕</button></td>` : ''}</tr>`).join('')
+            || `<tr><td colspan="${d.columnas.length + 1}" style="padding:14px;color:#64748b">${ed ? 'Sin filas. Pulsa “＋ Fila” para empezar.' : 'Aún no hay información registrada.'}</td></tr>`}
+          ${d.filas.length && tot.some(v => v !== null) ? `<tr class="tot">${tot.map((v, j) => `<td class="${v !== null ? 'num' : ''}">${v !== null ? v.toLocaleString('es-PE', { maximumFractionDigits: 2 }) : (j ? '' : 'TOTAL')}</td>`).join('')}${ed ? '<td></td>' : ''}</tr>` : ''}
+        </tbody></table></div>
+        <div class="v10-extra"></div>
+      </div>`;
+      o.afterDraw && o.afterDraw(host.querySelector('.v10-extra'), st.d);
     }
-  }, true);
-
-  if (window.visualViewport) {
-    let prevScale = window.visualViewport.scale || 1;
-    window.visualViewport.addEventListener('resize', () => {
-      const currScale = window.visualViewport.scale || 1;
-      // Si el teclado se cerró o el zoom quedó arriba de 1, regresa a la vista general
-      if (currScale > 1.02 || (prevScale > 1.02 && currScale <= 1.02)) {
-        forceResetView();
-      }
-      prevScale = currScale;
+    // Al editar una celda NO se redibuja la tabla (así no se pierde el foco al pasar con Tab):
+    // solo se recalculan los totales y el resumen.
+    function refresh() {
+      const d = st.d, tr = host.querySelector('tr.tot');
+      if (tr) d.columnas.forEach((c, j) => { if (isNum(c) && tr.children[j]) tr.children[j].textContent = d.filas.reduce((a, f) => a + numVal(f[j]), 0).toLocaleString('es-PE', { maximumFractionDigits: 2 }); });
+      const sv = host.querySelector('[data-a="save"]'); if (sv) sv.textContent = (st.dirty ? '● ' : '') + 'Guardar';
+      o.afterDraw && o.afterDraw(host.querySelector('.v10-extra'), d);
+    }
+    host.addEventListener('change', e => {
+      const inp = e.target.closest('input[data-i]'); if (!inp || !dev()) return;
+      st.d.filas[+inp.dataset.i][+inp.dataset.j] = inp.value.trim(); st.dirty = true;
+      refresh(); o.onChange && o.onChange(st.d);
     });
+    host.addEventListener('click', async e => {
+      const b = e.target.closest('[data-a]'); if (!b || !host.contains(b)) return;
+      const a = b.dataset.a, d = st.d;
+      if (a === 'xls') {
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet([d.columnas, ...d.filas]), o.title.slice(0, 28));
+        XLSX.writeFile(wb, `${o.mod}_${new Date().toISOString().slice(0, 10)}.xlsx`); return;
+      }
+      if (!dev()) return;
+      if (a === 'row') d.filas.push(d.columnas.map(() => ''));
+      else if (a === 'col') { const n = cleanName(prompt('Nombre de la nueva columna (ej. Garantía, Peso, Marca):')); if (!n) return; d.columnas.push(n); d.filas.forEach(f => f.push('')); }
+      else if (a === 'ren') { const j = +b.dataset.j; const n = cleanName(prompt('Nuevo nombre de la columna:', d.columnas[j])); if (!n) return; d.columnas[j] = n; }
+      else if (a === 'dcol') { const j = +b.dataset.j; if (!confirm(`¿Borrar la columna "${d.columnas[j]}" y sus datos?`)) return; d.columnas.splice(j, 1); d.filas.forEach(f => f.splice(j, 1)); }
+      else if (a === 'drow') { d.filas.splice(+b.dataset.i, 1); }
+      else if (a === 'save') { if (await tlSave(o.mod, d)) st.dirty = false; }
+      if (a !== 'save') st.dirty = true;
+      draw(); o.onChange && o.onChange(d);
+    });
+    return { load, get data() { return st.d; }, redraw: draw };
+  }
+  const colIdx = (cols, re) => cols.findIndex(c => re.test(c));
+
+  /* ============================== 1. MAPA ============================== */
+  const PERU = { latMin: -18.6, latMax: 0.3, lonMin: -81.7, lonMax: -68.3 };
+  const inPeru = ([a, b]) => a >= PERU.latMin && a <= PERU.latMax && b >= PERU.lonMin && b <= PERU.lonMax;
+  function mapFitAll() {
+    if (typeof map === 'undefined' || !map) return;
+    map.invalidateSize();
+    const pts = window.__mapPts || [];
+    const ok = pts.filter(inPeru);
+    const use = ok.length ? ok : pts;
+    if (use.length) map.fitBounds(use, { padding: [32, 32], maxZoom: 14, animate: false });
+    else map.setView([-9.19, -75.02], 5, { animate: false });
+  }
+  window.mapFitAll = mapFitAll;
+  const _renderMap = window.renderMap;
+  window.renderMap = function () {
+    const r = _renderMap.apply(this, arguments);
+    const pts = window.__mapPts || [], out = pts.filter(p => !inPeru(p)).length;
+    if (out && $('map-info')) $('map-info').textContent += ` · ${out} fuera de Perú (revisa coordenadas)`;
+    setTimeout(mapFitAll, 0);
+    const c = $('map-canvas');
+    if (c && !c.querySelector('.v10-mapfit')) {
+      const b = document.createElement('button');
+      b.type = 'button'; b.className = 'v10-mapfit'; b.textContent = '⤢ Vista general';
+      b.addEventListener('click', ev => { ev.stopPropagation(); mapFitAll(); });
+      L.DomEvent.disableClickPropagation(b);
+      c.appendChild(b);
+    }
+    return r;
+  };
+  const CAR = '<div class="v10-car"><span class="ring"></span><svg viewBox="0 0 32 32"><rect x="9" y="3" width="14" height="26" rx="5" fill="#38bdf8" stroke="#0b1220" stroke-width="1.6"/><rect x="11" y="8" width="10" height="5" rx="1.6" fill="#0b1220" opacity=".8"/><rect x="11" y="20.5" width="10" height="4" rx="1.4" fill="#0b1220" opacity=".65"/><rect x="6.5" y="7" width="3" height="5" rx="1" fill="#0b1220"/><rect x="22.5" y="7" width="3" height="5" rx="1" fill="#0b1220"/><rect x="6.5" y="20" width="3" height="5" rx="1" fill="#0b1220"/><rect x="22.5" y="20" width="3" height="5" rx="1" fill="#0b1220"/></svg><span class="led"></span></div>';
+  window.placeGpsReference = function (lat, lon, centerMap = false) {
+    gpsRefLat = lat; gpsRefLon = lon;
+    $('gps-manual-lat').value = lat.toFixed(6);
+    $('gps-manual-lon').value = lon.toFixed(6);
+    $('btn-clear-gps').classList.remove('ui-hidden');
+    $('gps-active-coord-label').textContent = `Vehículo / GPS: ${lat.toFixed(6)}, ${lon.toFixed(6)}`;
+    if (typeof map !== 'undefined' && map) {
+      if (gpsRefMarker && map.hasLayer(gpsRefMarker)) map.removeLayer(gpsRefMarker);
+      gpsRefMarker = L.marker([lat, lon], { zIndexOffset: 1000, icon: L.divIcon({ className: '', iconSize: [44, 44], iconAnchor: [22, 22], html: CAR }) })
+        .bindTooltip('Vehículo buscado', { direction: 'top', offset: [0, -18] }).addTo(map);
+      if (centerMap) map.setView([lat, lon], 13);
+    }
+    updateNearestAntennasPanel();
+  };
+
+  /* ====================== 2. ANALIZADOR DE TECNOLOGÍAS ====================== */
+  const keyPunto = v => normalizeText(String(v || '').replace(/\s*\(\s*PE\s*\)\s*/gi, ''));
+  function rowIndexByPunto(punto) {
+    const k = keyPunto(punto);
+    return excelData.findIndex(r => { const pk = findColumn(r, ['PUNTOS', 'PUNTO']); return pk && keyPunto(r[pk]) === k; });
+  }
+  window.v10EditPunto = punto => { const i = rowIndexByPunto(punto); if (i >= 0) openRecordEditor(i); else showToast('No se encontró el registro'); };
+  const _showTechDetail = window.showTechDetail;
+  window.showTechDetail = function (index) {
+    _showTechDetail(index);
+    const x = currentTechRows[index], c = $('tech-detail-container'); if (!x || !c) return;
+    const i = rowIndexByPunto(x.punto), row = excelData[i];
+    const card = c.querySelector('.card'); if (!card) return;
+    const fields = row ? Object.entries(row).filter(([k, v]) => !k.startsWith('_') && !isEmpty(v)) : [];
+    const box = document.createElement('div');
+    box.innerHTML = `${dev() && i >= 0 ? `<div class="v10-row" style="justify-content:flex-end"><button class="v10-b pri" data-edit>✎ Editar ficha</button></div>` : ''}
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 mt-3">${fields.map(([k, v]) => `<div class="chip px-3 py-2"><p class="text-[9px] font-bold uppercase text-slate-400">${esc(k)}</p><p class="text-xs font-semibold text-white break-words">${esc(v)}</p></div>`).join('')}</div>`;
+    const ed = box.querySelector('[data-edit]');
+    if (ed) ed.addEventListener('click', () => openRecordEditor(i));
+    card.appendChild(box);
+  };
+  // Al guardar en la ficha, refrescar el analizador si está abierto
+  const _saveRecord = window.saveRecordChanges;
+  window.saveRecordChanges = async function () {
+    await _saveRecord.apply(this, arguments);
+    if (!$('view-tech').classList.contains('ui-hidden')) renderTech();
+  };
+
+  async function getRastRows(force) {
+    if (!force && Array.isArray(window.__rastRows) && window.__rastRows.length) return window.__rastRows;
+    if (!sb()) return [];
+    const { data, error } = await sb().from('mdz_hunter_rastreadores').select('*').order('orden', { ascending: true }).limit(2000);
+    if (error) return [];
+    window.__rastRows = (data || []).map(r => r.estado === 'SIN_SENAL' ? { ...r, estado: 'INTERNO' } : r);
+    return window.__rastRows;
+  }
+  const RLBL = e => e === 'INTERNO' ? 'Vehículos internos' : String(e || 'ACTIVO').replace('_', ' ');
+  async function renderTechRastreo() {
+    const body = $('tech-body');
+    body.innerHTML = msg('fa-satellite-dish', 'Cargando rastreadores…', 'Datos del módulo Rastreadores');
+    const R = await getRastRows(true);
+    if (currentTechGroup !== 'RASTREO') return;
+    const cnt = f => count(R, f);
+    const batKey = (window.__rastCampos || []).find(c => /bater/i.test(c));
+    const bats = batKey ? R.map(r => numVal((r.extras || {})[batKey])).filter(v => v > 0) : [];
+    const avgBat = bats.length ? (bats.reduce((a, b) => a + b, 0) / bats.length).toFixed(1) + '%' : '—';
+    body.innerHTML = `<div class="space-y-4">
+      <div class="v10-row" style="justify-content:space-between"><p class="text-[11px] text-slate-400">Fuente: módulo <b>Rastreadores</b> (lo que alimentas ahí se refleja aquí).</p>
+        <button class="v10-b" onclick="setView('rast')">Abrir Rastreadores →</button></div>
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-2.5">
+        ${kpi('fa-car', 'Unidades', R.length)}
+        ${kpi('fa-signal', 'Activos', R.filter(r => r.estado === 'ACTIVO').length)}
+        ${kpi('fa-warehouse', 'Vehículos internos', R.filter(r => r.estado === 'INTERNO').length)}
+        ${kpi('fa-battery-half', 'Batería promedio', avgBat)}
+      </div>
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-3">
+        ${box('Por estado', bars(cnt(r => RLBL(r.estado))))}
+        ${box('Por modelo de equipo', bars(cnt(r => r.modelo || 'Sin modelo'), '#38bdf8'))}
+        ${box('Por zona', bars(cnt(r => r.zona || 'Sin zona'), '#10b981'))}
+        ${box('Por responsable', bars(cnt(r => r.responsable || 'Sin responsable').slice(0, 10), '#f59e0b'))}
+      </div></div>`;
+  }
+  const _renderTech = window.renderTech;
+  window.renderTech = function () {
+    if (currentTechGroup === 'RASTREO') return renderTechRastreo();
+    return _renderTech.apply(this, arguments);
+  };
+
+  /* ====================== 3. COSTOS (Analizador de precios) ====================== */
+  let costTec = null, costZona = null, costHost = null;
+  function techCostSummary(el, d) {
+    const iT = colIdx(d.columnas, /tecnolog/i), iQ = colIdx(d.columnas, /cant/i), iP = colIdx(d.columnas, /precio|costo|monto/i);
+    if (iT < 0 || iP < 0) { el.innerHTML = '<p class="v10-sub" style="margin-top:10px">Para ver el costo por tecnología, mantén una columna “Tecnología” y otra de “Precio”.</p>'; return; }
+    const G = {};
+    d.filas.forEach(f => { const t = String(f[iT] || 'SIN TECNOLOGÍA').trim().toUpperCase(); const q = iQ >= 0 ? (numVal(f[iQ]) || 1) : 1; G[t] = (G[t] || 0) + q * numVal(f[iP]); });
+    const nPts = {}; excelData.forEach(r => { const t = getRowTech(r); nPts[t] = (nPts[t] || 0) + 1; });
+    const ent = Object.entries(G).sort((a, b) => b[1] - a[1]);
+    el.innerHTML = ent.length ? `<h4 class="mu-h" style="color:#cbd5e1;margin-top:14px">Costo de levantar cada tecnología</h4>
+      <div class="v10-kpis">${ent.map(([t, v]) => `<div class="v10-kpi"><span>${esc(t)}</span><b>${soles(v)}</b><span style="text-transform:none">${nPts[t] ? `× ${nPts[t]} puntos = ${soles(v * nPts[t])}` : 'por unidad'}</span></div>`).join('')}</div>` : '';
+  }
+  function zonaRowTotal(d, f) {
+    return d.columnas.reduce((a, c, j) => (/(s\/|costo|transporte|vi[aá]tic|material|otros|monto|combust|peaje|hosped|alimen)/i.test(c) && !/d[ií]as|t[eé]cnic|person/i.test(c)) ? a + numVal(f[j]) : a, 0);
+  }
+  function zonaSummary(el, d) {
+    const iZ = colIdx(d.columnas, /zona/i), iD = colIdx(d.columnas, /d[ií]as/i);
+    if (iZ < 0) { el.innerHTML = ''; return; }
+    const G = {};
+    d.filas.forEach(f => {
+      const z = String(f[iZ] || 'SIN ZONA').trim().toUpperCase() || 'SIN ZONA';
+      const g = G[z] = G[z] || { n: 0, tot: 0, dias: 0 };
+      g.n++; g.tot += zonaRowTotal(d, f); g.dias += iD >= 0 ? numVal(f[iD]) : 0;
+    });
+    const zs = Object.keys(G).sort();
+    el.innerHTML = zs.length ? `<h4 class="mu-h" style="color:#cbd5e1;margin-top:14px">Resumen por zona</h4>
+      <div class="v10-scroll-x"><table class="v10-t"><thead><tr><th>Zona</th><th>Salidas</th><th>Días</th><th>Gasto total</th><th>Promedio / salida</th><th>Costo / día</th></tr></thead><tbody>
+      ${zs.map(z => { const g = G[z]; return `<tr><td style="padding:7px 8px">${esc(z)}</td><td class="num">${g.n}</td><td class="num">${g.dias}</td><td class="num">${soles(g.tot)}</td><td class="num">${soles(g.tot / g.n)}</td><td class="num">${g.dias ? soles(g.tot / g.dias) : '—'}</td></tr>`; }).join('')}
+      </tbody></table></div>
+      <h4 class="mu-h" style="color:#cbd5e1;margin-top:14px">Cotizador de mantenimiento</h4>
+      <div class="v10-row"><select data-q="z">${zs.map(z => `<option value="${esc(z)}">${esc(z)}</option>`).join('')}</select>
+        <label class="text-[11px] text-slate-400">Días <input data-q="d" type="number" min="1" value="3" style="width:70px"></label>
+        <label class="text-[11px] text-slate-400">Margen % <input data-q="m" type="number" min="0" value="30" style="width:70px"></label>
+        <span data-q="out" class="text-xs text-slate-200"></span></div>` : '';
+    const calc = () => {
+      const z = el.querySelector('[data-q="z"]'); if (!z) return;
+      const g = G[z.value], dias = numVal(el.querySelector('[data-q="d"]').value) || 1, m = numVal(el.querySelector('[data-q="m"]').value);
+      const perDay = g.dias ? g.tot / g.dias : g.tot / g.n, costo = perDay * dias;
+      el.querySelector('[data-q="out"]').innerHTML = `Costo estimado <b>${soles(costo)}</b> · Precio sugerido <b style="color:#22c55e">${soles(costo * (1 + m / 100))}</b>`;
+    };
+    el.querySelectorAll('[data-q]').forEach(i => i.addEventListener('input', calc)); calc();
+  }
+  function ensureCostos() {
+    const body = $('price-body'); if (!body) return;
+    if (!costHost) {
+      costHost = document.createElement('div'); costHost.id = 'v10-costos'; costHost.className = 'space-y-4';
+      costHost.innerHTML = '<div id="v10-cost-tec"></div><div id="v10-cost-zona"></div>';
+      costTec = EditTable(costHost.querySelector('#v10-cost-tec'), {
+        mod: 'costos_tecnologia', seedFrom: 'price', icon: '🧩', title: 'Costos de tecnología (equipos)',
+        sub: 'Estructura, radio, fuentes, antenas… Agrega las columnas que necesites. El resumen calcula cuánto cuesta levantar cada tecnología.',
+        defCols: ['Tecnología', 'Equipo', 'Código', 'Cantidad', 'Precio unitario (S/)', 'Proveedor', 'Almacén', 'Nota'],
+        numRe: /cant|precio|costo|monto|total/i, afterDraw: techCostSummary
+      });
+      costZona = EditTable(costHost.querySelector('#v10-cost-zona'), {
+        mod: 'costos_mant_zona', seedFrom: 'maint', icon: '🚚', title: 'Costos de mantenimiento por zona',
+        sub: 'Registra cada salida (ej. Lima → Norte): días y gastos. Sirve para cotizar futuros mantenimientos.',
+        defCols: ['Zona', 'Fecha', 'Días', 'Técnicos', 'Transporte (S/)', 'Viáticos (S/)', 'Materiales (S/)', 'Otros (S/)', 'Nota'],
+        numRe: /d[ií]as|t[eé]cnic|s\/|costo|transporte|vi[aá]tic|material|otros|monto/i, afterDraw: zonaSummary
+      });
+      costTec.load(); costZona.load();
+    }
+    if (!body.contains(costHost)) body.appendChild(costHost);
+  }
+  const _renderPrice = window.renderPrice;
+  window.renderPrice = function () { const r = _renderPrice.apply(this, arguments); ensureCostos(); return r; };
+
+  /* ============================== 4. CONSOLA NOC ============================== */
+  let nocSource = 'none';
+  const nocSer = a => (a || []).map(r => ({ ...r, CONECTIVIDAD_DT: r.CONECTIVIDAD_DT instanceof Date && !isNaN(r.CONECTIVIDAD_DT) ? r.CONECTIVIDAD_DT.toISOString() : null }));
+  const nocDes = a => (a || []).map(r => ({ ...r, CONECTIVIDAD_DT: r.CONECTIVIDAD_DT ? new Date(r.CONECTIVIDAD_DT) : null }));
+  const _nocHandleFile = window.nocHandleFile, _nocCheckReady = window.nocCheckReady, _nocDemo = window.nocLoadDemoData;
+  window.nocHandleFile = function (inp, t) { nocSource = 'files'; return _nocHandleFile(inp, t); };
+  window.nocCheckReady = function () {
+    _nocCheckReady();
+    if (nocSource === 'files' && nocState.rawDet && nocState.rawRep && nocState.rawLoj && canNoc()) nocSaveCorte(true);
+  };
+  async function nocSaveCorte(auto) {
+    if (!canNoc()) { showToast('Solo dev o NOC pueden guardar cortes'); return; }
+    if (!nocState.resumenTotal || !nocState.dfTotal.length) { showToast('Primero carga los 3 reportes'); return; }
+    const rt = nocState.resumenTotal, fc = (nocState.fechaCorte instanceof Date ? nocState.fechaCorte : new Date()).toISOString();
+    const datos = { det: nocSer(nocState.rawDet), rep: nocSer(nocState.rawRep), loj: nocSer(nocState.rawLoj),
+      params: { sla: $('nocParamSla').value, verde: $('nocParamVerde').value, amarillo: $('nocParamAmarillo').value } };
+    const r1 = await sb().from('noc_ultimo').upsert({ id: 1, fecha_corte: fc, datos }, { onConflict: 'id' });
+    const r2 = await sb().from('noc_historial').upsert({
+      fecha_corte: fc, disp_global: +(rt.dispEstricta * 100).toFixed(2), disp_ponderada: +(rt.dispPonderada * 100).toFixed(2),
+      activa: rt.activa, verde: rt.verde, amarillo: rt.amarillo, rojo: rt.rojo, meta_sla: numVal($('nocParamSla').value),
+      por_grupo: Object.fromEntries(nocState.resumenGrupos.map(g => [g.grupo, { estricta: +(g.dispEstricta * 100).toFixed(2), ponderada: +(g.dispPonderada * 100).toFixed(2), activa: g.activa }]))
+    }, { onConflict: 'fecha_corte' });
+    const err = r1.error || r2.error;
+    if (err) { showToast('No se guardó el corte: ' + err.message); return; }
+    nocSource = 'ultimo';
+    showToast(auto ? 'Corte guardado como último (y en el historial)' : 'Corte guardado');
+    nocLoadHist();
+  }
+  async function nocLoadUltimo(silent) {
+    if (!sb()) return false;
+    const { data, error } = await sb().from('noc_ultimo').select('fecha_corte, datos, subido_por, updated_at').eq('id', 1).maybeSingle();
+    if (error || !data || !data.datos) { if (!silent) showToast('Aún no hay un corte guardado'); return false; }
+    const d = data.datos;
+    nocState.rawDet = nocDes(d.det); nocState.rawRep = nocDes(d.rep); nocState.rawLoj = nocDes(d.loj);
+    if (d.params) { if (d.params.sla) $('nocParamSla').value = d.params.sla; if (d.params.verde) $('nocParamVerde').value = d.params.verde; if (d.params.amarillo) $('nocParamAmarillo').value = d.params.amarillo; }
+    const lbl = `(corte ${fmtDate(data.fecha_corte)})`;
+    $('nocBadgeDet').textContent = `${nocState.rawDet.length} ${lbl}`; $('nocBadgeRep').textContent = `${nocState.rawRep.length} ${lbl}`; $('nocBadgeLoj').textContent = `${nocState.rawLoj.length} ${lbl}`;
+    nocSource = 'ultimo';
+    _nocCheckReady();
+    $('nocStatusText').textContent = `Último corte guardado · ${fmtDate(data.fecha_corte)}${data.subido_por ? ' · ' + data.subido_por : ''}`;
+    return true;
+  }
+  window.nocLoadDemoData = async function () { if (!(await nocLoadUltimo(true))) { nocSource = 'demo'; _nocDemo(); showToast('Sin corte guardado: mostrando demo'); } };
+
+  let nocHist = [];
+  async function nocLoadHist() {
+    if (!sb()) return;
+    const { data, error } = await sb().from('noc_historial').select('*').order('fecha_corte', { ascending: false }).limit(1000);
+    nocHist = error ? [] : (data || []);
+    nocRenderHist();
+  }
+  function periodKey(d, mode) {
+    const x = new Date(d);
+    if (mode === 'mes') return x.toISOString().slice(0, 7);
+    if (mode === 'anio') return String(x.getFullYear());
+    if (mode === 'semana') { const t = new Date(Date.UTC(x.getFullYear(), x.getMonth(), x.getDate())); const day = t.getUTCDay() || 7; t.setUTCDate(t.getUTCDate() + 4 - day); const y0 = new Date(Date.UTC(t.getUTCFullYear(), 0, 1)); return `${t.getUTCFullYear()}-S${String(Math.ceil(((t - y0) / 864e5 + 1) / 7)).padStart(2, '0')}`; }
+    return fmtDate(d);
+  }
+  function nocRenderHist() {
+    const host = $('v10-noc-hist'); if (!host) return;
+    const mode = host.querySelector('[data-h="mode"]')?.value || 'corte';
+    const groups = new Map();
+    nocHist.forEach(h => { const k = periodKey(h.fecha_corte, mode); if (!groups.has(k)) groups.set(k, []); groups.get(k).push(h); });
+    const avg = (arr, f) => { const v = arr.map(f).filter(x => x !== null && x !== undefined && isFinite(x)); return v.length ? v.reduce((a, b) => a + Number(b), 0) / v.length : null; };
+    const gname = ['DETEKTOR', 'REPOTENCIADOS', 'LOJACK'];
+    const rows = [...groups.entries()].map(([k, arr]) => ({ k, n: arr.length, g: avg(arr, h => h.disp_global), p: avg(arr, h => h.disp_ponderada),
+      by: gname.map(gn => avg(arr, h => h.por_grupo && h.por_grupo[gn] ? h.por_grupo[gn].estricta : null)), id: arr[0].id, meta: avg(arr, h => h.meta_sla) }));
+    host.querySelector('[data-h="body"]').innerHTML = rows.length ? `<div class="v10-scroll-x" style="max-height:340px;overflow-y:auto"><table class="v10-t"><thead><tr>
+        <th>${mode === 'corte' ? 'Fecha de corte' : 'Periodo'}</th>${mode !== 'corte' ? '<th>Cortes</th>' : ''}<th>Disp. global</th><th>Ponderada</th>${gname.map(g => `<th>${g}</th>`).join('')}<th style="min-width:120px">vs meta</th>${mode === 'corte' && dev() ? '<th></th>' : ''}</tr></thead><tbody>
+      ${rows.map(r => `<tr><td style="padding:7px 8px">${esc(r.k)}</td>${mode !== 'corte' ? `<td class="num">${r.n}</td>` : ''}<td class="num">${r.g !== null ? pct(r.g) : '—'}</td><td class="num">${r.p !== null ? pct(r.p) : '—'}</td>
+        ${r.by.map(v => `<td class="num">${v !== null ? pct(v) : '—'}</td>`).join('')}
+        <td><div class="v10-bar"><i style="width:${Math.max(2, Math.min(100, r.g || 0))}%;background:${(r.g || 0) >= (r.meta || 95) ? '#22c55e' : '#f59e0b'}"></i></div></td>
+        ${mode === 'corte' && dev() ? `<td><button class="x" data-h="del" data-id="${Number(r.id)}" title="Borrar registro">✕</button></td>` : ''}</tr>`).join('')}
+      </tbody></table></div>` : '<p class="v10-sub">Todavía no hay cortes guardados. Al subir los 3 reportes se guardan solos (o usa “Guardar corte”).</p>';
+    host._rows = rows; host._mode = mode;
+  }
+  function ensureNocUI() {
+    const view = $('view-noc'); if (!view || $('v10-noc-hist')) return;
+    // Botón Demo → Último corte, y botón Guardar corte
+    const demoBtn = view.querySelector('button[onclick="nocLoadDemoData()"]');
+    if (demoBtn) demoBtn.innerHTML = '<i class="fa-solid fa-clock-rotate-left mr-1 text-[var(--accent)]"></i>Último corte';
+    if (canNoc() && demoBtn && !$('v10-noc-save')) {
+      const b = document.createElement('button'); b.id = 'v10-noc-save'; b.type = 'button';
+      b.className = demoBtn.className; b.innerHTML = '<i class="fa-solid fa-floppy-disk mr-1 text-[var(--accent)]"></i>Guardar corte';
+      b.addEventListener('click', () => nocSaveCorte(false)); demoBtn.after(b);
+    }
+    const host = document.createElement('div'); host.id = 'v10-noc-hist'; host.className = 'v10-sec';
+    host.innerHTML = `<div class="v10-row" style="justify-content:space-between"><div><h3>📈 Historial de disponibilidad</h3><p class="v10-sub">Solo se guardan los porcentajes: tu registro para reportar semanas, meses o años.</p></div>
+      <div class="v10-tools"><select data-h="mode" class="sel"><option value="corte">Por corte</option><option value="semana">Semanal</option><option value="mes">Mensual</option><option value="anio">Anual</option></select><button class="v10-b" data-h="xls">Excel</button></div></div>
+      <div data-h="body"></div>`;
+    host.querySelector('[data-h="mode"]').addEventListener('change', nocRenderHist);
+    host.addEventListener('click', async e => {
+      const b = e.target.closest('[data-h]'); if (!b) return;
+      if (b.dataset.h === 'xls') {
+        const rows = host._rows || []; const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet([['Periodo', 'Cortes', 'Disp. global %', 'Ponderada %', 'DETEKTOR %', 'REPOTENCIADOS %', 'LOJACK %'],
+          ...rows.map(r => [r.k, r.n, r.g, r.p, ...r.by])]), 'Historial');
+        XLSX.writeFile(wb, `Historial_NOC_${host._mode}_${new Date().toISOString().slice(0, 10)}.xlsx`);
+      }
+      if (b.dataset.h === 'del' && dev() && confirm('¿Borrar este registro del historial?')) {
+        const { error } = await sb().from('noc_historial').delete().eq('id', Number(b.dataset.id));
+        if (error) showToast('Error: ' + error.message); else nocLoadHist();
+      }
+    });
+    const scroller = view.querySelector('.flex-1.overflow-y-auto'); if (scroller) scroller.appendChild(host);
+  }
+
+  /* ============================== 5. RASTREADORES ============================== */
+  window.__rastCampos = [];
+  async function loadRastCampos() { const d = await tlLoad('rast_campos'); window.__rastCampos = d ? d.columnas.filter(Boolean).map(cleanName) : []; }
+  window.__rastAddCampo = async name => {
+    const n = cleanName(name); if (!n || window.__rastCampos.includes(n)) return;
+    window.__rastCampos.push(n);
+    await tlSave('rast_campos', { columnas: window.__rastCampos, filas: [] });
+  };
+  let lects = [], anBuilt = false;
+  async function loadLecturas() {
+    if (!sb()) return;
+    const { data, error } = await sb().from('rastreadores_lecturas').select('*').order('fecha', { ascending: true }).limit(5000);
+    lects = error ? [] : (data || []);
+    if (error) $('rast-analisis').querySelector('[data-an="body"]').innerHTML = `<p class="v10-sub">No se pudieron leer las lecturas (${esc(error.message)}). ¿Ejecutaste el SQL v10?</p>`;
+    else renderAnalisis();
+  }
+  function slopePerMonth(pts) { // regresión lineal de batería vs tiempo
+    if (pts.length < 2) return null;
+    const xs = pts.map(p => p.t / (30 * 864e5)), ys = pts.map(p => p.b);
+    const mx = xs.reduce((a, b) => a + b, 0) / xs.length, my = ys.reduce((a, b) => a + b, 0) / ys.length;
+    const num = xs.reduce((a, x, i) => a + (x - mx) * (ys[i] - my), 0), den = xs.reduce((a, x) => a + (x - mx) ** 2, 0);
+    return den ? num / den : null;
+  }
+  function nearestAntenna(lat, lon) {
+    let best = null;
+    excelData.forEach(r => { const i = info(r); if (!i.ok || i.movil) return; const d = haversineKm(lat, lon, i.lat, i.lon); if (!best || d < best.d) best = { p: i.punto, d }; });
+    return best;
+  }
+  function renderAnalisis() {
+    const host = $('rast-analisis'); if (!host) return;
+    const sel = host.querySelector('[data-an="unidad"]'); const fu = sel ? sel.value : 'ALL';
+    const rows = window.__rastRows || [];
+    if (sel && sel.options.length <= 1) sel.innerHTML = '<option value="ALL">Todas las unidades</option>' + rows.map(r => `<option value="${esc(String(r.id))}">${esc(r.unidad || r.placa || 'ID ' + r.id)}</option>`).join('');
+    if (sel) sel.value = fu;
+    const L = lects.filter(l => fu === 'ALL' || String(l.rastreador_id) === fu);
+    const byU = new Map();
+    L.forEach(l => { const k = String(l.rastreador_id || l.unidad || '?'); if (!byU.has(k)) byU.set(k, []); byU.get(k).push(l); });
+    const nameOf = k => { const r = rows.find(x => String(x.id) === k); return r ? (r.unidad || r.placa) : (byU.get(k)?.[0]?.unidad || k); };
+    const bat = [...byU.entries()].map(([k, arr]) => {
+      const pts = arr.filter(l => l.bateria !== null && l.bateria !== undefined).map(l => ({ t: new Date(l.fecha).getTime(), b: Number(l.bateria) }));
+      if (!pts.length) return null;
+      const s = slopePerMonth(pts), last = pts[pts.length - 1];
+      const meses = s && s < 0 ? (last.b - 20) / -s : null;
+      return { k, n: pts.length, first: pts[0].b, last: last.b, s, al20: meses !== null && meses > 0 ? new Date(last.t + meses * 30 * 864e5) : null };
+    }).filter(Boolean).sort((a, b) => a.last - b.last);
+    const stops = new Map();
+    L.forEach(l => {
+      if (!(Number(l.parada_min) > 0)) return;
+      const k = (l.lugar && String(l.lugar).trim()) || (isFinite(l.lat) && isFinite(l.lon) && l.lat !== null ? `${Number(l.lat).toFixed(3)}, ${Number(l.lon).toFixed(3)}` : 'Sin lugar');
+      const g = stops.get(k) || { min: 0, n: 0, u: new Set(), lat: l.lat, lon: l.lon }; g.min += Number(l.parada_min); g.n++; g.u.add(nameOf(String(l.rastreador_id || l.unidad))); stops.set(k, g);
+    });
+    const topStops = [...stops.entries()].sort((a, b) => b[1].min - a[1].min).slice(0, 10);
+    const ant = {}; L.forEach(l => String(l.antenas || '').split(/[,;/|]+/).map(s => s.trim().toUpperCase()).filter(Boolean).forEach(a => ant[a] = (ant[a] || 0) + 1));
+    const topAnt = Object.entries(ant).sort((a, b) => b[1] - a[1]).slice(0, 10);
+    const low = bat.filter(b => b.last < 30).length;
+    host.querySelector('[data-an="body"]').innerHTML = `
+      <div class="v10-kpis"><div class="v10-kpi"><span>Lecturas</span><b>${L.length}</b></div><div class="v10-kpi"><span>Unidades con datos</span><b>${byU.size}</b></div>
+        <div class="v10-kpi"><span>Batería promedio actual</span><b>${bat.length ? (bat.reduce((a, b) => a + b.last, 0) / bat.length).toFixed(1) + '%' : '—'}</b></div>
+        <div class="v10-kpi"><span>Batería &lt; 30%</span><b style="color:${low ? '#f87171' : '#fff'}">${low}</b></div></div>
+      <div class="v10-grid2">
+        <div class="v10-sec"><h3>🔋 Degradación de batería</h3><p class="v10-sub">Tendencia calculada con todas las lecturas de cada unidad.</p>
+          <div class="v10-scroll-x"><table class="v10-t"><thead><tr><th>Unidad</th><th>Lecturas</th><th>Inicial</th><th>Actual</th><th>%/mes</th><th>Llega a 20%</th></tr></thead><tbody>
+          ${bat.map(b => `<tr><td style="padding:7px 8px">${esc(nameOf(b.k))}</td><td class="num">${b.n}</td><td class="num">${b.first}%</td><td class="num" style="color:${b.last < 30 ? '#f87171' : '#e2e8f0'}">${b.last}%</td><td class="num">${b.s === null ? '—' : b.s.toFixed(2)}</td><td class="num">${b.al20 ? fmtDate(b.al20) : '—'}</td></tr>`).join('') || '<tr><td colspan="6" style="padding:12px;color:#64748b">Sin lecturas de batería.</td></tr>'}
+          </tbody></table></div></div>
+        <div class="v10-sec"><h3>⏱️ Dónde se detienen más tiempo</h3><p class="v10-sub">Top 10 por minutos detenidos (por lugar o coordenada).</p>
+          <div class="v10-scroll-x"><table class="v10-t"><thead><tr><th>Lugar</th><th>Horas</th><th>Paradas</th><th>Unidades</th><th>Antena más cercana</th></tr></thead><tbody>
+          ${topStops.map(([k, g]) => { const na = isFinite(g.lat) && isFinite(g.lon) && g.lat !== null ? nearestAntenna(Number(g.lat), Number(g.lon)) : null; return `<tr><td style="padding:7px 8px">${esc(k)}</td><td class="num">${(g.min / 60).toFixed(1)}</td><td class="num">${g.n}</td><td>${esc([...g.u].join(', '))}</td><td>${na ? esc(na.p) + ` <span class="text-slate-400">(${na.d.toFixed(1)} km)</span>` : '—'}</td></tr>`; }).join('') || '<tr><td colspan="5" style="padding:12px;color:#64748b">Sin paradas registradas.</td></tr>'}
+          </tbody></table></div></div>
+        <div class="v10-sec"><h3>📡 Antenas que más lo ven</h3><p class="v10-sub">Según la columna “antenas” de cada lectura.</p>
+          ${topAnt.length ? bars(topAnt, '#a855f7') : '<p class="v10-sub">Sin datos de antenas.</p>'}</div>
+      </div>
+      ${dev() ? `<div class="v10-sec" style="margin-top:12px"><h3>Últimas lecturas</h3><div class="v10-scroll-x" style="max-height:260px;overflow-y:auto"><table class="v10-t"><thead><tr><th>Fecha</th><th>Unidad</th><th>Batería</th><th>Lugar</th><th>Parada (min)</th><th>Antenas</th><th></th></tr></thead><tbody>
+        ${L.slice(-50).reverse().map(l => `<tr><td style="padding:6px 8px">${esc(fmtDate(l.fecha))}</td><td>${esc(nameOf(String(l.rastreador_id || l.unidad)))}</td><td class="num">${l.bateria ?? '—'}</td><td>${esc(l.lugar || '')}</td><td class="num">${l.parada_min ?? ''}</td><td>${esc(l.antenas || '')}</td><td><button class="x" data-an="del" data-id="${Number(l.id)}">✕</button></td></tr>`).join('')}
+      </tbody></table></div></div>` : ''}`;
+  }
+  function lecturaForm() {
+    const rows = window.__rastRows || [];
+    const o = document.createElement('div');
+    o.className = 'fixed inset-0 z-[400] bg-black/75 flex items-center justify-center p-4';
+    const F = [['fecha', 'Fecha y hora', 'datetime-local'], ['bateria', 'Batería %', 'number'], ['lugar', 'Lugar / dirección', 'text'], ['parada_min', 'Minutos detenido', 'number'], ['lat', 'Latitud', 'text'], ['lon', 'Longitud', 'text'], ['antenas', 'Antenas que lo ven (separadas por coma)', 'text'], ['nota', 'Nota', 'text']];
+    const now = new Date(Date.now() - new Date().getTimezoneOffset() * 6e4).toISOString().slice(0, 16);
+    o.innerHTML = `<div class="panel w-full max-w-xl max-h-[88vh] flex flex-col fade"><div class="px-5 py-3 border-b border-white/10 text-sm font-bold text-white">Nueva lectura de rastreador</div>
+      <div class="flex-1 overflow-y-auto scroll p-5 grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <label class="block text-[10px] font-bold uppercase text-slate-400 sm:col-span-2">Unidad<select data-l="rid" class="sel w-full max-w-none mt-1">${rows.map(r => `<option value="${esc(String(r.id))}">${esc(r.unidad || r.placa || 'ID ' + r.id)}</option>`).join('')}</select></label>
+        ${F.map(([k, l, t]) => `<label class="block text-[10px] font-bold uppercase text-slate-400">${l}<input data-l="${k}" type="${t}" ${k === 'fecha' ? `value="${now}"` : ''} ${t === 'number' ? 'step="any" min="0"' : 'maxlength="300"'} class="w-full mt-1 px-3 py-2 text-xs bg-black/40 border border-white/10 text-white outline-none"></label>`).join('')}
+      </div><div class="px-5 py-3 border-t border-white/10 flex justify-end gap-2"><button data-m="x" class="chip px-4 py-2 text-xs font-semibold">Cancelar</button><button data-m="ok" class="btn px-5 py-2 text-xs font-bold text-white">Guardar</button></div></div>`;
+    o.addEventListener('click', async e => {
+      const m = e.target.closest('[data-m]'); if (!m) { if (e.target === o) o.remove(); return; }
+      if (m.dataset.m === 'x') { o.remove(); return; }
+      const g = k => o.querySelector(`[data-l="${k}"]`).value.trim();
+      const rid = g('rid'), r = rows.find(x => String(x.id) === rid);
+      const n = v => v === '' ? null : Number(String(v).replace(',', '.'));
+      const p = { rastreador_id: rid, unidad: r ? (r.unidad || r.placa) : null, fecha: g('fecha') ? new Date(g('fecha')).toISOString() : new Date().toISOString(),
+        bateria: n(g('bateria')), lugar: g('lugar') || null, parada_min: n(g('parada_min')), lat: n(g('lat')), lon: n(g('lon')), antenas: g('antenas') || null, nota: g('nota') || null };
+      if (p.bateria !== null && !(p.bateria >= 0 && p.bateria <= 100)) { showToast('Batería debe estar entre 0 y 100'); return; }
+      if ((p.lat !== null && !(Math.abs(p.lat) <= 90)) || (p.lon !== null && !(Math.abs(p.lon) <= 180))) { showToast('Coordenadas inválidas'); return; }
+      const { error } = await sb().from('rastreadores_lecturas').insert(p);
+      if (error) { showToast('Error: ' + error.message); return; }
+      o.remove(); showToast('Lectura guardada'); loadLecturas();
+    });
+    document.body.appendChild(o);
+  }
+  async function importLecturas(file) {
+    const wb = XLSX.read(new Uint8Array(await file.arrayBuffer()), { type: 'array', cellDates: true });
+    const raw = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], { defval: null });
+    const rows = window.__rastRows || [];
+    const pick = (o, re) => { const k = Object.keys(o).find(x => re.test(normalizeText(x))); return k ? o[k] : null; };
+    const n = v => { if (v === null || v === '') return null; const x = Number(String(v).replace(',', '.').replace(/[^0-9.\-]/g, '')); return isFinite(x) ? x : null; };
+    const out = raw.slice(0, 5000).map(o => {
+      const u = String(pick(o, /unidad|placa|vehic/) || '').trim();
+      const r = rows.find(x => normalizeText(x.unidad) === normalizeText(u) || normalizeText(x.placa) === normalizeText(u));
+      const f = pick(o, /fecha|hora|time/); const fd = f instanceof Date ? f : new Date(f);
+      const b = n(pick(o, /bater/));
+      return { rastreador_id: r ? String(r.id) : null, unidad: u || null, fecha: isNaN(fd) ? new Date().toISOString() : fd.toISOString(),
+        bateria: b !== null && b >= 0 && b <= 100 ? b : null, lugar: (pick(o, /lugar|direcc|zona/) || null), parada_min: n(pick(o, /parada|detenid|minut/)),
+        lat: n(pick(o, /^lat/)), lon: n(pick(o, /^lon|^lng/)), antenas: pick(o, /antena/) ? String(pick(o, /antena/)).slice(0, 300) : null, nota: pick(o, /nota|obs/) ? String(pick(o, /nota|obs/)).slice(0, 300) : null };
+    }).filter(x => x.unidad || x.rastreador_id);
+    if (!out.length) { showToast('No encontré filas con columna Unidad/Placa'); return; }
+    for (let i = 0; i < out.length; i += 500) {
+      const { error } = await sb().from('rastreadores_lecturas').insert(out.slice(i, i + 500));
+      if (error) { showToast('Error importando: ' + error.message); return; }
+    }
+    showToast(`${out.length} lecturas importadas`); loadLecturas();
+  }
+  function ensureRastUI() {
+    const view = $('view-rast'); if (!view || anBuilt) return;
+    anBuilt = true;
+    const head = view.querySelector('div'); // cabecera
+    const tabs = document.createElement('div'); tabs.className = 'v10-tabs';
+    tabs.innerHTML = '<button class="on" data-t="u">Unidades</button><button data-t="a">Análisis</button>';
+    head.lastElementChild.prepend(tabs);
+    tabs.addEventListener('click', e => {
+      const b = e.target.closest('[data-t]'); if (!b) return;
+      tabs.querySelectorAll('button').forEach(x => x.classList.toggle('on', x === b));
+      view.classList.toggle('v10-an', b.dataset.t === 'a');
+      if (b.dataset.t === 'a') loadLecturas();
+    });
+    const an = document.createElement('div'); an.id = 'rast-analisis';
+    an.innerHTML = `<div class="v10-row" style="justify-content:space-between;margin-bottom:6px"><select data-an="unidad" class="sel"><option value="ALL">Todas las unidades</option></select>
+      <div class="v10-tools">${dev() ? `<button class="v10-b pri" data-an="add">＋ Lectura</button><label class="v10-b">Importar Excel<input data-an="file" type="file" accept=".xlsx,.xls,.csv" hidden></label>` : ''}
+      <button class="v10-b" data-an="xls">Excel</button></div></div>
+      <p class="v10-sub">Excel sugerido: columnas <b>Unidad, Fecha, Batería, Lugar, Parada (min), Latitud, Longitud, Antenas, Nota</b>.</p>
+      <div data-an="body"></div>`;
+    $('rast-body').appendChild(an);
+    an.querySelector('[data-an="unidad"]').addEventListener('change', renderAnalisis);
+    an.addEventListener('click', async e => {
+      const b = e.target.closest('[data-an]'); if (!b) return;
+      if (b.dataset.an === 'add' && dev()) lecturaForm();
+      if (b.dataset.an === 'xls') { const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(lects.map(({ id, creado_por, created_at, ...r }) => r)), 'Lecturas'); XLSX.writeFile(wb, `Lecturas_rastreadores_${new Date().toISOString().slice(0, 10)}.xlsx`); }
+      if (b.dataset.an === 'del' && dev() && confirm('¿Borrar esta lectura?')) { const { error } = await sb().from('rastreadores_lecturas').delete().eq('id', Number(b.dataset.id)); if (error) showToast('Error: ' + error.message); else loadLecturas(); }
+    });
+    an.addEventListener('change', e => { const f = e.target.closest('[data-an="file"]'); if (f && f.files[0] && dev()) { importLecturas(f.files[0]); f.value = ''; } });
+  }
+
+  /* ============================== 6. RAFI FLOTANTE ============================== */
+  const KB = [
+    ['filter', 'Búsqueda de puntos', 'buscar punto antena imei sim vlu comando at bloquear desbloquear reseteador ficha'],
+    ['map', 'Mapa táctico', 'mapa gps carro vehiculo ubicacion coordenadas antenas cercanas cobertura sector zona'],
+    ['tech', 'Analizador de tecnologías', 'tecnologia modelos operador claro movistar rastreo laboratorio distribucion editar'],
+    ['maint', 'Plan de mantenimiento', 'mantenimiento checklist tecnico urgente proximo revision sector pendiente programado'],
+    ['price', 'Analizador de precios y costos', 'precio alquiler costo equipo proveedor almacen estructura radio fuente cotizar zona viaticos margen'],
+    ['noc', 'Consola NOC', 'noc disponibilidad sla porcentaje corte historial semanal mensual anual reporte excel detektor lojack repotenciado'],
+    ['rast', 'Rastreadores', 'rastreador vehiculo interno bateria parada antenas placa unidad analisis lectura'],
+    ['rafi', 'Centro RAFI (FAQ y búsqueda avanzada)', 'faq preguntas guia consola busqueda avanzada']
+  ];
+  let faqDb = [], rafiTab = 'guia';
+  async function loadFaq() { try { const { data } = await sb().from('rafi_faq').select('*').order('created_at', { ascending: false }).limit(300); faqDb = data || []; } catch (e) { faqDb = []; } }
+  function rafiGuide(body) {
+    body.innerHTML = `<input data-r="q" placeholder="¿Qué buscas? ej. batería, SLA, comando, costo…" maxlength="120"><div data-r="res" style="display:grid;gap:6px"></div>`;
+    const draw = () => {
+      const q = normalizeText(body.querySelector('[data-r="q"]').value);
+      const words = q.split(/\s+/).filter(w => w.length > 2);
+      const score = txt => words.reduce((a, w) => a + (normalizeText(txt).includes(w) ? 1 : 0), 0);
+      const mods = KB.map(([v, t, k]) => ({ v, t, k, s: q ? score(t + ' ' + k) : 1 })).filter(m => m.s > 0).sort((a, b) => b.s - a.s);
+      const faqs = [...faqDb, ...(typeof loadRafiFaqs === 'function' ? loadRafiFaqs() : [])].map(f => ({ ...f, s: q ? score(`${f.cat} ${f.q} ${f.a}`) : 0 })).filter(f => f.s > 0).sort((a, b) => b.s - a.s).slice(0, 5);
+      body.querySelector('[data-r="res"]').innerHTML =
+        mods.map(m => `<button class="rp-link" data-go="${m.v}">→ ${esc(m.t)}<small>${esc(m.k.split(' ').slice(0, 6).join(' · '))}</small></button>`).join('') +
+        faqs.map(f => `<div class="rp-q"><b>${esc(f.q)}</b><div class="rp-a">${esc(f.a)}</div></div>`).join('') +
+        (q && !mods.length && !faqs.length ? '<p class="v10-sub">No encontré eso. Déjalo en “Preguntar” y te responderán.</p>' : '');
+    };
+    body.querySelector('[data-r="q"]').addEventListener('input', draw); draw();
+  }
+  async function rafiAsk(body) {
+    body.innerHTML = `<textarea data-r="t" rows="3" maxlength="2000" placeholder="Escribe tu consulta o pregunta…"></textarea><button class="rp-btn" data-r="send">Enviar consulta</button><b style="margin-top:6px">Mis consultas</b><div data-r="mine" style="display:grid;gap:6px"><p class="v10-sub">Cargando…</p></div>`;
+    const { data } = await sb().from('rafi_consultas').select('*').eq('user_id', hunterSession.user.id).order('creado', { ascending: false }).limit(20);
+    const mine = data || [];
+    body.querySelector('[data-r="mine"]').innerHTML = mine.map(c => `<div class="rp-q">${esc(c.texto)}<br><small>${esc(fmtDate(c.creado))} · ${c.estado === 'RESPONDIDA' ? '✅ Respondida' : '⏳ Pendiente'}</small>${c.respuesta ? `<div class="rp-a">${esc(c.respuesta)}</div>` : ''}</div>`).join('') || '<p class="v10-sub">Aún no enviaste consultas.</p>';
+  }
+  async function rafiInbox(body) {
+    body.innerHTML = '<p class="v10-sub">Cargando…</p>';
+    const { data, error } = await sb().from('rafi_consultas').select('*').order('creado', { ascending: false }).limit(60);
+    if (error) { body.innerHTML = `<p class="v10-sub">${esc(error.message)}</p>`; return; }
+    const L = data || [];
+    body.innerHTML = `<p class="v10-sub">${L.filter(c => c.estado !== 'RESPONDIDA').length} pendientes</p>` + L.map(c => `<div class="rp-q" data-id="${Number(c.id)}">
+      <b>${esc(c.usuario || '')}</b> <small>${esc(fmtDate(c.creado))}</small><br>${esc(c.texto)}
+      ${c.respuesta ? `<div class="rp-a">${esc(c.respuesta)}</div>` : ''}
+      <textarea rows="2" maxlength="2000" placeholder="Responder…" style="margin-top:6px">${esc(c.respuesta || '')}</textarea>
+      <div class="v10-row" style="margin-top:4px"><button class="v10-b pri" data-r="reply">Responder</button><button class="v10-b" data-r="faq">Guardar como FAQ</button><button class="v10-b" data-r="del">Borrar</button></div></div>`).join('');
+  }
+  function rafiDraw() {
+    const pop = $('rafi-pop'); if (!pop || !pop.classList.contains('v10')) return;
+    pop.querySelectorAll('.rp-tabs button').forEach(b => b.classList.toggle('on', b.dataset.tab === rafiTab));
+    const body = pop.querySelector('.rp-body');
+    if (rafiTab === 'guia') rafiGuide(body); else if (rafiTab === 'preguntar') rafiAsk(body); else rafiInbox(body);
+  }
+  function mountRafi() {
+    const fab = $('rafi-fab'), btn = $('rafi-btn'); if (!fab || !btn || fab.dataset.v10) return false;
+    fab.dataset.v10 = '1';
+    const old = $('rafi-pop'); if (old) old.remove();
+    const pop = document.createElement('div'); pop.id = 'rafi-pop'; pop.className = 'v10';
+    pop.innerHTML = `<div class="rp-h"><b>🚀 ¡Hola${hunterPerfil && hunterPerfil.nombre ? ', ' + esc(hunterPerfil.nombre) : ''}! Soy RAFI</b><div class="v10-sub" style="margin:2px 0 0">Te digo en qué módulo está lo que buscas o dejas tu consulta.</div></div>
+      <div class="rp-tabs"><button data-tab="guia">Guía</button><button data-tab="preguntar">Preguntar</button>${dev() ? '<button data-tab="bandeja">Bandeja</button>' : ''}</div>
+      <div class="rp-body"></div>`;
+    const hello = document.createElement('div'); hello.id = 'rafi-hello'; hello.textContent = '¡Hola! 👋 ¿Te ayudo?';
+    fab.prepend(pop); fab.prepend(hello);
+    btn.onclick = () => { hello.classList.remove('on'); pop.classList.toggle('on'); if (pop.classList.contains('on')) rafiDraw(); };
+    pop.addEventListener('click', async e => {
+      const t = e.target.closest('[data-tab]'); if (t) { rafiTab = t.dataset.tab; rafiDraw(); return; }
+      const go = e.target.closest('[data-go]'); if (go) { pop.classList.remove('on'); setView(go.dataset.go); return; }
+      const r = e.target.closest('[data-r]'); if (!r) return;
+      if (r.dataset.r === 'send') {
+        const ta = pop.querySelector('[data-r="t"]'); const texto = ta.value.trim().slice(0, 2000); if (!texto) return;
+        const visible = ['filter', 'map', 'tech', 'maint', 'price', 'noc', 'rafi', 'rast'].find(v => { const el = $('view-' + v); return el && !el.classList.contains('ui-hidden'); });
+        const { error } = await sb().from('rafi_consultas').insert({ texto, modulo: visible || null });
+        if (error) { showToast('No se pudo enviar: ' + error.message); return; }
+        showToast('Consulta enviada'); rafiDraw(); return;
+      }
+      const card = r.closest('[data-id]'); if (!card || !dev()) return;
+      const id = Number(card.dataset.id), resp = card.querySelector('textarea').value.trim().slice(0, 2000);
+      if (r.dataset.r === 'reply') { const { error } = await sb().from('rafi_consultas').update({ respuesta: resp || null, estado: resp ? 'RESPONDIDA' : 'PENDIENTE', respondido: new Date().toISOString() }).eq('id', id); showToast(error ? 'Error: ' + error.message : 'Respuesta guardada'); rafiDraw(); }
+      if (r.dataset.r === 'faq') {
+        if (!resp) { showToast('Escribe la respuesta primero'); return; }
+        const { data: c } = await sb().from('rafi_consultas').select('texto').eq('id', id).maybeSingle();
+        const { error } = await sb().from('rafi_faq').insert({ cat: 'CONSULTA', q: String(c?.texto || '').slice(0, 500), a: resp });
+        showToast(error ? 'Error: ' + error.message : 'Agregada a la guía'); loadFaq();
+      }
+      if (r.dataset.r === 'del' && confirm('¿Borrar esta consulta?')) { const { error } = await sb().from('rafi_consultas').delete().eq('id', id); showToast(error ? 'Error: ' + error.message : 'Borrada'); rafiDraw(); }
+    });
+    const sayHi = () => { if (!pop.classList.contains('on') && logged()) { hello.classList.add('on'); setTimeout(() => hello.classList.remove('on'), 4500); } };
+    setTimeout(sayHi, 1500); setInterval(sayHi, 120000);
+    return true;
+  }
+
+  /* ============================== 7. ARRANQUE ============================== */
+  const _setView = window.setView;
+  window.setView = function (v) {
+    const r = _setView.apply(this, arguments);
+    if (v === 'map') { setTimeout(mapFitAll, 140); setTimeout(mapFitAll, 450); }
+    if (v === 'noc') { ensureNocUI(); nocLoadHist(); if (!nocState.dfTotal.length) nocLoadUltimo(true); }
+    if (v === 'rast') ensureRastUI();
+    return r;
+  };
+  async function onLogin() {
+    const nr = $('nav-rafi'); if (nr) nr.id = 'rafi-nav-hidden';   // RAFI sale del menú: ahora es el asistente flotante
+    if (nr) nr.dataset.v = 'rafi';
+    await Promise.all([loadRastCampos(), loadFaq()]);
+  }
+  let wasLogged = false;
+  setInterval(() => {
+    const now = logged();
+    if (now && !wasLogged) onLogin();
+    if (!now && wasLogged) { costHost = null; anBuilt = false; const h = $('v10-noc-hist'); if (h) h.remove(); const fab = $('rafi-fab'); if (fab) delete fab.dataset.v10; }
+    wasLogged = now;
+    if (now && $('rafi-fab') && !$('rafi-fab').dataset.v10) mountRafi();
+  }, 700);
+
+  // Gráficos: sin brillo neón en el tema ejecutivo
+  if (window.Chart && window.Chart.register) {
+    window.Chart.register({ id: 'v10NoGlow', beforeDatasetsDraw(c) { if (document.body.classList.contains('tema-ejecutivo')) { c.ctx.shadowBlur = 0; c.ctx.shadowColor = 'transparent'; } } });
   }
 })();
 </script>
+
+</body>
+</html>
