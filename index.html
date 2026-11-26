@@ -1717,7 +1717,7 @@ body:not(.theme-day):not(.hunter-preauth) .panel,body:not(.theme-day):not(.hunte
             <button type="button" onclick="setGpsFromInputs()" class="px-3 py-1 rounded-lg bg-white/10 hover:bg-white/15 border border-white/10 text-white font-semibold cursor-pointer">
               Ubicar
             </button>
-            <span id="gps-active-coord-label" class="text-slate-400 text-[11px]">Clic en el mapa o ingresa lat/lon para ver las 5 antenas más cercanas.</span>
+            <span id="gps-active-coord-label" class="text-slate-400 text-[11px]">Clic en el mapa o ingresa lat/lon para ver las 4 antenas más cercanas.</span>
           </div>
 
           <div id="map-legend" class="px-4 py-1.5 flex items-center gap-1.5 overflow-x-auto scroll whitespace-nowrap text-[11px]"></div>
@@ -1727,7 +1727,7 @@ body:not(.theme-day):not(.hunter-preauth) .panel,body:not(.theme-day):not(.hunte
             <div id="nearest-antennas-panel" class="ui-hidden chip p-3 lg:w-72 shrink-0 overflow-y-auto scroll flex flex-col gap-2">
               <div class="flex items-center justify-between border-b border-white/10 pb-2">
                 <h3 class="text-[11px] font-bold uppercase tracking-wider text-[var(--accent)]"><i class="fa-solid fa-satellite-dish mr-1.5"></i>Más Cercanas</h3>
-                <span class="text-[10px] font-semibold px-2 py-0.5 rounded bg-white/10 text-slate-300">Top 5</span>
+                <span class="text-[10px] font-semibold px-2 py-0.5 rounded bg-white/10 text-slate-300">Top 4</span>
               </div>
               <div id="nearest-antennas-list" class="space-y-2 text-xs"></div>
             </div>
@@ -2021,7 +2021,7 @@ body:not(.theme-day):not(.hunter-preauth) .panel,body:not(.theme-day):not(.hunte
       box.classList.remove("ui-hidden"); totp.classList.add("ui-hidden"); rem?.classList.add("ui-hidden");
       const email = String(session.user?.email || "");
       const u = $("sb-user-input");
-      if (u && !u.value) u.value = email.endsWith("@mdz.local") ? email.replace("@mdz.local", "").toUpperCase() : email;
+      if (u && !u.value) { u.value = email.endsWith("@mdz.local") ? email.replace("@mdz.local", "").toUpperCase() : email; u.dataset.prefill = u.value; document.body.classList.remove("login-busy"); }
     }
     async function mdzForgetDevice() {
       mdzSetLocked(false);
@@ -2912,7 +2912,7 @@ body:not(.theme-day):not(.hunter-preauth) .panel,body:not(.theme-day):not(.hunte
       $("btn-gps-mode").classList.remove("ring-2", "ring-sky-400");
       $("btn-clear-gps").classList.add("ui-hidden");
       $("nearest-antennas-panel").classList.add("ui-hidden");
-      $("gps-active-coord-label").textContent = "Clic en el mapa o ingresa lat/lon para ver las 5 antenas más cercanas.";
+      $("gps-active-coord-label").textContent = "Clic en el mapa o ingresa lat/lon para ver las 4 antenas más cercanas.";
       if (map && gpsRefMarker && map.hasLayer(gpsRefMarker)) map.removeLayer(gpsRefMarker);
       gpsRefMarker = null;
     }
@@ -2935,8 +2935,17 @@ body:not(.theme-day):not(.hunter-preauth) .panel,body:not(.theme-day):not(.hunte
       const panel = $("nearest-antennas-panel"), listEl = $("nearest-antennas-list");
       if (gpsRefLat === null || gpsRefLon === null) { panel.classList.add("ui-hidden"); return; }
       panel.classList.remove("ui-hidden");
-      const candidates = excelData.map(info).filter(i => i.ok && !i.movil).map(i => ({ ...i, distKm: haversineKm(gpsRefLat, gpsRefLon, i.lat, i.lon) })).sort((a, b) => a.distKm - b.distKm).slice(0, 5);
-      listEl.innerHTML = candidates.map((c, idx) => `<div class="p-2.5 rounded-xl bg-black/30 border border-white/10 space-y-1"><div class="flex items-center justify-between gap-2"><span class="font-bold text-white truncate">${idx + 1}. ${escapeHtml(c.punto)}</span><span class="px-1.5 py-0.5 rounded bg-sky-500/20 text-sky-300 font-bold shrink-0">${c.distKm.toFixed(2)} km</span></div><div class="flex items-center justify-between text-[11px] text-slate-400"><span class="truncate">${escapeHtml(c.tec)}</span><a href="https://www.google.com/maps/dir/?api=1&origin=${gpsRefLat},${gpsRefLon}&destination=${c.lat},${c.lon}" target="_blank" class="text-[var(--accent)] hover:underline font-semibold">Ruta</a></div></div>`).join("");
+      // v12: una sola entrada por punto (sus tecnologías juntas) y solo las 4 más cercanas
+      const byPunto = new Map();
+      excelData.map(info).filter(i => i.ok && !i.movil).forEach(i => {
+        const k = normalizeText(String(i.punto).replace(/\s*\(\s*PE\s*\)\s*/gi, ""));
+        const prev = byPunto.get(k);
+        if (!prev) byPunto.set(k, { ...i, distKm: haversineKm(gpsRefLat, gpsRefLon, i.lat, i.lon) });
+        else if (!prev.tec.split(" + ").includes(i.tec)) prev.tec += " + " + i.tec;
+      });
+      const candidates = [...byPunto.values()].sort((a, b) => a.distKm - b.distKm).slice(0, 4);
+      listEl.innerHTML = candidates.map((c, idx) => `<div class="p-2.5 rounded-xl bg-black/30 border border-white/10 space-y-1"><div class="flex items-center justify-between gap-2"><span class="font-bold text-white truncate">${idx + 1}. ${escapeHtml(c.punto)}</span><span class="px-1.5 py-0.5 rounded bg-sky-500/20 text-sky-300 font-bold shrink-0">${c.distKm.toFixed(2)} km</span></div><div class="flex items-center justify-between text-[11px] text-slate-400"><span class="truncate">${escapeHtml(c.tec)}</span><a href="https://www.google.com/maps/dir/?api=1&origin=${gpsRefLat},${gpsRefLon}&destination=${c.lat},${c.lon}" target="_blank" rel="noopener" class="text-[var(--accent)] hover:underline font-semibold">Ruta</a></div></div>`).join("");
+      if (window.__v12DrawRays) window.__v12DrawRays(candidates);
     }
 
     const filtered = () => { const q = normalizeText(searchInput.value); return q ? excelData.filter(r => Object.entries(r).some(([k, v]) => !k.startsWith("_") && normalizeText(v).includes(q))) : excelData; };
@@ -3785,6 +3794,107 @@ const ledPlanet = (() => {
   return { grp, uni, core, ring };
 })();
 globe.add(ledPlanet.grp);
+// ---------- v12 · MOVIMIENTO (efecto del video): anillo orbital que se inclina, cometas y código flotante ----------
+const motion = (() => {
+  const grp = new THREE.Group(); scene.add(grp);
+  const col1 = new THREE.Color('#7aa2ff'), col2 = new THREE.Color('#c08bff');
+  const readTheme = () => {
+    try {
+      const cs = getComputedStyle(document.body);
+      const a = cs.getPropertyValue('--t1rgb').split(',').map(Number), b = cs.getPropertyValue('--t2rgb').split(',').map(Number);
+      if (a.length === 3 && a.every(isFinite)) col1.setRGB(a[0] / 255, a[1] / 255, a[2] / 255, THREE.SRGBColorSpace);
+      if (b.length === 3 && b.every(isFinite)) col2.setRGB(b[0] / 255, b[1] / 255, b[2] / 255, THREE.SRGBColorSpace);
+    } catch (e) {}
+  };
+  readTheme();
+  const dotTex = (() => {
+    const c = document.createElement('canvas'); c.width = c.height = 64;
+    const x = c.getContext('2d'), g = x.createRadialGradient(32, 32, 0, 32, 32, 32);
+    g.addColorStop(0, 'rgba(255,255,255,1)'); g.addColorStop(.3, 'rgba(255,255,255,.55)'); g.addColorStop(1, 'rgba(255,255,255,0)');
+    x.fillStyle = g; x.fillRect(0, 0, 64, 64); return new THREE.CanvasTexture(c);
+  })();
+
+  // 1) Anillo de partículas alrededor del login (banda gruesa con arcos más brillantes)
+  const ringPivot = new THREE.Group(); grp.add(ringPivot);
+  const RN = compact ? 1400 : 2600, rPos = new Float32Array(RN * 3), rCol = new Float32Array(RN * 3), rAng = new Float32Array(RN), rRad = new Float32Array(RN);
+  for (let i = 0; i < RN; i++) {
+    rAng[i] = Math.random() * TAU;
+    const g = (Math.random() + Math.random() + Math.random()) / 3 - .5;
+    rRad[i] = R * 1.42 + g * 0.42;
+    rPos[i * 3 + 1] = (Math.random() - .5) * 0.10 + g * 0.08;
+  }
+  const rGeo = new THREE.BufferGeometry();
+  rGeo.setAttribute('position', new THREE.BufferAttribute(rPos, 3));
+  rGeo.setAttribute('color', new THREE.BufferAttribute(rCol, 3));
+  const rMat = new THREE.PointsMaterial({ size: compact ? 0.05 : 0.045, map: dotTex, vertexColors: true, transparent: true, opacity: .9, blending: THREE.AdditiveBlending, depthWrite: false });
+  const ringPts = new THREE.Points(rGeo, rMat); ringPts.frustumCulled = false; ringPivot.add(ringPts);
+
+  // 2) Cometas que salen disparados desde el centro hacia afuera (con estela)
+  const CN = compact ? 7 : 12, SEG = 2;
+  const cGeo = new THREE.BufferGeometry(), cPos = new Float32Array(CN * SEG * 3), cCol = new Float32Array(CN * SEG * 3);
+  cGeo.setAttribute('position', new THREE.BufferAttribute(cPos, 3)); cGeo.setAttribute('color', new THREE.BufferAttribute(cCol, 3));
+  const cIdx = []; for (let i = 0; i < CN; i++) cIdx.push(i * 2, i * 2 + 1); cGeo.setIndex(cIdx);
+  const cLines = new THREE.LineSegments(cGeo, new THREE.LineBasicMaterial({ vertexColors: true, transparent: true, opacity: 1, blending: THREE.AdditiveBlending, depthWrite: false }));
+  cLines.frustumCulled = false; grp.add(cLines);
+  const heads = new THREE.Points(new THREE.BufferGeometry(), new THREE.PointsMaterial({ size: .16, map: dotTex, vertexColors: true, transparent: true, blending: THREE.AdditiveBlending, depthWrite: false }));
+  const hPos = new Float32Array(CN * 3), hCol = new Float32Array(CN * 3);
+  heads.geometry.setAttribute('position', new THREE.BufferAttribute(hPos, 3)); heads.geometry.setAttribute('color', new THREE.BufferAttribute(hCol, 3));
+  heads.frustumCulled = false; grp.add(heads);
+  const comets = Array.from({ length: CN }, (_, i) => ({ life: -Math.random() * 3 - i * .25, dur: 1, len: 2, dir: new THREE.Vector3(1, 0, 0), r0: R * 1.2 }));
+  const spawn = c => {
+    const a = Math.random() * TAU;
+    c.dir.set(Math.cos(a), Math.sin(a) * .62, .35 + Math.random() * .5).normalize();
+    c.r0 = R * (1.1 + Math.random() * .6); c.dur = 1.1 + Math.random() * 1.3; c.life = 0; c.len = 1.4 + Math.random() * 1.8;
+  };
+
+  // 3) Código flotante (0x1A, 1010, C3…) que orbita lento y se apaga y enciende
+  const WORDS = ['0x1A', '1010', 'C3', '2FA', '0101', 'E4', '0xFF', 'A7', '11', '0x09', '1018', 'B2'];
+  const labels = WORDS.slice(0, compact ? 7 : 12).map((w, i) => {
+    const c = document.createElement('canvas'); c.width = 128; c.height = 48;
+    const x = c.getContext('2d'); x.font = '600 26px ui-monospace, Menlo, monospace'; x.fillStyle = '#fff'; x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillText(w, 64, 26);
+    const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: new THREE.CanvasTexture(c), transparent: true, opacity: 0, depthWrite: false, blending: THREE.AdditiveBlending }));
+    sp.scale.set(.62, .23, 1); grp.add(sp);
+    return { sp, a: (i / WORDS.length) * TAU + Math.random() * .4, r: R * (1.9 + Math.random() * 1.1), y: (Math.random() - .5) * 3.2, s: (.04 + Math.random() * .05) * (i % 2 ? 1 : -1), ph: Math.random() * TAU };
+  });
+
+  let themeT = 0;
+  function update(t, dt, k) {
+    themeT += dt; if (themeT > 1) { themeT = 0; readTheme(); }
+    // Anillo: gira rápido y su inclinación "bambolea" como en el video
+    ringPivot.rotation.set(.30 + Math.sin(t * .42) * .14, 0, -.12 + Math.sin(t * .31) * .16);
+    const spin = t * .55 * k;
+    for (let i = 0; i < RN; i++) {
+      const a = rAng[i] + spin * (R * 1.42 / rRad[i]);
+      rPos[i * 3] = Math.cos(a) * rRad[i]; rPos[i * 3 + 2] = Math.sin(a) * rRad[i];
+      // arcos brillantes que recorren la banda
+      const glow = Math.pow(.5 + .5 * Math.cos(a * 2 - t * 1.3), 6);
+      const c = glow > .4 ? col2 : col1, b = .35 + glow * 1.2;
+      rCol[i * 3] = c.r * b; rCol[i * 3 + 1] = c.g * b; rCol[i * 3 + 2] = c.b * b;
+    }
+    rGeo.attributes.position.needsUpdate = true; rGeo.attributes.color.needsUpdate = true;
+    // Cometas
+    comets.forEach((c, i) => {
+      c.life += dt * k;
+      if (c.life >= c.dur) spawn(c);
+      const u = Math.max(0, c.life / c.dur), on = c.life > 0 ? Math.sin(Math.min(1, u) * Math.PI) : 0;
+      const d = c.r0 + u * 9, hx = c.dir.x * d, hy = c.dir.y * d, hz = c.dir.z * d * .6;
+      const tl = Math.max(c.r0, d - c.len * (.4 + u));
+      cPos.set([hx, hy, hz, c.dir.x * tl, c.dir.y * tl, c.dir.z * tl * .6], i * 6);
+      cCol.set([col1.r * on * 1.3, col1.g * on * 1.3, col1.b * on * 1.3, 0, 0, 0], i * 6);
+      hPos.set([hx, hy, hz], i * 3); hCol.set([col2.r * on, col2.g * on, col2.b * on], i * 3);
+    });
+    cGeo.attributes.position.needsUpdate = true; cGeo.attributes.color.needsUpdate = true;
+    heads.geometry.attributes.position.needsUpdate = true; heads.geometry.attributes.color.needsUpdate = true;
+    // Código flotante
+    labels.forEach(l => {
+      const a = l.a + t * l.s * k;
+      l.sp.position.set(Math.cos(a) * l.r, l.y + Math.sin(t * .3 + l.ph) * .25, Math.sin(a) * l.r * .45 - .5);
+      l.sp.material.opacity = Math.max(0, Math.sin(t * .5 + l.ph)) * .55;
+      l.sp.material.color.copy(col1);
+    });
+  }
+  return { grp, update };
+})();
 // Este grupo queda como ancla 3D para ciudades, conexiones, satélites y pulsos de Lima.
 // ---------- Ciudades y Conexiones (Hub: Lima) ----------
 const LIMA = [-12.05, -77.04];
@@ -4291,6 +4401,8 @@ function animate() {
   // Ondas LED + rotación del planeta
   globe.rotation.y += dt * 0.055 * k;
   ledPlanet.uni.uTime.value = t * k;
+  motion.grp.visible = isPreauth;
+  if (isPreauth) motion.update(t, dt, k);
   ledPlanet.ring.rotation.y -= dt * 0.12 * k;
   ledPlanet.core.material.opacity = 0.72 + Math.sin(t * 1.4) * 0.12;
   // Micro-rotación de las órbitas para dar sensación de energía y profundidad.
@@ -6078,7 +6190,7 @@ body.login-busy #login-floating-card{opacity:1!important;translate:0 0!important
   if (!card) return;
   const inputs = () => [...card.querySelectorAll('input')];
   const update = () => {
-    const busy = inputs().some(i => i.value !== '') || card.contains(document.activeElement) && document.activeElement.tagName === 'INPUT';
+    const busy = inputs().some(i => i.type !== 'checkbox' && i.value !== '' && !(i.dataset.prefill && i.value === i.dataset.prefill)) || card.contains(document.activeElement) && document.activeElement.tagName === 'INPUT';
     document.body.classList.toggle('login-busy', busy);
   };
   ['focusin', 'focusout', 'input', 'change'].forEach(ev => card.addEventListener(ev, () => setTimeout(update, 0)));
@@ -7880,6 +7992,78 @@ html body.tema-ejecutivo:not(.hunter-preauth) .hud-ico { filter: none !important
     });
   }
 
+  /* ====================== v12 · MAPA: RAYOS A LAS 4 MÁS CERCANAS + EDITAR NOMBRE / TECNOLOGÍA ====================== */
+  let rayLayer = null;
+  function clearRays() { if (rayLayer && typeof map !== 'undefined' && map) map.removeLayer(rayLayer); rayLayer = null; }
+  window.__v12DrawRays = function (cands) {
+    clearRays();
+    if (typeof map === 'undefined' || !map || gpsRefLat === null || !cands.length) return;
+    rayLayer = L.layerGroup().addTo(map);
+    const car = [gpsRefLat, gpsRefLon];
+    cands.forEach((c, i) => {
+      const to = [c.lat, c.lon];
+      L.polyline([car, to], { className: 'v12-ray-glow', weight: 7, opacity: .25, interactive: false }).addTo(rayLayer);
+      L.polyline([car, to], { className: 'v12-ray', weight: 2.5, opacity: 1, dashArray: '10 12', interactive: false }).addTo(rayLayer);
+      L.circleMarker(to, { radius: 9, className: 'v12-target', weight: 2, fillOpacity: .25 })
+        .bindTooltip(`<b>${i + 1}. ${esc(c.punto)}</b><span>${esc(c.tec)} · ${c.distKm.toFixed(2)} km</span>`, { permanent: true, direction: i % 2 ? 'left' : 'right', offset: [i % 2 ? -10 : 10, 0], className: 'v12-lbl' })
+        .addTo(rayLayer);
+    });
+    try { map.fitBounds(L.latLngBounds([car, ...cands.map(c => [c.lat, c.lon])]), { padding: [70, 70], maxZoom: 15 }); } catch (e) {}
+  };
+  const _clearGps = window.clearGpsReference;
+  window.clearGpsReference = function () { clearRays(); return _clearGps.apply(this, arguments); };
+
+  // Editar nombre (celda) y tecnología desde el mapa: actualiza mdz_hunter_inventario (RLS: solo dev)
+  const _popupHtml = window.popupHtml;
+  window.popupHtml = function (i) {
+    const h = _popupHtml.apply(this, arguments);
+    return dev() ? h.replace(/<\/div>$/, `<button type="button" class="v12-mapedit" data-punto="${esc(i.punto)}">✎ Editar nombre / tecnología</button></div>`) : h;
+  };
+  function rowsOfPunto(punto) {
+    const k = keyPunto(punto), out = [];
+    excelData.forEach((r, idx) => { const pk = findColumn(r, ['PUNTOS', 'PUNTO']); if (pk && keyPunto(r[pk]) === k) out.push(idx); });
+    return out;
+  }
+  function openMapEdit(punto) {
+    if (!dev()) return;
+    const idxs = rowsOfPunto(punto); if (!idxs.length) { showToast('No se encontró el punto'); return; }
+    const TK = findColumn(excelData[idxs[0]], ['TECNOLOGIA']);
+    const techs = [...new Set(excelData.map(r => { const k = findColumn(r, ['TECNOLOGIA']); return k ? String(r[k] || '').trim().toUpperCase() : ''; }).filter(Boolean))].sort();
+    const ov = document.createElement('div'); ov.id = 'v12-edit';
+    ov.innerHTML = `<div class="bx" role="dialog" aria-label="Editar punto">
+      <h3>Editar punto del mapa</h3>
+      <label>Nombre de la celda / punto <small>(se cambia en ${idxs.length} registro${idxs.length > 1 ? 's' : ''})</small><input data-f="name" maxlength="120" value="${esc(String(punto).trim())}"></label>
+      ${idxs.map((ri, n) => `<label>Tecnología${idxs.length > 1 ? ` · registro ${n + 1}` : ''}<input data-f="tec" data-ri="${ri}" maxlength="60" list="v12-techs" value="${esc(TK ? String(excelData[ri][findColumn(excelData[ri], ['TECNOLOGIA'])] || '').trim() : '')}"></label>`).join('')}
+      <datalist id="v12-techs">${techs.map(t => `<option value="${esc(t)}">`).join('')}</datalist>
+      <p class="v10-sub">El cambio se guarda en Supabase (tabla del inventario) y se ve en todos los módulos.</p>
+      <div class="v10-row" style="justify-content:flex-end"><button class="v10-b" data-x>Cancelar</button><button class="v10-b pri" data-s>Guardar</button></div></div>`;
+    document.body.appendChild(ov);
+    const close = () => ov.remove();
+    ov.addEventListener('click', e => { if (e.target === ov || e.target.closest('[data-x]')) close(); });
+    ov.querySelector('[data-s]').addEventListener('click', async () => {
+      const name = ov.querySelector('[data-f="name"]').value.replace(/[<>]/g, '').trim();
+      if (!name) { showToast('El nombre no puede quedar vacío'); return; }
+      const btn = ov.querySelector('[data-s]'); btn.disabled = true; btn.textContent = 'Guardando…';
+      let ok = 0, fail = 0;
+      for (const inp of ov.querySelectorAll('[data-f="tec"]')) {
+        const row = excelData[+inp.dataset.ri]; if (!row) continue;
+        const pk = findColumn(row, ['PUNTOS', 'PUNTO']), tk = findColumn(row, ['TECNOLOGIA']) || 'TECNOLOGIA';
+        const before = { p: row[pk], t: row[tk] };
+        row[pk] = name; row[tk] = inp.value.replace(/[<>]/g, '').trim().toUpperCase();
+        if (before.p === row[pk] && before.t === row[tk]) continue;
+        try { await persistRowToSupabase(row, false); ok++; } catch (e) { row[pk] = before.p; row[tk] = before.t; fail++; }
+      }
+      close();
+      showToast(fail ? `Guardado con errores (${fail})` : ok ? 'Punto actualizado en Supabase' : 'Sin cambios');
+      if (ok) { updateGlobalStats(); renderMap(); if (gpsRefLat !== null) updateNearestAntennasPanel(); }
+    });
+    ov.querySelector('[data-f="name"]').focus();
+  }
+  document.addEventListener('click', e => {
+    const b = e.target.closest('.v12-mapedit'); if (!b) return;
+    e.preventDefault(); e.stopPropagation(); openMapEdit(b.dataset.punto);
+  });
+
   /* ============================== 7. ARRANQUE ============================== */
   const _setView = window.setView;
   window.setView = function (v) {
@@ -7942,6 +8126,26 @@ html body #login-floating-card #sb-remember-wrap.ui-hidden { display: none !impo
 .v11-pe.ok { color: #22c55e; border-color: rgba(34,197,94,.5); }
 .v11-pin { width: 92px; padding: 3px 6px; border-radius: 6px; background: rgba(0,0,0,.45); border: 1px solid rgba(255,255,255,.2); color: #fff; font-size: 12px; text-align: right; }
 .v11-ed { color: #fbbf24; font-weight: 700; cursor: help; }
+</style>
+
+<style id="hunter-v12-css">
+/* ===== HUNTER CORE v12 · Mapa ===== */
+.leaflet-overlay-pane path.v12-ray { stroke: #38bdf8; animation: v12dash 1.1s linear infinite; filter: drop-shadow(0 0 4px rgba(56,189,248,.9)); }
+.leaflet-overlay-pane path.v12-ray-glow { stroke: #38bdf8; }
+.leaflet-overlay-pane path.v12-target { stroke: #fbbf24; fill: #fbbf24; animation: v12pulse 1.6s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
+@keyframes v12dash { to { stroke-dashoffset: -22; } }
+@keyframes v12pulse { 50% { stroke-opacity: .35; fill-opacity: .08; } }
+.leaflet-tooltip.v12-lbl { background: rgba(8,12,20,.92); color: #e2e8f0; border: 1px solid rgba(56,189,248,.55); border-radius: 8px; padding: 4px 8px; font-size: 11px; line-height: 1.25; box-shadow: 0 4px 14px rgba(0,0,0,.45); }
+.leaflet-tooltip.v12-lbl b { display: block; color: #fff; font-size: 11.5px; }
+.leaflet-tooltip.v12-lbl span { color: #7dd3fc; font-size: 10px; }
+.leaflet-tooltip.v12-lbl::before { display: none; }
+.v12-mapedit { margin-top: 8px; width: 100%; padding: 5px 8px; border-radius: 7px; font-size: 11px; font-weight: 700; cursor: pointer; background: rgba(56,189,248,.14); color: #7dd3fc; border: 1px solid rgba(56,189,248,.45); }
+#v12-edit { position: fixed; inset: 0; z-index: 10050; background: rgba(0,0,0,.65); display: flex; align-items: center; justify-content: center; padding: 14px; }
+#v12-edit .bx { width: min(440px, 100%); max-height: 88vh; overflow: auto; background: #0f172a; color: #e2e8f0; border: 1px solid rgba(255,255,255,.16); border-radius: 14px; padding: 16px; display: grid; gap: 10px; font-size: 12px; }
+#v12-edit h3 { margin: 0; font-size: 14px; font-weight: 800; }
+#v12-edit label { display: grid; gap: 4px; font-weight: 700; color: #cbd5e1; }
+#v12-edit label small { font-weight: 500; color: #94a3b8; }
+#v12-edit input { padding: 8px 10px; border-radius: 8px; background: rgba(0,0,0,.4); border: 1px solid rgba(255,255,255,.2); color: #fff; font-size: 13px; }
 </style>
 
 </body>
