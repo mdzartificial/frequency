@@ -9495,5 +9495,681 @@ html body #login-floating-card #sb-remember-wrap.ui-hidden { display: none !impo
 #v12-edit input { padding: 8px 10px; border-radius: 8px; background: rgba(0,0,0,.4); border: 1px solid rgba(255,255,255,.2); color: #fff; font-size: 13px; }
 </style>
 
+
+<style id="hunter-v15-css">
+/* ===== HUNTER CORE v15 · Fusión RF (POTENCIA + POSICIÓN) · solo dev ===== */
+#view-fusion .fx-drop { position: relative; display: flex; flex-direction: column; gap: 4px; padding: 14px; border-radius: 14px; border: 1.5px dashed rgba(148,163,184,.35); background: rgba(0,0,0,.22); cursor: pointer; transition: border-color .2s, background .2s; min-height: 92px; }
+#view-fusion .fx-drop:hover, #view-fusion .fx-drop.drag { border-color: var(--accent, #38bdf8); background: rgba(56,189,248,.07); }
+#view-fusion .fx-drop.ok { border-style: solid; border-color: rgba(34,197,94,.6); }
+#view-fusion .fx-drop input[type=file] { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+#view-fusion .fx-drop b { font-size: 12.5px; color: #f1f5f9; letter-spacing: .03em; }
+#view-fusion .fx-drop span { font-size: 11px; color: #94a3b8; line-height: 1.35; word-break: break-all; }
+#view-fusion .fx-par { display: grid; gap: 3px; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #94a3b8; }
+#view-fusion .fx-par input, #view-fusion .fx-in { width: 100%; padding: 7px 9px; border-radius: 9px; background: rgba(0,0,0,.4); border: 1px solid rgba(255,255,255,.14); color: #fff; font-size: 12px; outline: none; text-transform: none; letter-spacing: 0; font-weight: 600; }
+#view-fusion .fx-par input:focus, #view-fusion .fx-in:focus { border-color: var(--accent, #38bdf8); }
+#view-fusion .fx-par small { font-weight: 500; text-transform: none; letter-spacing: 0; color: #64748b; }
+#view-fusion h2 > span { width: 24px; height: 24px; display: inline-block; flex: 0 0 24px; }
+#view-fusion h2 > span .hud-ico { width: 100%; height: 100%; }
+#fx-map { height: 560px; border-radius: 14px; overflow: hidden; border: 1px solid rgba(255,255,255,.1); background: #0b0f17; }
+@media (max-width: 760px) { #fx-map { height: 420px; } }
+body:not(.theme-day) #fx-map .leaflet-tile-pane { filter: invert(1) hue-rotate(195deg) brightness(.84) contrast(.94) saturate(.55); }
+#view-fusion .fx-kpi { padding: 10px 12px; }
+#view-fusion .fx-kpi p:first-child { font-size: 20px; font-weight: 800; line-height: 1.1; }
+#view-fusion .fx-kpi p:last-child { font-size: 10.5px; color: #94a3b8; text-transform: uppercase; letter-spacing: .04em; margin-top: 2px; }
+#view-fusion .fx-tbl { width: 100%; border-collapse: collapse; font-size: 11.5px; }
+#view-fusion .fx-tbl th { position: sticky; top: 0; background: rgba(15,23,42,.96); color: #cbd5e1; font-weight: 700; text-align: left; padding: 7px 8px; white-space: nowrap; border-bottom: 1px solid rgba(255,255,255,.12); }
+#view-fusion .fx-tbl td { padding: 6px 8px; border-bottom: 1px solid rgba(255,255,255,.06); color: #e2e8f0; white-space: nowrap; }
+#view-fusion .fx-tbl tr.sin td { color: #fca5a5; }
+#view-fusion .fx-scroll { max-height: 340px; overflow: auto; border-radius: 12px; border: 1px solid rgba(255,255,255,.08); }
+#view-fusion .fx-ant { display: grid; grid-template-columns: minmax(80px, 120px) 1fr; gap: 8px; align-items: center; padding: 8px 10px; border-radius: 10px; background: rgba(0,0,0,.25); border: 1px solid rgba(255,255,255,.08); }
+#view-fusion .fx-ant.bad { border-color: rgba(245,158,11,.55); background: rgba(245,158,11,.08); }
+#view-fusion .fx-ant code { font-family: 'JetBrains Mono', monospace; font-weight: 700; color: #fff; font-size: 12px; }
+#view-fusion .fx-ant .row { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+#view-fusion .fx-ant select { flex: 1 1 180px; min-width: 0; }
+#view-fusion .fx-ant .st { font-size: 11px; color: #94a3b8; }
+#view-fusion .fx-msg { padding: 9px 12px; border-radius: 10px; font-size: 12px; line-height: 1.45; }
+#view-fusion .fx-msg.warn { background: rgba(245,158,11,.12); border: 1px solid rgba(245,158,11,.4); color: #fde68a; }
+#view-fusion .fx-msg.err { background: rgba(239,68,68,.12); border: 1px solid rgba(239,68,68,.45); color: #fecaca; }
+#view-fusion .fx-msg.ok { background: rgba(34,197,94,.1); border: 1px solid rgba(34,197,94,.4); color: #bbf7d0; }
+#view-fusion .fx-legend { display: flex; flex-wrap: wrap; gap: 10px 16px; align-items: center; font-size: 11px; color: #cbd5e1; }
+#view-fusion .fx-grad { width: 150px; height: 9px; border-radius: 5px; background: linear-gradient(90deg, #ef4444, #facc15, #22c55e); display: inline-block; vertical-align: middle; margin: 0 6px; }
+#view-fusion .fx-chart { position: relative; height: 260px; }
+.fx-pin { display: flex; align-items: center; justify-content: center; font: 800 9px/1 Arial, sans-serif; color: #0b1220; border: 2px solid #fff; border-radius: 50%; box-shadow: 0 2px 6px rgba(0,0,0,.45); width: 100%; height: 100%; box-sizing: border-box; }
+.fx-star { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; font: 900 9px/1 Arial, sans-serif; color: #0b1220; clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%); padding-top: 3px; box-sizing: border-box; }
+.fx-starwrap { filter: drop-shadow(0 0 2px #fff) drop-shadow(0 2px 4px rgba(0,0,0,.5)); width: 100%; height: 100%; }
+.fx-tower { display: flex; flex-direction: column; align-items: center; transform: translateY(-6px); }
+.fx-tower i { width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 15px; font-style: normal; border: 2px solid #fff; box-shadow: 0 0 12px var(--c), 0 2px 8px rgba(0,0,0,.5); background: radial-gradient(circle at 30% 30%, #fff, var(--c)); }
+.fx-tower b { margin-top: 3px; padding: 2px 7px; border-radius: 999px; font: 700 9.5px Arial, sans-serif; color: #fff; background: rgba(8,12,20,.9); border: 1px solid var(--c); white-space: nowrap; }
+.fx-arrow { color: #e0f2fe; font-size: 15px; font-weight: 900; line-height: 1; text-shadow: 0 0 3px #000, 0 0 6px rgba(0,0,0,.8); }
+.fx-se { width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font: 800 10px Arial; color: #fff; border: 2px solid #fff; box-shadow: 0 2px 6px rgba(0,0,0,.5); }
+.fx-popup { font: 12px/1.45 Arial, sans-serif; min-width: 190px; }
+.fx-popup b.t { display: block; font-size: 13px; margin-bottom: 3px; }
+.fx-popup .k { color: #94a3b8; }
+canvas.fx-heat { pointer-events: none; }
+/* Tema ejecutivo / día: suaviza los fondos */
+body.theme-day #view-fusion .fx-tbl th { background: #f1f5f9; color: #0f172a; }
+body.theme-day #view-fusion .fx-tbl td { color: #0f172a; }
+body.theme-day #view-fusion .fx-drop b { color: #0f172a; }
+</style>
+
+<script id="hunter-v15-fusion-js">
+/* =====================================================================
+   HUNTER CORE v15 · Módulo "Fusión RF" (solo rol dev)
+   Une POTENCIA (RSSI 0-255 por PSD/antena) con POSICIÓN (GPS del carro)
+   por fecha-hora, TODO en el navegador: nada se sube a ningún servidor.
+   Lo único que se guarda en Supabase es la tabla de asociación
+   PSD → antena (tablas_libres, modulo 'fusion_psd'), cuya escritura ya
+   está limitada al rol dev por RLS (policy tl_write).
+   ===================================================================== */
+(() => {
+  if (!document.getElementById('nav-noc')) return;
+  const RSSI_MAX = 255;
+  const MOD_PSD = 'fusion_psd';
+  const esc = escapeHtml;
+  const dev = () => typeof isDevRole === 'function' && isDevRole();
+  const logged = () => !!(typeof hunterSession !== 'undefined' && hunterSession) && !document.body.classList.contains('hunter-preauth');
+
+  // Antenas de respaldo (tomadas del script Python original). El inventario de Supabase tiene prioridad.
+  const BASE_ANT = {"50 COMAS":[-11.9788563,-77.0550796],"AGUSTINO":[-12.0525586128491,-77.0029398758451],"AZUL":[-12.0712171967824,-76.9900196659681],"BARRANCA":[-10.6697665179718,-77.7939319615494],"BASE":[-12.110817,-77.01068],"CHOSICA":[-11.9202029,-76.6722488],"CONDOR":[-12.0022666666667,-77.00775],"CONDOR - 2":[-11.922958332712,-76.9599279400634],"CONDOR - 3":[-11.9608989,-76.9937116],"CRUZADO":[-11.9965178258431,-77.1181344690123],"IMPERIO":[-12.0478648,-77.0370882],"IZQUIERDO":[-12.0522918,-77.1067664],"MARRON":[-12.140195542105,-76.9791470415635],"MILLA - P5":[-12.0186863655891,-77.0686278327656],"MIRONES":[-12.0680088905284,-77.0735995064862],"MUSA":[-12.0875838410807,-76.8835185236857],"LA QUIPA":[-12.4609603564565,-76.7713778802629],"VALLE":[-11.97559,-77.120904],"PACHA":[-12.0165108802405,-76.9004585228141],"PACHA - 2":[-11.982546238287,-76.9430048905873],"PACIFICO":[-11.9336217,-77.0428488],"PANTANO":[-12.1903768251884,-77.0210689635606],"PURUCHUCO":[-12.0516080241946,-76.929379404189],"REAL - P6":[-11.7787662976685,-77.171891437451],"SALVADOR":[-12.2069946777643,-76.9283156130662],"SAN DIEGO":[-11.9620091392243,-77.0866972392533],"SANTA ANITA":[-12.0357527777778,-76.9586111111111],"SATELITE":[-11.864358,-77.131526],"TRAPICHE":[-11.9032805555556,-77.0531311666667],"VERDE":[-12.1849157,-76.953085],"VERDE 2":[-12.2332445925849,-76.90979434898],"VIOLETA":[-11.8652973158462,-77.0603945788502],"VIOLETA 2":[-11.8320446302741,-77.1056903016467],"CARABAYLLO":[-11.8881282995052,-77.020246710621],"LOMAS":[-11.8661527777778,-77.0194888888889],"MARTIN":[-11.9862828370323,-77.0842741006156],"PACHA-3":[-11.9727807114041,-76.8951707198709],"LURIN":[-12.2657777777778,-76.8808888888889],"PATIVILCA":[-10.7476086,-77.7489676],"HUAYCAN":[-12.0226260776432,-76.8099799020236],"ASIA":[-12.7596223,-76.6000354],"HUAMPANI GOLF":[-11.9684189816525,-76.7945840742988],"COLLIQUE":[-11.9135592461877,-77.0172290522715],"MARQUEZ":[-11.94325,-77.13175],"SARITA":[-12.0249463089723,-77.1298789819155],"ORO":[-12.0805284957388,-77.0328794267255]};
+  // Códigos PSD confirmados por Andrea (respaldo si el inventario no trae la columna PL)
+  const BASE_PSD = { PL045: 'SANTA ANITA' };
+  const PALETA = ['#38bdf8', '#f472b6', '#a78bfa', '#fb923c', '#34d399', '#facc15', '#60a5fa', '#f87171', '#2dd4bf', '#c084fc', '#fbbf24', '#4ade80'];
+
+  /* ---------------------------- utilidades ---------------------------- */
+  const U = s => String(s == null ? '' : s).normalize('NFD').replace(/[̀-ͯ]/g, '').toUpperCase().replace(/\s+/g, ' ').trim();
+  const pad = (n, l = 2) => String(n).padStart(l, '0');
+  // Las horas se manejan "tal cual" (hora local de Lima) en milisegundos UTC ficticios: así no hay saltos por zona horaria del navegador.
+  const fmtT = (ms, withMs) => { if (ms == null) return ''; const d = new Date(ms); return `${d.getUTCFullYear()}-${pad(d.getUTCMonth() + 1)}-${pad(d.getUTCDate())} ${pad(d.getUTCHours())}:${pad(d.getUTCMinutes())}:${pad(d.getUTCSeconds())}${withMs ? '.' + pad(d.getUTCMilliseconds(), 3) : ''}`; };
+  const fmtH = ms => fmtT(ms).slice(11);
+  function parseFecha(v) {
+    if (v == null || v === '') return null;
+    if (v instanceof Date) return isNaN(v) ? null : Date.UTC(v.getFullYear(), v.getMonth(), v.getDate(), v.getHours(), v.getMinutes(), v.getSeconds(), v.getMilliseconds());
+    if (typeof v === 'number' && v > 20000 && v < 80000) return Math.round((v - 25569) * 86400000); // número de serie Excel
+    const s = String(v).trim();
+    let m = s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})[ _T]+(\d{1,2}):?(\d{2}):?(\d{2})(?:[.,](\d+))?\s*(Z|[+-]\d{2}:?\d{2})?$/i);
+    if (m) {
+      let t = Date.UTC(+m[1], +m[2] - 1, +m[3], +m[4], +m[5], +m[6], m[7] ? Math.round(+('0.' + m[7]) * 1000) : 0);
+      if (m[8]) { // trae zona horaria explícita → se convierte a hora de Lima (UTC-5)
+        const off = m[8].toUpperCase() === 'Z' ? 0 : (m[8][0] === '-' ? -1 : 1) * (+m[8].slice(1, 3) * 60 + +m[8].slice(-2));
+        t = t - off * 60000 - 5 * 3600000;
+      }
+      return t;
+    }
+    m = s.match(/^(\d{1,2})[\/-](\d{1,2})[\/-](\d{4})[ _T]+(\d{1,2}):(\d{2})(?::(\d{2}))?(?:[.,](\d+))?\s*(AM|PM|A\.?\s?M\.?|P\.?\s?M\.?)?$/i);
+    if (m) {
+      let h = +m[4]; const ap = (m[8] || '').toUpperCase().replace(/[.\s]/g, '');
+      if (ap === 'PM' && h < 12) h += 12; if (ap === 'AM' && h === 12) h = 0;
+      return Date.UTC(+m[3], +m[2] - 1, +m[1], h, +m[5], +(m[6] || 0), m[7] ? Math.round(+('0.' + m[7]) * 1000) : 0);
+    }
+    return null;
+  }
+  function parseLatLon(v) {
+    const n = String(v == null ? '' : v).match(/-?\d+(?:[.,]\d+)?/g);
+    if (!n || n.length < 2) return null;
+    const lat = parseFloat(n[0].replace(',', '.')), lon = parseFloat(n[1].replace(',', '.'));
+    if (!isFinite(lat) || !isFinite(lon) || Math.abs(lat) > 90 || Math.abs(lon) > 180 || (lat === 0 && lon === 0)) return null;
+    return [lat, lon];
+  }
+  const num = v => { const x = parseFloat(String(v == null ? '' : v).replace(',', '.')); return isFinite(x) ? x : null; };
+  const hav = (a1, o1, a2, o2) => haversineKm(a1, o1, a2, o2) * 1000;
+  const findCol = (cols, cands) => {
+    const N = cols.map(c => [U(c), c]);
+    for (const k of cands) { const f = N.find(([n]) => n === U(k)); if (f) return f[1]; }
+    for (const k of cands) { const f = N.find(([n]) => n.includes(U(k))); if (f) return f[1]; }
+    return null;
+  };
+  function colorRssi(v) { // rojo (débil) → amarillo → verde (fuerte)
+    if (v == null) return '#94a3b8';
+    const x = Math.max(0, Math.min(1, v / RSSI_MAX));
+    const [a, b, f] = x < .5 ? [[239, 68, 68], [250, 204, 21], x / .5] : [[250, 204, 21], [34, 197, 94], (x - .5) / .5];
+    return '#' + a.map((c, i) => Math.round(c + (b[i] - c) * f).toString(16).padStart(2, '0')).join('');
+  }
+  const psdKey = s => { const u = U(s); const m = u.match(/\bPL[\s\-_]?0*(\d{1,4})\b/); return m ? 'PL' + pad(+m[1], 3) : u; };
+  const n1 = v => v == null || !isFinite(v) ? '—' : (Math.round(v * 10) / 10).toLocaleString('es-PE');
+  const n0 = v => v == null || !isFinite(v) ? '—' : Math.round(v).toLocaleString('es-PE');
+
+  /* ---------------------------- estado ---------------------------- */
+  const S = {
+    files: { pot: null, pos: null },        // {name, rows, cols}
+    map: null, layers: null, ctrl: null, charts: [],
+    psdMap: {},                               // 'PL045' → {antena, lat, lon}
+    psdLoaded: false, result: null
+  };
+
+  /* ---------------------------- UI ---------------------------- */
+  const ICON = '<svg class="hud-ico" viewBox="0 0 24 24"><path d="M12 13.5v8"/><path d="M8.5 21.5h7"/><circle cx="12" cy="12" r="1.6"/><path d="M8.6 8.6a4.8 4.8 0 0 0 0 6.8M15.4 8.6a4.8 4.8 0 0 1 0 6.8"/><path d="M5.8 5.8a8.8 8.8 0 0 0 0 12.4M18.2 5.8a8.8 8.8 0 0 1 0 12.4"/><circle cx="19.5" cy="4.5" r="1.6" fill="currentColor"/></svg>';
+  const nav = document.createElement('button');
+  nav.id = 'nav-fusion'; nav.dataset.v = 'fusion'; nav.title = 'Fusión RF · Potencia + Posición (dev)';
+  nav.className = 'ui-hidden'; nav.innerHTML = ICON;
+  nav.addEventListener('click', () => window.setView('fusion'));
+  (document.getElementById('nav-rast') || document.getElementById('nav-noc')).after(nav);
+
+  const sec = document.createElement('section');
+  sec.id = 'view-fusion';
+  sec.className = 'view ui-hidden map panel flex-1 min-w-0 flex flex-col overflow-hidden';
+  sec.innerHTML = `
+  <div class="flex flex-wrap items-center justify-between gap-3 px-5 pt-4 pb-3 border-b border-white/10">
+    <div><h2 class="text-base font-bold text-white flex items-center gap-2"><span class="text-[var(--accent)] inline-block w-6 h-6">${ICON}</span>Fusión RF · Potencia + Posición</h2>
+    <p class="text-[11px] text-slate-400">Une el RSSI (0–255) con el GPS del carro por fecha y hora · todo se procesa en tu navegador, los archivos no se suben</p></div>
+    <div class="flex gap-2 flex-wrap">
+      <button id="fx-run" class="btn px-4 py-1.5 text-xs font-bold text-white cursor-pointer" disabled><i class="fa-solid fa-bolt mr-1"></i>Procesar</button>
+      <button id="fx-xlsx" class="chip px-3 py-1.5 text-xs font-semibold text-emerald-300 cursor-pointer" disabled><i class="fa-solid fa-file-excel mr-1"></i>Descargar Excel</button>
+      <button id="fx-reset" class="chip px-3 py-1.5 text-xs font-semibold text-slate-300 cursor-pointer"><i class="fa-solid fa-rotate-left mr-1"></i>Limpiar</button>
+    </div>
+  </div>
+  <div id="fx-body" class="flex-1 overflow-y-auto scroll px-5 py-4 space-y-4">
+    <div class="grid grid-cols-1 lg:grid-cols-[1fr_1fr_1.25fr] gap-3">
+      <label class="fx-drop" id="fx-drop-pot"><input type="file" accept=".xls,.xlsx,.csv" data-k="pot"><b><i class="fa-solid fa-signal mr-1 text-[var(--accent)]"></i>1 · Archivo de POTENCIA</b><span data-s>Arrastra o elige el Excel con PSD, FECHA INGRESO y RSSI.</span></label>
+      <label class="fx-drop" id="fx-drop-pos"><input type="file" accept=".xls,.xlsx,.csv" data-k="pos"><b><i class="fa-solid fa-location-crosshairs mr-1 text-[var(--accent)]"></i>2 · Archivo de POSICIÓN</b><span data-s>Arrastra o elige el Excel del GPS con Latitud-Longitud y Fecha-Hora.</span></label>
+      <div class="card p-3 grid grid-cols-2 gap-2.5">
+        <label class="fx-par">Tolerancia (s)<input id="fx-tol" type="number" min="1" max="3600" value="30"><small>Máx. distancia en tiempo al GPS más cercano</small></label>
+        <label class="fx-par">Interpolar hasta (s)<input id="fx-gap" type="number" min="0" max="3600" value="120"><small>Máx. hueco entre 2 GPS para calcular el punto intermedio</small></label>
+        <label class="fx-par">Desfase GPS (s)<input id="fx-off" type="number" step="1" value="0"><small>Si el GPS viene en UTC: −18000</small></label>
+        <label class="fx-par">Estrella si RSSI ≥<input id="fx-star" type="number" min="0" max="255" value="200"><small>Valores altos se dibujan como ★</small></label>
+      </div>
+    </div>
+    <div id="fx-msgs" class="space-y-2"></div>
+    <div id="fx-ants" class="hidden card p-3 space-y-2">
+      <div class="flex flex-wrap items-center justify-between gap-2"><h3 class="text-xs font-bold uppercase tracking-wider text-slate-300"><i class="fa-solid fa-tower-broadcast mr-1 text-[var(--accent)]"></i>Antenas detectadas en el PSD</h3>
+      <span class="text-[11px] text-slate-500">Si un código no se reconoce, elige su antena y pulsa Guardar: se recordará para la próxima vez.</span></div>
+      <div id="fx-ant-list" class="grid grid-cols-1 xl:grid-cols-2 gap-2"></div>
+    </div>
+    <div id="fx-out" class="hidden space-y-4">
+      <div id="fx-kpis" class="grid grid-cols-2 sm:grid-cols-4 xl:grid-cols-8 gap-2"></div>
+      <div class="card p-3 space-y-2">
+        <div class="fx-legend"><span><b>RSSI</b> 0<span class="fx-grad"></span>255</span><span>● burbuja = lectura (número = RSSI)</span><span>★ = RSSI alto</span><span>Borde = color de la antena</span><span style="color:#38bdf8">━ ➤ recorrido GPS</span></div>
+        <div id="fx-map"></div>
+      </div>
+      <div class="grid grid-cols-1 xl:grid-cols-2 gap-3">
+        <div class="card p-3"><h3 class="text-xs font-bold uppercase tracking-wider text-slate-300 mb-2">RSSI vs. distancia a la antena</h3><div class="fx-chart"><canvas id="fx-ch-dist"></canvas></div></div>
+        <div class="card p-3"><h3 class="text-xs font-bold uppercase tracking-wider text-slate-300 mb-2">RSSI en el tiempo</h3><div class="fx-chart"><canvas id="fx-ch-time"></canvas></div></div>
+      </div>
+      <div class="card p-3 space-y-2"><h3 class="text-xs font-bold uppercase tracking-wider text-slate-300">Estadísticas por antena</h3><div class="fx-scroll" id="fx-stats"></div></div>
+      <div class="card p-3 space-y-2"><div class="flex flex-wrap items-center justify-between gap-2"><h3 class="text-xs font-bold uppercase tracking-wider text-slate-300">Lecturas fusionadas</h3><input id="fx-q" class="fx-in" style="max-width:260px" placeholder="Filtrar por hora, antena, método..."></div><div class="fx-scroll" id="fx-rows"></div></div>
+      <div class="card p-3 space-y-2" id="fx-desc-card"><h3 class="text-xs font-bold uppercase tracking-wider text-slate-300">Filas descartadas o sin posición</h3><div class="fx-scroll" id="fx-desc"></div></div>
+    </div>
+  </div>`;
+  (document.getElementById('view-rast') || document.getElementById('view-noc')).after(sec);
+  const $f = id => document.getElementById(id);
+
+  function setMsgs(list) {
+    $f('fx-msgs').innerHTML = list.map(([t, m]) => `<div class="fx-msg ${t}">${m}</div>`).join('');
+  }
+
+  /* ---------------------------- lectura de archivos ---------------------------- */
+  async function readFile(file) {
+    if (!window.XLSX) throw new Error('No se cargó la librería de Excel (SheetJS).');
+    if (file.size > 40 * 1024 * 1024) throw new Error('El archivo supera 40 MB.');
+    const buf = await file.arrayBuffer();
+    const wb = XLSX.read(buf, { type: 'array', cellDates: true, dense: true });
+    let best = null;
+    for (const n of wb.SheetNames) { // la hoja con más filas útiles
+      const rows = XLSX.utils.sheet_to_json(wb.Sheets[n], { defval: '', raw: true });
+      if (!best || rows.length > best.rows.length) best = { sheet: n, rows };
+    }
+    if (!best || !best.rows.length) throw new Error(`"${file.name}" no tiene filas.`);
+    const cols = Object.keys(best.rows[0]);
+    return { name: file.name, sheet: best.sheet, rows: best.rows, cols };
+  }
+  const kindOf = f => {
+    if (findCol(f.cols, ['RSSI']) && (findCol(f.cols, ['PSD']) || findCol(f.cols, ['FECHA INGRESO']))) return 'pot';
+    if (findCol(f.cols, ['Latitud-Longitud', 'Latitud Longitud', 'LatLon']) || (findCol(f.cols, ['Latitud', 'Lat']) && findCol(f.cols, ['Longitud', 'Lon', 'Lng']))) return 'pos';
+    return null;
+  };
+  async function onFile(file, slot) {
+    try {
+      const f = await readFile(file);
+      const k = kindOf(f) || slot;
+      if (k !== slot) showToast(`Detecté que "${f.name}" es de ${k === 'pot' ? 'POTENCIA' : 'POSICIÓN'}: lo coloqué en su lugar`);
+      S.files[k] = f;
+      paintDrops();
+    } catch (e) { setMsgs([['err', esc(e.message || e)]]); }
+  }
+  function paintDrops() {
+    for (const k of ['pot', 'pos']) {
+      const d = $f('fx-drop-' + k), f = S.files[k];
+      d.classList.toggle('ok', !!f);
+      d.querySelector('[data-s]').innerHTML = f ? `<i class="fa-solid fa-check text-emerald-400 mr-1"></i>${esc(f.name)} · ${f.rows.length.toLocaleString('es-PE')} filas · hoja "${esc(f.sheet)}"` : (k === 'pot' ? 'Arrastra o elige el Excel con PSD, FECHA INGRESO y RSSI.' : 'Arrastra o elige el Excel del GPS con Latitud-Longitud y Fecha-Hora.');
+    }
+    $f('fx-run').disabled = !(S.files.pot && S.files.pos);
+  }
+  sec.querySelectorAll('.fx-drop').forEach(d => {
+    const inp = d.querySelector('input');
+    inp.addEventListener('change', () => { if (inp.files[0]) onFile(inp.files[0], inp.dataset.k); inp.value = ''; });
+    d.addEventListener('dragover', e => { e.preventDefault(); d.classList.add('drag'); });
+    d.addEventListener('dragleave', () => d.classList.remove('drag'));
+    d.addEventListener('drop', async e => {
+      e.preventDefault(); d.classList.remove('drag');
+      const fs = [...(e.dataTransfer.files || [])];
+      for (const f of fs.slice(0, 2)) await onFile(f, inp.dataset.k);
+    });
+  });
+
+  /* ---------------------------- antenas ---------------------------- */
+  function inventarioAntenas() {
+    const out = new Map();
+    try {
+      (typeof excelData !== 'undefined' ? excelData : []).forEach(r => {
+        const i = info(r); if (!i.ok || i.movil || !i.punto) return;
+        const k = U(i.punto);
+        if (!out.has(k)) out.set(k, { antena: String(i.punto).trim(), lat: i.lat, lon: i.lon, src: 'inventario', rows: [], tecs: new Set() });
+        const a = out.get(k); a.rows.push(r); if (i.tec && i.tec !== 'SIN ESPECIFICAR') a.tecs.add(i.tec);
+      });
+    } catch (e) {}
+    return out;
+  }
+  function catalogo() { // inventario primero, luego la lista del script original
+    const inv = inventarioAntenas(), all = new Map(inv);
+    Object.entries(BASE_ANT).forEach(([n, [lat, lon]]) => {
+      const k = U(n);
+      const yaEsta = [...inv.keys()].some(x => x === k || x.endsWith('-' + k) || x.endsWith(' ' + k));
+      if (!yaEsta) all.set(k, { antena: n, lat, lon, src: 'lista base' });
+    });
+    return all;
+  }
+  function resolverPSD(raw, cat) {
+    const key = psdKey(raw), u = U(raw);
+    if (S.psdMap[key]) return { ...S.psdMap[key], via: 'guardado' };
+    // 1) código PL en alguna celda del inventario (ej. columna PL / CÓDIGO = PL045)
+    if (/^PL\d{3}$/.test(key)) {
+      for (const a of cat.values()) {
+        if (!a.rows) continue;
+        const hit = a.rows.some(row => Object.entries(row).some(([c, v]) => !String(c).startsWith('_') && typeof v !== 'object' && psdKey(v) === key));
+        if (hit) return { antena: a.antena, lat: a.lat, lon: a.lon, tec: [...a.tecs].join(' + '), via: 'inventario Supabase (código ' + key + ')' };
+      }
+      // código conocido del script original (por si el inventario aún no lo tiene)
+      if (BASE_PSD[key]) { const n = U(BASE_PSD[key]); const a = [...cat.values()].find(x => U(x.antena) === n || U(x.antena).endsWith(n)); if (a) return { antena: a.antena, lat: a.lat, lon: a.lon, via: 'lista base' }; }
+    }
+    // 2) nombre de antena contenido en el texto del PSD
+    const list = [...cat.values()].sort((a, b) => b.antena.length - a.antena.length);
+    for (const a of list) {
+      const n = U(a.antena).replace(/^LIMA-?\s*/, '');
+      if (n.length >= 3 && new RegExp('(^|[^A-Z0-9])' + n.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '($|[^A-Z0-9])').test(u)) return { antena: a.antena, lat: a.lat, lon: a.lon, tec: a.tecs ? [...a.tecs].join(' + ') : '', via: 'nombre' };
+    }
+    return null;
+  }
+  async function loadPsdMap() {
+    if (S.psdLoaded || !hunterSbClient) return;
+    try {
+      const { data } = await hunterSbClient.from('tablas_libres').select('filas').eq('modulo', MOD_PSD).maybeSingle();
+      (data && Array.isArray(data.filas) ? data.filas : []).forEach(f => {
+        if (f && f.psd && f.antena && isFinite(+f.lat) && isFinite(+f.lon)) S.psdMap[psdKey(f.psd)] = { antena: String(f.antena), lat: +f.lat, lon: +f.lon };
+      });
+      S.psdLoaded = true;
+    } catch (e) {}
+  }
+  async function savePsdMap() {
+    if (!dev()) { showToast('Solo el rol dev puede guardar asociaciones'); return false; }
+    const filas = Object.entries(S.psdMap).map(([psd, a]) => ({ psd, antena: a.antena, lat: a.lat, lon: a.lon }));
+    const { error } = await hunterSbClient.from('tablas_libres').upsert({ modulo: MOD_PSD, columnas: ['psd', 'antena', 'lat', 'lon'], filas }, { onConflict: 'modulo' });
+    if (error) { showToast('No se guardó: ' + error.message); return false; }
+    showToast('Asociación guardada en Supabase'); return true;
+  }
+
+  /* ---------------------------- fusión ---------------------------- */
+  function params() {
+    const g = (id, d, lo, hi) => { const v = parseFloat($f(id).value); return isFinite(v) ? Math.min(hi, Math.max(lo, v)) : d; };
+    return { tol: g('fx-tol', 30, 1, 3600), gap: g('fx-gap', 120, 0, 3600), off: g('fx-off', 0, -86400, 86400), star: g('fx-star', 200, 0, 255) };
+  }
+
+  function procesar() {
+    const P = params(), pot = S.files.pot, pos = S.files.pos, desc = [], avisos = [];
+    // --- GPS ---
+    const cF = findCol(pos.cols, ['Fecha-Hora', 'Fecha Hora', 'FechaHora', 'Fecha']);
+    const cLL = findCol(pos.cols, ['Latitud-Longitud', 'Latitud Longitud', 'LatLon']);
+    const cLa = cLL ? null : findCol(pos.cols, ['Latitud', 'Lat']), cLo = cLL ? null : findCol(pos.cols, ['Longitud', 'Lon', 'Lng']);
+    if (!cF) throw new Error('POSICIÓN: no encontré la columna Fecha-Hora.');
+    if (!cLL && !(cLa && cLo)) throw new Error('POSICIÓN: no encontré Latitud-Longitud.');
+    let gps = [];
+    pos.rows.forEach((r, i) => {
+      const t = parseFecha(r[cF]);
+      const ll = cLL ? parseLatLon(r[cLL]) : parseLatLon(`${r[cLa]} ${r[cLo]}`);
+      if (t == null) desc.push(['POSICIÓN', i + 2, 'Fecha ilegible', String(r[cF])]);
+      else if (!ll) desc.push(['POSICIÓN', i + 2, 'Coordenada inválida o 0,0', String(cLL ? r[cLL] : `${r[cLa]}, ${r[cLo]}`)]);
+      else gps.push({ t: t + P.off * 1000, lat: ll[0], lon: ll[1], fila: i + 2, raw: r });
+    });
+    gps.sort((a, b) => a.t - b.t);
+    gps = gps.filter((g, i) => { if (i && g.t === gps[i - 1].t) { desc.push(['POSICIÓN', g.fila, 'Hora repetida (se usa la primera)', fmtT(g.t)]); return false; } return true; });
+    if (!gps.length) throw new Error('POSICIÓN no tiene puntos GPS válidos.');
+    // huecos largos del GPS
+    for (let i = 1; i < gps.length; i++) { const d = (gps[i].t - gps[i - 1].t) / 1000; if (d > Math.max(P.gap, 60)) avisos.push(`Hueco de GPS de ${Math.round(d / 60 * 10) / 10} min entre ${fmtH(gps[i - 1].t)} y ${fmtH(gps[i].t)}.`); }
+
+    // --- POTENCIA ---
+    const pF = findCol(pot.cols, ['FECHA INGRESO', 'Fecha Ingreso', 'Fecha-Hora', 'Fecha']);
+    const pR = findCol(pot.cols, ['RSSI', 'Potencia']), pP = findCol(pot.cols, ['PSD']);
+    if (!pF) throw new Error('POTENCIA: no encontré la columna FECHA INGRESO.');
+    if (!pR) throw new Error('POTENCIA: no encontré la columna RSSI.');
+    const lect = [];
+    pot.rows.forEach((r, i) => {
+      const t = parseFecha(r[pF]), v = num(r[pR]);
+      if (t == null) desc.push(['POTENCIA', i + 2, 'Fecha ilegible', String(r[pF])]);
+      else if (v == null || v < 0 || v > RSSI_MAX) desc.push(['POTENCIA', i + 2, `RSSI fuera de 0–${RSSI_MAX}`, String(r[pR])]);
+      else lect.push({ t, rssi: v, psdRaw: pP ? String(r[pP]) : '', psd: pP ? psdKey(r[pP]) : 'SIN PSD', fila: i + 2, raw: r });
+    });
+    lect.sort((a, b) => a.t - b.t);
+    if (!lect.length) throw new Error('POTENCIA no tiene lecturas válidas.');
+
+    // ¿se cruzan los horarios? si no, sugerir desfase
+    const gi = gps[0].t, gf = gps[gps.length - 1].t, li = lect[0].t, lf = lect[lect.length - 1].t;
+    if (li > gf || lf < gi) {
+      const sug = [-5, 5].map(h => h * 3600000).find(o => !(li > gf + o || lf < gi + o));
+      avisos.unshift(`<b>Los horarios no se cruzan</b> (GPS ${fmtT(gi)} a ${fmtT(gf)} · POTENCIA ${fmtT(li)} a ${fmtT(lf)}).${sug ? ` Parece que el GPS está en UTC: prueba Desfase GPS = <b>${sug / 1000}</b> s.` : ''}`);
+    }
+
+    // --- antenas ---
+    const cat = catalogo(), ant = {};
+    [...new Set(lect.map(l => l.psd))].forEach(k => { ant[k] = resolverPSD(lect.find(l => l.psd === k).psdRaw, cat); });
+
+    // --- emparejar cada lectura con el GPS (búsqueda binaria) ---
+    const T = gps.map(g => g.t);
+    const lb = x => { let lo = 0, hi = T.length; while (lo < hi) { const m = (lo + hi) >> 1; if (T[m] < x) lo = m + 1; else hi = m; } return lo; };
+    lect.forEach(l => {
+      const i = lb(l.t), a = i > 0 ? gps[i - 1] : null, b = i < gps.length ? gps[i] : null;
+      const da = a ? (l.t - a.t) / 1000 : Infinity, db = b ? (b.t - l.t) / 1000 : Infinity;
+      if (b && db === 0) Object.assign(l, { lat: b.lat, lon: b.lon, met: 'EXACTO', des: 0 });
+      else if (a && b && (b.t - a.t) / 1000 <= P.gap) {
+        const f = (l.t - a.t) / (b.t - a.t);
+        Object.assign(l, { lat: a.lat + (b.lat - a.lat) * f, lon: a.lon + (b.lon - a.lon) * f, met: 'INTERPOLADO', des: Math.min(da, db) });
+      } else {
+        const [d, g] = da <= db ? [da, a] : [db, b];
+        if (d <= P.tol) Object.assign(l, { lat: g.lat, lon: g.lon, met: 'CERCANO', des: d });
+        else { Object.assign(l, { lat: null, lon: null, met: 'SIN_GPS', des: isFinite(d) ? d : null }); desc.push(['POTENCIA', l.fila, `Sin GPS a menos de ${P.tol} s (el más cercano a ${n1(d)} s). Queda en el Excel sin coordenadas.`, fmtT(l.t, true)]); }
+      }
+      const A = ant[l.psd];
+      l.antena = A ? A.antena : `SIN ANTENA (${l.psd})`;
+      l.dist = A && l.lat != null ? hav(l.lat, l.lon, A.lat, A.lon) : null;
+      l.pct = l.rssi / RSSI_MAX * 100;
+    });
+
+    // --- estadísticas por antena ---
+    const grupos = {};
+    lect.forEach(l => (grupos[l.antena] = grupos[l.antena] || []).push(l));
+    const stats = Object.entries(grupos).map(([nombre, L], idx) => {
+      const R = L.map(l => l.rssi), ub = L.filter(l => l.lat != null), D = ub.map(l => l.dist).filter(d => d != null);
+      const best = (ub.length ? ub : L).reduce((m, l) => l.rssi > m.rssi ? l : m);
+      const sorted = [...R].sort((a, b) => a - b), med = sorted.length % 2 ? sorted[(sorted.length - 1) / 2] : (sorted[sorted.length / 2 - 1] + sorted[sorted.length / 2]) / 2;
+      const A = Object.values(ant).find(a => a && a.antena === nombre) || null;
+      const far = ub.filter(l => l.dist != null).reduce((m, l) => (!m || l.dist > m.dist ? l : m), null);
+      return {
+        antena: nombre, color: PALETA[idx % PALETA.length], psd: [...new Set(L.map(l => l.psd))].join(', '),
+        n: L.length, nUb: ub.length, max: Math.max(...R), min: Math.min(...R), avg: R.reduce((s, x) => s + x, 0) / R.length, med,
+        nStar: R.filter(x => x >= P.star).length, best, dMin: D.length ? Math.min(...D) : null, dAvg: D.length ? D.reduce((s, x) => s + x, 0) / D.length : null,
+        dMax: D.length ? Math.max(...D) : null, far, A, t0: L[0].t, t1: L[L.length - 1].t
+      };
+    });
+    const conPos = lect.filter(l => l.lat != null);
+    return { P, gps, lect, conPos, stats, ant, desc, avisos, files: { pot: pot.name, pos: pos.name } };
+  }
+
+  /* ---------------------------- mapa ---------------------------- */
+  // Capa de calor propia: muestra la SEÑAL MÁXIMA en cada zona (no la cantidad de puntos).
+  const HeatLayer = L.Layer.extend({
+    initialize(pts, opt) { this._pts = pts; this._o = Object.assign({ radiusM: 45, minPx: 10, maxPx: 70, opacity: .72 }, opt || {}); },
+    onAdd(map) {
+      this._map = map;
+      this._c = L.DomUtil.create('canvas', 'fx-heat leaflet-zoom-hide');
+      map.getPanes().overlayPane.appendChild(this._c);
+      map.on('moveend zoomend resize', this._draw, this); this._draw();
+    },
+    onRemove(map) { map.off('moveend zoomend resize', this._draw, this); this._c.remove(); },
+    _draw() {
+      const m = this._map, s = m.getSize(), c = this._c, o = this._o;
+      if (!s.x || !s.y) return;
+      c.width = s.x; c.height = s.y; c.style.width = s.x + 'px'; c.style.height = s.y + 'px';
+      L.DomUtil.setPosition(c, m.containerPointToLayerPoint([0, 0]));
+      const ctx = c.getContext('2d', { willReadFrequently: true });
+      ctx.fillStyle = '#000'; ctx.fillRect(0, 0, s.x, s.y);
+      ctx.globalCompositeOperation = 'lighten';
+      const lat0 = m.getCenter().lat, mpp = 40075016.686 * Math.cos(lat0 * Math.PI / 180) / Math.pow(2, m.getZoom() + 8);
+      const r = Math.max(o.minPx, Math.min(o.maxPx, o.radiusM / mpp));
+      for (const p of this._pts) {
+        const pt = m.latLngToContainerPoint([p[0], p[1]]);
+        if (pt.x < -r || pt.y < -r || pt.x > s.x + r || pt.y > s.y + r) continue;
+        const v = Math.round(Math.max(.02, p[2]) * 255);
+        const g = ctx.createRadialGradient(pt.x, pt.y, 0, pt.x, pt.y, r);
+        g.addColorStop(0, `rgb(${v},255,0)`); g.addColorStop(.45, `rgb(${Math.round(v * .7)},178,0)`); g.addColorStop(1, 'rgb(0,0,0)');
+        ctx.fillStyle = g; ctx.beginPath(); ctx.arc(pt.x, pt.y, r, 0, Math.PI * 2); ctx.fill();
+      }
+      ctx.globalCompositeOperation = 'source-over';
+      const img = ctx.getImageData(0, 0, s.x, s.y), d = img.data;
+      for (let i = 0; i < d.length; i += 4) {
+        const cov = d[i + 1];
+        if (cov < 6) { d[i + 3] = 0; continue; }
+        const val = Math.min(1, d[i] / cov), x = val;
+        const [a, b, f] = x < .5 ? [[239, 68, 68], [250, 204, 21], x / .5] : [[250, 204, 21], [34, 197, 94], (x - .5) / .5];
+        d[i] = a[0] + (b[0] - a[0]) * f; d[i + 1] = a[1] + (b[1] - a[1]) * f; d[i + 2] = a[2] + (b[2] - a[2]) * f;
+        d[i + 3] = Math.min(255, cov * o.opacity * 1.15);
+      }
+      ctx.putImageData(img, 0, 0);
+    }
+  });
+
+  function popupLect(l, st) {
+    return `<div class="fx-popup"><b class="t" style="color:${st ? st.color : '#fff'}">${esc(l.antena)}</b>
+      <span class="k">Hora:</span> ${fmtT(l.t, true)}<br><span class="k">RSSI:</span> <b style="color:${colorRssi(l.rssi)}">${n0(l.rssi)}</b> / 255 (${n1(l.pct)} %)<br>
+      <span class="k">Posición:</span> ${l.met}${l.des != null ? ` (±${n1(l.des)} s)` : ''}<br>
+      <span class="k">Distancia a la antena:</span> ${l.dist != null ? n0(l.dist) + ' m' : 'sin coordenadas de antena'}<br>
+      <span class="k">PSD:</span> ${esc(l.psdRaw)}<br><span class="k">Coordenadas:</span> ${l.lat.toFixed(6)}, ${l.lon.toFixed(6)}</div>`;
+  }
+
+  function dibujarMapa(R) {
+    if (!window.L) { setMsgs([['err', 'No se cargó Leaflet (mapa).']]); return; }
+    if (!S.map) {
+      S.map = L.map('fx-map', { preferCanvas: true, zoomControl: true });
+      L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap', maxZoom: 19 }).addTo(S.map);
+    }
+    if (S.ctrl) { S.ctrl.remove(); S.ctrl = null; }
+    if (S.layers) Object.values(S.layers).forEach(l => S.map.removeLayer(l));
+    const stBy = Object.fromEntries(R.stats.map(s => [s.antena, s]));
+    const lay = {
+      rec: L.layerGroup(), heat: new HeatLayer(R.conPos.map(l => [l.lat, l.lon, l.rssi / RSSI_MAX])),
+      lect: L.layerGroup(), ant: L.layerGroup(), lin: L.layerGroup(), gpsPts: L.layerGroup()
+    };
+    // recorrido
+    const ruta = R.gps.map(g => [g.lat, g.lon]);
+    L.polyline(ruta, { color: '#0c4a6e', weight: 7, opacity: .55 }).addTo(lay.rec);
+    L.polyline(ruta, { color: '#38bdf8', weight: 3.5, opacity: .95 }).bindTooltip('Recorrido GPS').addTo(lay.rec);
+    const paso = Math.max(1, Math.floor(ruta.length / 30));
+    for (let i = 0; i + 1 < ruta.length; i += paso) {
+      let j = i + 1; while (j < ruta.length - 1 && hav(ruta[i][0], ruta[i][1], ruta[j][0], ruta[j][1]) < 15) j++;
+      const [a1, o1] = ruta[i], [a2, o2] = ruta[j];
+      if (a1 === a2 && o1 === o2) continue;
+      const ang = Math.atan2((o2 - o1) * Math.cos(a1 * Math.PI / 180), a2 - a1) * 180 / Math.PI;
+      L.marker([(a1 + a2) / 2, (o1 + o2) / 2], { interactive: false, icon: L.divIcon({ className: '', iconSize: [14, 14], iconAnchor: [7, 7], html: `<div class="fx-arrow" style="transform:rotate(${ang - 90}deg)">➤</div>` }) }).addTo(lay.rec);
+    }
+    const se = (p, txt, bg, tip) => L.marker(p, { icon: L.divIcon({ className: '', iconSize: [22, 22], iconAnchor: [11, 11], html: `<div class="fx-se" style="background:${bg}">${txt}</div>` }) }).bindTooltip(tip).addTo(lay.rec);
+    se(ruta[0], 'I', '#16a34a', 'Inicio ' + fmtH(R.gps[0].t)); se(ruta[ruta.length - 1], 'F', '#dc2626', 'Fin ' + fmtH(R.gps[R.gps.length - 1].t));
+    R.gps.forEach(g => L.circleMarker([g.lat, g.lon], { radius: 3, color: '#0ea5e9', weight: 1, fillColor: '#e0f2fe', fillOpacity: .9 }).bindTooltip('GPS ' + fmtH(g.t)).addTo(lay.gpsPts));
+    // antenas
+    R.stats.forEach(s => {
+      if (!s.A) return;
+      L.marker([s.A.lat, s.A.lon], { zIndexOffset: 900, icon: L.divIcon({ className: '', iconSize: [30, 30], iconAnchor: [15, 15], html: `<div class="fx-tower" style="--c:${s.color}"><i>📡</i><b>${esc(s.antena)}</b></div>` }) })
+        .bindPopup(`<div class="fx-popup"><b class="t" style="color:${s.color}">📡 ${esc(s.antena)}</b><span class="k">PSD:</span> ${esc(s.psd)}${s.A.tec ? `<br><span class="k">Tecnología:</span> ${esc(s.A.tec)}` : ''}<br><span class="k">Lecturas:</span> ${s.n} (${s.nUb} ubicadas)<br><span class="k">RSSI máx / prom / mín:</span> ${n0(s.max)} / ${n1(s.avg)} / ${n0(s.min)}<br><span class="k">Distancia mín / prom / máx:</span> ${n0(s.dMin)} / ${n0(s.dAvg)} / ${n0(s.dMax)} m<br><span class="k">Coordenadas:</span> ${s.A.lat.toFixed(6)}, ${s.A.lon.toFixed(6)}</div>`).addTo(lay.ant);
+      L.circle([s.A.lat, s.A.lon], { radius: 60, color: s.color, weight: 2, fillOpacity: .12 }).addTo(lay.ant);
+    });
+    // lecturas
+    const pocas = R.conPos.length <= 1500;
+    R.conPos.forEach(l => {
+      const st = stBy[l.antena], col = st ? st.color : '#94a3b8', c = colorRssi(l.rssi);
+      let mk;
+      if (l.rssi >= R.P.star) mk = L.marker([l.lat, l.lon], { zIndexOffset: 500, icon: L.divIcon({ className: '', iconSize: [30, 30], iconAnchor: [15, 15], html: `<div class="fx-starwrap"><div class="fx-star" style="background:${c}">${n0(l.rssi)}</div></div>` }) });
+      else if (pocas) mk = L.marker([l.lat, l.lon], { icon: L.divIcon({ className: '', iconSize: [24, 24], iconAnchor: [12, 12], html: `<div class="fx-pin" style="background:${c};border-color:${col}">${n0(l.rssi)}</div>` }) });
+      else mk = L.circleMarker([l.lat, l.lon], { radius: 6, color: col, weight: 2, fillColor: c, fillOpacity: .95 });
+      mk.bindTooltip(`${esc(l.antena)} · RSSI ${n0(l.rssi)} · ${fmtH(l.t)}`).bindPopup(popupLect(l, st)).addTo(lay.lect);
+      if (st && st.A) L.polyline([[l.lat, l.lon], [st.A.lat, st.A.lon]], { color: col, weight: 1.3, opacity: .5, dashArray: '4 6', interactive: false }).addTo(lay.lin);
+    });
+    lay.rec.addTo(S.map); lay.heat.addTo(S.map); lay.ant.addTo(S.map); lay.lect.addTo(S.map);
+    S.layers = lay;
+    S.ctrl = L.control.layers(null, {
+      'Recorrido GPS (con sentido)': lay.rec, 'Mapa de calor (señal máx.)': lay.heat, 'Lecturas RSSI': lay.lect,
+      'Antenas': lay.ant, 'Líneas lectura → antena': lay.lin, 'Puntos GPS': lay.gpsPts
+    }, { collapsed: window.innerWidth < 760 }).addTo(S.map);
+    const pts = ruta.concat(R.stats.filter(s => s.A).map(s => [s.A.lat, s.A.lon]));
+    setTimeout(() => { S.map.invalidateSize(); try { S.map.fitBounds(pts, { padding: [30, 30], maxZoom: 17 }); } catch (e) {} }, 60);
+  }
+
+  /* ---------------------------- gráficos ---------------------------- */
+  function dibujarGraficos(R) {
+    S.charts.forEach(c => { try { c.destroy(); } catch (e) {} }); S.charts = [];
+    if (!window.Chart) return;
+    const tick = getComputedStyle(document.body).color || '#cbd5e1', grid = 'rgba(148,163,184,.15)';
+    const noLabels = { datalabels: { display: false } };
+    const base = { responsive: true, maintainAspectRatio: false, animation: false, plugins: { ...noLabels, legend: { labels: { color: tick, boxWidth: 10, font: { size: 11 } } } } };
+    const dsDist = R.stats.filter(s => s.A).map(s => ({ label: s.antena, data: R.conPos.filter(l => l.antena === s.antena && l.dist != null).map(l => ({ x: Math.round(l.dist), y: l.rssi })), backgroundColor: s.color, borderColor: s.color, pointRadius: 4 }));
+    S.charts.push(new Chart($f('fx-ch-dist'), { type: 'scatter', data: { datasets: dsDist }, options: { ...base, scales: { x: { title: { display: true, text: 'Distancia a la antena (m)', color: tick }, ticks: { color: tick }, grid: { color: grid } }, y: { min: 0, max: 255, title: { display: true, text: 'RSSI', color: tick }, ticks: { color: tick }, grid: { color: grid } } } } }));
+    const dsTime = R.stats.map(s => ({ label: s.antena, data: R.lect.filter(l => l.antena === s.antena).map(l => ({ x: l.t, y: l.rssi })), borderColor: s.color, backgroundColor: s.color, pointRadius: 3, borderWidth: 1.5, tension: .2, showLine: true }));
+    S.charts.push(new Chart($f('fx-ch-time'), { type: 'scatter', data: { datasets: dsTime }, options: { ...base, scales: { x: { ticks: { color: tick, callback: v => fmtH(v).slice(0, 5) }, grid: { color: grid } }, y: { min: 0, max: 255, ticks: { color: tick }, grid: { color: grid } } }, plugins: { ...base.plugins, tooltip: { callbacks: { label: c => `${c.dataset.label}: ${c.parsed.y} · ${fmtH(c.parsed.x)}` } } } } }));
+    if (!dsDist.length) $f('fx-ch-dist').parentElement.insertAdjacentHTML('beforeend', '<p class="text-[11px] text-slate-500 mt-1">Asigna la antena del PSD para ver la distancia.</p>');
+  }
+
+  /* ---------------------------- tablas y KPIs ---------------------------- */
+  function pintarAntenas(R) {
+    const cat = catalogo(), opts = [...cat.values()].sort((a, b) => a.antena.localeCompare(b.antena));
+    const box = $f('fx-ant-list'); $f('fx-ants').classList.remove('hidden');
+    box.innerHTML = Object.entries(R.ant).map(([psd, a]) => {
+      const n = R.lect.filter(l => l.psd === psd).length;
+      return `<div class="fx-ant ${a ? '' : 'bad'}" data-psd="${esc(psd)}"><div><code>${esc(psd)}</code><div class="st">${n} lecturas</div></div>
+      <div class="space-y-1"><div class="st">${a ? `<i class="fa-solid fa-check text-emerald-400"></i> <b class="text-white">${esc(a.antena)}</b>${a.tec ? ' · ' + esc(a.tec) : ''} · ${esc(a.via)} · ${a.lat.toFixed(5)}, ${a.lon.toFixed(5)}` : '<i class="fa-solid fa-triangle-exclamation text-amber-400"></i> Código no reconocido: elige la antena'}</div>
+      <div class="row"><select class="sel fx-sel"><option value="">— elegir antena —</option>${opts.map(o => `<option value="${esc(U(o.antena))}" ${a && U(a.antena) === U(o.antena) ? 'selected' : ''}>${esc(o.antena)} (${o.src})</option>`).join('')}<option value="__manual">✎ Otra: escribir coordenadas…</option></select>
+      <button class="chip px-3 py-1.5 text-[11px] font-bold text-white cursor-pointer fx-save">Guardar</button></div></div></div>`;
+    }).join('');
+  }
+  $f('fx-ant-list').addEventListener('click', async e => {
+    const b = e.target.closest('.fx-save'); if (!b) return;
+    const card = b.closest('.fx-ant'), psd = card.dataset.psd, v = card.querySelector('.fx-sel').value;
+    if (!v) { showToast('Elige una antena'); return; }
+    let a;
+    if (v === '__manual') {
+      const nombre = (prompt(`Nombre de la antena para ${psd}:`) || '').trim().slice(0, 60); if (!nombre) return;
+      const ll = parseLatLon(prompt(`Coordenadas de ${nombre} (lat, lon). Ej: -12.0357, -76.9586`) || '');
+      if (!ll) { showToast('Coordenadas inválidas'); return; }
+      a = { antena: nombre.toUpperCase(), lat: ll[0], lon: ll[1] };
+    } else { const o = catalogo().get(v); if (!o) return; a = { antena: o.antena, lat: o.lat, lon: o.lon }; }
+    S.psdMap[psd] = a;
+    b.disabled = true; await savePsdMap(); b.disabled = false;
+    run(); // recalcula con la nueva antena
+  });
+
+  function pintarResultado(R) {
+    $f('fx-out').classList.remove('hidden');
+    const sinPos = R.lect.length - R.conPos.length, all = R.lect.map(l => l.rssi);
+    const best = R.conPos.length ? R.conPos.reduce((m, l) => l.rssi > m.rssi ? l : m) : null;
+    const k = [
+      ['Puntos GPS', n0(R.gps.length), 'var(--accent)'], ['Lecturas RSSI', n0(R.lect.length), '#e2e8f0'],
+      ['Con posición', n0(R.conPos.length), '#22c55e'], ['Sin GPS cerca', n0(sinPos), sinPos ? '#f59e0b' : '#64748b'],
+      ['RSSI máximo', n0(Math.max(...all)), colorRssi(Math.max(...all))], ['RSSI promedio', n1(all.reduce((s, x) => s + x, 0) / all.length), '#e2e8f0'],
+      ['Antenas', n0(R.stats.length), '#a78bfa'], ['Mejor punto ubicado', best ? `${n0(best.rssi)}${best.dist != null ? ` · ${n0(best.dist)} m` : ''}` : '—', '#38bdf8']
+    ];
+    $f('fx-kpis').innerHTML = k.map(([l, v, c]) => `<div class="chip fx-kpi"><p style="color:${c}">${v}</p><p>${l}</p></div>`).join('');
+    $f('fx-stats').innerHTML = `<table class="fx-tbl"><thead><tr><th>Antena</th><th>PSD</th><th>Lecturas</th><th>Ubicadas</th><th>RSSI máx</th><th>Prom.</th><th>Mediana</th><th>Mín</th><th>% prom. /255</th><th>≥ ${R.P.star}</th><th>Máx. ubicado</th><th>Dist. en máx. (m)</th><th>Dist. mín (m)</th><th>Dist. prom (m)</th><th>Dist. máx (m)</th><th>Desde</th><th>Hasta</th></tr></thead><tbody>${R.stats.map(s => `<tr><td><span style="display:inline-block;width:9px;height:9px;border-radius:50%;background:${s.color};margin-right:6px"></span><b>${esc(s.antena)}</b></td><td>${esc(s.psd)}</td><td>${s.n}</td><td>${s.nUb}</td><td style="color:${colorRssi(s.max)}"><b>${n0(s.max)}</b></td><td>${n1(s.avg)}</td><td>${n1(s.med)}</td><td>${n0(s.min)}</td><td>${n1(s.avg / RSSI_MAX * 100)} %</td><td>${s.nStar}</td><td>${n0(s.best.rssi)} · ${fmtH(s.best.t)}</td><td>${n0(s.best.dist)}</td><td>${n0(s.dMin)}</td><td>${n0(s.dAvg)}</td><td>${n0(s.dMax)}</td><td>${fmtH(s.t0)}</td><td>${fmtH(s.t1)}</td></tr>`).join('')}</tbody></table>`;
+    pintarFilas(R);
+    $f('fx-desc-card').classList.toggle('hidden', !R.desc.length);
+    $f('fx-desc').innerHTML = `<table class="fx-tbl"><thead><tr><th>Archivo</th><th>Fila</th><th>Motivo</th><th>Valor</th></tr></thead><tbody>${R.desc.slice(0, 1000).map(d => `<tr><td>${esc(d[0])}</td><td>${esc(d[1])}</td><td style="white-space:normal">${esc(d[2])}</td><td>${esc(d[3])}</td></tr>`).join('')}</tbody></table>`;
+  }
+  function pintarFilas(R) {
+    const q = U($f('fx-q').value);
+    const rows = R.lect.filter(l => !q || U(`${fmtT(l.t, true)} ${l.antena} ${l.met} ${l.psdRaw} ${l.rssi}`).includes(q));
+    $f('fx-rows').innerHTML = `<table class="fx-tbl"><thead><tr><th>Fecha-hora</th><th>Antena</th><th>RSSI</th><th>%</th><th>Latitud</th><th>Longitud</th><th>Método</th><th>Desfase (s)</th><th>Dist. antena (m)</th></tr></thead><tbody>${rows.slice(0, 2000).map(l => `<tr class="${l.lat == null ? 'sin' : ''}"><td>${fmtT(l.t, true)}</td><td>${esc(l.antena)}</td><td style="color:${colorRssi(l.rssi)}"><b>${n0(l.rssi)}</b></td><td>${n1(l.pct)}</td><td>${l.lat != null ? l.lat.toFixed(6) : '—'}</td><td>${l.lon != null ? l.lon.toFixed(6) : '—'}</td><td>${l.met}</td><td>${n1(l.des)}</td><td>${n0(l.dist)}</td></tr>`).join('')}</tbody></table>${rows.length > 2000 ? `<p class="text-[11px] text-slate-500 p-2">Mostrando 2.000 de ${rows.length.toLocaleString('es-PE')} (el Excel trae todas).</p>` : ''}`;
+  }
+  $f('fx-q').addEventListener('input', () => S.result && pintarFilas(S.result));
+
+  /* ---------------------------- Excel ---------------------------- */
+  function descargarExcel() {
+    const R = S.result; if (!R || !window.XLSX) return;
+    const extraPot = S.files.pot.cols.filter(c => !['FECHA INGRESO', 'RSSI', 'PSD'].includes(U(c)));
+    const fus = R.lect.map(l => {
+      const o = { 'FechaHora': fmtT(l.t, true), 'Antena': l.antena, 'PSD': l.psdRaw, 'RSSI': l.rssi, 'RSSI_%': +l.pct.toFixed(1), 'Latitud': l.lat != null ? +l.lat.toFixed(7) : '', 'Longitud': l.lon != null ? +l.lon.toFixed(7) : '', 'Metodo_posicion': l.met, 'Desfase_GPS_s': l.des != null ? +l.des.toFixed(1) : '', 'Distancia_antena_m': l.dist != null ? +l.dist.toFixed(1) : '' };
+      extraPot.forEach(c => { if (!(c in o)) o[c] = l.raw[c] instanceof Date ? fmtT(parseFecha(l.raw[c])) : l.raw[c]; });
+      return o;
+    });
+    const est = R.stats.map(s => ({ 'Antena': s.antena, 'PSD': s.psd, 'Lecturas': s.n, 'Con posicion': s.nUb, 'RSSI max': s.max, 'RSSI min': s.min, 'RSSI promedio': +s.avg.toFixed(1), 'RSSI mediana': s.med, '% promedio sobre 255': +(s.avg / RSSI_MAX * 100).toFixed(1), [`Lecturas >= ${R.P.star}`]: s.nStar, 'RSSI max ubicado': s.best.rssi, 'Hora RSSI max ubicado': fmtT(s.best.t), 'Dist. en RSSI max (m)': s.best.dist != null ? +s.best.dist.toFixed(1) : '', 'Dist. min (m)': s.dMin != null ? +s.dMin.toFixed(1) : '', 'Dist. promedio (m)': s.dAvg != null ? +s.dAvg.toFixed(1) : '', 'Dist. max (m)': s.dMax != null ? +s.dMax.toFixed(1) : '', 'Lat antena': s.A ? s.A.lat : 'SIN COORDENADAS', 'Lon antena': s.A ? s.A.lon : '', 'Primera': fmtT(s.t0), 'Ultima': fmtT(s.t1) }));
+    const cron = [
+      ...R.gps.map(g => ({ t: g.t, o: { 'FechaHora': fmtT(g.t, true), 'Origen': 'POSICION', 'Latitud': g.lat, 'Longitud': g.lon, 'Antena': '', 'RSSI': '', 'Metodo_posicion': 'GPS' } })),
+      ...R.lect.map(l => ({ t: l.t, o: { 'FechaHora': fmtT(l.t, true), 'Origen': 'POTENCIA', 'Latitud': l.lat ?? '', 'Longitud': l.lon ?? '', 'Antena': l.antena, 'RSSI': l.rssi, 'Metodo_posicion': l.met } }))
+    ].sort((a, b) => a.t - b.t).map(x => x.o);
+    const gpsH = R.gps.map(g => { const o = { 'FechaHora': fmtT(g.t), 'Latitud': g.lat, 'Longitud': g.lon }; Object.keys(g.raw).forEach(c => { if (!/fecha|latitud/i.test(c)) o[c] = String(g.raw[c]); }); return o; });
+    const desc = R.desc.map(d => ({ 'Archivo': d[0], 'Fila Excel': d[1], 'Motivo': d[2], 'Valor': d[3] }));
+    const par = [
+      ['Archivo POTENCIA', R.files.pot], ['Archivo POSICION', R.files.pos], ['Puntos GPS válidos', R.gps.length], ['Lecturas válidas', R.lect.length],
+      ['Lecturas con posición', R.conPos.length], ['Lecturas sin posición', R.lect.length - R.conPos.length], ['Tolerancia (s)', R.P.tol],
+      ['Interpolar hasta (s)', R.P.gap], ['Desfase GPS aplicado (s)', R.P.off], ['Estrella si RSSI >=', R.P.star],
+      ['GPS desde / hasta', `${fmtT(R.gps[0].t)} / ${fmtT(R.gps[R.gps.length - 1].t)}`], ['POTENCIA desde / hasta', `${fmtT(R.lect[0].t, true)} / ${fmtT(R.lect[R.lect.length - 1].t, true)}`],
+      ['Avisos', R.avisos.map(a => a.replace(/<[^>]+>/g, '')).join(' | ') || 'Ninguno'], ['', ''],
+      ['EXACTO', 'La hora de la lectura coincide con un punto GPS'], ['INTERPOLADO', 'Posición calculada entre el GPS anterior y el siguiente'],
+      ['CERCANO', 'Se tomó el GPS más próximo dentro de la tolerancia'], ['SIN_GPS', 'No había GPS cerca: no se inventa la posición'],
+      ['Generado', fmtT(Date.now() - 5 * 3600000) + ' (hora Lima) · HUNTER CORE · Fusión RF']
+    ].map(([a, b]) => ({ 'Parámetro': a, 'Valor': b }));
+    const wb = XLSX.utils.book_new();
+    const add = (rows, name) => {
+      const ws = XLSX.utils.json_to_sheet(rows.length ? rows : [{ '(vacío)': '' }]);
+      const keys = Object.keys(rows[0] || { '(vacío)': '' });
+      ws['!cols'] = keys.map(k => ({ wch: Math.min(60, Math.max(k.length, ...rows.slice(0, 300).map(r => String(r[k] ?? '').length)) + 2) }));
+      if (ws['!ref']) ws['!autofilter'] = { ref: ws['!ref'] };
+      XLSX.utils.book_append_sheet(wb, ws, name);
+    };
+    add(fus, 'Fusion'); add(est, 'Estadisticas'); add(cron, 'Cronologico'); add(gpsH, 'RecorridoGPS'); add(desc, 'Descartados'); add(par, 'Parametros');
+    const d = new Date(R.lect[0].t);
+    XLSX.writeFile(wb, `fusion_potencia_posicion_${d.getUTCFullYear()}${pad(d.getUTCMonth() + 1)}${pad(d.getUTCDate())}.xlsx`);
+  }
+
+  /* ---------------------------- flujo ---------------------------- */
+  async function run() {
+    if (!dev()) { showToast('Módulo solo para dev'); return; }
+    if (!(S.files.pot && S.files.pos)) return;
+    const btn = $f('fx-run'); btn.disabled = true; btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-1"></i>Procesando…';
+    try {
+      await loadPsdMap();
+      await new Promise(r => setTimeout(r, 20));
+      const R = procesar(); S.result = R;
+      const msgs = R.avisos.map(a => ['warn', a]);
+      const sinAnt = Object.entries(R.ant).filter(([, a]) => !a).map(([k]) => k);
+      if (sinAnt.length) msgs.unshift(['warn', `No reconozco ${sinAnt.length === 1 ? 'el PSD' : 'los PSD'} <b>${sinAnt.map(esc).join(', ')}</b>: elige su antena abajo para ver líneas, distancias y la torre en el mapa.`]);
+      const sinPos = R.lect.length - R.conPos.length;
+      msgs.push(['ok', `Listo: ${R.conPos.length} de ${R.lect.length} lecturas quedaron ubicadas${sinPos ? ` · ${sinPos} sin GPS a menos de ${R.P.tol} s (no se inventa su posición)` : ''}.`]);
+      setMsgs(msgs);
+      pintarAntenas(R); pintarResultado(R); dibujarMapa(R); dibujarGraficos(R);
+      $f('fx-xlsx').disabled = false;
+    } catch (e) {
+      console.error(e); setMsgs([['err', esc(e.message || String(e))]]);
+    } finally { btn.disabled = !(S.files.pot && S.files.pos); btn.innerHTML = '<i class="fa-solid fa-bolt mr-1"></i>Procesar'; }
+  }
+  $f('fx-run').addEventListener('click', run);
+  $f('fx-xlsx').addEventListener('click', descargarExcel);
+  $f('fx-reset').addEventListener('click', () => {
+    S.files = { pot: null, pos: null }; S.result = null; paintDrops(); setMsgs([]);
+    $f('fx-out').classList.add('hidden'); $f('fx-ants').classList.add('hidden'); $f('fx-xlsx').disabled = true;
+    if (S.layers && S.map) Object.values(S.layers).forEach(l => S.map.removeLayer(l)); S.layers = null;
+  });
+
+  /* ---------------------------- navegación y rol ---------------------------- */
+  const OTHER = ['map', 'tech', 'maint', 'price', 'noc', 'rafi', 'rast'];
+  const _sv = window.setView;
+  window.setView = function (v) {
+    if (v === 'fusion') {
+      if (!dev()) { showToast('Módulo solo para dev'); return; }
+      document.querySelectorAll('.rail button[data-v]').forEach(b => b.classList.toggle('on', b.dataset.v === 'fusion'));
+      $('side').classList.add('ui-hidden'); $('view-filter').classList.add('ui-hidden');
+      OTHER.forEach(x => { const el = $('view-' + x); if (el) el.classList.add('ui-hidden'); });
+      sec.classList.remove('ui-hidden');
+      if (S.map) setTimeout(() => S.map.invalidateSize(), 80);
+      loadPsdMap();
+      return;
+    }
+    sec.classList.add('ui-hidden');
+    return _sv.apply(this, arguments);
+  };
+  function syncRole() {
+    const ok = logged() && dev();
+    nav.classList.toggle('ui-hidden', !ok);
+    if (!ok && !sec.classList.contains('ui-hidden')) { sec.classList.add('ui-hidden'); try { _sv('filter'); } catch (e) {} }
+    if (!logged()) { S.psdLoaded = false; S.psdMap = {}; }
+  }
+  const _ar = window.applySessionRoleUI;
+  if (typeof _ar === 'function') window.applySessionRoleUI = function () { const r = _ar.apply(this, arguments); syncRole(); return r; };
+  setInterval(syncRole, 1000);
+  syncRole();
+})();
+</script>
+
 </body>
 </html>
