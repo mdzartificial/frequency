@@ -1442,6 +1442,11 @@ body:not(.theme-day):not(.hunter-preauth) .panel,body:not(.theme-day):not(.hunte
 #lt-o .sc{overflow:auto;padding:10px}#lt-o table{border-collapse:collapse;width:100%}#lt-o td,#lt-o th{border:1px solid #fff2;padding:2px}
 #lt-o input{width:100%;min-width:90px;background:#0008;color:#fff;padding:4px;border:0;outline:0}#lt-o button{padding:4px 10px;border-radius:8px;background:#ffffff18;color:#fff;font-weight:700;margin:2px}
 </style>
+<style id="hunter-sin-transicion">
+#transition-meter{display:none!important}
+section[id^="view-"],section.view,.fade{animation:none!important;transition:none!important}
+.marker-blink{animation:none!important}
+</style>
 </head>
 <body class="hunter-preauth">
   <!-- =========================================================
@@ -1587,7 +1592,7 @@ body:not(.theme-day):not(.hunter-preauth) .panel,body:not(.theme-day):not(.hunte
         <svg class="hud-ico" viewBox="0 0 24 24"><polygon points="12 2.5 21 8.5 12 14.5 3 8.5"/><path d="M3 13l9 6 9-6"/><path d="M3 17l9 6 9-6" opacity="0.65"/></svg>
       </button>
 
-      <button id="nav-noc" data-v="noc" onclick="setView('noc')" title="Consola NOC">
+      <button id="nav-noc" data-v="noc" onclick="setView('noc')" title="Tabla de Disponibilidad">
         <svg class="hud-ico" viewBox="0 0 24 24"><rect x="2.5" y="4" width="19" height="14" rx="2.5"/><path d="M5.5 12h3l1.7-4 2.6 7 1.8-3H18.5"/><path d="M8.5 21h7M12 18v3"/></svg>
       </button>
 
@@ -1789,7 +1794,7 @@ body:not(.theme-day):not(.hunter-preauth) .panel,body:not(.theme-day):not(.hunte
           <div class="flex flex-wrap items-center justify-between gap-3 px-5 pt-4 pb-3 border-b border-white/10">
             <div>
               <h2 class="text-base font-bold text-white flex items-center gap-2">
-                <i class="fa-solid fa-chart-line text-[var(--accent)]"></i> Consola NOC
+                <i class="fa-solid fa-chart-line text-[var(--accent)]"></i> Tabla de Disponibilidad
               </h2>
               <p class="text-[11px] text-slate-400">DETEKTOR · REPOTENCIADOS · LOJACK · <span id="nocBannerCorte" class="text-slate-300">Esperando reportes...</span></p>
             </div>
@@ -1918,7 +1923,7 @@ body:not(.theme-day):not(.hunter-preauth) .panel,body:not(.theme-day):not(.hunte
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-4">
               <div class="lg:col-span-5 card p-4 space-y-2.5 text-xs">
                 <h3 class="text-xs font-bold uppercase tracking-wider text-slate-300">2. Guardar Consulta / Guía</h3>
-                <select id="rafi-faq-cat" class="sel w-full max-w-none"><option value="CONSOLA NOC">Consola NOC</option><option value="COMANDOS AT">Comandos AT</option><option value="MAPA / GPS">Mapa / GPS</option><option value="RED / RF">Red / RF</option></select>
+                <select id="rafi-faq-cat" class="sel w-full max-w-none"><option value="CONSOLA NOC">Tabla de Disponibilidad</option><option value="COMANDOS AT">Comandos AT</option><option value="MAPA / GPS">Mapa / GPS</option><option value="RED / RF">Red / RF</option></select>
                 <input id="rafi-faq-q" type="text" placeholder="Pregunta frecuente..." class="w-full px-3 py-2 rounded-lg bg-black/40 border border-white/10 text-white outline-none focus:border-[var(--accent)]">
                 <textarea id="rafi-faq-a" rows="3" placeholder="Respuesta o procedimiento paso a paso..." class="w-full px-3 py-2 rounded-lg bg-black/40 border border-white/10 text-white outline-none focus:border-[var(--accent)]"></textarea>
                 <button type="button" onclick="saveRafiQuestion()" class="btn w-full py-2 rounded-lg text-xs font-bold text-white cursor-pointer">Guardar en RAFI</button>
@@ -2097,7 +2102,7 @@ body:not(.theme-day):not(.hunter-preauth) .panel,body:not(.theme-day):not(.hunte
     ];
 
     const DEFAULT_RAFI_FAQS = [
-      { id: "faq-1", cat: "CONSOLA NOC", q: "¿Cuándo un punto pasa a estado ROJO en la Consola NOC?", a: "Cuando supera el umbral de horas sin reportar configurado en 'Amarillo' (por defecto > 48 horas), salvo que figure como DESINSTALADO." },
+      { id: "faq-1", cat: "CONSOLA NOC", q: "¿Cuándo un punto pasa a estado ROJO en la Tabla de Disponibilidad?", a: "Cuando supera el umbral de horas sin reportar configurado en 'Amarillo' (por defecto > 48 horas), salvo que figure como DESINSTALADO." },
       { id: "faq-2", cat: "COMANDOS AT", q: "¿Cómo saber si un reseteador usa AT+GTDOS o AT+GTOUT?", a: "Revisa el prefijo del IMEI en la tarjeta del punto: GV58CG, GV58LAU y GV57CG usan AT+GTDOS; GV300W y GV55W usan AT+GTOUT." },
       { id: "faq-3", cat: "MAPA / GPS", q: "¿Cómo ubicar las antenas más cercanas a un punto GPS?", a: "En Mapa Táctico, pulsa 'Colocar Punto GPS' y haz clic en el mapa o ingresa latitud y longitud para ver el Top 5 más cercano." }
     ];
@@ -2826,7 +2831,8 @@ body:not(.theme-day):not(.hunter-preauth) .panel,body:not(.theme-day):not(.hunte
     function renderAdditionalData(row, excluded, realIdx) {
       const dev = isDevRole(), ex = new Set(excluded.filter(Boolean).map(k => String(k).toUpperCase()));
       let h = "";
-      Object.entries(row).forEach(([k, v]) => {
+      const _rk = k => { const n = normalizeText(k).replace(/[^a-z0-9]/g, ""); if (n.includes("slot")) return 100; const o = ["pl", "cp", "status", "modemqueclink", "modemsim", "radio", "vlu"]; const p = o.indexOf(n); return p < 0 ? 50 : p; };
+      Object.entries(row).map((e, ix) => [e, ix]).sort((a, b) => _rk(a[0][0]) - _rk(b[0][0]) || a[1] - b[1]).map(x => x[0]).forEach(([k, v]) => {
         if (k.startsWith("_") || ex.has(k.toUpperCase())) return;
         if (!dev && isEmpty(v)) return;
         const n = normalizeText(k), safeCol = k.replace(/\\/g, "\\\\").replace(/'/g, "\\'");
@@ -2836,7 +2842,7 @@ body:not(.theme-day):not(.hunter-preauth) .panel,body:not(.theme-day):not(.hunte
           return;
         }
         const fHtml = dev ? `<input type="text" value="${escapeHtml(v ?? "")}" onchange="updateCardFieldInline(${realIdx}, '${escapeHtml(safeCol)}', this.value, false)" class="inline-dev-input text-xs font-semibold mt-1">` : `<p class="text-xs font-semibold text-white break-words mt-0.5">${escapeHtml(v)}</p>`;
-        h += `<div class="chip px-2.5 py-2"><p class="text-[9px] font-bold uppercase text-slate-400 truncate">${escapeHtml(k)}</p>${fHtml}</div>`;
+        h += `<div class="chip px-2.5 py-2"><p class="text-[9px] font-bold uppercase text-slate-400 truncate">${escapeHtml(/^\s*modem\s*sim\s*$/i.test(k) ? "MODEM SIM QUECLINK" : k)}</p>${fHtml}</div>`;
       });
       return h || `<div class="col-span-full text-xs text-slate-500 italic">Sin datos adicionales.</div>`;
     }
@@ -3014,7 +3020,7 @@ body:not(.theme-day):not(.hunter-preauth) .panel,body:not(.theme-day):not(.hunte
       const pts = []; let miss = 0;
       const validPoints = src.map(info).filter(i => { if (!i.ok) miss++; return i.ok; });
       validPoints.forEach(i => {
-        L.circleMarker([i.lat, i.lon], { radius: 6.5, color: col(i), fillColor: col(i), fillOpacity: 0.85, weight: 1.8, className: i.visitado ? "" : "marker-blink" }).bindPopup(popupHtml(i), { maxWidth: 320 }).addTo(layer);
+        L.circleMarker([i.lat, i.lon], { radius: 6.5, color: col(i), fillColor: col(i), fillOpacity: 0.85, weight: 1.8, className: "" }).bindPopup(popupHtml(i), { maxWidth: 320 }).addTo(layer);
         pts.push([i.lat, i.lon]);
       });
       map.addLayer(layer);
@@ -5968,7 +5974,7 @@ animate();
 
 <script>
 (function(){const f=document.createElement('div');f.id='rafi-fab';f.innerHTML='<div id="rafi-pop"><b>🚀 ¡Hola, soy RAFI!</b><p style="margin:6px 0">¿Qué buscas?</p><div id="rafi-guide" style="display:grid;gap:4px"></div><textarea id="rafi-cq" rows="2" placeholder="Escribe tu consulta o pregunta..."></textarea><button class="rb" id="rafi-send">Enviar consulta</button><div id="rafi-inbox" style="margin-top:8px"></div></div><button id="rafi-btn" title="RAFI">🚀</button>';
-function mount(){document.body.appendChild(f);const g=f.querySelector('#rafi-guide');[['filter','Buscar puntos / antenas'],['map','Mapa táctico y GPS'],['tech','Analizador de tecnologías'],['maint','Plan de mantenimiento'],['price','Analizador de precios'],['noc','Consola NOC'],['rast','Rastreadores'],['rafi','Centro de consola / FAQ']].forEach(([v,t])=>{const b=document.createElement('button');b.textContent='→ '+t;b.style.cssText='text-align:left;padding:4px 8px;border-radius:8px;background:#ffffff10;color:#e2e8f0;cursor:pointer';b.onclick=()=>{try{setView(v)}catch(e){}f.querySelector('#rafi-pop').classList.remove('on')};g.appendChild(b)});
+function mount(){document.body.appendChild(f);const g=f.querySelector('#rafi-guide');[['filter','Buscar puntos / antenas'],['map','Mapa táctico y GPS'],['tech','Analizador de tecnologías'],['maint','Plan de mantenimiento'],['price','Analizador de precios'],['noc','Tabla de Disponibilidad'],['rast','Rastreadores'],['rafi','Centro de consola / FAQ']].forEach(([v,t])=>{const b=document.createElement('button');b.textContent='→ '+t;b.style.cssText='text-align:left;padding:4px 8px;border-radius:8px;background:#ffffff10;color:#e2e8f0;cursor:pointer';b.onclick=()=>{try{setView(v)}catch(e){}f.querySelector('#rafi-pop').classList.remove('on')};g.appendChild(b)});
 f.querySelector('#rafi-btn').onclick=()=>{f.querySelector('#rafi-pop').classList.toggle('on');inbox()};
 f.querySelector('#rafi-send').onclick=async()=>{const t=f.querySelector('#rafi-cq').value.trim();if(!t)return;const row={texto:t,usuario:(hunterSession?.user?.email)||'anon'};let ok=false;try{if(hunterSbClient){const{error}=await hunterSbClient.from('rafi_consultas').insert(row);ok=!error}}catch(e){}
 if(!ok){const l=JSON.parse(localStorage.getItem('rafi_consultas_local')||'[]');l.push({...row,creado:new Date().toISOString()});localStorage.setItem('rafi_consultas_local',JSON.stringify(l))}
@@ -7221,7 +7227,7 @@ body.hunter-preauth #login-floating-card{transform:perspective(1400px) rotateX(v
     });
   }
 
-  /* ---------- Consola NOC también puede exportar Excel ---------- */
+  /* ---------- Tabla de Disponibilidad también puede exportar Excel ---------- */
   const canExport = () => isDevRole() || isNocOnlyRole();
   const _apply = window.applySessionRoleUI;
   window.applySessionRoleUI = function (s) {
@@ -7665,7 +7671,7 @@ html body:not(.hunter-preauth) #rast-list::-webkit-scrollbar-thumb:hover {
 }
 </style>
 <style id="hunter-noc-file-fix">
-/* Estilo compacto y angular para los 3 selectores de Excel en Consola NOC */
+/* Estilo compacto y angular para los 3 selectores de Excel en Tabla de Disponibilidad */
 html body:not(.hunter-preauth):not(.theme-day) #view-noc input[type="file"] {
   padding: 4px 6px !important;
   font-family: var(--font-mono) !important;
@@ -9144,7 +9150,7 @@ html body.tema-ejecutivo:not(.hunter-preauth) .hud-ico { filter: none !important
     ['tech', 'Analizador de tecnologías', 'tecnologia modelos operador claro movistar rastreo laboratorio distribucion editar'],
     ['maint', 'Plan de mantenimiento', 'mantenimiento checklist tecnico urgente proximo revision sector pendiente programado'],
     ['price', 'Analizador de precios y costos', 'precio alquiler costo equipo proveedor almacen estructura radio fuente cotizar zona viaticos margen'],
-    ['noc', 'Consola NOC', 'noc disponibilidad sla porcentaje corte historial semanal mensual anual reporte excel detektor lojack repotenciado'],
+    ['noc', 'Tabla de Disponibilidad', 'noc disponibilidad sla porcentaje corte historial semanal mensual anual reporte excel detektor lojack repotenciado'],
     ['rast', 'Rastreadores', 'rastreador vehiculo interno bateria parada antenas placa unidad analisis lectura'],
     ['rafi', 'Centro RAFI (FAQ y búsqueda avanzada)', 'faq preguntas guia consola busqueda avanzada']
   ];
@@ -11962,16 +11968,18 @@ html body.dx .dx-halo.crit{ animation:dxRadar 1.7s ease-out infinite; }
   function calcViaje(inp) {
     const pl = CS.pl.find(p => p.id === inp.pl), det = [];
     const per = inp.tec + (inp.yo ? 1 : 0);
+    const local = !!pl && /\b(lima|callao)\b/i.test(String(pl.destino || '') + ' ' + String(pl.zona || '')) && inp.dias <= 1;
     (pl ? pl.items || [] : []).forEach(it => {
       const m = Number(it.monto) || 0, f = { por_viaje: 1, por_dia: inp.dias, por_persona: per, por_persona_dia: per * inp.dias }[it.modo] ?? 1;
       det.push({ concepto: it.concepto, detalle: `${soles(m)} ${MODOS[it.modo] || ''}`, total: n2(m * f), cero: !m });
     });
     const T = CS.vi.TECNICO || { desayuno: 20, almuerzo: 30, cena: 20, hospedaje_noche: 0 }, R = CS.vi.RESPONSABLE || { desayuno: 30, almuerzo: 30, cena: 30, hospedaje_noche: 0 };
     const dia = v => (Number(v.desayuno) || 0) + (Number(v.almuerzo) || 0) + (Number(v.cena) || 0);
-    if (inp.tec) det.push({ concepto: `Viáticos técnicos (${inp.tec})`, detalle: `${soles(dia(T))} por día × ${inp.dias} día${inp.dias > 1 ? 's' : ''}`, total: n2(inp.tec * inp.dias * dia(T)) });
-    if (inp.yo) det.push({ concepto: 'Viáticos responsable', detalle: `${soles(dia(R))} por día × ${inp.dias} día${inp.dias > 1 ? 's' : ''}`, total: n2(inp.dias * dia(R)) });
+    if (local) det.push({ concepto: 'Viáticos y hospedaje', detalle: 'No aplica: destino en Lima de 1 día (solo cochera/adicionales)', total: 0 });
+    if (!local && inp.tec) det.push({ concepto: `Viáticos técnicos (${inp.tec})`, detalle: `${soles(dia(T))} por día × ${inp.dias} día${inp.dias > 1 ? 's' : ''}`, total: n2(inp.tec * inp.dias * dia(T)) });
+    if (!local && inp.yo) det.push({ concepto: 'Viáticos responsable', detalle: `${soles(dia(R))} por día × ${inp.dias} día${inp.dias > 1 ? 's' : ''}`, total: n2(inp.dias * dia(R)) });
     const hosp = inp.noches * (inp.tec * (Number(T.hospedaje_noche) || 0) + (inp.yo ? Number(R.hospedaje_noche) || 0 : 0));
-    if (inp.noches && per) det.push({ concepto: `Hospedaje (${inp.noches} noche${inp.noches > 1 ? 's' : ''})`, detalle: 'según viáticos por persona', total: n2(hosp), cero: !hosp });
+    if (!local && inp.noches && per) det.push({ concepto: `Hospedaje (${inp.noches} noche${inp.noches > 1 ? 's' : ''})`, detalle: 'según viáticos por persona', total: n2(hosp), cero: !hosp });
     return { pl, det, total: n2(det.reduce((a, d) => a + d.total, 0)), per };
   }
   // Costos reales registrados en el analizador de precios (tabla "Costos de mantenimiento por zona")
