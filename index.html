@@ -12563,6 +12563,7 @@ html body.hunter-preauth.login-fail #mdz-fail-fx{ display:block; }
     <p class="text-[11px] text-slate-400">Prueba semanal del grupo electrógeno · control de la sala de servidores · solo dev</p></div>
     <div class="flex gap-2 flex-wrap"><div class="v21-tabs" role="tablist">
       <button data-tab="ge" class="on">Grupo electrógeno</button><button data-tab="sala">Sala de servidores</button><button data-tab="cfg">Configurar</button></div>
+      <button class="v21-btn" id="st-pdf" onclick="window.__mdzReportDialog && window.__mdzReportDialog()"><i class="fa-solid fa-file-pdf"></i>PDF semanal</button>
       <button class="v21-btn" id="st-xls"><i class="fa-solid fa-file-excel"></i>Excel</button>
       <button class="v21-btn" id="st-reload" title="Actualizar"><i class="fa-solid fa-rotate"></i></button></div></div>
     <div class="flex-1 overflow-y-auto scroll p-5 space-y-4"><div id="st-msg"></div><div id="st-body" class="space-y-4"></div></div>`;
@@ -12609,12 +12610,12 @@ html body.hunter-preauth.login-fail #mdz-fail-fx{ display:block; }
       c.from('mdz_sala_config').select('valor').eq('clave', 'general').maybeSingle()
     ]);
     const bad = [g, s, k].find(x => x.error);
-    if (bad) { $('st-msg').innerHTML = errBox(bad.error); $('st-body').innerHTML = ''; killCharts(); return; }
+    if (bad) { $('st-msg').innerHTML = (window.__mdzQueue && window.__mdzQueue.isNet(bad.error)) ? '<div class="v21-msg warn">Sin conexión: no se puede leer el historial ahora. Lo que registres se guardará en este equipo y se subirá al volver la señal.</div>' : errBox(bad.error); if (!(window.__mdzQueue && window.__mdzQueue.isNet(bad.error))) { $('st-body').innerHTML = ''; killCharts(); return; } }
     S.ge = g.data || []; S.sala = s.data || [];
     const v = k.data && k.data.valor;
     S.cfg = Object.assign(JSON.parse(JSON.stringify(DEF_CFG)), v || {});
     if (!Array.isArray(S.cfg.equipos) || !S.cfg.equipos.length) S.cfg.equipos = ['GE-01'];
-    $('st-msg').innerHTML = !k.data ? `<div class="v21-msg warn">Supabase respondió sin configuración. Si ya ejecutaste <code>${SQLF}</code>, sal y vuelve a entrar con tu código 2FA.</div>` : '';
+    if (!bad) $('st-msg').innerHTML = !k.data ? `<div class="v21-msg warn">Supabase respondió sin configuración. Si ya ejecutaste <code>${SQLF}</code>, sal y vuelve a entrar con tu código 2FA.</div>` : '';
     draw();
   }
 
@@ -12869,16 +12870,22 @@ html body.hunter-preauth.login-fail #mdz-fail-fx{ display:block; }
         const row = { fecha: $('ge-fecha').value, equipo: $('ge-equipo').value, encendido_auto: segVal('ge-enc') || 'OK', combustible_pct: num($('ge-comb').value), horometro_h: num($('ge-horo').value), arranque_seg: num($('ge-arr').value), bateria_v: num($('ge-bat').value), observacion: $('ge-obs').value.trim() || null, extras: readExtras('ge') };
         const er = [!row.fecha && 'Falta la fecha', rangeErr('Combustible', row.combustible_pct, 0, 100), rangeErr('Horómetro', row.horometro_h, 0, 10000000), rangeErr('Arranque', row.arranque_seg, 0, 3600), rangeErr('Batería', row.bateria_v, 0, 60)].filter(Boolean);
         if (er.length) { $('st-msg').innerHTML = `<div class="v21-msg err">${er.map(esc).join('<br>')}</div>`; return; }
+        const Qo = window.__mdzQueue;
+        if (!S.editGe && Qo && Qo.offline()) { Qo.add('mdz_ge_registros', row, 'Prueba ' + row.equipo); return; }   // v24: sin conexión → cola
         const q = S.editGe ? c.from('mdz_ge_registros').update(row).eq('id', S.editGe) : c.from('mdz_ge_registros').insert(row);
         const { error } = await q; const wasEdit = !!S.editGe;
+        if (error && !wasEdit && Qo && Qo.isNet(error)) { Qo.add('mdz_ge_registros', row, 'Prueba ' + row.equipo); return; }
         if (!error) { S.editGe = null; S.equipo = row.equipo; }
         await done(error, wasEdit ? 'Registro actualizado' : 'Prueba semanal guardada');
       } else if (ev.target.id === 'sala-form') {
         const row = { fecha: $('sa-fecha').value, temperatura_c: num($('sa-temp').value), humedad_pct: num($('sa-hum').value), carga_ups_pct: num($('sa-ups').value), autonomia_min: num($('sa-aut').value), carga_kw: num($('sa-kw').value), aire_acond: segVal('sa-aire') || 'OK', limpieza: segVal('sa-limp') || 'OK', alarmas: $('sa-alarm').value.trim() || null, observacion: $('sa-obs').value.trim() || null, extras: readExtras('sala') };
         const er = [!row.fecha && 'Falta la fecha', rangeErr('Temperatura', row.temperatura_c, -20, 80), rangeErr('Humedad', row.humedad_pct, 0, 100), rangeErr('Carga del UPS', row.carga_ups_pct, 0, 100), rangeErr('Autonomía', row.autonomia_min, 0, 100000), rangeErr('Carga eléctrica', row.carga_kw, 0, 100000)].filter(Boolean);
         if (er.length) { $('st-msg').innerHTML = `<div class="v21-msg err">${er.map(esc).join('<br>')}</div>`; return; }
+        const Qo = window.__mdzQueue;
+        if (!S.editSala && Qo && Qo.offline()) { Qo.add('mdz_sala_registros', row, 'Revisión de sala'); return; }   // v24: sin conexión → cola
         const q = S.editSala ? c.from('mdz_sala_registros').update(row).eq('id', S.editSala) : c.from('mdz_sala_registros').insert(row);
         const { error } = await q; const wasEdit = !!S.editSala;
+        if (error && !wasEdit && Qo && Qo.isNet(error)) { Qo.add('mdz_sala_registros', row, 'Revisión de sala'); return; }
         if (!error) S.editSala = null;
         await done(error, wasEdit ? 'Revisión actualizada' : 'Revisión guardada');
       }
@@ -13020,6 +13027,7 @@ html body.hunter-preauth.login-fail #mdz-fail-fx{ display:block; }
       rows.forEach(r => { const i = info(r); if (!i.punto) return; tot++; if (!i.visitado) pend++; });
       if (tot && pend) out.push({ lvl: 'info', txt: `${pend} de ${tot} antenas siguen sin visita registrada.`, go: 'maint' });
     } catch (e) {}
+    for (const fn of (window.__mdzRafiExtra || [])) { try { (await fn() || []).forEach(x => out.push(x)); } catch (e) {} }   // v24: avisos de otros módulos
     const rank = { bad: 0, warn: 1, info: 2 };
     return out.sort((a, b) => rank[a.lvl] - rank[b.lvl]);
   }
@@ -13068,6 +13076,508 @@ html body.hunter-preauth.login-fail #mdz-fail-fx{ display:block; }
   let wasOk = false;
   setInterval(() => { const ok = logged() && dev(); if (ok && !wasOk) setTimeout(refreshRafi, 2500); if (!ok && wasOk) refreshRafi(); wasOk = ok; }, 1000);
   setInterval(() => { if (logged() && dev()) refreshRafi(); }, 10 * 60e3);
+})();
+</script>
+<style id="hunter-v24-css">
+/* ===== v24 · Incidentes con fotos, reporte semanal PDF, app instalable y cola sin conexión (solo dev) ===== */
+#view-inc h2 > span .hud-ico { width:100%; height:100%; fill:none; stroke:currentColor; stroke-width:1.7; stroke-linecap:round; stroke-linejoin:round; }
+.v24-list { display:grid; grid-template-columns:1fr; gap:10px; }
+@media (min-width:1100px){ .v24-list { grid-template-columns:1fr 1fr; } }
+.v24-inc { padding:12px 14px; min-width:0; }
+.v24-inc h4 { margin:0; font-size:13.5px; font-weight:800; color:#fff; display:flex; flex-wrap:wrap; gap:6px; align-items:center; }
+.v24-inc .meta { font-size:11px; color:#94a3b8; margin:3px 0 6px; }
+.v24-inc p { font-size:12.3px; color:#dbe4f3; margin:4px 0; white-space:pre-wrap; word-break:break-word; }
+.v24-inc p.sol { color:#bbf7d0; }
+.v24-thumbs { display:flex; flex-wrap:wrap; gap:6px; margin-top:6px; }
+.v24-thumbs button, .v24-thumbs .ph { position:relative; width:74px; height:74px; padding:0; border:1px solid rgba(255,255,255,.18); background:rgba(0,0,0,.35) center/cover no-repeat; cursor:zoom-in; overflow:hidden; }
+.v24-thumbs .ph { cursor:default; display:flex; align-items:center; justify-content:center; font-size:10px; color:#94a3b8; }
+.v24-thumbs .rm { position:absolute; top:2px; right:2px; width:20px; height:20px; border:0; background:rgba(0,0,0,.75); color:#fca5a5; font-weight:800; font-size:12px; cursor:pointer; display:flex; align-items:center; justify-content:center; }
+.v24-tipo { display:inline-block; padding:1px 7px; font-size:10.5px; font-weight:800; letter-spacing:.03em; background:rgba(56,189,248,.14); color:#7dd3fc; }
+.v24-tipo.ROBO, .v24-tipo.VANDALISMO { background:rgba(239,68,68,.16); color:#fca5a5; }
+.v24-tipo.ENERGIA { background:rgba(245,158,11,.15); color:#fcd34d; }
+#v24-lightbox { position:fixed; inset:0; z-index:200; display:none; align-items:center; justify-content:center; padding:16px; background:rgba(0,0,0,.88); }
+#v24-lightbox.on { display:flex; }
+#v24-lightbox img { max-width:100%; max-height:100%; object-fit:contain; box-shadow:0 20px 60px rgba(0,0,0,.8); }
+#v24-lightbox button { position:absolute; top:12px; right:14px; width:40px; height:40px; border:1px solid rgba(255,255,255,.3); background:rgba(0,0,0,.6); color:#fff; font-size:18px; cursor:pointer; }
+/* cola sin conexión */
+#v24-queue { position:fixed; left:14px; bottom:14px; z-index:9998; display:none; align-items:center; gap:8px; padding:7px 12px; font:700 12px system-ui,sans-serif; color:#1a1003;
+  background:#fbbf24; border:1px solid #fde68a; box-shadow:0 8px 24px rgba(0,0,0,.5); cursor:pointer; clip-path:polygon(8px 0,100% 0,100% calc(100% - 8px),calc(100% - 8px) 100%,0 100%,0 8px); }
+#v24-queue.on { display:flex; }
+#v24-queue { max-width:calc(100vw - 100px); line-height:1.35; }
+html body #inc-modal > .panel { padding:16px !important; }
+#v24-queue.off { background:#f87171; border-color:#fecaca; color:#fff; }
+@media (max-width:768px){ #v24-queue { left:8px; bottom:calc(72px + env(safe-area-inset-bottom)); } }
+#v24-install { display:none; }
+#v24-install.on { display:inline-flex; }
+/* reporte semanal imprimible (PDF) */
+#mdz-report { display:none; }
+@media print {
+  @page { size:A4; margin:14mm 12mm; }
+  html body.mdz-printing { background:#fff !important; padding:0 !important; }
+  html body.mdz-printing > *:not(#mdz-report) { display:none !important; }
+  html body.mdz-printing::after, html body.mdz-printing::before { display:none !important; content:none !important; }
+  html body.mdz-printing #mdz-report { display:block !important; }
+}
+#mdz-report { color:#0f172a; background:#fff; font:11.5px/1.45 "Segoe UI",system-ui,sans-serif; }
+#mdz-report * { color:inherit; text-shadow:none !important; box-shadow:none !important; }
+#mdz-report .rp-head { display:flex; justify-content:space-between; align-items:flex-end; border-bottom:3px solid #f59e0b; padding-bottom:8px; margin-bottom:12px; }
+#mdz-report .rp-head h1 { margin:0; font-size:20px; letter-spacing:.06em; animation:none !important; }
+#mdz-report .rp-head small { color:#475569; }
+#mdz-report h2 { font-size:13.5px; margin:16px 0 6px; padding:4px 8px; background:#0f172a; color:#fff !important; letter-spacing:.06em; text-transform:uppercase; break-after:avoid; }
+#mdz-report .rp-kpis { display:grid; grid-template-columns:repeat(4,1fr); gap:6px; }
+#mdz-report .rp-kpis div { border:1px solid #cbd5e1; padding:6px 8px; }
+#mdz-report .rp-kpis b { display:block; font-size:15px; }
+#mdz-report .rp-kpis span { font-size:10px; color:#475569; text-transform:uppercase; }
+#mdz-report table { width:100%; border-collapse:collapse; margin-top:4px; break-inside:auto; }
+#mdz-report th { background:#f1f5f9; text-align:left; font-size:10px; text-transform:uppercase; padding:4px 6px; border:1px solid #cbd5e1; }
+#mdz-report td { padding:4px 6px; border:1px solid #e2e8f0; vertical-align:top; }
+#mdz-report tr { break-inside:avoid; }
+#mdz-report td.n, #mdz-report th.n { text-align:right; font-variant-numeric:tabular-nums; }
+#mdz-report .ok { color:#15803d; font-weight:700; } #mdz-report .bad { color:#b91c1c; font-weight:700; } #mdz-report .warn { color:#b45309; font-weight:700; }
+#mdz-report .muted { color:#64748b; }
+html body #mdz-report, html body #mdz-report :is(h1,h2,h3,p,td,th,b,small,span,div) { color:#0f172a !important; letter-spacing:normal !important; text-transform:none; animation:none !important; filter:none !important; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+html body #mdz-report h1 { font-size:20px !important; letter-spacing:.04em !important; }
+html body #mdz-report h2 { background:none !important; border-left:5px solid #f59e0b; border-bottom:1px solid #cbd5e1; padding:3px 8px !important; text-transform:uppercase; letter-spacing:.05em !important; }
+html body #mdz-report th { background:#f1f5f9 !important; text-transform:uppercase; font-weight:700; color:#334155 !important; }
+html body #mdz-report .rp-head small, html body #mdz-report .muted, html body #mdz-report .rp-kpis span, html body #mdz-report .rp-foot { color:#475569 !important; }
+html body #mdz-report .ok, html body #mdz-report .ok * { color:#15803d !important; }
+html body #mdz-report .bad, html body #mdz-report .bad * { color:#b91c1c !important; }
+html body #mdz-report .warn, html body #mdz-report .warn * { color:#b45309 !important; }
+#mdz-report .rp-foot { margin-top:18px; padding-top:6px; border-top:1px solid #cbd5e1; font-size:10px; color:#64748b; }
+@media (max-width:640px){ #view-inc .p-5 { padding:12px !important; } }
+</style>
+<script id="hunter-v24-js">
+(() => {
+  'use strict';
+  const $ = id => document.getElementById(id);
+  const esc = v => (typeof escapeHtml === 'function' ? escapeHtml(v == null ? '' : String(v)) : String(v == null ? '' : v).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])));
+  const dev = () => typeof isDevRole === 'function' && isDevRole();
+  const logged = () => !!(typeof hunterSession !== 'undefined' && hunterSession) && !document.body.classList.contains('hunter-preauth');
+  const sb = () => (typeof hunterSbClient !== 'undefined' ? hunterSbClient : null);
+  const toast = m => { try { showToast(m); } catch (e) {} };
+  const hoy = () => new Date(Date.now() - 5 * 3600e3).toISOString().slice(0, 10);
+  const fdate = s => s ? String(s).slice(0, 10).split('-').reverse().join('/') : '—';
+  const fmt = (v, d = 1) => v == null || v === '' ? '—' : Number(v).toLocaleString('es-PE', { minimumFractionDigits: 0, maximumFractionDigits: d });
+  const soles = v => 'S/ ' + (Number(v) || 0).toLocaleString('es-PE', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  const num = v => { if (v === '' || v == null) return null; const n = Number(String(v).replace(',', '.')); return isFinite(n) ? n : null; };
+  const addDays = (s, n) => { const d = new Date(s + 'T12:00:00Z'); d.setUTCDate(d.getUTCDate() + n); return d.toISOString().slice(0, 10); };
+  const mondayOf = s => { const d = new Date(s + 'T12:00:00Z'); d.setUTCDate(d.getUTCDate() - (d.getUTCDay() + 6) % 7); return d.toISOString().slice(0, 10); };
+  const norm = v => String(v == null ? '' : v).normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/\s*\(\s*PE\s*\)\s*/gi, ' ').toUpperCase().replace(/[^A-Z0-9 ]+/g, ' ').replace(/\s+/g, ' ').trim();
+  const missing = e => e && (/does not exist|schema cache|PGRST205|42P01/i.test(e.message || '') || e.code === '42P01' || e.code === 'PGRST205');
+  const errBox = (e, f) => missing(e)
+    ? `<div class="v21-msg warn">Falta crear las tablas en Supabase: ejecuta <code>${f}</code> una vez en el SQL Editor y vuelve a abrir este módulo.</div>`
+    : `<div class="v21-msg err">No se pudo leer o guardar en Supabase: ${esc(e && e.message || e)}${e && e.code ? ` <code>${esc(e.code)}</code>` : ''}</div>`;
+
+  /* =====================================================================
+     1) APP INSTALABLE (PWA) + COLA DE REGISTROS SIN CONEXIÓN
+     ===================================================================== */
+  try {
+    if (!document.querySelector('link[rel="manifest"]')) { const l = document.createElement('link'); l.rel = 'manifest'; l.href = 'manifest.webmanifest'; document.head.appendChild(l); }
+    if (!document.querySelector('meta[name="theme-color"]')) { const m = document.createElement('meta'); m.name = 'theme-color'; m.content = '#060810'; document.head.appendChild(m); }
+    if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')) {
+      window.addEventListener('load', () => navigator.serviceWorker.register('sw.js', { scope: './' }).catch(e => console.warn('[v24] service worker', e)));
+    }
+  } catch (e) {}
+  let installEvt = null;
+  window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); installEvt = e; syncInstall(); });
+  window.addEventListener('appinstalled', () => { installEvt = null; syncInstall(); toast('HUNTER CORE quedó instalado como app'); });
+  const instBtn = document.createElement('button');
+  instBtn.id = 'v24-install'; instBtn.type = 'button'; instBtn.className = 'v21-btn'; instBtn.innerHTML = '<i class="fa-solid fa-mobile-screen"></i>Instalar app';
+  instBtn.title = 'Instalar HUNTER CORE en este equipo o celular';
+  instBtn.addEventListener('click', async () => { if (!installEvt) return; installEvt.prompt(); try { await installEvt.userChoice; } catch (e) {} installEvt = null; syncInstall(); });
+  function syncInstall() { instBtn.classList.toggle('on', !!installEvt && logged() && dev()); }
+
+  const QKEY = 'mdz_cola_offline_v1';
+  const qGet = () => { try { return JSON.parse(localStorage.getItem(QKEY) || '[]') || []; } catch (e) { return []; } };
+  const qSet = a => { try { localStorage.setItem(QKEY, JSON.stringify(a.slice(-200))); } catch (e) {} };
+  const isNet = e => !navigator.onLine || /Failed to fetch|NetworkError|Load failed|network|fetch/i.test(String((e && (e.message || e)) || ''));
+  const chip = document.createElement('div'); chip.id = 'v24-queue'; chip.setAttribute('role', 'status'); chip.tabIndex = 0;
+  let flushing = false;
+  function drawChip() {
+    const n = qGet().length, show = logged() && dev() && (n > 0 || !navigator.onLine);
+    if (!chip.isConnected) document.body.appendChild(chip);
+    chip.classList.toggle('on', show); chip.classList.toggle('off', !navigator.onLine);
+    chip.textContent = !navigator.onLine ? `Sin conexión${n ? ` · ${n} registro${n === 1 ? '' : 's'} se subirán al volver la señal` : ' · lo que registres se guardará y se subirá después'}` : `⟳ ${n} registro${n === 1 ? '' : 's'} sin subir · toca para reintentar`;
+  }
+  async function flush() {
+    const c = sb(); if (flushing || !c || !navigator.onLine || !logged()) { drawChip(); return; }
+    const q = qGet(); if (!q.length) { drawChip(); return; }
+    flushing = true; let ok = 0; const rest = [];
+    for (const it of q) {
+      try { const { error } = await c.from(it.t).insert(it.row); if (error) { if (isNet(error)) rest.push(it); else { rest.push(Object.assign(it, { err: error.message })); } } else ok++; }
+      catch (e) { rest.push(it); }
+    }
+    qSet(rest); flushing = false; drawChip();
+    if (ok) { toast(`${ok} registro${ok === 1 ? '' : 's'} sin conexión subido${ok === 1 ? '' : 's'} a Supabase`); try { window.__mdzSala && window.__mdzSala.loadAll(); } catch (e) {} try { incLoad(); } catch (e) {} }
+  }
+  window.__mdzQueue = {
+    offline: () => !navigator.onLine, isNet,
+    add: (t, row, label) => { const q = qGet(); q.push({ t, row, label: label || t, at: new Date().toISOString() }); qSet(q); drawChip(); toast('Sin conexión: guardado en este equipo, se subirá al volver la señal'); },
+    flush, list: qGet
+  };
+  chip.addEventListener('click', flush);
+  window.addEventListener('online', () => { drawChip(); setTimeout(flush, 1500); });
+  window.addEventListener('offline', drawChip);
+
+  /* =====================================================================
+     2) INCIDENTES POR ANTENA CON FOTOS
+     ===================================================================== */
+  const SQLF = 'supabase_v24_incidentes.sql', BUCKET = 'mdz-incidentes';
+  const TIPOS = [['ROBO', 'Robo'], ['VANDALISMO', 'Vandalismo'], ['FALLA_EQUIPO', 'Falla de equipo'], ['ENERGIA', 'Energía'], ['COMUNICACION', 'Comunicación'], ['CLIMA', 'Clima'], ['MANTENIMIENTO', 'Mantenimiento'], ['OTRO', 'Otro']];
+  const tipoTxt = t => (TIPOS.find(x => x[0] === t) || [t, t])[1];
+  const ESTADOS = [['ABIERTO', 'Abierto', 'bad'], ['EN_PROCESO', 'En proceso', 'warn'], ['CERRADO', 'Cerrado', 'ok']];
+  const SEV = [['BAJA', 'Baja', 'mute'], ['MEDIA', 'Media', 'warn'], ['ALTA', 'Alta', 'bad']];
+  const pill = (list, v) => { const x = list.find(y => y[0] === v) || [v, v, 'mute']; return `<span class="v23-st ${x[2]}">${esc(x[1])}</span>`; };
+  const ICON = '<svg class="hud-ico" viewBox="0 0 24 24"><path d="M12 3 2.5 20h19L12 3Z"/><path d="M12 9.5v4.5"/><circle cx="12" cy="17" r=".6"/></svg>';
+
+  const nav = document.createElement('button');
+  nav.id = 'nav-inc'; nav.dataset.v = 'inc'; nav.title = 'Incidentes por antena (dev)'; nav.className = 'ui-hidden'; nav.innerHTML = ICON;
+  nav.addEventListener('click', () => window.setView('inc'));
+  (document.getElementById('nav-sala') || document.getElementById('nav-caja') || document.getElementById('nav-noc')).after(nav);
+  const sec = document.createElement('section');
+  sec.id = 'view-inc'; sec.className = 'view ui-hidden map panel flex-1 min-w-0 flex flex-col overflow-hidden';
+  (document.getElementById('view-sala') || document.getElementById('view-caja') || document.getElementById('view-noc')).after(sec);
+  sec.innerHTML = `<div class="flex flex-wrap items-center justify-between gap-3 px-5 pt-4 pb-3 border-b border-white/10">
+    <div><h2 class="text-base font-bold text-white flex items-center gap-2"><span class="text-[var(--accent)] inline-block" style="width:24px;height:24px">${ICON}</span>Incidentes por antena</h2>
+    <p class="text-[11px] text-slate-400">Robos, fallas y visitas con fotos desde el celular · historial por punto · solo dev</p></div>
+    <div class="flex gap-2 flex-wrap" id="inc-actions"><button class="v21-btn pri" id="inc-new"><i class="fa-solid fa-plus"></i>Nuevo incidente</button>
+      <button class="v21-btn" id="inc-pdf"><i class="fa-solid fa-file-pdf"></i>Reporte semanal PDF</button>
+      <button class="v21-btn" id="inc-xls"><i class="fa-solid fa-file-excel"></i>Excel</button>
+      <button class="v21-btn" id="inc-reload" title="Actualizar"><i class="fa-solid fa-rotate"></i></button></div></div>
+    <div class="flex-1 overflow-y-auto scroll p-5 space-y-4"><div id="inc-msg"></div><div id="inc-body" class="space-y-4"></div></div>`;
+  sec.querySelector('#inc-actions').prepend(instBtn);
+  const modal = document.createElement('div'); modal.id = 'inc-modal'; modal.className = 'v21-modal hidden'; modal.setAttribute('role', 'dialog'); modal.setAttribute('aria-modal', 'true'); modal.innerHTML = '<div class="panel"></div>';
+  document.body.appendChild(modal);
+  const lb = document.createElement('div'); lb.id = 'v24-lightbox'; lb.innerHTML = '<button type="button" aria-label="Cerrar">✕</button><img alt="Foto del incidente">'; document.body.appendChild(lb);
+  lb.addEventListener('click', () => lb.classList.remove('on'));
+
+  const I = { rows: [], q: '', estado: '', tipo: '', punto: '', edit: null, newFiles: [], removed: [], urls: new Map(), opened: false };
+  let opened = false;
+  const _sv = window.setView;
+  window.setView = function (v) {
+    if (v === 'inc') {
+      if (!dev()) { toast('Módulo solo para dev'); return; }
+      document.querySelectorAll('.rail button[data-v]').forEach(b => b.classList.toggle('on', b.dataset.v === v));
+      if ($('side')) $('side').classList.add('ui-hidden');
+      document.querySelectorAll('section[id^="view-"]').forEach(s => s.classList.toggle('ui-hidden', s.id !== 'view-inc'));
+      opened = true; incLoad(); return;
+    }
+    sec.classList.add('ui-hidden');
+    return _sv.apply(this, arguments);
+  };
+  function syncRole() {
+    const ok = logged() && dev();
+    nav.classList.toggle('ui-hidden', !ok); syncInstall(); drawChip();
+    if (!ok && !sec.classList.contains('ui-hidden')) { sec.classList.add('ui-hidden'); try { _sv('filter'); } catch (e) {} }
+    if (!ok && opened) { opened = false; I.rows = []; I.urls.forEach(u => URL.revokeObjectURL(u)); I.urls.clear(); $('inc-body').innerHTML = ''; modal.classList.add('hidden'); }
+  }
+
+  function invNames() {
+    const out = new Map();
+    (typeof excelData !== 'undefined' ? excelData : []).forEach(r => { try { const i = info(r); if (i.punto) out.set(String(i.punto).trim(), i); } catch (e) {} });
+    return out;
+  }
+  async function incLoad() {
+    const c = sb(); if (!c) { $('inc-msg').innerHTML = '<div class="v21-msg err">Sin conexión con Supabase.</div>'; return; }
+    $('inc-msg').innerHTML = '<div class="v21-msg ok">Cargando…</div>';
+    const { data, error } = await c.from('mdz_incidentes').select('*').order('fecha', { ascending: false }).order('id', { ascending: false }).limit(2000);
+    if (error) { $('inc-msg').innerHTML = isNet(error) ? '<div class="v21-msg warn">Sin conexión: no se pueden mostrar los incidentes ahora. Puedes registrar uno nuevo y se subirá al volver la señal.</div>' : errBox(error, SQLF); I.rows = []; incDraw(); return; }
+    I.rows = data || []; $('inc-msg').innerHTML = ''; incDraw();
+  }
+  function filtered() {
+    const q = norm(I.q);
+    return I.rows.filter(r => (!I.estado || r.estado === I.estado) && (!I.tipo || r.tipo === I.tipo) && (!I.punto || norm(r.punto) === norm(I.punto))
+      && (!q || norm(r.punto + ' ' + (r.descripcion || '') + ' ' + (r.solucion || '')).includes(q)));
+  }
+  function incDraw() {
+    const rows = I.rows, mes = hoy().slice(0, 7);
+    const ab = rows.filter(r => r.estado === 'ABIERTO').length, pr = rows.filter(r => r.estado === 'EN_PROCESO').length;
+    const alta = rows.filter(r => r.estado !== 'CERRADO' && r.severidad === 'ALTA').length;
+    const delMes = rows.filter(r => String(r.fecha).startsWith(mes)), costoMes = delMes.reduce((s, r) => s + (Number(r.costo) || 0), 0);
+    const byP = new Map(); rows.forEach(r => byP.set(r.punto, (byP.get(r.punto) || 0) + 1));
+    const top = [...byP.entries()].sort((a, b) => b[1] - a[1]).slice(0, 8), mx = top.length ? top[0][1] : 1;
+    const list = filtered(), qn = (window.__mdzQueue ? window.__mdzQueue.list() : []).filter(x => x.t === 'mdz_incidentes');
+    $('inc-body').innerHTML = `
+      ${qn.length ? `<div class="v21-msg warn">${qn.length} incidente${qn.length === 1 ? '' : 's'} registrado${qn.length === 1 ? '' : 's'} sin conexión, pendiente${qn.length === 1 ? '' : 's'} de subir (sin fotos; agrégalas al volver la señal).</div>` : ''}
+      <div class="v21-kpis">
+        <div class="card v23-kpi${ab ? ' bad' : ''}"><p>${ab}</p><p>Abiertos</p></div>
+        <div class="card v23-kpi${pr ? ' warn' : ''}"><p>${pr}</p><p>En proceso</p></div>
+        <div class="card v23-kpi${alta ? ' bad' : ''}"><p>${alta}</p><p>Severidad alta sin cerrar</p></div>
+        <div class="card v23-kpi"><p>${delMes.length}</p><p>Este mes</p></div>
+        <div class="card v23-kpi"><p>${soles(costoMes)}</p><p>Costo del mes</p></div>
+      </div>
+      ${top.length ? `<div class="card p-3"><h3 class="text-xs font-bold uppercase tracking-wider text-slate-300 mb-1">Antenas con más incidentes</h3><div class="v21-bars">${top.map(([p, n]) => `<div><span class="truncate" title="${esc(p)}">${esc(p)}</span><i style="width:${Math.max(6, n / mx * 100)}%"></i><button class="v21-mini" data-hist="${esc(p)}">${n} · ver</button></div>`).join('')}</div></div>` : ''}
+      <div class="v21-bar">
+        <input id="inc-q" placeholder="Buscar punto o texto…" value="${esc(I.q)}" style="flex:1;min-width:160px">
+        <select id="inc-est"><option value="">Todos los estados</option>${ESTADOS.map(e => `<option value="${e[0]}"${I.estado === e[0] ? ' selected' : ''}>${e[1]}</option>`).join('')}</select>
+        <select id="inc-tipo"><option value="">Todos los tipos</option>${TIPOS.map(e => `<option value="${e[0]}"${I.tipo === e[0] ? ' selected' : ''}>${e[1]}</option>`).join('')}</select>
+        ${I.punto ? `<button class="v21-mini ok" data-clearp="1">Punto: ${esc(I.punto)} ✕</button>` : ''}
+      </div>
+      ${list.length ? `<div class="v24-list">${list.map(card).join('')}</div>` : `<div class="v21-msg ok">${rows.length ? 'Ningún incidente coincide con el filtro.' : 'Aún no hay incidentes registrados. Usa "Nuevo incidente"; desde el celular puedes tomar las fotos al momento.'}</div>`}`;
+    loadThumbs();
+  }
+  function card(r) {
+    const fotos = Array.isArray(r.fotos) ? r.fotos : [];
+    const inv = invNames().get(String(r.punto).trim());
+    return `<article class="card v24-inc">
+      <h4>${esc(r.punto)} <span class="v24-tipo ${esc(r.tipo)}">${esc(tipoTxt(r.tipo))}</span> ${pill(SEV, r.severidad)} ${pill(ESTADOS, r.estado)}</h4>
+      <div class="meta">${fdate(r.fecha)}${r.costo != null ? ' · ' + soles(r.costo) : ''}${r.estado === 'CERRADO' && r.cerrado_el ? ' · cerrado el ' + fdate(r.cerrado_el) : ''}</div>
+      ${r.descripcion ? `<p>${esc(r.descripcion)}</p>` : ''}${r.solucion ? `<p class="sol">✔ ${esc(r.solucion)}</p>` : ''}
+      ${fotos.length ? `<div class="v24-thumbs">${fotos.map((f, i) => `<button type="button" data-foto="${esc(f)}" aria-label="Ver foto ${i + 1}"></button>`).join('')}</div>` : ''}
+      <div class="flex flex-wrap gap-2 mt-2"><button class="v21-mini" data-ied="${r.id}">Editar / fotos</button>
+        ${r.estado !== 'CERRADO' ? `<button class="v21-mini ok" data-iclose="${r.id}">Cerrar</button>` : ''}
+        <button class="v21-mini" data-hist="${esc(r.punto)}">Historial del punto</button>
+        ${inv && inv.ok ? `<button class="v21-mini" data-imap="${esc(r.punto)}">Mapa</button>` : ''}
+        <button class="v21-mini bad" data-idel="${r.id}">Borrar</button></div></article>`;
+  }
+  async function blobUrl(path) {
+    if (I.urls.has(path)) return I.urls.get(path);
+    const c = sb(); if (!c || !c.storage) return null;
+    const { data, error } = await c.storage.from(BUCKET).download(path);
+    if (error || !data) return null;
+    const u = URL.createObjectURL(data); I.urls.set(path, u); return u;
+  }
+  async function loadThumbs() {
+    const btns = [...document.querySelectorAll('#inc-body [data-foto], #inc-modal [data-foto]')];
+    for (const b of btns) { const u = await blobUrl(b.dataset.foto); if (u && b.isConnected) b.style.backgroundImage = `url("${u}")`; else if (b.isConnected) { b.textContent = 'sin acceso'; b.style.fontSize = '10px'; } }
+  }
+
+  function formHtml(r) {
+    const f = r || { fecha: hoy(), punto: I.punto || '', tipo: 'FALLA_EQUIPO', severidad: 'MEDIA', estado: 'ABIERTO', fotos: [] };
+    const fotos = (Array.isArray(f.fotos) ? f.fotos : []).filter(p => !I.removed.includes(p));
+    const names = [...invNames().keys()].sort();
+    return `<form id="inc-form" autocomplete="off" class="space-y-3">
+      <div class="flex items-center justify-between"><h3 class="text-sm font-bold text-white">${r ? 'Editar incidente' : 'Nuevo incidente'}</h3><button type="button" class="v21-mini" data-iclosem="1" aria-label="Cerrar">✕</button></div>
+      <div class="v21-form">
+        <label>Fecha<input type="date" id="if-fecha" value="${esc(f.fecha)}" required max="${addDays(hoy(), 1)}"></label>
+        <label>Punto / antena<input id="if-punto" list="if-puntos" maxlength="200" required value="${esc(f.punto)}" placeholder="Escribe o elige del inventario"><datalist id="if-puntos">${names.map(n => `<option value="${esc(n)}">`).join('')}</datalist></label>
+        <label>Tipo<select id="if-tipo">${TIPOS.map(t => `<option value="${t[0]}"${f.tipo === t[0] ? ' selected' : ''}>${t[1]}</option>`).join('')}</select></label>
+        <label>Severidad<select id="if-sev">${SEV.map(t => `<option value="${t[0]}"${f.severidad === t[0] ? ' selected' : ''}>${t[1]}</option>`).join('')}</select></label>
+        <label>Estado<select id="if-est">${ESTADOS.map(t => `<option value="${t[0]}"${f.estado === t[0] ? ' selected' : ''}>${t[1]}</option>`).join('')}</select></label>
+        <label>Costo (S/)<input id="if-costo" inputmode="decimal" placeholder="opcional" value="${esc(f.costo ?? '')}"></label>
+        <label class="full">Qué pasó<textarea id="if-desc" rows="3" maxlength="2000" placeholder="Qué se encontró, desde cuándo, qué equipos afecta…">${esc(f.descripcion || '')}</textarea></label>
+        <label class="full">Solución o acción tomada<textarea id="if-sol" rows="2" maxlength="2000">${esc(f.solucion || '')}</textarea></label>
+        <label class="full">Fotos (máximo 8 · se comprimen antes de subir)
+          <input type="file" id="if-files" accept="image/*" capture="environment" multiple>
+        </label>
+      </div>
+      <div class="v24-thumbs" id="if-thumbs">${fotos.map(p => `<span style="position:relative;display:inline-block"><button type="button" data-foto="${esc(p)}" aria-label="Ver foto"></button><button type="button" class="rm" data-rmfoto="${esc(p)}" aria-label="Quitar foto">✕</button></span>`).join('')}
+        ${I.newFiles.map((x, i) => `<span style="position:relative;display:inline-block"><span class="ph" style="background-image:url('${x.url}');background-size:cover"></span><button type="button" class="rm" data-rmnew="${i}" aria-label="Quitar foto nueva">✕</button></span>`).join('')}</div>
+      <div id="if-msg"></div>
+      <div class="flex flex-wrap gap-2"><button class="v21-btn pri" type="submit"><i class="fa-solid fa-floppy-disk"></i>Guardar</button><button class="v21-btn" type="button" data-iclosem="1">Cancelar</button></div>
+    </form>`;
+  }
+  function openForm(r) {
+    I.edit = r ? r.id : null; I.removed = []; I.newFiles.forEach(x => URL.revokeObjectURL(x.url)); I.newFiles = [];
+    modal.querySelector('.panel').innerHTML = formHtml(r); modal.classList.remove('hidden'); loadThumbs();
+    setTimeout(() => { const el = $('if-punto'); if (el && !el.value) el.focus(); else { const d = $('if-desc'); d && d.focus(); } }, 50);
+  }
+  function redrawForm() {
+    const keep = ['if-fecha', 'if-punto', 'if-tipo', 'if-sev', 'if-est', 'if-costo', 'if-desc', 'if-sol'].reduce((o, id) => { const el = $(id); if (el) o[id] = el.value; return o; }, {});
+    const r = I.edit ? I.rows.find(x => x.id === I.edit) : null;
+    modal.querySelector('.panel').innerHTML = formHtml(r);
+    Object.entries(keep).forEach(([id, v]) => { const el = $(id); if (el) el.value = v; });
+    loadThumbs();
+  }
+  // foto → JPEG de máx. 1600 px (≈ 200–500 KB)
+  function compress(file) {
+    return new Promise(res => {
+      const url = URL.createObjectURL(file), img = new Image();
+      img.onload = () => {
+        const k = Math.min(1, 1600 / Math.max(img.naturalWidth, img.naturalHeight)), cv = document.createElement('canvas');
+        cv.width = Math.round(img.naturalWidth * k); cv.height = Math.round(img.naturalHeight * k);
+        cv.getContext('2d').drawImage(img, 0, 0, cv.width, cv.height); URL.revokeObjectURL(url);
+        cv.toBlob(b => res(b || file), 'image/jpeg', .82);
+      };
+      img.onerror = () => { URL.revokeObjectURL(url); res(file.size < 3e6 ? file : null); };
+      img.src = url;
+    });
+  }
+  modal.addEventListener('change', async e => {
+    if (e.target.id !== 'if-files') return;
+    const r = I.edit ? I.rows.find(x => x.id === I.edit) : null, have = ((r && r.fotos) || []).filter(p => !I.removed.includes(p)).length + I.newFiles.length;
+    const files = [...e.target.files].slice(0, Math.max(0, 8 - have));
+    if (e.target.files.length > files.length) toast('Máximo 8 fotos por incidente');
+    for (const f of files) { const b = await compress(f); if (b) I.newFiles.push({ blob: b, url: URL.createObjectURL(b) }); }
+    redrawForm();
+  });
+  modal.addEventListener('click', async e => {
+    if (e.target === modal) { modal.classList.add('hidden'); return; }
+    const b = e.target.closest('button'); if (!b) return;
+    if (b.dataset.iclosem) { modal.classList.add('hidden'); return; }
+    if (b.dataset.rmfoto) { I.removed.push(b.dataset.rmfoto); redrawForm(); return; }
+    if (b.dataset.rmnew) { const x = I.newFiles.splice(Number(b.dataset.rmnew), 1)[0]; if (x) URL.revokeObjectURL(x.url); redrawForm(); return; }
+    if (b.dataset.foto) { const u = await blobUrl(b.dataset.foto); if (u) { lb.querySelector('img').src = u; lb.classList.add('on'); } }
+  });
+  modal.addEventListener('submit', async e => {
+    e.preventDefault(); const c = sb(); if (!c) return;
+    const btn = e.target.querySelector('button[type=submit]'); btn.disabled = true;
+    const msg = t => { $('if-msg').innerHTML = t; };
+    try {
+      const estado = $('if-est').value, prev = I.edit ? I.rows.find(x => x.id === I.edit) : null;
+      const row = { fecha: $('if-fecha').value, punto: $('if-punto').value.trim().slice(0, 200), tipo: $('if-tipo').value, severidad: $('if-sev').value, estado,
+        costo: num($('if-costo').value), descripcion: $('if-desc').value.trim() || null, solucion: $('if-sol').value.trim() || null,
+        cerrado_el: estado === 'CERRADO' ? ((prev && prev.cerrado_el) || hoy()) : null };
+      if (!row.fecha || !row.punto) { msg('<div class="v21-msg err">Falta la fecha o el punto.</div>'); return; }
+      if (row.costo != null && (row.costo < 0 || row.costo > 1e7)) { msg('<div class="v21-msg err">El costo no es válido.</div>'); return; }
+      // sin conexión: el incidente (sin fotos) va a la cola
+      if (!I.edit && !navigator.onLine) { window.__mdzQueue.add('mdz_incidentes', Object.assign(row, { fotos: [] }), 'Incidente ' + row.punto); modal.classList.add('hidden'); incDraw(); return; }
+      let id = I.edit, fotos = ((prev && prev.fotos) || []).filter(p => !I.removed.includes(p));
+      if (!id) {
+        const { data, error } = await c.from('mdz_incidentes').insert(Object.assign({}, row, { fotos: [] })).select('id').single();
+        if (error) { if (isNet(error)) { window.__mdzQueue.add('mdz_incidentes', Object.assign(row, { fotos: [] }), 'Incidente ' + row.punto); modal.classList.add('hidden'); incDraw(); return; } msg(errBox(error, SQLF)); return; }
+        id = data.id;
+      }
+      let fallo = 0;
+      if (I.newFiles.length) {
+        if (!c.storage) fallo = I.newFiles.length;
+        else for (let i = 0; i < I.newFiles.length; i++) {
+          msg(`<div class="v21-msg ok">Subiendo foto ${i + 1} de ${I.newFiles.length}…</div>`);
+          const path = `${id}/${Date.now()}_${i}.jpg`;
+          const { error } = await c.storage.from(BUCKET).upload(path, I.newFiles[i].blob, { contentType: 'image/jpeg', upsert: false });
+          if (error) fallo++; else fotos.push(path);
+        }
+      }
+      if (I.removed.length && c.storage) { try { await c.storage.from(BUCKET).remove(I.removed); } catch (er) {} }
+      const { error } = await c.from('mdz_incidentes').update(Object.assign({}, row, { fotos: fotos.slice(0, 8) })).eq('id', id);
+      if (error) { msg(errBox(error, SQLF)); return; }
+      modal.classList.add('hidden'); I.newFiles.forEach(x => URL.revokeObjectURL(x.url)); I.newFiles = [];
+      toast(fallo ? `Incidente guardado, pero ${fallo} foto${fallo === 1 ? '' : 's'} no se subieron. Revisa que ejecutaste ${SQLF}.` : (I.edit ? 'Incidente actualizado' : 'Incidente registrado'));
+      I.edit = null; await incLoad();
+      try { window.__mdzRafiRefresh && window.__mdzRafiRefresh(); } catch (er) {}
+    } finally { if (btn.isConnected) btn.disabled = false; }
+  });
+  sec.addEventListener('input', e => { if (e.target.id === 'inc-q') { I.q = e.target.value; clearTimeout(I.t); I.t = setTimeout(() => { const pos = e.target.selectionStart; incDraw(); const q = $('inc-q'); q.focus(); try { q.setSelectionRange(pos, pos); } catch (er) {} }, 250); } });
+  sec.addEventListener('change', e => { if (e.target.id === 'inc-est') { I.estado = e.target.value; incDraw(); } if (e.target.id === 'inc-tipo') { I.tipo = e.target.value; incDraw(); } });
+  sec.addEventListener('click', async e => {
+    const b = e.target.closest('button'); if (!b || !sec.contains(b)) return;
+    if (b.id === 'inc-new') { openForm(null); return; }
+    if (b.id === 'inc-reload') { incLoad(); return; }
+    if (b.id === 'inc-xls') { incXls(); return; }
+    if (b.id === 'inc-pdf') { reportDialog(); return; }
+    if (b.dataset.clearp) { I.punto = ''; incDraw(); return; }
+    if (b.dataset.hist) { I.punto = b.dataset.hist; I.q = ''; I.estado = ''; I.tipo = ''; incDraw(); sec.querySelector('.overflow-y-auto').scrollTop = 0; return; }
+    if (b.dataset.foto) { const u = await blobUrl(b.dataset.foto); if (u) { lb.querySelector('img').src = u; lb.classList.add('on'); } return; }
+    if (b.dataset.ied) { openForm(I.rows.find(r => r.id === Number(b.dataset.ied))); return; }
+    if (b.dataset.imap) { const i = invNames().get(b.dataset.imap); if (!i || !i.ok) return; window.setView('map'); setTimeout(() => { try { map.setView([i.lat, i.lon], 16); } catch (er) {} }, 450); return; }
+    const c = sb(); if (!c) return;
+    if (b.dataset.iclose) { const { error } = await c.from('mdz_incidentes').update({ estado: 'CERRADO', cerrado_el: hoy() }).eq('id', Number(b.dataset.iclose)); if (error) { $('inc-msg').innerHTML = errBox(error, SQLF); return; } toast('Incidente cerrado'); incLoad(); return; }
+    if (b.dataset.idel) {
+      if (b.dataset.sure !== '1') { b.dataset.sure = '1'; b.textContent = '¿Borrar con fotos?'; setTimeout(() => { if (b.isConnected) { b.dataset.sure = ''; b.textContent = 'Borrar'; } }, 4000); return; }
+      const r = I.rows.find(x => x.id === Number(b.dataset.idel));
+      if (r && Array.isArray(r.fotos) && r.fotos.length && c.storage) { try { await c.storage.from(BUCKET).remove(r.fotos); } catch (er) {} }
+      const { error } = await c.from('mdz_incidentes').delete().eq('id', Number(b.dataset.idel));
+      if (error) { $('inc-msg').innerHTML = errBox(error, SQLF); return; } toast('Incidente borrado'); incLoad();
+    }
+  });
+  document.addEventListener('keydown', e => { if (e.key !== 'Escape') return; if (lb.classList.contains('on')) lb.classList.remove('on'); else if (!modal.classList.contains('hidden')) modal.classList.add('hidden'); });
+  function incXls() {
+    if (typeof XLSX === 'undefined') { toast('Excel no disponible'); return; }
+    const rows = filtered().map(r => ({ 'FECHA': r.fecha, 'PUNTO': r.punto, 'TIPO': tipoTxt(r.tipo), 'SEVERIDAD': r.severidad, 'ESTADO': r.estado, 'COSTO S/': r.costo == null ? '' : Number(r.costo), 'QUÉ PASÓ': r.descripcion || '', 'SOLUCIÓN': r.solucion || '', 'FOTOS': (r.fotos || []).length, 'CERRADO EL': r.cerrado_el || '' }));
+    const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(rows.length ? rows : [{ 'FECHA': '' }]), 'Incidentes');
+    XLSX.writeFile(wb, `incidentes_${hoy()}.xlsx`);
+  }
+
+  /* =====================================================================
+     3) REPORTE SEMANAL PARA GERENCIA (se guarda como PDF desde la ventana de impresión)
+     ===================================================================== */
+  function reportDialog() {
+    const lastMon = addDays(mondayOf(hoy()), -7), thisMon = mondayOf(hoy());
+    modal.querySelector('.panel').innerHTML = `<div class="space-y-3"><div class="flex items-center justify-between"><h3 class="text-sm font-bold text-white">Reporte semanal para gerencia</h3><button type="button" class="v21-mini" data-iclosem="1" aria-label="Cerrar">✕</button></div>
+      <p class="text-[12px] text-slate-300">Incluye grupo electrógeno, mantenimiento preventivo, sala de servidores, caja chica, visitas a antenas e incidentes. Se abre la ventana de impresión: elige <b>Guardar como PDF</b>.</p>
+      <div class="v21-form"><label>Semana desde el lunes<input type="date" id="rp-from" value="${lastMon}"></label>
+        <label>Atajo<select id="rp-quick"><option value="${lastMon}">Semana pasada</option><option value="${thisMon}">Semana actual</option></select></label></div>
+      <div id="rp-msg"></div>
+      <div class="flex gap-2"><button class="v21-btn pri" id="rp-go" type="button"><i class="fa-solid fa-file-pdf"></i>Generar PDF</button><button class="v21-btn" type="button" data-iclosem="1">Cancelar</button></div></div>`;
+    modal.classList.remove('hidden');
+    $('rp-quick').addEventListener('change', e => { $('rp-from').value = e.target.value; });
+    $('rp-go').addEventListener('click', async () => {
+      const from = mondayOf($('rp-from').value || lastMon); $('rp-msg').innerHTML = '<div class="v21-msg ok">Preparando el reporte…</div>';
+      try { await buildReport(from); modal.classList.add('hidden'); printReport(from); }
+      catch (er) { $('rp-msg').innerHTML = `<div class="v21-msg err">No se pudo preparar: ${esc(er.message || er)}</div>`; }
+    });
+  }
+  window.__mdzReportDialog = reportDialog;
+  async function buildReport(from) {
+    const to = addDays(from, 6), c = sb(); if (!c) throw new Error('sin conexión con Supabase');
+    const inW = r => r.fecha >= from && r.fecha <= to;
+    const safe = async p => { try { const r = await p; return r.error ? { data: null, err: r.error } : r; } catch (e) { return { data: null, err: e }; } };
+    const [ge, sa, cfg, caja, inc] = await Promise.all([
+      safe(c.from('mdz_ge_registros').select('*').order('fecha', { ascending: true }).order('id', { ascending: true }).limit(3000)),
+      safe(c.from('mdz_sala_registros').select('*').order('fecha', { ascending: true }).order('id', { ascending: true }).limit(3000)),
+      safe(c.from('mdz_sala_config').select('valor').eq('clave', 'general').maybeSingle()),
+      safe(c.from('mdz_caja_movimientos').select('*').order('fecha', { ascending: true }).order('id', { ascending: true }).limit(5000)),
+      safe(c.from('mdz_incidentes').select('*').order('fecha', { ascending: true }).limit(2000))
+    ]);
+    const cf = (cfg.data && cfg.data.valor) || {}, u = Object.assign({ combustible_min: 30, temp_max: 27, hum_min: 40, hum_max: 60, ups_max: 80 }, cf.umbrales || {});
+    const na = '<p class="muted">Sin datos (módulo no configurado o sin permisos).</p>';
+    // grupo electrógeno
+    const geAll = ge.data || [], geW = geAll.filter(inW);
+    const geRows = geW.map(r => `<tr><td>${fdate(r.fecha)}</td><td>${esc(r.equipo)}</td><td class="${r.encendido_auto === 'OK' ? 'ok' : r.encendido_auto === 'FALLA' ? 'bad' : 'warn'}">${r.encendido_auto === 'NO_PROBADO' ? 'No probado' : r.encendido_auto}</td><td class="n${r.combustible_pct != null && Number(r.combustible_pct) < u.combustible_min ? ' bad' : ''}">${fmt(r.combustible_pct)}${r.combustible_pct != null ? ' %' : ''}</td><td class="n">${fmt(r.horometro_h)}</td><td class="n">${r.arranque_seg != null ? fmt(r.arranque_seg) + ' s' : '—'}</td><td>${esc(r.observacion || '')}</td></tr>`).join('');
+    const mantRows = Object.entries(cf.mant || {}).flatMap(([eq, plan]) => {
+      const list = geAll.filter(r => r.equipo === eq); let horo = null; for (let i = list.length - 1; i >= 0; i--) if (list[i].horometro_h != null) { horo = Number(list[i].horometro_h); break; }
+      return (plan || []).map(t => { if (t.ultimo_h == null || horo == null || !(t.cada_h > 0)) return `<tr><td>${esc(eq)}</td><td>${esc(t.tarea)}</td><td class="n">${fmt(t.cada_h)}</td><td class="muted" colspan="2">Falta el dato del último servicio</td></tr>`;
+        const f = Number(t.ultimo_h) + Number(t.cada_h) - horo, cls = f <= 0 ? 'bad' : f <= Math.max(25, t.cada_h * .1) ? 'warn' : 'ok';
+        return `<tr><td>${esc(eq)}</td><td>${esc(t.tarea)}</td><td class="n">${fmt(t.cada_h)}</td><td class="n">${f <= 0 ? 'vencido ' + fmt(-f) : fmt(f)} h</td><td class="${cls}">${cls === 'bad' ? 'Vencido' : cls === 'warn' ? 'Próximo' : 'Al día'}</td></tr>`; });
+    }).join('');
+    // sala
+    const saW = (sa.data || []).filter(inW);
+    const saRows = saW.map(r => `<tr><td>${fdate(r.fecha)}</td><td class="n${r.temperatura_c != null && Number(r.temperatura_c) > u.temp_max ? ' bad' : ''}">${r.temperatura_c != null ? fmt(r.temperatura_c) + ' °C' : '—'}</td><td class="n">${r.humedad_pct != null ? fmt(r.humedad_pct) + ' %' : '—'}</td><td class="n${r.carga_ups_pct != null && Number(r.carga_ups_pct) > u.ups_max ? ' bad' : ''}">${r.carga_ups_pct != null ? fmt(r.carga_ups_pct) + ' %' : '—'}</td><td class="n">${r.autonomia_min != null ? fmt(r.autonomia_min) + ' min' : '—'}</td><td class="${r.aire_acond === 'FALLA' ? 'bad' : ''}">${r.aire_acond === 'NO_APLICA' ? 'No aplica' : r.aire_acond}</td><td>${esc(r.alarmas || '')}</td></tr>`).join('');
+    // caja chica: saldo corrido (SALDO reinicia, ABONO suma, GASTO resta)
+    const mov = caja.data || []; let saldo = 0, saldoIni = 0, ab = 0, ga = 0; const cajaRows = [];
+    mov.forEach(m => { const v = Number(m.monto) || 0; if (m.fecha < from) { saldo = m.tipo === 'SALDO' ? v : m.tipo === 'ABONO' ? saldo + v : saldo - v; saldoIni = saldo; return; } if (m.fecha > to) return;
+      saldo = m.tipo === 'SALDO' ? v : m.tipo === 'ABONO' ? saldo + v : saldo - v; if (m.tipo === 'ABONO') ab += v; if (m.tipo === 'GASTO') ga += v;
+      cajaRows.push(`<tr><td>${fdate(m.fecha)}</td><td>${m.tipo}</td><td>${esc(m.concepto)}</td><td>${esc(m.categoria || '')}</td><td class="n ${m.tipo === 'GASTO' ? 'bad' : m.tipo === 'ABONO' ? 'ok' : ''}">${m.tipo === 'GASTO' ? '−' : ''}${soles(v)}</td><td class="n">${soles(saldo)}</td></tr>`); });
+    // visitas (inventario cargado en el tablero)
+    let tot = 0, vis = 0; const pend = [];
+    (typeof excelData !== 'undefined' ? excelData : []).forEach(r => { try { const i = info(r); if (!i.punto) return; tot++; if (i.visitado) vis++; else pend.push(String(i.punto)); } catch (e) {} });
+    // incidentes
+    const incAll = inc.data || [], incW = incAll.filter(inW), incOpen = incAll.filter(r => r.estado !== 'CERRADO');
+    const incRow = r => `<tr><td>${fdate(r.fecha)}</td><td>${esc(r.punto)}</td><td>${esc(tipoTxt(r.tipo))}</td><td class="${r.severidad === 'ALTA' ? 'bad' : r.severidad === 'MEDIA' ? 'warn' : ''}">${r.severidad}</td><td class="${r.estado === 'CERRADO' ? 'ok' : 'bad'}">${r.estado === 'EN_PROCESO' ? 'En proceso' : r.estado}</td><td>${esc(r.descripcion || '')}${r.solucion ? `<br><span class="ok">✔ ${esc(r.solucion)}</span>` : ''}</td><td class="n">${(r.fotos || []).length}</td></tr>`;
+    const geFall = geW.filter(r => r.encendido_auto === 'FALLA').length;
+    const quien = (typeof hunterPerfil !== 'undefined' && hunterPerfil && hunterPerfil.nombre) ? hunterPerfil.nombre : 'MDZ';
+    let rep = $('mdz-report'); if (!rep) { rep = document.createElement('div'); rep.id = 'mdz-report'; document.body.appendChild(rep); }
+    rep.innerHTML = `<div class="rp-head"><div><h1>HUNTER CORE · REPORTE SEMANAL</h1><small>Semana del ${fdate(from)} al ${fdate(to)} · mdzhunter</small></div><small>Generado el ${fdate(hoy())} por ${esc(quien)}</small></div>
+      <div class="rp-kpis">
+        <div><b>${geW.length ? (geFall ? `<span class="bad">${geFall} falla${geFall === 1 ? '' : 's'}</span>` : '<span class="ok">OK</span>') : '<span class="warn">Sin prueba</span>'}</b><span>Prueba del grupo electrógeno</span></div>
+        <div><b>${saW.length ? saW.length + ' revisión' + (saW.length === 1 ? '' : 'es') : '<span class="warn">Sin revisión</span>'}</b><span>Sala de servidores</span></div>
+        <div><b>${soles(saldo)}</b><span>Saldo de caja chica al ${fdate(to)}</span></div>
+        <div><b>${incW.length} nuevo${incW.length === 1 ? '' : 's'} · ${incOpen.length} abierto${incOpen.length === 1 ? '' : 's'}</b><span>Incidentes</span></div>
+      </div>
+      <h2>Grupo electrógeno</h2>${ge.err ? na : geRows ? `<table><thead><tr><th>Fecha</th><th>Equipo</th><th>Encendido</th><th class="n">Combustible</th><th class="n">Horómetro</th><th class="n">Arranque</th><th>Observación</th></tr></thead><tbody>${geRows}</tbody></table>` : '<p class="warn">No se registró la prueba semanal en esta semana.</p>'}
+      ${mantRows ? `<h2>Mantenimiento preventivo (según horómetro)</h2><table><thead><tr><th>Equipo</th><th>Tarea</th><th class="n">Cada</th><th class="n">Faltan</th><th>Estado</th></tr></thead><tbody>${mantRows}</tbody></table>` : ''}
+      <h2>Sala de servidores</h2>${sa.err ? na : saRows ? `<table><thead><tr><th>Fecha</th><th class="n">Temperatura</th><th class="n">Humedad</th><th class="n">UPS</th><th class="n">Autonomía</th><th>Aire</th><th>Alarmas</th></tr></thead><tbody>${saRows}</tbody></table>` : '<p class="warn">No se registró revisión en esta semana.</p>'}
+      <h2>Caja chica</h2>${caja.err ? na : `<p>Saldo al inicio: <b>${soles(saldoIni)}</b> · Abonos: <b class="ok">${soles(ab)}</b> · Gastos: <b class="bad">${soles(ga)}</b> · Saldo al cierre: <b>${soles(saldo)}</b></p>${cajaRows.length ? `<table><thead><tr><th>Fecha</th><th>Tipo</th><th>Concepto</th><th>Categoría</th><th class="n">Monto</th><th class="n">Saldo</th></tr></thead><tbody>${cajaRows.join('')}</tbody></table>` : '<p class="muted">Sin movimientos en la semana.</p>'}`}
+      <h2>Visitas a antenas</h2>${tot ? `<p>Visitadas: <b class="ok">${vis}</b> de ${tot} · Pendientes: <b class="${pend.length ? 'warn' : 'ok'}">${pend.length}</b> (según el inventario cargado al generar el reporte).</p>${pend.length ? `<p class="muted">${pend.slice(0, 60).map(esc).join(' · ')}${pend.length > 60 ? ' …' : ''}</p>` : ''}` : '<p class="muted">El inventario no estaba cargado al generar el reporte.</p>'}
+      <h2>Incidentes de la semana</h2>${inc.err ? na : incW.length ? `<table><thead><tr><th>Fecha</th><th>Punto</th><th>Tipo</th><th>Severidad</th><th>Estado</th><th>Detalle</th><th class="n">Fotos</th></tr></thead><tbody>${incW.map(incRow).join('')}</tbody></table>` : '<p class="ok">Sin incidentes nuevos.</p>'}
+      ${incOpen.filter(r => r.fecha < from).length ? `<h2>Incidentes abiertos de semanas anteriores</h2><table><thead><tr><th>Fecha</th><th>Punto</th><th>Tipo</th><th>Severidad</th><th>Estado</th><th>Detalle</th><th class="n">Fotos</th></tr></thead><tbody>${incOpen.filter(r => r.fecha < from).map(incRow).join('')}</tbody></table>` : ''}
+      <div class="rp-foot">Reporte generado automáticamente por HUNTER CORE. Datos de Supabase al ${new Date().toLocaleString('es-PE')}. Documento interno.</div>`;
+    return rep;
+  }
+  window.__mdzBuildReport = buildReport;
+  function printReport(from) {
+    const t0 = document.title; document.title = `Reporte_semanal_HUNTER_${from}`;
+    document.body.classList.add('mdz-printing');
+    const done = () => { document.body.classList.remove('mdz-printing'); document.title = t0; window.removeEventListener('afterprint', done); };
+    window.addEventListener('afterprint', done);
+    setTimeout(() => { try { window.print(); } catch (e) {} setTimeout(() => { if (!window.matchMedia || !matchMedia('print').matches) done(); }, 1500); }, 150);
+  }
+
+  /* RAFI: avisa incidentes graves sin cerrar y registros sin subir */
+  (window.__mdzRafiExtra = window.__mdzRafiExtra || []).push(async () => {
+    const out = [], c = sb(), q = qGet();
+    if (q.length) out.push({ lvl: 'warn', txt: `${q.length} registro${q.length === 1 ? '' : 's'} hecho${q.length === 1 ? '' : 's'} sin conexión aún no se subieron.`, go: null });
+    if (c) { const { data, error } = await c.from('mdz_incidentes').select('id,punto,severidad,estado,fecha').neq('estado', 'CERRADO').limit(500);
+      if (!error && data) { const alta = data.filter(r => r.severidad === 'ALTA'); if (alta.length) out.push({ lvl: 'bad', txt: `${alta.length} incidente${alta.length === 1 ? '' : 's'} de severidad alta sin cerrar: ${alta.slice(0, 3).map(r => r.punto).join(', ')}${alta.length > 3 ? '…' : ''}.`, go: 'inc' });
+        else if (data.length) out.push({ lvl: 'info', txt: `${data.length} incidente${data.length === 1 ? '' : 's'} abierto${data.length === 1 ? '' : 's'}.`, go: 'inc' }); } }
+    return out;
+  });
+
+  const _ar = window.applySessionRoleUI;
+  if (typeof _ar === 'function') window.applySessionRoleUI = function () { const r = _ar.apply(this, arguments); syncRole(); return r; };
+  setInterval(syncRole, 1000); syncRole();
+  setTimeout(flush, 4000);
+  window.__mdzInc = { I, incLoad, incDraw };
 })();
 </script>
 </body>
