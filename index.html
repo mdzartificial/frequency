@@ -14216,8 +14216,80 @@ body:not(.theme-day) .v26-map .leaflet-tile-pane { filter: invert(1) hue-rotate(
 /* robo: focos */
 .v26-focos .row { display:flex; justify-content:space-between; gap:8px; font-size:12px; padding:4px 0; border-bottom:1px dashed rgba(255,255,255,.08); color:#e2e8f0; }
 .v26-focos .row:last-child { border-bottom:0; }
+/* ===== v27 · Recuperos: mapa rediseñado, proyecciones, historial, calor en todos los mapas ===== */
+.v27-mgrid { display:grid; grid-template-columns:minmax(0,1fr) 290px; gap:12px; }
+.v27-map { height:min(660px,72vh); }
+.v27-side { max-height:min(660px,72vh); overflow-y:auto; padding-right:2px; }
+@media (max-width:1100px){ .v27-mgrid { grid-template-columns:1fr; } .v27-side { max-height:none; } .v27-map { height:min(560px,62vh); } }
+.v27-mapwrap:fullscreen { background:#05080f; padding:14px; overflow:auto; }
+.v27-mapwrap:fullscreen .v27-map, .v27-mapwrap:fullscreen .v26-map { height:calc(100vh - 90px); }
+.v27-mapwrap:fullscreen .v27-side { max-height:calc(100vh - 90px); }
+.v27-h { margin:0 0 8px; font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:.07em; color:#cbd5e1; }
+.v27-seg { display:inline-flex; padding:3px; border-radius:999px; background:rgba(0,0,0,.35); border:1px solid rgba(255,255,255,.12); }
+.v27-seg button { padding:5px 13px; border-radius:999px; font-size:11px; font-weight:800; color:#94a3b8; background:transparent; border:0; cursor:pointer; transition:background .15s,color .15s; }
+.v27-seg button.on { background:var(--accent,#38bdf8); color:#06121f; }
+.v27-ovs { display:inline-flex; flex-wrap:wrap; gap:6px; }
+.v27-ovs button { display:inline-flex; align-items:center; gap:6px; padding:5px 11px; border-radius:999px; font-size:11px; font-weight:700; color:#94a3b8; background:rgba(0,0,0,.25); border:1px solid rgba(255,255,255,.12); cursor:pointer; }
+.v27-ovs button i { width:9px; height:9px; border-radius:3px; border:1.5px solid currentColor; display:inline-block; }
+.v27-ovs button.on { color:#e2e8f0; border-color:rgba(56,189,248,.55); background:rgba(56,189,248,.12); }
+.v27-ovs button.on i { background:var(--accent,#38bdf8); border-color:var(--accent,#38bdf8); }
+.v27-rad { display:inline-flex; align-items:center; gap:6px; font-size:11px; color:#94a3b8; font-weight:700; }
+.v27-rad .sel { padding:4px 8px; font-size:11px; }
+.v27-minfo { background:rgba(8,12,20,.88); backdrop-filter:blur(6px); border:1px solid rgba(255,255,255,.12); border-radius:12px; padding:10px 12px; color:#e2e8f0; font-size:11px; min-width:180px; box-shadow:0 8px 24px rgba(0,0,0,.35); }
+.v27-minfo .t { font-weight:800; font-size:12px; margin-bottom:6px; }
+.v27-minfo .g { display:grid; grid-template-columns:auto auto; gap:3px 12px; } .v27-minfo .g span { color:#94a3b8; } .v27-minfo .g b { text-align:right; }
+.v27-mleg { background:rgba(8,12,20,.85); border:1px solid rgba(255,255,255,.12); border-radius:10px; padding:8px 10px; color:#cbd5e1; font-size:10.5px; display:flex; flex-direction:column; gap:5px; max-width:230px; }
+.v27-mleg span { display:flex; align-items:center; gap:7px; }
+.v27-lbub { width:14px; height:14px; border-radius:50%; background:rgba(239,68,68,.55); border:2px solid #fff; display:inline-block; }
+.v27-lant { width:14px; height:14px; border-radius:4px; background:#0f172a; border:2px solid #38bdf8; display:inline-block; }
+.v27-lgap { width:14px; height:14px; border-radius:50%; border:2px dashed #ef4444; display:inline-block; }
+.v27-lsug { color:#22c55e; font-size:13px; line-height:1; }
+.v27-ldot { width:10px; height:10px; border-radius:50%; display:inline-block; border:2px solid #fff; } .v27-ldot.ok { background:#10b981; } .v27-ldot.open { background:#ef4444; }
+.v27-grad i { display:inline-block; width:90px; height:8px; border-radius:4px; background:linear-gradient(90deg,#10b981,#f59e0b,#ef4444); }
+.v27-grad.heat i { background:linear-gradient(90deg,#1e3a8a,#38bdf8,#a78bfa,#f472b6,#f97316,#ef4444); }
+.v27-bub { width:var(--s); height:var(--s); border-radius:50%; display:grid; place-items:center; background:radial-gradient(circle at 35% 30%, color-mix(in srgb, var(--c) 70%, #fff) 0%, var(--c) 55%, color-mix(in srgb, var(--c) 70%, #000) 100%); border:2px solid rgba(255,255,255,.9); box-shadow:0 0 0 5px color-mix(in srgb, var(--c) 28%, transparent), 0 6px 16px rgba(0,0,0,.45); color:#fff; font-weight:900; font-size:12px; text-shadow:0 1px 2px rgba(0,0,0,.6); transition:transform .15s; cursor:pointer; }
+.v27-bub:hover { transform:scale(1.08); }
+.v27-clu { width:var(--s); height:var(--s); border-radius:50%; display:grid; place-items:center; background:conic-gradient(#ef4444 0 var(--p), #10b981 var(--p) 100%); box-shadow:0 4px 12px rgba(0,0,0,.45); }
+.v27-clu b { width:calc(var(--s) - 10px); height:calc(var(--s) - 10px); border-radius:50%; background:#0b1220; color:#fff; display:grid; place-items:center; font-size:11px; font-weight:900; }
+.v27-dot { width:14px; height:14px; border-radius:50%; background:var(--c); border:2px solid #fff; box-shadow:0 1px 4px rgba(0,0,0,.5); }
+.v27-dot.open { box-shadow:0 0 0 3px rgba(239,68,68,.35), 0 1px 4px rgba(0,0,0,.5); }
+.v27-ant { width:30px; height:30px; border-radius:9px; display:grid; place-items:center; background:#0b1220; border:2px solid var(--c); box-shadow:0 0 0 4px color-mix(in srgb, var(--c) 22%, transparent), 0 4px 10px rgba(0,0,0,.45); }
+.v27-ant svg { width:20px; height:20px; fill:none; stroke:var(--c); stroke-width:1.7; stroke-linecap:round; stroke-linejoin:round; }
+.leaflet-tooltip.v27-antlbl { display:none; background:rgba(8,12,20,.85); color:#e2e8f0; border:1px solid rgba(255,255,255,.15); border-radius:6px; padding:1px 6px; font-size:10px; font-weight:800; box-shadow:none; }
+.leaflet-tooltip.v27-antlbl::before { display:none; }
+.v27-z12 .leaflet-tooltip.v27-antlbl { display:block; }
+.v27-sug { width:30px; height:30px; border-radius:50%; display:grid; place-items:center; position:relative; background:#052e16; border:2px solid #22c55e; color:#4ade80; font-size:15px; box-shadow:0 0 0 5px rgba(34,197,94,.2), 0 4px 10px rgba(0,0,0,.45); }
+.v27-sug i { position:absolute; top:-6px; right:-6px; width:16px; height:16px; border-radius:50%; background:#22c55e; color:#052e16; font-size:10px; font-style:normal; font-weight:900; display:grid; place-items:center; }
+.v27-pop { font-size:12px; line-height:1.5; min-width:200px; }
+.v27-pop > b { font-size:13px; }
+.v27-pop .st { display:inline-block; margin:4px 0; padding:1px 8px; border-radius:6px; font-size:10.5px; font-weight:800; color:#fff; } .v27-pop .st.ok { background:#047857; } .v27-pop .st.op { background:#b45309; }
+.v27-pg { display:grid; grid-template-columns:auto 1fr; gap:2px 12px; margin-top:6px; } .v27-pg span { color:#64748b; } .v27-pg b { font-weight:800; }
+.v27-fi { width:100%; display:grid; grid-template-columns:24px minmax(0,1fr) auto; gap:8px; align-items:center; text-align:left; padding:8px 9px; margin-bottom:6px; border-radius:10px; background:rgba(255,255,255,.03); border:1px solid rgba(255,255,255,.08); color:#e2e8f0; cursor:pointer; transition:background .15s,border-color .15s; }
+.v27-fi:hover { background:rgba(56,189,248,.08); border-color:rgba(56,189,248,.4); }
+.v27-fi .n { width:24px; height:24px; border-radius:7px; display:grid; place-items:center; background:rgba(239,68,68,.18); color:#fca5a5; font-weight:900; font-size:11px; }
+.v27-fi .z b { display:block; font-size:12px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; } .v27-fi .z small { color:#94a3b8; font-size:10.5px; }
+.v27-fi .c { text-align:right; font-weight:900; font-size:15px; } .v27-fi .c small { display:block; font-size:10px; font-weight:700; }
+.v26-tbl tr[data-goz], .v26-tbl tr[data-go] { cursor:pointer; }
+.v26-tbl tr[data-goz]:hover td, .v26-tbl tr[data-go]:hover td { background:rgba(56,189,248,.07); }
+.v27-sim { display:grid; grid-template-columns:minmax(0,1.1fr) minmax(0,1fr); gap:16px; align-items:start; margin-top:10px; }
+#rc-simout { display:grid; grid-template-columns:150px minmax(0,1fr); gap:14px; align-items:center; }
+@media (max-width:900px){ .v27-sim { grid-template-columns:1fr; } }
+@media (max-width:520px){ #rc-simout { grid-template-columns:1fr; justify-items:center; } }
+.v27-gauge { width:140px; height:140px; border-radius:50%; display:grid; place-items:center; background:conic-gradient(var(--c) calc(var(--p) * 1%), rgba(255,255,255,.07) 0); }
+.v27-gauge > div { width:112px; height:112px; border-radius:50%; background:#0b1220; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; }
+.v27-gauge b { font-size:30px; font-weight:900; color:var(--c); line-height:1; } .v27-gauge small { font-size:10px; color:#94a3b8; margin-top:4px; max-width:90px; }
+.v27-parts .row { display:flex; justify-content:space-between; gap:10px; padding:5px 0; border-bottom:1px dashed rgba(255,255,255,.08); font-size:12px; } .v27-parts small { color:#94a3b8; }
+.v27-heatbtn { display:inline-flex; align-items:center; gap:6px; padding:6px 11px; border-radius:8px; background:rgba(8,12,20,.88); color:#e2e8f0; border:1px solid rgba(255,255,255,.2) !important; font-size:11px; font-weight:800; cursor:pointer; box-shadow:0 2px 8px rgba(0,0,0,.35); }
+.v27-heatbtn i { color:#f97316; }
+.v27-heatbtn.on { background:linear-gradient(90deg,#f97316,#ef4444); color:#fff; border-color:transparent !important; } .v27-heatbtn.on i { color:#fff; }
+.v27-heatbtn.ui-hidden { display:none !important; }
+@media (max-width:640px){ .v27-minfo { min-width:0; padding:6px 9px; } .v27-minfo .t { margin:0; font-size:11px; } .v27-minfo .g, .v27-mleg { display:none; } .v27-map { height:min(480px,60vh); } }
+body.theme-day .v27-minfo, body.theme-day .v27-mleg, body.theme-day .v27-heatbtn:not(.on) { background:rgba(255,255,255,.94); color:#0f172a; border-color:rgba(15,23,42,.15) !important; }
+body.theme-day .v27-gauge > div, body.theme-day .v27-clu b, body.theme-day .v27-ant { background:#fff; }
+body.theme-day .v27-clu b { color:#0f172a; }
+body.theme-day .v27-fi { color:#0f172a; background:rgba(15,23,42,.03); border-color:rgba(15,23,42,.1); }
 </style>
-<script id="hunter-v26-js">
+<script id="hunter-v27-js">
 (() => {
   'use strict';
   const $ = id => document.getElementById(id);
@@ -14576,6 +14648,7 @@ body:not(.theme-day) .v26-map .leaflet-tile-pane { filter: invert(1) hue-rotate(
         if (!st && !zona && !placa) continue;
         if (!/[A-Z]/i.test(String(placa || '') + String(zona || ''))) continue;   // filas de números sueltos
         const op = parseInt(String(g('op')).replace(/\D/g, ''), 10), fecha = pDate(g('date'));
+        if (fecha && fecha < '2020-01-01') continue;   // casos antiguos (ej. hoja de 2018) no se cargan
         const clave = isFinite(op) && op > 0 ? 'OP' + op : (fecha || 'SF') + '|' + (placa || 'SP') + '|' + (zona || '');
         out.set(clave.slice(0, 80), {
           clave: clave.slice(0, 80), op: isFinite(op) && op > 0 ? op : null, fecha, hoja: txt(sn, 60),
@@ -14619,6 +14692,8 @@ body:not(.theme-day) .v26-map .leaflet-tile-pane { filter: invert(1) hue-rotate(
       reconf: /^SI/.test(cl(r.reconfirmado)), taxi: /^SI/.test(cl(r.taxi)), obs: r.observacion || '', owner: cl(r.propietario), fuente: r.fuente || '',
       coords: k ? [D[k][0] + (hash(r.clave) - .5) * .014, D[k][1] + (hash(r.clave + '·') - .5) * .014] : null,
     };
+    o.daysOpen = !o.recovered && o.date ? Math.max(0, Math.floor((limaNow() - o.date) / 864e5)) : null;
+    o.statusPrev = cl(r.status_anterior); o.statusChanged = r.status_cambiado || null; o.carga = r.ultima_carga || null;
     o.h = [o.plate, o.month, o.zone, o.type, o.brand, o.model, o.mod, o.ins, o.devRaw, o.cls, o.tags.join(' '), o.devst, o.status, cl(o.obs), o.lrec, o.owner, o.op].join(' ');
     return o;
   }
@@ -14642,7 +14717,7 @@ body:not(.theme-day) .v26-map .leaflet-tile-pane { filter: invert(1) hue-rotate(
   const rsec = document.createElement('section');
   rsec.id = 'view-recup'; rsec.className = 'view ui-hidden map panel flex-1 min-w-0 flex flex-col overflow-hidden';
   ($('view-robo') || $('view-noc')).after(rsec);
-  const VIEWS = [['resumen', 'Resumen'], ['mapa', 'Mapa general'], ['gps', 'Mapa por tecnología'], ['tec', 'Tecnología'], ['tiempos', 'Tiempos y horarios'], ['zonas', 'Zonas y riesgo'], ['veh', 'Vehículos'], ['datos', 'Datos']];
+  const VIEWS = [['resumen', 'Resumen'], ['proy', 'Proyecciones'], ['mapa', 'Mapa general'], ['gps', 'Mapa por tecnología'], ['tec', 'Tecnología'], ['tiempos', 'Tiempos y horarios'], ['zonas', 'Zonas y riesgo'], ['veh', 'Vehículos'], ['datos', 'Datos'], ['hist', 'Historial de cargas']];
   rsec.innerHTML = `<div class="flex flex-wrap items-center justify-between gap-3 px-5 pt-4 pb-3 border-b border-white/10">
     <div><h2 class="text-base font-bold text-white flex items-center gap-2"><span class="text-[var(--accent)] inline-block" style="width:24px;height:24px">${RICON}</span>Recuperos</h2>
     <p class="text-[11px] text-slate-400">Robos y recuperos del Excel de consola · GPS unificado / LOJACK / DETEKTOR · solo dev</p></div>
@@ -14661,23 +14736,24 @@ body:not(.theme-day) .v26-map .leaflet-tile-pane { filter: invert(1) hue-rotate(
     </div>`;
   if (window.innerWidth < 760) $('rc-fbox').removeAttribute('open');   // en celular los filtros empiezan plegados
   // vistas con mapa: el contenedor del mapa se crea una sola vez
-  $('rcv-mapa').innerHTML = `<div class="card p-4"><div class="v26-mapbar" id="rc-mb1"><span class="text-[11px] font-bold uppercase tracking-wider text-slate-300 mr-2">Mapa general</span></div><div id="rc-map1" class="v26-map"></div>
-    <div class="v26-legend"><span><i style="background:#10b981"></i>Recuperado</span><span><i style="background:#ef4444;outline:2px solid rgba(239,68,68,.9)"></i>En proceso (borde grueso, sin parpadeo)</span><span>Ubicación aproximada por distrito</span></div><div id="rc-ap1"></div></div><div class="v26-cg mt-3" id="rc-mapa-ch"></div>`;
-  $('rcv-gps').innerHTML = `<div class="card p-4"><div class="v26-mapbar" id="rc-mb2"><span class="text-[11px] font-bold uppercase tracking-wider text-slate-300 mr-2">Mapa por tecnología</span></div>
+  $('rcv-mapa').innerHTML = `<div class="card p-4 v27-mapwrap"><div class="v26-mapbar" id="rc-mb1"><span class="text-[11px] font-bold uppercase tracking-wider text-slate-300 mr-2">Mapa general</span></div>
+    <div class="v27-mgrid"><div id="rc-map1" class="v26-map v27-map"></div><aside class="v27-side scroll" id="rc-side1"></aside></div><div id="rc-ap1"></div></div><div class="v26-cg mt-3" id="rc-mapa-ch"></div>`;
+  $('rcv-gps').innerHTML = `<div class="card p-4 v27-mapwrap"><div class="v26-mapbar" id="rc-mb2"><span class="text-[11px] font-bold uppercase tracking-wider text-slate-300 mr-2">Mapa por tecnología</span></div>
     <div class="v26-gs"><div id="rc-map2" class="v26-map"></div><div><div class="v26-gv" id="rc-gv"></div><div class="v26-kg mt-3" id="rc-gk" style="grid-template-columns:repeat(3,1fr)"></div><p class="text-[11px] font-bold uppercase tracking-wider text-slate-300 mt-4 mb-2">Variantes de GPS · tasa de recupero</p><div id="rc-gs"></div></div></div><div id="rc-ap2"></div></div>`;
 
   const FL = [['mes', 'Mes', r => [r.month]], ['est', 'Estado', r => [r.recovered ? 'RECUPERADO' : 'EN PROCESO']], ['zona', 'Zona', r => [r.zone]], ['mod', 'Modalidad', r => [r.mod]], ['cls', 'Tecnología', r => [r.cls]], ['sub', 'Variante GPS', r => r.tags], ['tipo', 'Tipo', r => [r.type]], ['ins', 'Aseguradora', r => [r.ins]], ['marca', 'Marca', r => [r.brand]], ['comb', 'Combinación', r => [r.gl ? 'GPS + LOJACK' : r.gd ? 'GPS + DETEKTOR' : r.cls === 'GPS' ? 'SOLO GPS' : r.cls]], ['rec', 'Reconfirmado', r => [r.reconf ? 'SI' : 'NO']]];
+  const PER = [['TODOS', 'Todo el historial'], ['30', 'Últimos 30 días'], ['90', 'Últimos 90 días'], ['180', 'Últimos 6 meses'], ['365', 'Último año']];
   function buildFilters() {
-    const prev = {}; FL.forEach(([id]) => { const s = $('rcf-' + id); if (s) prev[id] = s.value; });
-    $('rc-filters').innerHTML = FL.map(([id, l, f]) => {
+    const prev = {}; FL.forEach(([id]) => { const s = $('rcf-' + id); if (s) prev[id] = s.value; }); const pp = ($('rcf-per') || {}).value || 'TODOS';
+    $('rc-filters').innerHTML = `<label>Periodo<select id="rcf-per" class="sel max-w-none">${PER.map(([v, l]) => `<option value="${v}" ${pp === v ? 'selected' : ''}>${l}</option>`).join('')}</select></label>` + FL.map(([id, l, f]) => {
       let v = id === 'mes' ? [...new Map(REC.data.map(r => [r.month, r.mk])).entries()].sort((a, b) => b[1].localeCompare(a[1])).map(x => x[0]) : [...new Set(REC.data.flatMap(f).filter(Boolean))].sort();
       return `<label>${l}<select id="rcf-${id}" class="sel max-w-none"><option>TODOS</option>${v.map(x => `<option ${prev[id] === x ? 'selected' : ''}>${esc(x)}</option>`).join('')}</select></label>`;
     }).join('');
   }
-  function filt() {
-    const t = cl(REC.q).split(' ').filter(Boolean);
+  function filt(sinPeriodo) {
+    const t = cl(REC.q).split(' ').filter(Boolean), per = sinPeriodo ? 'TODOS' : ($('rcf-per') || {}).value || 'TODOS', lim = per === 'TODOS' ? null : limaNow() - per * 864e5;
     const sel = FL.map(([id, , f]) => [($('rcf-' + id) || {}).value || 'TODOS', f]);
-    return REC.data.filter(r => sel.every(([v, f]) => v === 'TODOS' || f(r).includes(v)) && t.every(x => r.h.includes(x)));
+    return REC.data.filter(r => sel.every(([v, f]) => v === 'TODOS' || f(r).includes(v)) && t.every(x => r.h.includes(x)) && (!lim || (r.date && r.date >= lim)));
   }
 
   // ---------- gráficos (Chart.js, ya cargado en el tablero) ----------
@@ -14716,7 +14792,7 @@ body:not(.theme-day) .v26-map .leaflet-tile-pane { filter: invert(1) hue-rotate(
       ['Casos con GPS', g.length, '#22d3ee', 'GPS unificado'], ['Recupero GPS', pct(gr, g.length) + '%', '#06b6d4'], ['Recupero LOJACK', pct(lj.filter(r => r.recovered).length, lj.length) + '%', '#f59e0b', lj.length + ' casos'], ['Recupero DETEKTOR', pct(dk.filter(r => r.recovered).length, dk.length) + '%', '#a78bfa', dk.length + ' casos'],
       ['Demora mediana denuncia', fmtM(med(dd.map(r => r.diff))), '#06b6d4', 'robo → Hunter'], ['Denuncia ≤30 min', pct(dd.filter(r => r.diff <= 30).length, dd.length) + '%', '#22c55e'], ['Denuncia >6 h', pct(dd.filter(r => r.diff > 360).length, dd.length) + '%', '#ef4444'], ['Tiempo recupero mediano', fmtM(med(d.filter(r => r.trec != null).map(r => r.trec))), '#10b981'],
       ['Hora pico', ph > 0 ? hrs.indexOf(ph) + ' h' : '--', '#f43f5e'], ['Día pico', pd > 0 ? DAYS[dys.indexOf(pd)] : '--', '#a855f7'], ['Franja crítica', fk && fk[1] ? fk[0] : '--', '#ec4899', fk ? pct(fk[1], d.length) + '% de casos' : ''], ['Zonas afectadas', Object.keys(count(d, r => r.zone)).length, '#3b82f6'],
-      ['Placas reincidentes', pl.length, '#f59e0b', 'robadas más de 1 vez'], ['Taxis', pct(d.filter(r => r.taxi).length, d.length) + '%', '#eab308'], ['Reconfirmados', pct(d.filter(r => r.reconf).length, d.length) + '%', '#14b8a6'], ['Sin cía. de seguros', pct(d.filter(r => /SIN C/.test(r.ins)).length, d.length) + '%', '#f87171'], ['Mixtos GPS + otro', g.filter(r => r.hybrid).length, '#8b5cf6'], ['Meses con datos', Object.keys(count(d, r => r.month)).length, '#64748b']];
+      ['Placas reincidentes', pl.length, '#f59e0b', 'robadas más de 1 vez'], ['Taxis', pct(d.filter(r => r.taxi).length, d.length) + '%', '#eab308'], ['Reconfirmados', pct(d.filter(r => r.reconf).length, d.length) + '%', '#14b8a6'], ['Sin cía. de seguros', pct(d.filter(r => /SIN C/.test(r.ins)).length, d.length) + '%', '#f87171'], ['Mixtos GPS + otro', g.filter(r => r.hybrid).length, '#8b5cf6'], ['Abiertos > 30 días', d.filter(r => r.daysOpen > 30).length, '#ef4444', 'casos antiguos sin recuperar'], ['Cambios de estado', d.filter(r => r.statusChanged).length, '#f59e0b', 'detectados entre cargas'], ['Recuperados en la última carga', HIST.list[0] ? HIST.list[0].recuperados || 0 : '--', '#22c55e', HIST.list[0] ? fdt(HIST.list[0].creado) : 'sin historial aún'], ['Meses con datos', Object.keys(count(d, r => r.month)).length, '#64748b']];
     const z = topN(count(d, r => r.zone), 1)[0], zo = topN(count(d.filter(r => !r.recovered), r => r.zone), 1)[0], md = topN(count(d, r => r.mod), 1)[0], mo = topN(count(d, r => r.model), 1)[0], gz = topN(count(g, r => r.zone), 1)[0], gs = topN(count(g, r => r.tags), 1)[0], bz = rateBy(d, r => r.zone, 1, 5)[0];
     const wz = Object.entries(count(d, r => r.zone)).filter(x => x[1] >= 5).map(([k, t]) => [k, pct(d.filter(r => r.zone === k && r.recovered).length, t)]).sort((a, b) => a[1] - b[1])[0];
     const I = [['🔥 Zona dominante', z && `${z[0]}: ${z[1]} incidentes (${pct(z[1], d.length)}%)`], ['🚨 Mayor carga abierta', zo && `${zo[0]}: ${zo[1]} en proceso`], ['⚠ Modalidad líder', md && `${md[0]} (${md[1]})`], ['🚗 Modelo más robado', mo && `${mo[0]} (${mo[1]})`], ['📡 Variante GPS líder', gs && `${gs[0]}: ${gs[1]} casos`], ['📍 Foco GPS', gz && `${gz[0]}: ${gz[1]} casos`], ['✅ Mejor recupero (≥5)', bz && `${bz[0]}: ${bz[1]}%`], ['❌ Peor recupero (≥5)', wz && `${wz[0]}: ${wz[1]}%`], ['🔁 Reincidencia', pl[0] && `${pl[0][0]} aparece ${pl[0][1]} veces`]];
@@ -14763,7 +14839,8 @@ body:not(.theme-day) .v26-map .leaflet-tile-pane { filter: invert(1) hue-rotate(
   }
   function vZonas(d) {
     const h = $('rcv-zonas'), R = zonasRisk(d);
-    h.innerHTML = `<div class="card p-4"><p class="text-[11px] font-bold uppercase tracking-wider text-slate-300 mb-2">Índice de riesgo por zona (60% volumen + 40% casos abiertos)</p><div style="max-height:380px;overflow:auto"><table class="v26-tbl"><tr><th>#</th><th>Zona</th><th>Total</th><th>Recup.</th><th>Abiertos</th><th>GPS</th><th>% recupero</th><th>Riesgo</th></tr>${R.map(([k, v, s], i) => `<tr><td>${i + 1}</td><td><b>${esc(k)}</b></td><td>${v.t}</td><td>${v.r}</td><td>${v.t - v.r}</td><td>${v.g}</td><td><div class="v26-bar"><i style="width:${pct(v.r, v.t)}%"></i></div>${pct(v.r, v.t)}%</td><td><span class="v26-tag" style="background:${s > 66 ? '#7f1d1d' : s > 33 ? '#78350f' : '#064e3b'};color:#fff">${s}</span></td></tr>`).join('')}</table></div></div><div class="v26-cg mt-3" id="rc-zon-ch"></div>`;
+    const ZA = Object.fromEntries(zonasAlza(d).map(z => [z.k, z]));
+    h.innerHTML = `<div class="card p-4"><p class="text-[11px] font-bold uppercase tracking-wider text-slate-300 mb-1">Índice de riesgo por zona (60% volumen + 40% casos abiertos)</p><p class="text-[11px] text-slate-400 mb-2">Tendencia = últimos 30 días frente al promedio mensual de los 3 meses anteriores. Proyección = casos esperados en los próximos 30 días. Toca una fila para verla en el mapa.</p><div class="v10-scroll-x" style="max-height:420px;overflow:auto"><table class="v26-tbl"><tr><th>#</th><th>Zona</th><th>Total</th><th>Abiertos</th><th>% recupero</th><th>30 días</th><th>Tendencia</th><th>Proyección 30 d</th><th>Mejor tecnología</th><th>Edad prom. abiertos</th><th>Riesgo</th></tr>${R.map(([k, v, s], i) => { const z = ZA[k] || {}; const c = D[dkey(k)]; return `<tr${c ? ` data-goz="${c[0]},${c[1]}"` : ''}><td>${i + 1}</td><td><b>${esc(k)}</b></td><td>${v.t}</td><td>${v.t - v.r}</td><td><div class="v26-bar"><i style="width:${pct(v.r, v.t)}%"></i></div>${pct(v.r, v.t)}%</td><td>${z.d30 ?? 0}</td><td>${trendTxt(z.var || 0)}</td><td><b>${z.proy ?? 0}</b></td><td>${z.best ? `<span style="color:${CLSC[z.best[0]] || '#fff'}">●</span> ${z.best[0]} <small class="text-slate-400">${z.best[1]}%</small>` : '-'}</td><td>${z.edad == null ? '-' : z.edad + ' d'}</td><td><span class="v26-tag" style="background:${s > 66 ? '#7f1d1d' : s > 33 ? '#78350f' : '#064e3b'};color:#fff">${s}</span></td></tr>`; }).join('')}</table></div></div><div class="v26-cg mt-3" id="rc-zon-ch"></div>`;
     const H = $('rc-zon-ch'), zt = R.slice(0, 10);
     mk(H, 'zs', 'Zonas críticas · recuperados vs en proceso', { type: 'bar', stacked: true, data: { labels: zt.map(x => x[0]), datasets: [{ label: 'Recuperado', data: zt.map(x => x[1].r), backgroundColor: '#10b981' }, { label: 'En proceso', data: zt.map(x => x[1].t - x[1].r), backgroundColor: '#ef4444' }] }, options: { indexAxis: 'y' } });
     hb(H, 'zr', 'Recupero por zona (≥3 casos, %)', rateBy(d, r => r.zone, 10, 3), '#10b981', '% recupero'); hb(H, 'lr', 'Lugares de recupero', topN(count(d, r => r.lrec), 10), '#06b6d4'); hb(H, 'zm', 'Zonas con asalto a mano armada', topN(count(d.filter(r => /ARMADA/.test(r.mod)), r => r.zone)), '#f43f5e');
@@ -14778,84 +14855,359 @@ body:not(.theme-day) .v26-map .leaflet-tile-pane { filter: invert(1) hue-rotate(
   }
   function vDatos(d) {
     const h = $('rcv-datos'), n = Math.min(d.length, 500);
-    h.innerHTML = `<div class="card p-4"><p class="text-[11px] font-bold uppercase tracking-wider text-slate-300 mb-2">${d.length.toLocaleString()} registros${REC.q ? ` para “${esc(REC.q)}”` : ''} · mostrando ${n}</p><div class="v10-scroll-x" style="max-height:calc(100vh - 300px);overflow:auto"><table class="v26-tbl"><tr><th>Fecha</th><th>N° Op.</th><th>Placa</th><th>Zona</th><th>Vehículo</th><th>Dispositivo</th><th>Modalidad</th><th>Hora</th><th>Demora</th><th>Estado</th><th>Observación</th></tr>${d.slice(0, 500).map(r => `<tr><td>${fd(r.date)}</td><td>${esc(r.op || '')}</td><td><b>${esc(r.plate)}</b></td><td>${esc(r.zone)}</td><td>${esc([r.type, r.brand, r.model].filter(Boolean).join(' '))}</td><td><span class="v26-tag" style="background:${CLSC[r.cls] || '#334155'}33;color:${CLSC[r.cls] || '#fff'}">${esc(r.devRaw || '-')}</span></td><td>${esc(r.mod)}</td><td>${esc(r.horaTxt || '-')}</td><td>${esc(r.diffTxt || '-')}</td><td><span class="v26-tag" style="background:${r.recovered ? '#064e3b' : '#78350f'};color:#fff">${esc(r.status || '-')}</span></td><td style="max-width:260px">${esc(String(r.obs).slice(0, 160))}</td></tr>`).join('')}</table></div></div>`;
+    h.innerHTML = `<div class="card p-4"><p class="text-[11px] font-bold uppercase tracking-wider text-slate-300 mb-2">${d.length.toLocaleString()} registros${REC.q ? ` para “${esc(REC.q)}”` : ''} · mostrando ${n}</p><div class="v10-scroll-x" style="max-height:calc(100vh - 300px);overflow:auto"><table class="v26-tbl"><tr><th>Fecha</th><th>N° Op.</th><th>Placa</th><th>Zona</th><th>Vehículo</th><th>Dispositivo</th><th>Modalidad</th><th>Hora</th><th>Demora</th><th>Estado</th><th>Días abierto</th><th>Cambio de estado</th><th>Observación</th></tr>${d.slice(0, 500).map(r => `<tr><td>${fd(r.date)}</td><td>${esc(r.op || '')}</td><td><b>${esc(r.plate)}</b></td><td>${esc(r.zone)}</td><td>${esc([r.type, r.brand, r.model].filter(Boolean).join(' '))}</td><td><span class="v26-tag" style="background:${CLSC[r.cls] || '#334155'}33;color:${CLSC[r.cls] || '#fff'}">${esc(r.devRaw || '-')}</span></td><td>${esc(r.mod)}</td><td>${esc(r.horaTxt || '-')}</td><td>${esc(r.diffTxt || '-')}</td><td><span class="v26-tag" style="background:${r.recovered ? '#064e3b' : '#78350f'};color:#fff">${esc(r.status || '-')}</span></td><td>${r.daysOpen == null ? '-' : `<b style="color:${r.daysOpen > 30 ? '#f87171' : r.daysOpen > 7 ? '#fbbf24' : '#e2e8f0'}">${r.daysOpen}</b>`}</td><td style="font-size:10.5px">${r.statusPrev ? `${esc(r.statusPrev)} → <b>${esc(r.status)}</b><br><span class="text-slate-500">${fdt(r.statusChanged)}</span>` : '-'}</td><td style="max-width:260px">${esc(String(r.obs).slice(0, 160))}</td></tr>`).join('')}</table></div></div>`;
   }
 
-  // ---------- mapas ----------
+  // ---------- v27: proyecciones, estimaciones e historial de cargas ----------
+  const logit = p => Math.log(p / (1 - p)), sigm = x => 1 / (1 + Math.exp(-x));
+  const clamp = (p, a = .02, b = .98) => Math.max(a, Math.min(b, p));
+  const FRJ = h => h == null ? null : h < 6 ? 'Madrugada' : h < 12 ? 'Mañana' : h < 18 ? 'Tarde' : 'Noche';
+  const DEMB = m => m == null ? null : m <= 15 ? '0-15 min' : m <= 30 ? '16-30 min' : m <= 60 ? '31-60 min' : m <= 360 ? '1-6 h' : 'Más de 6 h';
+  const mkey = dt => dt.getFullYear() + '-' + String(dt.getMonth() + 1).padStart(2, '0');
+  const mlab = k => MESES[+k.slice(5) - 1] + ' ' + k.slice(2, 4);
+  const ageD = r => r.date ? (limaNow() - r.date) / 864e5 : null;
+  // serie mensual + regresión lineal sobre los últimos 12 meses completos
+  function serieMensual(d) {
+    const ds = d.filter(r => r.date); if (!ds.length) return null;
+    const now = limaNow(), cur = now.getUTCFullYear() + '-' + String(now.getUTCMonth() + 1).padStart(2, '0');
+    const c = count(ds, r => r.mk), rc = count(ds.filter(r => r.recovered), r => r.mk);
+    const first = Object.keys(c).sort()[0], ks = [];
+    for (let y = +first.slice(0, 4), m = +first.slice(5); ; m++) { if (m > 12) { m = 1; y++; } const k = y + '-' + String(m).padStart(2, '0'); ks.push(k); if (k >= cur || ks.length > 120) break; }
+    const comp = ks.filter(k => k < cur).slice(-12), mdn = med(comp.map(k => c[k] || 0)) || 0;
+    while (comp.length > 3 && (c[comp[0]] || 0) < mdn * .25) comp.shift();   // un primer mes casi vacío (inicio del registro) no cuenta para la tendencia
+    const n = comp.length, ys = comp.map(k => c[k] || 0);
+    const dim = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() + 1, 0)).getUTCDate(), dia = now.getUTCDate();
+    const parcial = c[cur] || 0, ritmo = Math.round(parcial / dia * dim);
+    let a = 0, b = 0, sd = 0;
+    if (n >= 2) { const mx = (n - 1) / 2, my = ys.reduce((s, v) => s + v, 0) / n; let sxy = 0, sxx = 0; ys.forEach((v, i) => { sxy += (i - mx) * (v - my); sxx += (i - mx) ** 2; }); b = sxx ? sxy / sxx : 0; a = my - b * mx; sd = Math.sqrt(ys.reduce((s, v, i) => s + (v - (a + b * i)) ** 2, 0) / Math.max(1, n - 2)); }
+    const fut = []; let y = now.getUTCFullYear(), m = now.getUTCMonth() + 1;
+    for (let i = 0; i < 3; i++) { const k = y + '-' + String(m).padStart(2, '0'), v = Math.max(0, a + b * (n + i)); fut.push({ k, v, lo: Math.max(0, v - 1.28 * sd), hi: v + 1.28 * sd }); m++; if (m > 12) { m = 1; y++; } }
+    // el mes en curso combina el ritmo real con la tendencia, según cuánto mes ya pasó
+    const wR = Math.min(1, dia / dim * 1.2); fut[0].mix = Math.round(wR * ritmo + (1 - wR) * fut[0].v);
+    const p3 = ys.slice(-3), prom3 = p3.length ? p3.reduce((s, v) => s + v, 0) / p3.length : 0;
+    const tasa6 = (() => { const k6 = comp.slice(-6); const t = k6.reduce((s, k) => s + (c[k] || 0), 0); return t ? pct(k6.reduce((s, k) => s + (rc[k] || 0), 0), t) : null; })();
+    return { comp, ys, c, rc, cur, parcial, ritmo, dia, dim, a, b, sd, n, fut, prom3, tasa6 };
+  }
+  // zonas: últimos 30 días frente al promedio mensual de los 90 días anteriores
+  function zonasAlza(d) {
+    const Z = {};
+    d.forEach(r => { if (!r.zone) return; const z = Z[r.zone] = Z[r.zone] || { k: r.zone, t: 0, o: 0, d30: 0, prev: 0, ages: [], cl: {} }; const a = ageD(r);
+      z.t++; if (!r.recovered) { z.o++; if (a != null) z.ages.push(a); } if (a != null) { if (a <= 30) z.d30++; else if (a <= 120) z.prev++; }
+      const c = z.cl[r.cls] = z.cl[r.cls] || [0, 0]; c[0]++; if (r.recovered) c[1]++; });
+    return Object.values(Z).map(z => { const base = z.prev / 3; z.base = +base.toFixed(1); z.var = base ? (z.d30 - base) / base : (z.d30 ? 1 : 0); z.proy = Math.round(.6 * z.d30 + .4 * base);
+      const bt = Object.entries(z.cl).filter(([, v]) => v[0] >= 2).map(([k, v]) => [k, pct(v[1], v[0]), v[0]]).sort((x, y) => y[1] - x[1])[0]; z.best = bt || null;
+      z.edad = z.ages.length ? Math.round(z.ages.reduce((s, v) => s + v, 0) / z.ages.length) : null; return z; });
+  }
+  // simulador: combinación logística suavizada de factores (k = casos de suavizado, w = peso)
+  const SIMF = [['cls', 'Tecnología', r => r.cls], ['dem', 'Demora en denunciar', r => DEMB(r.diff)], ['fr', 'Franja horaria', r => FRJ(r.hour)], ['mod', 'Modalidad', r => r.mod || null], ['zona', 'Zona', r => r.zone || null]];
+  const SIM = { sel: {} };
+  function simular(d, sel) {
+    const k = 5, w = .7, rec = d.filter(r => r.recovered).length, p0 = clamp((rec + 1) / (d.length + 2)), L0 = logit(p0);
+    let L1 = L0; const parts = [];
+    SIMF.forEach(([id, l, f]) => { const v = sel[id]; if (!v || v === 'TODOS') return; const x = d.filter(r => f(r) === v), n = x.length, rr = x.filter(r => r.recovered).length;
+      const pv = clamp((rr + k * p0) / (n + k)), c = w * (logit(pv) - L0); L1 += c; parts.push({ l, v, n, raw: n ? pct(rr, n) : null, c }); });
+    const p = sigm(L1); parts.forEach(x => { x.pts = Math.round((sigm(L0 + x.c) - p0) * 100); });
+    const sim = d.filter(r => SIMF.filter(([id]) => sel[id] && sel[id] !== 'TODOS').filter(([id, , f]) => f(r) === sel[id]).length >= Math.max(1, SIMF.filter(([id]) => sel[id] && sel[id] !== 'TODOS').length - 1));
+    const trs = d.filter(r => r.recovered && r.trec != null && SIMF.every(([id, , f]) => !sel[id] || sel[id] === 'TODOS' || id === 'zona' || f(r) === sel[id])).map(r => r.trec);
+    return { p0: Math.round(p0 * 100), p: Math.round(p * 100), parts, sim: sim.length, simRate: sim.length ? pct(sim.filter(r => r.recovered).length, sim.length) : null, trec: med(trs) };
+  }
+  function vProy(dAll) {
+    const h = $('rcv-proy'), d = dAll, S = serieMensual(d);
+    if (!S || S.n < 3) { h.innerHTML = '<div class="v21-msg">Necesito al menos 3 meses completos con fecha para proyectar. Con los filtros actuales no alcanza: prueba con Periodo “Todo el historial”.</div>'; return; }
+    const now = limaNow(), f0 = S.fut[0], f1 = S.fut[1], vsP = S.prom3 ? Math.round((f0.mix - S.prom3) / S.prom3 * 100) : 0;
+    const Z = zonasAlza(d), alza = Z.filter(z => z.d30 >= 2 && z.var > .2).sort((a, b) => (b.d30 - b.base) - (a.d30 - a.base));
+    // próximos 7 días por día de semana (últimas 12 semanas)
+    const r84 = d.filter(r => { const a = ageD(r); return a != null && a <= 84; }), wd = Array(7).fill(0); r84.forEach(r => wd[r.date.getDay()]++);
+    const rate = S.tasa6 != null ? S.tasa6 : pct(d.filter(r => r.recovered).length, d.length);
+    const nx = [...Array(7).keys()].map(i => { const t = new Date(now.getTime() + (i + 1) * 864e5), g = t.getUTCDay(); return { l: DAYS[g] + ' ' + String(t.getUTCDate()).padStart(2, '0') + '/' + String(t.getUTCMonth() + 1).padStart(2, '0'), v: +(wd[g] / 12).toFixed(1) }; });
+    const sem = nx.reduce((s, x) => s + x.v, 0), pico = nx.reduce((m, x) => x.v > m.v ? x : m, nx[0]);
+    const fr = count(r84, r => FRJ(r.hour)), frT = topN(fr, 1)[0];
+    // antigüedad de los abiertos y probabilidad de recupero según cuánto tiempo lleva abierto
+    const op = d.filter(r => !r.recovered && r.daysOpen != null), B = [['0-7 días', 0, 7], ['8-30 días', 8, 30], ['31-90 días', 31, 90], ['91-180 días', 91, 180], ['Más de 180', 181, 1e9]];
+    const bk = B.map(([l, a, b]) => [l, op.filter(r => r.daysOpen >= a && r.daysOpen <= b).length]);
+    const rt = d.filter(r => r.recovered && r.trec != null).map(r => r.trec), TT = [['1 h', 60], ['6 h', 360], ['24 h', 1440], ['3 días', 4320], ['7 días', 10080], ['30 días', 43200]];
+    const acum = TT.map(([l, m]) => [l, pct(rt.filter(v => v <= m).length, rt.length)]);
+    const later = [1, 3, 7, 30].map(dd => { const m = dd * 1440, a = d.filter(r => r.recovered && r.trec != null && r.trec > m).length, b = op.filter(r => r.daysOpen > dd).length; return [dd, a + b ? pct(a, a + b) : null, a, b]; });
+    // simulador
+    const opts = { cls: ['GPS', 'LOJACK', 'DETEKTOR', 'OTROS'].filter(x => d.some(r => r.cls === x)), dem: ['0-15 min', '16-30 min', '31-60 min', '1-6 h', 'Más de 6 h'], fr: ['Madrugada', 'Mañana', 'Tarde', 'Noche'], mod: topN(count(d, r => r.mod), 8).map(x => x[0]), zona: topN(count(d, r => r.zone), 30).map(x => x[0]) };
+    if (!SIM.sel.cls) SIM.sel = { cls: 'GPS', dem: '16-30 min', fr: 'TODOS', mod: 'TODOS', zona: 'TODOS' };
+    const sv = A => A.filter(x => x).map(([t, v]) => `<div class="card"><p>${t}</p><b>${v}</b></div>`).join('');
+    h.innerHTML = `<div class="v26-kg">${K('Proyección de este mes', f0.mix, '#38bdf8', `${S.parcial} al día ${S.dia} de ${S.dim} · ritmo ${S.ritmo}`)}${K('Vs. promedio 3 meses', (vsP > 0 ? '+' : '') + vsP + '%', vsP > 10 ? '#ef4444' : vsP < -10 ? '#22c55e' : '#94a3b8', `promedio ${S.prom3.toFixed(0)} casos/mes`)}${K('Próximo mes (' + mlab(f1.k) + ')', Math.round(f1.v), '#a78bfa', `rango probable ${Math.round(f1.lo)}–${Math.round(f1.hi)}`)}${K('Tendencia', (S.b >= 0 ? '+' : '') + S.b.toFixed(1) + '/mes', S.b > .5 ? '#ef4444' : S.b < -.5 ? '#22c55e' : '#94a3b8', `con ${S.n} meses completos`)}${K('Próximos 7 días', Math.round(sem), '#f43f5e', `≈ ${Math.round(sem * rate / 100)} recuperables (${rate}%)`)}${K('Día más probable', pico.l, '#f59e0b', `≈ ${pico.v} casos`)}${K('Abiertos > 30 días', op.filter(r => r.daysOpen > 30).length, '#ef4444', `de ${op.length} abiertos`)}${K('Recupero esperado', rate + '%', '#10b981', 'promedio últimos 6 meses')}</div>
+      <h3 class="v27-h mt-4">Lo que dicen los números</h3><div class="v26-ins">${sv([
+        ['📈 Este mes', `Va camino a ${f0.mix} casos (${vsP > 0 ? vsP + '% más' : vsP < 0 ? -vsP + '% menos' : 'igual'} que el promedio de los últimos 3 meses).`],
+        alza[0] && ['🔺 Zona en alza', `${alza[0].k}: ${alza[0].d30} casos en 30 días frente a ${alza[0].base} de promedio mensual. Proyección: ${alza[0].proy} el próximo mes.`],
+        frT && frT[1] && ['🕒 Franja a vigilar', `${frT[0]}: ${pct(frT[1], r84.length)}% de los robos de las últimas 12 semanas.`],
+        ['📅 Semana que viene', `Se esperan unos ${Math.round(sem)} robos; el día más cargado sería ${pico.l}.`],
+        later[2][1] != null && ['⏳ Casos viejos', `Un caso que ya lleva más de 7 días abierto tiene ${later[2][1]}% de probabilidad de recuperarse después.`],
+        acum[2] && ['⚡ Velocidad', `${acum[2][1]}% de los recuperos ocurren dentro de las primeras 24 h.`]])}</div>
+      <div class="v26-cg mt-4" id="rc-proy-ch"></div>
+      <div class="card p-4 mt-4"><div class="v27-simh"><div><p class="v27-h">Simulador de recupero</p><p class="text-[11px] text-slate-400">Elige cómo sería un robo y te digo la probabilidad de recuperarlo según el historial.</p></div></div>
+        <div class="v27-sim"><div class="v26-filt" id="rc-sim">${SIMF.map(([id, l]) => `<label>${l}<select class="sel max-w-none" data-sim="${id}"><option>TODOS</option>${opts[id].map(x => `<option ${SIM.sel[id] === x ? 'selected' : ''}>${esc(x)}</option>`).join('')}</select></label>`).join('')}</div><div id="rc-simout"></div></div></div>
+      <div class="v26-cg mt-4"><div class="card p-4"><p class="v27-h">Zonas en alza · últimos 30 días vs. promedio mensual previo</p><div style="max-height:340px;overflow:auto"><table class="v26-tbl"><tr><th>Zona</th><th>30 días</th><th>Promedio previo</th><th>Variación</th><th>Proyección 30 d</th><th>Abiertos</th></tr>${(alza.length ? alza : Z.sort((a, b) => b.d30 - a.d30)).slice(0, 15).map(z => `<tr data-goz="${(D[dkey(z.k)] || []).join(',')}"><td><b>${esc(z.k)}</b></td><td>${z.d30}</td><td>${z.base}</td><td>${trendTxt(z.var)}</td><td><b>${z.proy}</b></td><td>${z.o}</td></tr>`).join('')}</table></div></div>
+      <div class="card p-4"><p class="v27-h">Probabilidad de recupero según antigüedad</p><table class="v26-tbl"><tr><th>Si lleva abierto más de…</th><th>Prob. de recuperarse</th><th>Se recuperaron después</th><th>Siguen abiertos</th></tr>${later.map(([dd, p, a, b]) => `<tr><td>${dd} día${dd > 1 ? 's' : ''}</td><td>${p == null ? '--' : `<div class="v26-bar"><i style="width:${p}%"></i></div>${p}%`}</td><td>${a}</td><td>${b}</td></tr>`).join('')}</table><p class="text-[10.5px] text-slate-500 mt-2">Sirve para priorizar: mientras más antiguo, menos probable. Úsalo para decidir dónde poner el esfuerzo de búsqueda.</p></div></div>
+      <p class="text-[10.5px] text-slate-500 mt-3">Proyecciones con regresión lineal de los últimos ${S.n} meses completos (rango con 80% de confianza). Son estimaciones del historial del Excel, no certezas.</p>`;
+    const H = $('rc-proy-ch'), lab = [...S.comp, ...S.fut.map(x => x.k)].map(mlab), nC = S.comp.length, nul = a => Array(a).fill(null);
+    mk(H, 'pm', 'Casos por mes y proyección', { type: 'line', data: { labels: lab, datasets: [
+      { label: 'Real', data: [...S.ys, ...nul(3)], borderColor: '#38bdf8', backgroundColor: '#38bdf8', fill: true, tension: .3, pointRadius: 3 },
+      { label: 'Este mes (parcial)', data: [...nul(nC), S.parcial, null, null], borderColor: '#f59e0b', backgroundColor: '#f59e0b', pointRadius: 5, showLine: false },
+      { label: 'Proyección', data: [...nul(nC - 1), S.ys[nC - 1], S.fut[0].mix, Math.round(S.fut[1].v), Math.round(S.fut[2].v)], borderColor: '#a78bfa', backgroundColor: '#a78bfa', fill: false, borderDash: [6, 5], tension: .3, pointRadius: 3 },
+      { label: 'Máximo probable', data: [...nul(nC), ...S.fut.map(x => Math.round(x.hi))], borderColor: 'rgba(167,139,250,.0)', backgroundColor: 'rgba(167,139,250,.18)', fill: '+1', pointRadius: 0 },
+      { label: 'Mínimo probable', data: [...nul(nC), ...S.fut.map(x => Math.round(x.lo))], borderColor: 'rgba(167,139,250,.35)', backgroundColor: 'rgba(167,139,250,.35)', fill: false, pointRadius: 0 }] } }, true);
+    DESC.pm = 'Línea celeste: casos reales. Punto ámbar: lo que va del mes. Línea lila: proyección con su rango probable (zona sombreada).';
+    DESC.n7 = 'Casos esperados cada día de la próxima semana, según el promedio de ese día en las últimas 12 semanas.';
+    DESC.bk = 'Cuánto tiempo llevan abiertos los casos que siguen en proceso.';
+    DESC.ac = '% acumulado de recuperos logrados dentro de cada tiempo desde la denuncia.';
+    vb(H, 'n7', 'Próximos 7 días · casos esperados', nx.map(x => x.l), nx.map(x => x.v), '#f43f5e');
+    vb(H, 'bk', 'Antigüedad de los casos abiertos', bk.map(x => x[0]), bk.map(x => x[1]), ['#22c55e', '#eab308', '#f59e0b', '#f97316', '#ef4444']);
+    mk(H, 'ac', 'Velocidad de recupero (% acumulado)', { type: 'line', data: { labels: acum.map(x => x[0]), datasets: [{ label: '% recuperado', data: acum.map(x => x[1]), borderColor: '#10b981', backgroundColor: '#10b981', fill: true, tension: .3, pointRadius: 3 }] } });
+    simOut(d);
+  }
+  function simOut(d) {
+    const el = $('rc-simout'); if (!el) return;
+    const R = simular(d, SIM.sel), c = R.p >= 60 ? '#22c55e' : R.p >= 35 ? '#f59e0b' : '#ef4444';
+    el.innerHTML = `<div class="v27-gauge" style="--p:${R.p};--c:${c}"><div><b>${R.p}%</b><small>probabilidad de recupero</small></div></div>
+      <div class="v27-parts"><p class="text-[11px] text-slate-400 mb-2">Promedio general: <b class="text-white">${R.p0}%</b>. Cada factor suma o resta:</p>${R.parts.map(x => `<div class="row"><span>${esc(x.l)}: <b>${esc(x.v)}</b><small> · ${x.n} casos${x.raw != null ? ', ' + x.raw + '% real' : ''}</small>${x.n >= 20 && x.raw != null && (x.raw >= 95 || x.raw <= 5) ? '<br><small style="color:#fbbf24">⚠ ' + x.raw + '% en ' + x.n + ' casos es raro: revisa cómo se llena esa columna en el Excel</small>' : ''}</span><span style="color:${x.pts > 0 ? '#4ade80' : x.pts < 0 ? '#f87171' : '#94a3b8'}"><b>${x.pts > 0 ? '+' : ''}${x.pts} pts</b></span></div>`).join('') || '<p class="text-xs text-slate-500">Elige al menos un factor.</p>'}
+      <p class="text-[11px] text-slate-400 mt-2">Casos parecidos en el historial: <b class="text-white">${R.sim}</b>${R.simRate != null ? ` · se recuperó el <b class="text-white">${R.simRate}%</b>` : ''}${R.trec != null ? ` · tiempo típico de recupero <b class="text-white">${fmtM(R.trec)}</b>` : ''}</p></div>`;
+  }
+  rsec.addEventListener('change', e => { const s = e.target.closest('[data-sim]'); if (!s) return; SIM.sel[s.dataset.sim] = s.value; simOut(filt(true)); });
+
+  // historial de cada Excel subido (tabla mdz_recuperos_cargas + copia en Storage)
+  const HIST = { list: [], loaded: false, loading: false, err: '', open: null, det: {} };
+  const HTBL = 'mdz_recuperos_cargas', BUCKET = 'mdz-recuperos';
+  async function histLoad() {
+    if (HIST.loading || !dev() || !logged() || !sb()) return; HIST.loading = true;
+    try { const { data, error } = await sb().from(HTBL).select('id,archivo,ruta,origen,casos,nuevos,actualizados,cambios_estado,recuperados,hojas,creado').order('creado', { ascending: false }).limit(300); if (error) throw error; HIST.list = data || []; HIST.err = ''; }
+    catch (e) { HIST.err = /does not exist|relation|schema cache|42P01/i.test(e.message || '') ? 'Falta la tabla del historial: ejecuta en Supabase el archivo supabase_v27_recuperos.sql.' : 'No pude leer el historial: ' + (e.message || e); }
+    finally { HIST.loading = false; HIST.loaded = true; }
+    if (REC.opened && /hist|resumen/.test(REC.view)) render();
+  }
+  const fdt = s => s ? new Date(s).toLocaleString('es-PE', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : '-';
+  function vHist() {
+    const h = $('rcv-hist'), L0 = HIST.list;
+    if (!HIST.loaded) { h.innerHTML = '<div class="v21-msg">Cargando historial…</div>'; histLoad(); return; }
+    if (HIST.err) { h.innerHTML = `<div class="v21-msg warn">${esc(HIST.err)}</div>`; return; }
+    if (!L0.length) { h.innerHTML = '<div class="v21-msg">Todavía no hay cargas registradas. Desde ahora, cada vez que subas un Excel quedará aquí con su copia original y lo que cambió.</div>'; return; }
+    const u = L0[0], tot = L0.reduce((s, x) => s + (x.nuevos || 0), 0), recT = L0.reduce((s, x) => s + (x.recuperados || 0), 0);
+    h.innerHTML = `<div class="v26-kg">${K('Excels guardados', L0.length, '#38bdf8', `${L0.filter(x => x.origen === 'correo').length} por correo · ${L0.filter(x => x.origen !== 'correo').length} a mano`)}${K('Última carga', fdt(u.creado).slice(0, 10), '#94a3b8', fdt(u.creado).slice(12) + ' · ' + (u.archivo || ''))}${K('Nuevos en la última', u.nuevos || 0, '#f43f5e', 'casos que no existían')}${K('Recuperados en la última', u.recuperados || 0, '#10b981', 'pasaron a recuperado')}${K('Cambios de estado', u.cambios_estado || 0, '#f59e0b', 'en la última carga')}${K('Casos nuevos (total)', tot, '#a78bfa', 'sumando todas las cargas')}${K('Recuperos detectados', recT, '#22c55e', 'sumando todas las cargas')}</div>
+      <div class="v26-cg mt-4" id="rc-hist-ch"></div>
+      <div class="card p-4 mt-4"><p class="v27-h">Cada Excel subido</p><div class="v10-scroll-x" style="max-height:520px;overflow:auto"><table class="v26-tbl"><tr><th>Fecha</th><th>Archivo</th><th>Origen</th><th>Casos</th><th>Nuevos</th><th>Cambios</th><th>Recuperados</th><th>Hojas</th><th></th></tr>${L0.map(x => `<tr><td>${fdt(x.creado)}</td><td style="max-width:240px;overflow-wrap:anywhere"><b>${esc(x.archivo || '-')}</b></td><td><span class="v26-tag" style="background:${x.origen === 'correo' ? '#1e3a8a' : '#334155'};color:#fff">${x.origen === 'correo' ? 'Correo' : 'Manual'}</span></td><td>${x.casos ?? '-'}</td><td>${x.nuevos ?? '-'}</td><td>${x.cambios_estado ?? '-'}</td><td>${x.recuperados ?? '-'}</td><td style="max-width:180px;font-size:10.5px">${esc((x.hojas || []).slice(0, 4).join(', '))}${(x.hojas || []).length > 4 ? '…' : ''}</td>
+        <td style="white-space:nowrap"><button type="button" class="v21-btn" data-hdet="${x.id}">${HIST.open === x.id ? 'Ocultar' : 'Ver cambios'}</button>${x.ruta ? ` <button type="button" class="v21-btn" data-hdl="${x.id}" title="Descargar el Excel original"><i class="fa-solid fa-download"></i></button>` : ''}</td></tr>${HIST.open === x.id ? `<tr><td colspan="9">${histDet(x.id)}</td></tr>` : ''}`).join('')}</table></div>
+      <p class="text-[10.5px] text-slate-500 mt-2">El Excel original se guarda en la carpeta privada “${BUCKET}” de Supabase. Solo dev puede verlo y descargarlo.</p></div>`;
+    const H = $('rc-hist-ch'), S = [...L0].reverse().slice(-40), lb = S.map(x => fdt(x.creado).slice(0, 10));
+    DESC.hc = 'Por cada Excel: casos nuevos, cambios de estado y recuperos detectados al compararlo con lo que ya había.';
+    DESC.ht = 'Cantidad de casos que traía cada Excel.';
+    mk(H, 'hc', 'Qué trajo cada carga', { type: 'bar', data: { labels: lb, datasets: [{ label: 'Nuevos', data: S.map(x => x.nuevos || 0), backgroundColor: '#f43f5e', borderRadius: 3 }, { label: 'Cambios de estado', data: S.map(x => x.cambios_estado || 0), backgroundColor: '#f59e0b', borderRadius: 3 }, { label: 'Recuperados', data: S.map(x => x.recuperados || 0), backgroundColor: '#10b981', borderRadius: 3 }] } });
+    mk(H, 'ht', 'Casos por Excel', { type: 'line', data: { labels: lb, datasets: [{ label: 'Casos', data: S.map(x => x.casos || 0), borderColor: '#38bdf8', backgroundColor: '#38bdf8', fill: true, tension: .3, pointRadius: 3 }] } });
+  }
+  function histDet(id) {
+    const x = HIST.det[id];
+    if (!x) return '<p class="text-xs text-slate-400 p-2">Cargando cambios…</p>';
+    if (x.err) return `<div class="v21-msg warn">${esc(x.err)}</div>`;
+    if (!x.rows.length) return '<p class="text-xs text-slate-400 p-2">Este Excel no trajo casos nuevos ni cambios de estado.</p>';
+    const nv = x.rows.filter(r => !r.de), cb = x.rows.filter(r => r.de);
+    const tb = (t, A) => A.length ? `<div><p class="v27-h mt-2">${t} (${A.length}${A.length >= 300 ? '+' : ''})</p><div style="max-height:260px;overflow:auto"><table class="v26-tbl"><tr><th>Caso</th><th>Placa</th><th>Antes</th><th>Ahora</th></tr>${A.map(r => `<tr><td>${esc(String(r.clave || '').replace(/^OP/, 'Op. '))}</td><td><b>${esc(r.placa || '-')}</b></td><td>${esc(r.de || '—')}</td><td><span class="v26-tag" style="background:${/^SI$|RECUPER/i.test(r.a || '') && !/^NO/i.test(r.a || '') ? '#064e3b' : '#78350f'};color:#fff">${esc(r.a || '-')}</span></td></tr>`).join('')}</table></div></div>` : '';
+    return `<div class="v26-cg">${tb('Casos nuevos', nv) || '<p class="text-xs text-slate-400">Sin casos nuevos.</p>'}${tb('Cambios de estado', cb) || '<p class="text-xs text-slate-400">Sin cambios de estado.</p>'}</div>`;
+  }
+  rsec.addEventListener('click', async e => {
+    const a = e.target.closest('[data-hdet]'), b = e.target.closest('[data-hdl]');
+    if (a) { const id = +a.dataset.hdet; HIST.open = HIST.open === id ? null : id; vHist();
+      if (HIST.open && !HIST.det[id]) { try { const { data, error } = await sb().from(HTBL).select('id,detalle').eq('id', id).limit(1); if (error) throw error; HIST.det[id] = { rows: ((data || [])[0] || {}).detalle || [] }; } catch (er) { HIST.det[id] = { err: 'No pude leer el detalle: ' + (er.message || er) }; } if (REC.view === 'hist') vHist(); }
+      return; }
+    if (b) { const x = HIST.list.find(y => y.id === +b.dataset.hdl); if (!x || !x.ruta) return;
+      try { const { data, error } = await sb().storage.from(BUCKET).createSignedUrl(x.ruta, 120); if (error) throw error; const l = document.createElement('a'); l.href = data.signedUrl; l.download = x.archivo || 'recuperos.xlsx'; l.rel = 'noopener'; document.body.appendChild(l); l.click(); l.remove(); }
+      catch (er) { toast('No se pudo descargar: ' + (er.message || er)); } }
+  });
+  // compara el Excel nuevo con lo que ya está en Supabase (mismo criterio que la función del correo)
+  function mdzDiff(antes, filas) {
+    const rec = v => { const t = cl(v); return /^SI$|RECUPER/.test(t) && !/^NO/.test(t); };
+    let nuevos = 0, actualizados = 0, cambios = 0, recuperados = 0; const detalle = [];
+    for (const f of filas) {
+      if (!antes.has(f.clave)) { nuevos++; if (detalle.length < 300) detalle.push({ clave: f.clave, placa: f.placa, de: null, a: f.status }); continue; }
+      actualizados++; const prev = antes.get(f.clave) || '';
+      if (cl(prev) !== cl(f.status)) { cambios++; if (rec(f.status) && !rec(prev)) recuperados++; if (detalle.length < 300) detalle.push({ clave: f.clave, placa: f.placa, de: prev || null, a: f.status }); }
+    }
+    return { nuevos, actualizados, cambios, recuperados, detalle };
+  }
+  async function subirExcel(f) {
+    const box = $('rc-msg'), say = (t, k) => { box.innerHTML = `<div class="v21-msg ${k || ''}">${t}</div>`; };
+    say(`Leyendo ${esc(f.name)}…`);
+    const wb = XLSX.read(new Uint8Array(await f.arrayBuffer()), { type: 'array' });
+    const filas = mdzParseRecuperos(XLSX, wb, f.name);
+    if (!filas.length) { say('No encontré la cabecera “STATUS DE RECUPERO” y “DISPOSITIVO” en ninguna hoja (o todos los casos eran anteriores a 2020).', 'warn'); return; }
+    say(`Comparando ${filas.length} casos con lo que ya está guardado…`);
+    const antes = new Map(), cl0 = filas.map(x => x.clave);
+    for (let i = 0; i < cl0.length; i += 300) { const { data, error } = await sb().from('mdz_recuperos').select('clave,status').in('clave', cl0.slice(i, i + 300)); if (error) throw error; (data || []).forEach(r => antes.set(r.clave, r.status)); }
+    const df = mdzDiff(antes, filas), hojas = [...new Set(filas.map(x => x.hoja))];
+    say('Guardando una copia del Excel original…');
+    let ruta = `manual/${new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19)}_${f.name.replace(/[^\w.\-]+/g, '_').slice(0, 120)}`, avisos = [];
+    try { const { error } = await sb().storage.from(BUCKET).upload(ruta, f, { contentType: f.type || 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', upsert: false }); if (error) throw error; }
+    catch (e) { ruta = null; avisos.push('no se guardó la copia del archivo (' + (e.message || e) + ')'); }
+    let carga = null;
+    try { const { data, error } = await sb().from(HTBL).insert({ archivo: f.name, ruta, origen: 'manual', casos: filas.length, nuevos: df.nuevos, actualizados: df.actualizados, cambios_estado: df.cambios, recuperados: df.recuperados, hojas, detalle: df.detalle }).select('id'); if (error) throw error; carga = (Array.isArray(data) ? data[0] : data || {}).id || null; }
+    catch (e) { avisos.push('no se registró en el historial (' + (/does not exist|relation|schema cache|42P01/i.test(e.message || '') ? 'falta ejecutar supabase_v27_recuperos.sql' : e.message || e) + ')'); }
+    const rows = carga ? filas.map(x => ({ ...x, ultima_carga: carga })) : filas;
+    for (let i = 0; i < rows.length; i += 500) { say(`Guardando casos ${i + 1}–${Math.min(i + 500, rows.length)} de ${rows.length}…`); const { error } = await sb().from('mdz_recuperos').upsert(rows.slice(i, i + 500), { onConflict: 'clave' }); if (error) throw error; }
+    toast(`Excel guardado: ${df.nuevos} nuevos · ${df.cambios} cambios · ${df.recuperados} recuperados`);
+    HIST.loaded = false; await Promise.all([recLoad(), histLoad()]);
+    if (avisos.length) say(`Casos guardados, pero ${esc(avisos.join(' y '))}.`, 'warn');
+  }
+
+  // ---------- mapas (v27: rediseño) ----------
   const LIBS = { heat: 'https://cdn.jsdelivr.net/npm/leaflet.heat@0.2.0/dist/leaflet-heat.js', cluster: 'https://cdn.jsdelivr.net/npm/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js' };
   const libP = {};
-  const loadLib = k => libP[k] || (libP[k] = new Promise(res => { const s = document.createElement('script'); s.src = LIBS[k]; s.async = true; s.onload = () => res(true); s.onerror = () => res(false); document.head.appendChild(s); setTimeout(() => res(false), 12000); }));
+  // el mapa de calor falla si se dibuja en un mapa oculto (tamaño 0): se salta ese dibujo
+  const heatSafe = () => { try { const P0 = L.HeatLayer && L.HeatLayer.prototype; if (!P0 || P0.__v27) return; const o = P0._redraw; P0._redraw = function () { const m = this._map; if (!m) { this._frame = null; return; } const z = m.getSize(); if (!z.x || !z.y) { this._frame = null; return; } try { return o.apply(this, arguments); } catch (e) {} }; P0.__v27 = true; } catch (e) {} };
+  const loadLib = k => libP[k] || (libP[k] = new Promise(res => { const s = document.createElement('script'); s.src = LIBS[k]; s.async = true; s.onload = () => { if (k === 'heat') heatSafe(); res(true); }; s.onerror = () => res(false); document.head.appendChild(s); setTimeout(() => res(false), 12000); }));
+  let antCache = { sig: '', list: [] };
   function antenas() {
+    const R0 = rows(), sig = R0.length + '|' + (R0[0] ? puntoOf(R0[0]) : '');
+    if (sig === antCache.sig) return antCache.list;
     const m = new Map();
-    rows().forEach(r => { try { const i = info(r); if (i.movil || !i.ok || !i.punto) return; const k = keyOf(i.punto); if (!m.has(k)) m.set(k, [String(i.punto), i.lat, i.lon, /^LIMA/i.test(i.punto) || (i.lat > -12.9 && i.lat < -11.5 && i.lon > -77.4 && i.lon < -76.5)]); } catch (e) {} });
-    return [...m.values()];
+    R0.forEach(r => { try { const i = info(r); if (i.movil || !i.ok || !i.punto) return; const k = keyOf(i.punto); if (!m.has(k)) m.set(k, [String(i.punto), i.lat, i.lon, /^LIMA/i.test(i.punto) || (i.lat > -12.9 && i.lat < -11.5 && i.lon > -77.4 && i.lon < -76.5)]); } catch (e) {} });
+    antCache = { sig, list: [...m.values()] }; return antCache.list;
   }
+  const antShort = n => String(n).replace(/^LIMA-|^P-/, '');
+  const mixC = k => { const a = [16, 185, 129], b = [245, 158, 11], c = [239, 68, 68], t = Math.max(0, Math.min(1, k)), [x, y, f] = t < .5 ? [a, b, t * 2] : [b, c, (t - .5) * 2]; return `rgb(${x.map((v, i) => Math.round(v + (y[i] - v) * f)).join(',')})`; };
+  const TOWER = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 11v10M8.5 21h7M9.5 16.5h5M10 13.5l-1.5 7.5M14 13.5l1.5 7.5"/><circle cx="12" cy="9.5" r="1.6"/><path d="M8.2 6.2a5.2 5.2 0 0 0 0 6.6M15.8 6.2a5.2 5.2 0 0 1 0 6.6M5.6 4a8.6 8.6 0 0 0 0 11M18.4 4a8.6 8.6 0 0 1 0 11"/></svg>';
+  // estadística por foco (distrito): total, abiertos, últimos 30 días, tendencia, modalidad, tecnología, hora pico
+  function focosDe(rs) {
+    const H = {}, hoy = limaNow();
+    rs.forEach(r => { const k = dkey(r.zone); if (!k) return; const x = H[k] = H[k] || { k, c: D[k], t: 0, o: 0, d30: 0, p90: 0, mod: {}, cls: {}, hr: Array(24).fill(0) };
+      x.t++; if (!r.recovered) x.o++; if (r.date) { const dd = (hoy - r.date) / 864e5; if (dd <= 30) x.d30++; else if (dd <= 120) x.p90++; }
+      if (r.mod) x.mod[r.mod] = (x.mod[r.mod] || 0) + 1; x.cls[r.cls] = (x.cls[r.cls] || 0) + 1; if (r.hour != null) x.hr[r.hour]++; });
+    return Object.values(H).map(x => { const base = x.p90 / 3; x.trend = base ? (x.d30 - base) / base : (x.d30 ? 1 : 0); x.topMod = topN(x.mod, 1)[0]; x.topCls = topN(x.cls, 1)[0]; const mh = Math.max(...x.hr); x.peak = mh ? x.hr.indexOf(mh) : null; return x; }).sort((a, b) => b.t - a.t);
+  }
+  const trendTxt = t => t >= .25 ? `<span style="color:#f87171">▲ ${Math.round(t * 100)}%</span>` : t <= -.25 ? `<span style="color:#4ade80">▼ ${Math.round(-t * 100)}%</span>` : '<span style="color:#94a3b8">= estable</span>';
+  // cobertura: distancia de cada caso a su antena más cercana y sugerencias de nuevas antenas
+  function cobertura(rs, A, R) {
+    const C = rs.filter(r => r.coords).map(r => { let best = null, bd = 1e9; A.forEach(a => { const d = hav(a[1], a[2], r.coords[0], r.coords[1]); if (d < bd) { bd = d; best = a; } }); return { r, a: best, d: bd }; });
+    const unc = C.filter(x => x.d > R), cand = new Map();
+    unc.forEach(x => { const k = dkey(x.r.zone); if (k) cand.set(k, D[k]); });
+    const sug = []; let pend = unc.slice();
+    for (let i = 0; i < 3 && pend.length; i++) {
+      let best = null;
+      cand.forEach((c, k) => { const cov = pend.filter(x => hav(c[0], c[1], x.r.coords[0], x.r.coords[1]) <= R); if (!best || cov.length > best.cov.length) best = { k, c, cov }; });
+      if (!best || !best.cov.length) break;
+      sug.push({ k: best.k, c: best.c, n: best.cov.length, o: best.cov.filter(x => !x.r.recovered).length });
+      pend = pend.filter(x => !best.cov.includes(x)); cand.delete(best.k);
+    }
+    return { C, unc, sug, cubiertos: C.length - unc.length };
+  }
+  const MV = { mode: 'focos', ov: { ant: true, cov: false, gap: true, sug: true } };
   function mkMap(n) {
     if (REC.M[n] || typeof L === 'undefined') return REC.M[n];
-    const m = L.map('rc-map' + n, { preferCanvas: true }).setView([-12.0464, -77.0428], 11);
+    const m = L.map('rc-map' + n, { preferCanvas: true, zoomSnap: .5 }).setView([-12.0464, -77.0428], 11);
     L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap', maxZoom: 19 }).addTo(m);
-    const M = { n, m, mode: 'heat', pts: [], cur: null, rows: [], L: { points: L.layerGroup(), heat: L.layerGroup(), zones: L.layerGroup(), clusters: L.layerGroup() }, bar: $('rc-mb' + n), ap: $('rc-ap' + n) };
-    [['heat', 'Calor'], ['zones', 'Focos por distrito'], ['clusters', 'Agrupados'], ['points', 'Puntos']].forEach(([k, l]) => { const b = document.createElement('button'); b.type = 'button'; b.className = 'v26-pill' + (k === M.mode ? ' on' : ''); b.textContent = l; b.dataset.mode = k; M.bar.appendChild(b); });
-    const ab = document.createElement('button'); ab.type = 'button'; ab.className = 'v26-pill'; ab.dataset.ant = '1'; ab.style.marginLeft = 'auto'; ab.textContent = '📡 Cobertura de antenas'; M.bar.appendChild(ab);
-    const fs = document.createElement('button'); fs.type = 'button'; fs.className = 'v26-pill'; fs.dataset.fs = '1'; fs.textContent = '⛶'; fs.title = 'Pantalla completa'; M.bar.appendChild(fs);
+    const M = { n, m, pts: [], rows: [], L: { heat: L.layerGroup(), focos: L.layerGroup(), casos: L.layerGroup() }, O: { ant: L.layerGroup(), cov: L.layerGroup(), gap: L.layerGroup(), sug: L.layerGroup(), lines: L.layerGroup() }, bar: $('rc-mb' + n), ap: $('rc-ap' + n) };
+    M.bar.innerHTML += `<div class="v27-seg" role="group" aria-label="Vista del mapa">${[['focos', 'Focos'], ['heat', 'Calor'], ['casos', 'Casos']].map(([k, l]) => `<button type="button" data-mode="${k}">${l}</button>`).join('')}</div>
+      <div class="v27-ovs" role="group" aria-label="Capas">${[['ant', 'Antenas'], ['cov', 'Cobertura'], ['gap', 'Sin cobertura'], ['sug', 'Antena sugerida']].map(([k, l]) => `<button type="button" data-ov="${k}" aria-pressed="false"><i></i>${l}</button>`).join('')}</div>
+      <label class="v27-rad">Radio <select class="sel" data-antr="1">${[3, 5, 8, 10, 15, 20, 30].map(v => `<option value="${v}" ${REC.ANT.r === v ? 'selected' : ''}>${v} km</option>`).join('')}</select></label>
+      <button type="button" class="v26-pill" data-fs="1" title="Pantalla completa">⛶</button>`;
+    const info = L.control({ position: 'topright' }); info.onAdd = () => { const d = L.DomUtil.create('div', 'v27-minfo'); L.DomEvent.disableClickPropagation(d); return d; }; info.addTo(m); M.info = info;
+    const leg = L.control({ position: 'bottomleft' }); leg.onAdd = () => L.DomUtil.create('div', 'v27-mleg'); leg.addTo(m); M.leg = leg;
+    m.on('zoomend', () => m.getContainer().classList.toggle('v27-z12', m.getZoom() >= 12));
     M.bar.addEventListener('click', e => {
       const b = e.target.closest('button'); if (!b) return;
-      if (b.dataset.mode) { M.mode = b.dataset.mode; M.bar.querySelectorAll('[data-mode]').forEach(x => x.classList.toggle('on', x === b)); showL(M); }
-      if (b.dataset.ant) { REC.ANT.on = !REC.ANT.on; document.querySelectorAll('#view-recup [data-ant]').forEach(x => x.classList.toggle('on', REC.ANT.on)); Object.values(REC.M).forEach(drawAnt); }
-      if (b.dataset.fs) { const el = m.getContainer(); if (document.fullscreenElement) document.exitFullscreen(); else if (el.requestFullscreen) el.requestFullscreen(); }
+      if (b.dataset.mode) { MV.mode = b.dataset.mode; Object.values(REC.M).forEach(x => { syncBar(x); showL(x); }); }
+      if (b.dataset.ov) { MV.ov[b.dataset.ov] = !MV.ov[b.dataset.ov]; Object.values(REC.M).forEach(x => { syncBar(x); overlays(x); }); }
+      if (b.dataset.fs) { const el = m.getContainer().closest('.v27-mapwrap') || m.getContainer(); if (document.fullscreenElement) document.exitFullscreen(); else if (el.requestFullscreen) el.requestFullscreen(); }
     });
     document.addEventListener('fullscreenchange', () => setTimeout(() => m.invalidateSize(), 250));
-    REC.M[n] = M; return M;
+    REC.M[n] = M; syncBar(M); return M;
   }
-  const showL = M => { if (M.cur) M.m.removeLayer(M.cur); M.cur = M.L[M.mode]; M.m.addLayer(M.cur); };
-  const popup = r => `<div style="min-width:210px;font-size:12px"><b style="font-size:14px">${esc(r.plate || 'CASO')}</b>${r.op ? ` · Op. ${esc(r.op)}` : ''}<hr style="margin:4px 0;border-color:#26304266"><b>${r.recovered ? '🟢 RECUPERADO' : '🔴 EN PROCESO'}</b><br>📍 ${esc(r.zone || '-')}<br>🚗 ${esc([r.type, r.brand, r.model].filter(Boolean).join(' '))}<br>📡 ${esc(r.devRaw || '-')}${r.devst ? ' · ' + esc(r.devst) : ''}<br>⚠ ${esc(r.mod || '-')}<br>🕒 ${esc(r.horaTxt || '-')} · demora ${esc(r.diffTxt || '-')}<br>📅 ${fd(r.date)}</div>`;
+  function syncBar(M) {
+    M.bar.querySelectorAll('[data-mode]').forEach(x => x.classList.toggle('on', x.dataset.mode === MV.mode));
+    M.bar.querySelectorAll('[data-ov]').forEach(x => { const on = !!MV.ov[x.dataset.ov]; x.classList.toggle('on', on); x.setAttribute('aria-pressed', on ? 'true' : 'false'); });
+    const s = M.bar.querySelector('[data-antr]'); if (s) s.value = String(REC.ANT.r);
+  }
+  function showL(M) {
+    Object.entries(M.L).forEach(([k, l]) => { if (k === MV.mode) { if (!M.m.hasLayer(l)) M.m.addLayer(l); } else if (M.m.hasLayer(l)) M.m.removeLayer(l); });
+    legend(M);
+  }
+  function legend(M) {
+    const el = M.leg.getContainer(); if (!el) return;
+    const ov = [MV.ov.ant ? '<span><b class="v27-lant"></b>Antena (color = casos en su radio)</span>' : '', MV.ov.gap ? '<span><b class="v27-lgap"></b>Foco sin cobertura</span>' : '', MV.ov.sug ? '<span><b class="v27-lsug">★</b>Antena sugerida</span>' : ''].join('');
+    el.innerHTML = (MV.mode === 'focos' ? '<span><b class="v27-lbub"></b>Burbuja = casos del distrito · color = % abiertos</span><span class="v27-grad"><i></i>0% → 100% abiertos</span>'
+      : MV.mode === 'heat' ? '<span class="v27-grad heat"><i></i>menos → más robos</span>'
+      : '<span><b class="v27-ldot ok"></b>Recuperado</span><span><b class="v27-ldot open"></b>En proceso</span>') + ov;
+  }
+  const popup = r => `<div class="v27-pop"><b>${esc(r.plate || 'CASO')}</b>${r.op ? ` · Op. ${esc(r.op)}` : ''}<div class="st ${r.recovered ? 'ok' : 'op'}">${r.recovered ? 'RECUPERADO' : 'EN PROCESO' + (r.daysOpen != null ? ' · ' + r.daysOpen + ' días' : '')}</div>📍 ${esc(r.zone || '-')}<br>🚗 ${esc([r.type, r.brand, r.model].filter(Boolean).join(' '))}<br>📡 ${esc(r.devRaw || '-')}${r.devst ? ' · ' + esc(r.devst) : ''}<br>⚠ ${esc(r.mod || '-')}<br>🕒 ${esc(r.horaTxt || '-')} · demora ${esc(r.diffTxt || '-')}<br>📅 ${fd(r.date)}</div>`;
   function draw(M, rs, color) {
-    if (!M) return; M.rows = rs; Object.values(M.L).forEach(l => l.clearLayers()); M.pts = [];
-    const cluster = window.L && L.markerClusterGroup ? L.markerClusterGroup({ maxClusterRadius: 45 }) : null;
-    rs.forEach(r => {
-      if (!r.coords) return; M.pts.push(r.coords); const c = color(r);
-      const ic = () => L.divIcon({ className: '', html: `<div class="v26-mrk${r.recovered ? '' : ' open'}" style="background:${c}"></div>`, iconSize: [16, 16], iconAnchor: [8, 8] });
-      M.L.points.addLayer(L.marker(r.coords, { icon: ic() }).bindPopup(popup(r)));
-      (cluster || M.L.clusters).addLayer(L.marker(r.coords, { icon: ic() }).bindPopup(popup(r)));
+    if (!M) return; M.rows = rs; M.color = color; Object.values(M.L).forEach(l => l.clearLayers()); M.pts = [];
+    const withC = rs.filter(r => r.coords); withC.forEach(r => M.pts.push(r.coords));
+    // Calor
+    if (withC.length && L.heatLayer) M.L.heat.addLayer(L.heatLayer(withC.map(r => [...r.coords, r.recovered ? .45 : 1]), { radius: 34, blur: 26, maxZoom: 14, minOpacity: .25, gradient: { .15: '#1e3a8a', .35: '#38bdf8', .55: '#a78bfa', .75: '#f472b6', .9: '#f97316', 1: '#ef4444' } }));
+    else withC.forEach(r => L.circleMarker(r.coords, { radius: 16, stroke: false, fillColor: r.recovered ? '#f59e0b' : '#ef4444', fillOpacity: .14 }).addTo(M.L.heat));
+    // Focos (burbujas con cifras)
+    const F = focosDe(rs), mx = Math.max(1, ...F.map(x => x.t)), A = antenas();
+    M.focos = F;
+    F.forEach(x => {
+      const s = Math.round(26 + 34 * Math.sqrt(x.t / mx)), c = mixC(x.t ? x.o / x.t : 0);
+      let near = null; if (A.length) { let bd = 1e9; A.forEach(a => { const d = hav(x.c[0], x.c[1], a[1], a[2]); if (d < bd) { bd = d; near = [a, d]; } }); }
+      const ic = L.divIcon({ className: '', html: `<div class="v27-bub" style="--s:${s}px;--c:${c}"><b>${x.t}</b></div>`, iconSize: [s, s], iconAnchor: [s / 2, s / 2] });
+      L.marker(x.c, { icon: ic, riseOnHover: true, zIndexOffset: x.t }).bindTooltip(`${esc(x.k)} · ${x.t} casos`, { direction: 'top', offset: [0, -s / 2] })
+        .bindPopup(`<div class="v27-pop"><b>${esc(x.k)}</b><div class="v27-pg"><span>Casos</span><b>${x.t}</b><span>Abiertos</span><b>${x.o}</b><span>% recupero</span><b>${pct(x.t - x.o, x.t)}%</b><span>Últimos 30 días</span><b>${x.d30} ${trendTxt(x.trend)}</b><span>Modalidad</span><b>${esc(x.topMod ? x.topMod[0] : '-')}</b><span>Tecnología</span><b>${esc(x.topCls ? x.topCls[0] : '-')}</b><span>Hora pico</span><b>${x.peak != null ? x.peak + ' h' : '-'}</b>${near ? `<span>Antena más cercana</span><b>${esc(antShort(near[0][0]))} · ${near[1].toFixed(1)} km</b>` : ''}</div></div>`, { maxWidth: 300 }).addTo(M.L.focos);
     });
-    if (cluster) M.L.clusters.addLayer(cluster);
-    const withC = rs.filter(r => r.coords);
-    if (withC.length && L.heatLayer) M.L.heat.addLayer(L.heatLayer(withC.map(r => [...r.coords, r.recovered ? .5 : 1]), { radius: 30, blur: 22, maxZoom: 15, gradient: { .2: '#38bdf8', .45: '#a78bfa', .7: '#f472b6', 1: '#ef4444' } }));
-    else withC.forEach(r => L.circleMarker(r.coords, { radius: 14, stroke: false, fillColor: r.recovered ? '#f59e0b' : '#ef4444', fillOpacity: .16 }).addTo(M.L.heat));
-    const z = {}; rs.forEach(r => { const k = dkey(r.zone); if (!k) return; z[k] = z[k] || { t: 0, r: 0 }; z[k].t++; if (r.recovered) z[k].r++; });
-    Object.entries(z).forEach(([k, v]) => { const c = v.t - v.r > v.r ? '#ef4444' : '#10b981'; L.circle(D[k], { radius: Math.max(700, Math.sqrt(v.t) * 450), color: c, weight: 2, dashArray: '5 5', fillColor: c, fillOpacity: .26 }).bindPopup(`<b>${esc(k)}</b><br>Total <b>${v.t}</b> · Recuperados <b>${v.r}</b> · Abiertos <b>${v.t - v.r}</b><br>Recupero <b>${pct(v.r, v.t)}%</b>`).addTo(M.L.zones); });
+    // Casos (agrupados con anillo de % abiertos)
+    const cluster = L.markerClusterGroup ? L.markerClusterGroup({ maxClusterRadius: 50, showCoverageOnHover: false, iconCreateFunction: cg => { const ch = cg.getAllChildMarkers(), o = ch.filter(x => x.options.open).length, n = ch.length, p = Math.round(o / n * 100), s = n > 50 ? 48 : n > 15 ? 40 : 32; return L.divIcon({ className: '', html: `<div class="v27-clu" style="--s:${s}px;--p:${p}%"><b>${n}</b></div>`, iconSize: [s, s] }); } }) : null;
+    withC.forEach(r => { const mk2 = L.marker(r.coords, { open: !r.recovered, icon: L.divIcon({ className: '', html: `<div class="v27-dot ${r.recovered ? 'ok' : 'open'}" style="--c:${color(r)}"></div>`, iconSize: [14, 14], iconAnchor: [7, 7] }) }).bindPopup(popup(r)); (cluster || M.L.casos).addLayer(mk2); });
+    if (cluster) M.L.casos.addLayer(cluster);
     showL(M);
-    // encuadre: el grupo principal (Lima), sin que un caso lejano (ej. Ica) aleje todo el mapa
     const cLa = med(M.pts.map(x => x[0])), cLo = med(M.pts.map(x => x[1])), near = M.pts.filter(x => hav(cLa, cLo, x[0], x[1]) <= 70), fitPts = near.length >= M.pts.length * .7 ? near : M.pts;
     setTimeout(() => { M.m.invalidateSize(); if (fitPts.length) M.m.fitBounds(fitPts, { padding: [30, 30], maxZoom: 13 }); }, 80);
-    drawAnt(M);
+    overlays(M);
   }
-  function drawAnt(M) {
-    if (!M || !M.m) return; if (M.ant) { M.m.removeLayer(M.ant); M.ant = null; }
-    const P = M.ap; if (!REC.ANT.on || !M.rows) { if (P) P.innerHTML = ''; return; }
-    const R = REC.ANT.r, A = antenas().filter(a => REC.ANT.reg === 'ALL' || (REC.ANT.reg === 'LIMA') === a[3]), rs = M.rows.filter(r => r.coords);
-    if (!A.length) { P.innerHTML = '<div class="v21-msg warn mt-3">No encuentro antenas con coordenadas en la base de puntos. Carga la base para ver la cobertura.</div>'; return; }
-    M.ant = L.layerGroup().addTo(M.m);
-    const S = A.map(a => { const z = {}; let t = 0, rc = 0, g = 0; rs.forEach(r => { if (hav(a[1], a[2], r.coords[0], r.coords[1]) <= R) { t++; if (r.recovered) rc++; if (r.cls === 'GPS') g++; z[r.zone] = (z[r.zone] || 0) + 1; } }); return { a, t, rc, g, z }; });
-    const H = {}; rs.forEach(r => { const k = dkey(r.zone); if (!k) return; const x = H[k] = H[k] || { k, t: 0, o: 0 }; x.t++; if (!r.recovered) x.o++; });
-    const HL = Object.values(H).sort((x, y) => y.t - x.t).map(x => { const c = D[x.k]; return { ...x, c, n: A.map(a => [a, hav(c[0], c[1], a[1], a[2])]).sort((p, q) => p[1] - q[1]).slice(0, 3) }; });
-    const mx = Math.max(...S.map(s => s.t), 1), col = s => s.t >= .66 * mx ? '#ef4444' : s.t >= .33 * mx ? '#f59e0b' : s.t > 0 ? '#22c55e' : '#64748b';
-    S.forEach(s => { const a = s.a, c = col(s); L.circle([a[1], a[2]], { radius: R * 1000, color: c, weight: 1, fillColor: c, fillOpacity: .05 }).addTo(M.ant);
-      L.marker([a[1], a[2]], { icon: L.divIcon({ className: '', html: `<div style="font-size:20px;filter:drop-shadow(0 0 4px ${c})">📡</div>`, iconSize: [22, 22], iconAnchor: [11, 11] }) }).bindTooltip(esc(a[0])).bindPopup(`<b>📡 ${esc(a[0])}</b><br>Radio ${R} km · casos en radio <b>${s.t}</b> (🟢 ${s.rc} · 🔴 ${s.t - s.rc})<br>Con GPS ${s.g} · recupero ${pct(s.rc, s.t)}%`).addTo(M.ant); });
-    HL.slice(0, 10).forEach(x => { const [a, dd] = x.n[0]; L.polyline([x.c, [a[1], a[2]]], { color: '#fbbf24', weight: 2, dashArray: '6 6' }).bindTooltip(`${esc(x.k)} → ${esc(a[0])} · ${dd.toFixed(1)} km`).addTo(M.ant); L.circleMarker(x.c, { radius: 6 + Math.sqrt(x.t), color: '#fff', weight: 2, fillColor: '#ef4444', fillOpacity: .85 }).bindTooltip(`FOCO ${esc(x.k)}: ${x.t} casos`).addTo(M.ant); });
-    const md = rs.map(r => Math.min(...A.map(a => hav(a[1], a[2], r.coords[0], r.coords[1])))), cov = md.filter(x => x <= R).length, dm = med(md.map(x => +x.toFixed(2))), unc = HL.filter(x => x.n[0][1] > R), top1 = [...S].sort((x, y) => y.t - x.t)[0], idle = S.filter(s => !s.t).length, rk = [...S].sort((x, y) => y.t - x.t).slice(0, 15);
-    const td = x => x.n.map(([a, dd]) => `<td>${esc(a[0].replace('LIMA-', ''))}<br><small style="color:${dd <= R ? '#22c55e' : '#ef4444'}">${dd.toFixed(1)} km</small></td>`).join('');
-    P.innerHTML = `<div class="card p-4 mt-3"><div class="v26-ant"><b class="text-white">📡 Análisis de antenas (de tu base de puntos)</b><label>Radio: <b id="rc-rv${M.n}" class="text-[var(--accent)]">${R} km</b> <input type="range" min="1" max="40" value="${R}" data-antr="1" style="vertical-align:middle"></label>
-      <label>Región <select class="sel" data-antg="1">${[['ALL', 'Todas'], ['LIMA', 'Solo Lima'], ['PROV', 'Solo provincias']].map(([v, l]) => `<option value="${v}" ${REC.ANT.reg === v ? 'selected' : ''}>${l}</option>`).join('')}</select></label><small>Distancias aproximadas: los casos se ubican por distrito.</small></div>
-      <div class="v26-kg mb-3">${K('Antenas', A.length, '#38bdf8')}${K('Con casos en radio', A.length - idle, '#22c55e')}${K('Sin casos', idle, '#64748b')}${K('Casos cubiertos', pct(cov, rs.length) + '%', '#10b981')}${K('Distancia mediana', (dm ?? 0) + ' km', '#06b6d4', 'caso → antena')}${K('Focos sin cobertura', unc.length, '#ef4444')}${K('Antena más cargada', top1 && top1.t ? top1.a[0].replace('LIMA-', '') + ' · ' + top1.t : '--', '#f59e0b')}</div>
-      <div class="v26-cg"><div><p class="text-[11px] font-bold uppercase tracking-wider text-slate-300 mb-2">Focos de robo → 3 antenas más cercanas (clic para ir)</p><div style="max-height:360px;overflow:auto"><table class="v26-tbl"><tr><th>Foco</th><th>Casos</th><th>Abiertos</th><th>Antena 1</th><th>Antena 2</th><th>Antena 3</th><th>Cob.</th></tr>${HL.slice(0, 25).map(x => `<tr data-go="${x.c[0]},${x.c[1]}"><td><b>${esc(x.k)}</b></td><td>${x.t}</td><td>${x.o}</td>${td(x)}<td>${x.n[0][1] <= R ? '✅' : '❌'}</td></tr>`).join('')}</table></div></div>
-      <div><p class="text-[11px] font-bold uppercase tracking-wider text-slate-300 mb-2">Antenas con más casos en su radio</p><div style="max-height:360px;overflow:auto"><table class="v26-tbl"><tr><th>#</th><th>Antena</th><th>Casos</th><th>Recup.</th><th>Abiertos</th><th>GPS</th><th>Zona principal</th></tr>${rk.map((s, i) => `<tr data-go="${s.a[1]},${s.a[2]}"><td>${i + 1}</td><td><b>${esc(s.a[0])}</b></td><td><div class="v26-bar"><i style="width:${pct(s.t, mx)}%"></i></div>${s.t}</td><td>${s.rc}</td><td>${s.t - s.rc}</td><td>${s.g}</td><td>${esc((Object.entries(s.z).sort((x, y) => y[1] - x[1])[0] || ['-'])[0])}</td></tr>`).join('')}</table></div></div></div></div>`;
+  function overlays(M) {
+    if (!M || !M.m) return;
+    Object.values(M.O).forEach(l => { l.clearLayers(); if (M.m.hasLayer(l)) M.m.removeLayer(l); });
+    const R = REC.ANT.r, A = antenas().filter(a => REC.ANT.reg === 'ALL' || (REC.ANT.reg === 'LIMA') === a[3]), rs = M.rows || [];
+    const cv = A.length ? cobertura(rs, A, R) : null; M.cv = cv;
+    const conR = rs.filter(r => r.coords).length;
+    // tarjeta de resumen sobre el mapa
+    const ic = M.info.getContainer();
+    if (ic) ic.innerHTML = `<div class="t">${conR.toLocaleString()} casos en el mapa</div><div class="g"><span>Abiertos</span><b style="color:#f87171">${rs.filter(r => !r.recovered).length}</b><span>Recupero</span><b style="color:#4ade80">${pct(rs.filter(r => r.recovered).length, rs.length)}%</b>${cv ? `<span>Cubiertos (${R} km)</span><b>${pct(cv.cubiertos, cv.C.length)}%</b>` : ''}${M.focos && M.focos[0] ? `<span>Foco principal</span><b>${esc(M.focos[0].k)}</b>` : ''}</div>`;
+    legend(M);
+    if (!A.length) { if (M.ap) M.ap.innerHTML = MV.ov.ant || MV.ov.cov || MV.ov.gap || MV.ov.sug ? '<div class="v21-msg warn mt-3">No encuentro antenas con coordenadas en la base de puntos. Carga la base para ver antenas y cobertura.</div>' : ''; return; }
+    const load = A.map(a => { let t = 0, o = 0, g = 0; const z = {}; rs.forEach(r => { if (r.coords && hav(a[1], a[2], r.coords[0], r.coords[1]) <= R) { t++; if (!r.recovered) o++; if (r.cls === 'GPS') g++; z[r.zone] = (z[r.zone] || 0) + 1; } }); return { a, t, o, g, z }; });
+    const mx = Math.max(1, ...load.map(s => s.t));
+    if (MV.ov.cov) load.forEach(s => { const c = s.t ? mixC(s.t / mx) : '#64748b'; L.circle([s.a[1], s.a[2]], { radius: R * 1000, color: c, weight: 1, opacity: .55, fillColor: c, fillOpacity: .045, interactive: false }).addTo(M.O.cov); });
+    if (MV.ov.ant) {
+      load.forEach(s => { const c = s.t ? mixC(s.t / mx) : '#64748b';
+        L.marker([s.a[1], s.a[2]], { icon: L.divIcon({ className: '', html: `<div class="v27-ant" style="--c:${c}">${TOWER}</div>`, iconSize: [30, 30], iconAnchor: [15, 15] }), zIndexOffset: 500 })
+          .bindTooltip(esc(antShort(s.a[0])), { permanent: true, direction: 'right', offset: [14, 0], className: 'v27-antlbl' })
+          .bindPopup(`<div class="v27-pop"><b>${esc(s.a[0])}</b><div class="v27-pg"><span>Radio</span><b>${R} km</b><span>Casos en radio</span><b>${s.t}</b><span>Abiertos</span><b>${s.o}</b><span>Con GPS</span><b>${s.g}</b><span>% recupero</span><b>${pct(s.t - s.o, s.t)}%</b><span>Zona principal</span><b>${esc((topN(s.z, 1)[0] || ['-'])[0])}</b></div></div>`).addTo(M.O.ant); });
+      (M.focos || []).slice(0, 12).forEach(x => { let best = null, bd = 1e9; A.forEach(a => { const d = hav(x.c[0], x.c[1], a[1], a[2]); if (d < bd) { bd = d; best = a; } }); if (best) L.polyline([x.c, [best[1], best[2]]], { color: bd <= R ? '#38bdf8' : '#f87171', weight: 1.5, opacity: .75, dashArray: '2 6', interactive: true }).bindTooltip(`${esc(x.k)} → ${esc(antShort(best[0]))} · ${bd.toFixed(1)} km`, { sticky: true }).addTo(M.O.lines); });
+      M.O.lines.addTo(M.m);
+    }
+    if (MV.ov.gap && cv) {
+      const G = {}; cv.unc.forEach(x => { const k = dkey(x.r.zone); if (!k) return; const g = G[k] = G[k] || { k, n: 0, o: 0, d: x.d, a: x.a }; g.n++; if (!x.r.recovered) g.o++; });
+      Object.values(G).forEach(g => L.circle(D[g.k], { radius: 1100 + 250 * Math.sqrt(g.n), color: '#ef4444', weight: 2, dashArray: '6 5', fillColor: '#ef4444', fillOpacity: .07 }).bindTooltip(`Sin cobertura · ${esc(g.k)}: ${g.n} casos (${g.o} abiertos) · ${g.d.toFixed(1)} km a ${esc(antShort(g.a[0]))}`, { sticky: true }).addTo(M.O.gap));
+    }
+    if (MV.ov.sug && cv) cv.sug.forEach((s, i) => {
+      L.circle(s.c, { radius: R * 1000, color: '#22c55e', weight: 1.5, dashArray: '8 6', fillColor: '#22c55e', fillOpacity: .05, interactive: false }).addTo(M.O.sug);
+      L.marker(s.c, { icon: L.divIcon({ className: '', html: `<div class="v27-sug">★<i>${i + 1}</i></div>`, iconSize: [30, 30], iconAnchor: [15, 15] }), zIndexOffset: 800 })
+        .bindPopup(`<div class="v27-pop"><b>Antena sugerida #${i + 1}</b><div class="v27-pg"><span>Zona</span><b>${esc(s.k)}</b><span>Cubriría</span><b>${s.n} casos hoy sin cobertura</b><span>De ellos abiertos</span><b>${s.o}</b><span>Radio usado</span><b>${R} km</b></div><small>Ubicación aproximada (centro del distrito). Valida el sitio en campo.</small></div>`).addTo(M.O.sug);
+    });
+    Object.entries(M.O).forEach(([k, l]) => { if ((k === 'lines' ? MV.ov.ant : MV.ov[k]) && !M.m.hasLayer(l)) l.addTo(M.m); });
+    analysis(M, A, load, cv);
   }
-  rsec.addEventListener('click', e => { const tr = e.target.closest('tr[data-go]'); if (!tr) return; const [la, lo] = tr.dataset.go.split(',').map(Number), M = REC.M[REC.view === 'gps' ? 2 : 1]; if (M) { M.m.flyTo([la, lo], 13); M.m.getContainer().scrollIntoView({ behavior: 'smooth', block: 'center' }); } });
-  rsec.addEventListener('input', e => { const r = e.target.closest('[data-antr]'); if (r) { const M = REC.M[REC.view === 'gps' ? 2 : 1]; const lab = M && $('rc-rv' + M.n); if (lab) lab.textContent = r.value + ' km'; } });
+  function analysis(M, A, S, cv) {
+    const P = M.ap; if (!P) return;
+    if (!(MV.ov.ant || MV.ov.cov || MV.ov.gap || MV.ov.sug)) { P.innerHTML = ''; return; }
+    const R = REC.ANT.r, rs = (M.rows || []).filter(r => r.coords), mx = Math.max(1, ...S.map(s => s.t));
+    const HL = (M.focos || []).map(x => ({ ...x, n: A.map(a => [a, hav(x.c[0], x.c[1], a[1], a[2])]).sort((p, q) => p[1] - q[1]).slice(0, 3) }));
+    const dm = med(cv.C.map(x => +x.d.toFixed(2))), idle = S.filter(s => !s.t).length, rk = [...S].sort((x, y) => y.t - x.t).slice(0, 15), top1 = rk[0];
+    const td = x => x.n.map(([a, dd]) => `<td>${esc(antShort(a[0]))}<br><small style="color:${dd <= R ? '#4ade80' : '#f87171'}">${dd.toFixed(1)} km</small></td>`).join('');
+    P.innerHTML = `<div class="card p-4 mt-3"><div class="v26-ant"><b class="text-white">Cobertura de antenas · ${A.length} antenas de tu base de puntos</b><label>Región <select class="sel" data-antg="1">${[['ALL', 'Todas'], ['LIMA', 'Solo Lima'], ['PROV', 'Solo provincias']].map(([v, l]) => `<option value="${v}" ${REC.ANT.reg === v ? 'selected' : ''}>${l}</option>`).join('')}</select></label><small>Distancias aproximadas: los casos se ubican por distrito.</small></div>
+      <div class="v26-kg mb-3">${K('Casos cubiertos', pct(cv.cubiertos, cv.C.length) + '%', '#10b981', `a ≤ ${R} km de una antena`)}${K('Casos sin cobertura', cv.unc.length, '#ef4444', cv.unc.filter(x => !x.r.recovered).length + ' siguen abiertos')}${K('Distancia mediana', (dm ?? 0) + ' km', '#06b6d4', 'caso → antena')}${K('Antenas con casos', A.length - idle, '#38bdf8', idle + ' sin casos en su radio')}${K('Antena más exigida', top1 && top1.t ? antShort(top1.a[0]) : '--', '#f59e0b', top1 && top1.t ? top1.t + ' casos en radio' : '')}${K('Sugerencia #1', cv.sug[0] ? cv.sug[0].k : '--', '#22c55e', cv.sug[0] ? 'cubriría ' + cv.sug[0].n + ' casos' : 'todo cubierto')}</div>
+      <div class="v26-cg"><div><p class="v27-h">Focos → 3 antenas más cercanas (toca para ir)</p><div style="max-height:360px;overflow:auto"><table class="v26-tbl"><tr><th>Foco</th><th>Casos</th><th>Abiertos</th><th>30 d</th><th>Antena 1</th><th>Antena 2</th><th>Antena 3</th></tr>${HL.slice(0, 25).map(x => `<tr data-go="${x.c[0]},${x.c[1]}"><td><b>${esc(x.k)}</b></td><td>${x.t}</td><td>${x.o}</td><td>${x.d30} ${trendTxt(x.trend)}</td>${td(x)}</tr>`).join('')}</table></div></div>
+      <div><p class="v27-h">Antenas con más casos en su radio</p><div style="max-height:360px;overflow:auto"><table class="v26-tbl"><tr><th>#</th><th>Antena</th><th>Casos</th><th>Abiertos</th><th>GPS</th><th>Zona principal</th></tr>${rk.map((s, i) => `<tr data-go="${s.a[1]},${s.a[2]}"><td>${i + 1}</td><td><b>${esc(s.a[0])}</b></td><td><div class="v26-bar"><i style="width:${pct(s.t, mx)}%"></i></div>${s.t}</td><td>${s.o}</td><td>${s.g}</td><td>${esc((topN(s.z, 1)[0] || ['-'])[0])}</td></tr>`).join('')}</table></div>
+      ${cv.sug.length ? `<p class="v27-h mt-3">Dónde conviene la próxima antena</p><table class="v26-tbl"><tr><th>#</th><th>Zona sugerida</th><th>Casos que cubriría</th><th>Abiertos</th></tr>${cv.sug.map((s, i) => `<tr data-go="${s.c[0]},${s.c[1]}"><td>★ ${i + 1}</td><td><b>${esc(s.k)}</b></td><td>${s.n}</td><td>${s.o}</td></tr>`).join('')}</table>` : ''}</div></div></div>`;
+  }
+  rsec.addEventListener('click', e => { const tr = e.target.closest('tr[data-go], [data-goz]'); if (!tr) return; if (!/mapa|gps/.test(REC.view)) { const [la, lo] = (tr.dataset.go || tr.dataset.goz).split(',').map(Number); if (!isFinite(la)) return; REC.view = 'mapa'; Promise.all([loadLib('heat'), loadLib('cluster')]).then(() => { render(); setTimeout(() => REC.M[1] && REC.M[1].m.flyTo([la, lo], 13), 400); }); return; } const [la, lo] = (tr.dataset.go || tr.dataset.goz).split(',').map(Number), M = REC.M[REC.view === 'gps' ? 2 : 1]; if (M) { M.m.flyTo([la, lo], 13); M.m.getContainer().scrollIntoView({ behavior: 'smooth', block: 'center' }); } });
   rsec.addEventListener('change', e => {
-    if (e.target.closest('[data-antr]')) { REC.ANT.r = +e.target.value; Object.values(REC.M).forEach(drawAnt); return; }
-    if (e.target.closest('[data-antg]')) { REC.ANT.reg = e.target.value; Object.values(REC.M).forEach(drawAnt); return; }
+    if (e.target.closest('[data-antr]')) { REC.ANT.r = +e.target.value; Object.values(REC.M).forEach(x => { syncBar(x); overlays(x); }); return; }
+    if (e.target.closest('[data-antg]')) { REC.ANT.reg = e.target.value; Object.values(REC.M).forEach(overlays); return; }
     if (e.target.closest('#rc-filters')) render();
   });
   const GVT = ['ALL', 'GPS BASE', 'GPS-PP', 'GPS 360', 'HUNTER PRO', 'GPS AMI', 'PP SECURITY', 'HUNTER TOYOTA', 'GL', 'GD', 'LOJACK', 'DETEKTOR', 'OTROS'];
@@ -14866,19 +15218,20 @@ body:not(.theme-day) .v26-map .leaflet-tile-pane { filter: invert(1) hue-rotate(
     draw(M, rs, r => r.gl ? '#e879f9' : r.gd ? '#fb7185' : r.cls === 'GPS' ? (SUBC[r.tags[0]] || '#22d3ee') : (CLSC[r.cls] || '#64748b'));
     $('rc-gv').innerHTML = GVT.map(k => { const c = d.filter(GVF(k)).length; if (!c && k !== 'ALL') return ''; return `<button type="button" class="v26-pill ${REC.GV === k ? 'on' : ''}" data-gv="${k}"><span style="color:${GVC[k]};margin-right:5px">●</span>${GVL[k] || k} (${c})</button>`; }).join('');
     const rc = rs.filter(r => r.recovered).length, sc = rs.filter(r => !r.coords).length;
-    $('rc-gk').innerHTML = K('En mapa', rs.length - sc, '#22d3ee') + K('Recup.', rc, '#10b981') + K('Abiertos', rs.length - rc, '#ef4444') + `<div style="grid-column:1/-1;font-size:11px;color:#94a3b8">Total del filtro: <b>${rs.length}</b>. Borde grueso = sigue en proceso.${sc ? ` <span class="text-amber-300">${sc} sin ubicación (distrito no reconocido).</span>` : ''}</div>`;
+    $('rc-gk').innerHTML = K('En mapa', rs.length - sc, '#22d3ee') + K('Recup.', rc, '#10b981') + K('Abiertos', rs.length - rc, '#ef4444') + `<div style="grid-column:1/-1;font-size:11px;color:#94a3b8">Total del filtro: <b>${rs.length}</b>. En “Casos”, el punto con borde grueso sigue en proceso.${sc ? ` <span class="text-amber-300">${sc} sin ubicación (distrito no reconocido).</span>` : ''}</div>`;
     const st = count(g, r => r.tags), sr = count(g.filter(r => r.recovered), r => r.tags);
     $('rc-gs').innerHTML = topN(st).map(([k, v]) => `<div style="margin-bottom:10px"><div style="display:flex;justify-content:space-between;font-weight:700;font-size:11px"><span style="color:${SUBC[k]}">● ${esc(k)}</span><span>${v} · ${pct(sr[k] || 0, v)}%</span></div><div class="v26-bar"><i style="width:${pct(sr[k] || 0, v)}%"></i></div></div>`).join('') || '<small class="text-slate-400">Sin casos GPS</small>';
   }
   rsec.addEventListener('click', e => { const b = e.target.closest('[data-gv]'); if (b) { REC.GV = b.dataset.gv; render(); } });
   function vMapa(d) {
-    draw(mkMap(1), d, r => r.recovered ? '#10b981' : '#ef4444');
+    const M = mkMap(1); draw(M, d, r => r.recovered ? '#10b981' : '#ef4444');
+    const F = M.focos || [];
+    $('rc-side1').innerHTML = `<p class="v27-h">Focos principales</p>${F.slice(0, 12).map((x, i) => `<button type="button" class="v27-fi" data-goz="${x.c[0]},${x.c[1]}"><span class="n">${i + 1}</span><span class="z"><b>${esc(x.k)}</b><small>${x.o} abiertos · ${pct(x.t - x.o, x.t)}% recup. · pico ${x.peak != null ? x.peak + ' h' : '-'}</small></span><span class="c">${x.t}<small>${trendTxt(x.trend)}</small></span></button>`).join('') || '<p class="text-xs text-slate-500">Sin focos con distrito reconocido.</p>'}`;
     const H = $('rc-mapa-ch'); H.innerHTML = '';
-    hb(H, 'zs2', 'Distritos con más casos', topN(count(d, r => r.zone), 10), '#ef4444');
+    mk(H, 'zs2', 'Focos: casos totales vs últimos 30 días', { type: 'bar', data: { labels: F.slice(0, 10).map(x => x.k), datasets: [{ label: 'Total', data: F.slice(0, 10).map(x => x.t), backgroundColor: '#ef4444', borderRadius: 4 }, { label: 'Últimos 30 días', data: F.slice(0, 10).map(x => x.d30), backgroundColor: '#f59e0b', borderRadius: 4 }] }, options: { indexAxis: 'y' } });
     const sinU = d.filter(r => !r.coords);
     H.insertAdjacentHTML('beforeend', `<div class="card v26-ch"><p class="ct">Casos sin ubicar</p><p class="ds">El lugar de robo no coincide con un distrito conocido. Revisa cómo viene escrito en el Excel.</p><div style="max-height:240px;overflow:auto">${sinU.length ? `<table class="v26-tbl"><tr><th>Placa</th><th>Lugar de robo</th></tr>${sinU.slice(0, 60).map(r => `<tr><td>${esc(r.plate)}</td><td>${esc(r.zone || '(vacío)')}</td></tr>`).join('')}</table>` : '<p class="text-xs text-emerald-300">Todos los casos tienen distrito reconocido ✓</p>'}</div></div>`);
   }
-
   function render() {
     if (!REC.opened) return;
     REC.q = $('rc-q').value || '';
@@ -14886,14 +15239,15 @@ body:not(.theme-day) .v26-map .leaflet-tile-pane { filter: invert(1) hue-rotate(
     $('rc-cnt').textContent = REC.data.length ? `${d.length.toLocaleString()} de ${REC.data.length.toLocaleString()} casos` : '';
     rsec.querySelectorAll('[data-rv]').forEach(b => b.classList.toggle('on', b.dataset.rv === REC.view));
     rsec.querySelectorAll('.rc-view').forEach(v => v.classList.toggle('ui-hidden', v.id !== 'rcv-' + REC.view));
-    if (!REC.data.length) { rsec.querySelectorAll('.rc-view').forEach(v => { if (!/mapa|gps/.test(v.id)) v.innerHTML = ''; }); return; }
-    const fn = { resumen: vResumen, mapa: vMapa, gps: vGps, tec: vTec, tiempos: vTiempos, zonas: vZonas, veh: vVeh, datos: vDatos }[REC.view];
+    if (REC.view === 'hist') { vHist(); return; }
+    if (!REC.data.length) { rsec.querySelectorAll('.rc-view').forEach(v => { if (!/mapa|gps|hist/.test(v.id)) v.innerHTML = ''; }); return; }
+    const fn = { resumen: vResumen, proy: () => vProy(filt(true)), mapa: vMapa, gps: vGps, tec: vTec, tiempos: vTiempos, zonas: vZonas, veh: vVeh, datos: vDatos }[REC.view];
     try { fn(d, g); } catch (e) { console.error(e); $('rc-msg').innerHTML = `<div class="v21-msg warn">No se pudo dibujar esta vista: ${esc(e.message)}</div>`; }
   }
   rsec.addEventListener('click', e => { const b = e.target.closest('[data-rv]'); if (!b) return; REC.view = b.dataset.rv; if (/mapa|gps/.test(REC.view)) Promise.all([loadLib('heat'), loadLib('cluster')]).then(render); render(); });
   let qT; $('rc-q').addEventListener('input', () => { clearTimeout(qT); qT = setTimeout(render, 220); });
   $('rc-q').addEventListener('keydown', e => { if (e.key === 'Enter') { REC.view = 'datos'; render(); } });
-  $('rc-clear').addEventListener('click', () => { $('rc-q').value = ''; FL.forEach(([id]) => { const s = $('rcf-' + id); if (s) s.value = 'TODOS'; }); REC.GV = 'ALL'; render(); });
+  $('rc-clear').addEventListener('click', () => { $('rc-q').value = ''; FL.forEach(([id]) => { const s = $('rcf-' + id); if (s) s.value = 'TODOS'; }); if ($('rcf-per')) $('rcf-per').value = 'TODOS'; REC.GV = 'ALL'; render(); });
   $('rc-csv').addEventListener('click', () => {
     const d = filt(); if (!d.length) { toast('No hay registros para exportar'); return; }
     const q = v => `"${String(v ?? '').replace(/"/g, '""')}"`;
@@ -14909,6 +15263,7 @@ body:not(.theme-day) .v26-map .leaflet-tile-pane { filter: invert(1) hue-rotate(
       let all = [], from = 0;
       for (;;) { const { data, error } = await sb().from('mdz_recuperos').select('*').order('fecha', { ascending: false }).order('id', { ascending: false }).range(from, from + 999); if (error) throw error; all = all.concat(data || []); if (!data || data.length < 1000 || all.length >= 20000) break; from += 1000; }
       const prevMax = REC.maxId;
+      all = all.filter(r => !r.fecha || r.fecha >= '2020-01-01');   // v27: casos antiguos (hoja 2018) fuera
       REC.raw = all; REC.data = all.map(enrich); REC.loaded = true; REC.err = ''; REC.at = Date.now();
       REC.maxId = all.reduce((m, r) => Math.max(m, Number(r.id) || 0), 0);
       let seen = ls.get(SEEN, null); if (seen == null) { seen = REC.maxId; ls.set(SEEN, seen); }
@@ -14919,7 +15274,7 @@ body:not(.theme-day) .v26-map .leaflet-tile-pane { filter: invert(1) hue-rotate(
       }
       if (REC.opened) { ls.set(SEEN, REC.maxId); REC.nuevos = []; }
     } catch (e) {
-      REC.err = /does not exist|relation|schema cache|42P01/i.test(e.message || '') ? 'Falta la tabla de recuperos: ejecuta en Supabase el archivo supabase_v26_recuperos_validacion.sql.' : 'No pude leer los recuperos: ' + (e.message || e);
+      REC.err = /does not exist|relation|schema cache|42P01/i.test(e.message || '') ? 'Falta la tabla de recuperos: ejecuta en Supabase el archivo supabase_v27_recuperos.sql.' : 'No pude leer los recuperos: ' + (e.message || e);
     } finally { REC.loading = false; }
     if (REC.opened) { msg(); buildFilters(); render(); }
     focosDraw();
@@ -14927,7 +15282,7 @@ body:not(.theme-day) .v26-map .leaflet-tile-pane { filter: invert(1) hue-rotate(
   function msg() {
     const el = $('rc-msg'); if (!el) return;
     if (REC.err) { el.innerHTML = `<div class="v21-msg warn">${esc(REC.err)}</div>`; return; }
-    if (!REC.data.length) { el.innerHTML = '<div class="v21-msg">Aún no hay casos. Pulsa <b>Subir Excel</b> con el archivo STATUS DE RECUPERO, o configura el envío automático desde Outlook (guía v26).</div>'; return; }
+    if (!REC.data.length) { el.innerHTML = '<div class="v21-msg">Aún no hay casos. Pulsa <b>Subir Excel</b> con el archivo STATUS DE RECUPERO, o más adelante el envío automático desde Outlook.</div>'; return; }
     const last = REC.raw.reduce((m, r) => (r.actualizado && r.actualizado > m ? r.actualizado : m), '');
     el.innerHTML = `<div class="v21-msg ok">${REC.data.length.toLocaleString()} casos en Supabase${last ? ` · última actualización ${new Date(last).toLocaleString('es-PE', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })}` : ''}${REC.raw[0] && REC.raw[0].fuente ? ` · último archivo: ${esc(REC.raw[0].fuente)}` : ''}</div>`;
   }
@@ -14942,6 +15297,7 @@ body:not(.theme-day) .v26-map .leaflet-tile-pane { filter: invert(1) hue-rotate(
     if (REC.ch || !sb() || typeof sb().channel !== 'function') return;
     try {
       REC.ch = sb().channel('v26-recuperos').on('postgres_changes', { event: '*', schema: 'public', table: 'mdz_recuperos' }, () => { clearTimeout(rtT); rtT = setTimeout(() => recLoad(true), 1500); })
+        .on('postgres_changes', { event: 'INSERT', schema: 'public', table: HTBL }, () => { HIST.loaded = false; setTimeout(histLoad, 1600); })
         .subscribe(st => { REC.live = st === 'SUBSCRIBED'; live(); });
     } catch (e) { REC.ch = null; }
   }
@@ -14950,14 +15306,7 @@ body:not(.theme-day) .v26-map .leaflet-tile-pane { filter: invert(1) hue-rotate(
   $('rc-file').addEventListener('change', async e => {
     const f = e.target.files && e.target.files[0]; e.target.value = ''; if (!f || !dev()) return;
     if (typeof XLSX === 'undefined') { toast('No cargó la librería de Excel'); return; }
-    try {
-      $('rc-msg').innerHTML = `<div class="v21-msg">Leyendo ${esc(f.name)}…</div>`;
-      const wb = XLSX.read(new Uint8Array(await f.arrayBuffer()), { type: 'array' });
-      const filas = mdzParseRecuperos(XLSX, wb, f.name);
-      if (!filas.length) { $('rc-msg').innerHTML = '<div class="v21-msg warn">No encontré la cabecera “STATUS DE RECUPERO” y “DISPOSITIVO” en ninguna hoja.</div>'; return; }
-      for (let i = 0; i < filas.length; i += 500) { const { error } = await sb().from('mdz_recuperos').upsert(filas.slice(i, i + 500), { onConflict: 'clave' }); if (error) throw error; }
-      toast(`Excel subido: ${filas.length} casos guardados`); await recLoad();
-    } catch (err) { $('rc-msg').innerHTML = `<div class="v21-msg warn">No se pudo subir: ${esc(err.message || err)}</div>`; }
+    try { await subirExcel(f); } catch (err) { $('rc-msg').innerHTML = `<div class="v21-msg warn">No se pudo subir: ${esc(err.message || err)}</div>`; }
   });
 
   // ---------- RAFI: aviso de robos nuevos ----------
@@ -15002,13 +15351,50 @@ body:not(.theme-day) .v26-map .leaflet-tile-pane { filter: invert(1) hue-rotate(
     focoOn = !focoOn;
     if (focoLayer) { m.removeLayer(focoLayer); focoLayer = null; }
     if (focoOn) {
-      focoLayer = L.layerGroup().addTo(m);
+      focoLayer = L.layerGroup().addTo(m); const fl = focoLayer;
+      loadLib('heat').then(() => { if (focoLayer === fl && L.heatLayer) fl.addLayer(L.heatLayer(REC.data.filter(r => r.coords).map(r => [...r.coords, r.recovered ? .45 : 1]), HEATO)); });
       const z = {}; REC.data.forEach(r => { const k = dkey(r.zone); if (!k) return; z[k] = z[k] || { t: 0, o: 0 }; z[k].t++; if (!r.recovered) z[k].o++; });
       const mx = Math.max(1, ...Object.values(z).map(v => v.t));
-      Object.entries(z).forEach(([k, v]) => { const c = v.o > v.t / 2 ? '#ef4444' : '#f59e0b'; L.circle(D[k], { radius: 500 + 2200 * Math.sqrt(v.t / mx), stroke: true, color: c, weight: 1, fillColor: c, fillOpacity: .12 + .3 * v.t / mx }).bindTooltip(`${esc(k)}: ${v.t} robos · ${v.o} abiertos`).addTo(focoLayer); });
+      Object.entries(z).forEach(([k, v]) => { const c = v.o > v.t / 2 ? '#ef4444' : '#f59e0b'; L.circle(D[k], { radius: 500 + 2200 * Math.sqrt(v.t / mx), stroke: true, color: c, weight: 1, opacity: .5, fillColor: c, fillOpacity: .03 }).bindTooltip(`${esc(k)}: ${v.t} robos · ${v.o} abiertos`).addTo(focoLayer); });
     }
     focosDraw();
   });
+
+  // ---------- v27: botón "Calor de robos" en todos los mapas del tablero (solo dev, con datos de recuperos) ----------
+  const HEATO = { radius: 30, blur: 24, maxZoom: 14, minOpacity: .3, gradient: { .15: '#1e3a8a', .35: '#38bdf8', .55: '#a78bfa', .75: '#f472b6', .9: '#f97316', 1: '#ef4444' } };
+  const HEATM = new Set();
+  function heatCtl(m) {
+    try {
+      if (!m || m.__v27h || !m.getContainer || !m._loaded && !m._container) return;
+      const id = m.getContainer().id || ''; if (/^rc-map/.test(id)) { m.__v27h = { skip: true }; return; }   // Recuperos ya tiene su modo Calor
+      const S = m.__v27h = { on: false, layer: null, at: 0, btn: null };
+      const c = L.control({ position: 'topleft' });
+      c.onAdd = () => { const b = L.DomUtil.create('button', 'v27-heatbtn ui-hidden'); b.type = 'button'; b.title = 'Mapa de calor de robos (Excel de recuperos)'; b.setAttribute('aria-pressed', 'false'); b.innerHTML = '<i class="fa-solid fa-fire"></i><span>Calor de robos</span>';
+        L.DomEvent.disableClickPropagation(b); L.DomEvent.on(b, 'click', e => { L.DomEvent.stop(e); heatToggle(m); }); return b; };
+      c.addTo(m); S.btn = c.getContainer(); HEATM.add(m); heatSync();
+    } catch (e) {}
+  }
+  async function heatToggle(m, force) {
+    const S = m.__v27h; if (!S || S.skip) return; const on = force != null ? force : !S.on;
+    if (S.layer) { m.removeLayer(S.layer); S.layer = null; }
+    if (on) {
+      if (!REC.data.length) { toast('Aún no hay casos de recuperos cargados'); return; }
+      await loadLib('heat'); if (!L.heatLayer) { toast('No cargó la librería del mapa de calor'); return; }
+      S.layer = L.heatLayer(REC.data.filter(r => r.coords).map(r => [...r.coords, r.recovered ? .45 : 1]), HEATO).addTo(m); S.at = REC.at;
+    }
+    S.on = on; S.btn.classList.toggle('on', on); S.btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+  }
+  function heatSync() {
+    try { if (typeof map !== 'undefined' && map && map instanceof L.Map) heatCtl(map); } catch (e) {}
+    if (window.__mdzRoboMapRef) heatCtl(window.__mdzRoboMapRef);
+    const ok = dev() && logged() && REC.loaded && REC.data.length > 0;
+    HEATM.forEach(m => { const S = m.__v27h; if (!S || !S.btn) return; S.btn.classList.toggle('ui-hidden', !ok);
+      if (!ok && S.on) heatToggle(m, false); else if (S.on && S.at !== REC.at) heatToggle(m, true); });
+  }
+  if (typeof L !== 'undefined' && L.Map) {
+    L.Map.addInitHook(function () { const m = this; setTimeout(() => heatCtl(m), 0); });
+    ['setView', 'fitBounds', 'invalidateSize'].forEach(k => { const o = L.Map.prototype[k]; L.Map.prototype[k] = function () { const r = o.apply(this, arguments); if (!this.__v27h && this._container) setTimeout(() => heatCtl(this), 0); return r; }; });
+  }
 
   // ---------- IA: conocimiento + resumen de recuperos (sin placas ni propietarios) ----------
   window.__mdzIaExtra = texto => {
@@ -15038,6 +15424,7 @@ body:not(.theme-day) .v26-map .leaflet-tile-pane { filter: invert(1) hue-rotate(
       REC.opened = true; if (REC.maxId) { ls.set(SEEN, REC.maxId); REC.nuevos = []; }
       msg(); live(); buildFilters(); render(); subscribe();
       if (!REC.loaded || Date.now() - REC.at > 60000) recLoad();
+      if (!HIST.loaded) histLoad();
       if (/mapa|gps/.test(REC.view)) Promise.all([loadLib('heat'), loadLib('cluster')]).then(render);
       return;
     }
@@ -15055,7 +15442,7 @@ body:not(.theme-day) .v26-map .leaflet-tile-pane { filter: invert(1) hue-rotate(
     if (!D1 && !rsec.classList.contains('ui-hidden')) { rsec.classList.add('ui-hidden'); REC.opened = false; try { _sv('filter'); } catch (e) {} }
     if (D1 !== wasDev || L1 !== wasLogged) {
       wasDev = D1; wasLogged = L1;
-      if (D1) { valLoad(); recLoad(true); subscribe(); } else { VAL.map.clear(); VAL.loaded = false; VAL.filtro = 'ALL'; REC.raw = []; REC.data = []; REC.loaded = false; REC.nuevos = []; REC.maxId = 0; unsubscribe(); Object.keys(CH).forEach(k => { try { CH[k].destroy(); } catch (e) {} delete CH[k]; }); }
+      if (D1) { valLoad(); recLoad(true); subscribe(); histLoad(); } else { HIST.list = []; HIST.loaded = false; HIST.det = {}; HIST.open = null; VAL.map.clear(); VAL.loaded = false; VAL.filtro = 'ALL'; REC.raw = []; REC.data = []; REC.loaded = false; REC.nuevos = []; REC.maxId = 0; unsubscribe(); Object.keys(CH).forEach(k => { try { CH[k].destroy(); } catch (e) {} delete CH[k]; }); }
       if (L1) { colsLoad(); KB.at = 0; } else { window.__mdzCustomCols = []; KB.t = []; }
       KBV.sig = ''; valPanel(); focosDraw();
     }
@@ -15064,7 +15451,7 @@ body:not(.theme-day) .v26-map .leaflet-tile-pane { filter: invert(1) hue-rotate(
   if (typeof _ar === 'function') window.applySessionRoleUI = function () { const r = _ar.apply(this, arguments); syncRole(); return r; };
   let tick = 0;
   setInterval(() => {
-    tick++; syncRole(); mountKbTab(); rastTabs(); rastCount();
+    tick++; syncRole(); heatSync(); mountKbTab(); rastTabs(); rastCount();
     if (logged()) colsApply();
     if (dev() && VAL.loaded && tick % 5 === 0) valPanel();
     if (dev() && logged() && (REC.opened ? !REC.live && tick % 60 === 0 : tick % 300 === 0)) recLoad(true);
