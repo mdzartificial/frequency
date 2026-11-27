@@ -10710,6 +10710,7 @@ body.theme-day #view-milton .mp-ins p { color: #1e293b; }
       all.forEach(r => { let o = byMov.get(r.mov); if (!o) byMov.set(r.mov, o = { mov: r.mov, n: 0, psd: new Map(), primer: r, ult: r, sum: 0, cnt: 0 }); o.n++; if (r.t < o.primer.t) o.primer = r; if (r.t > o.ult.t) o.ult = r; if (r.rssi != null) { o.sum += r.rssi; o.cnt++; } const p = o.psd.get(r.psd) || { n: 0, max: -1 }; p.n++; if (r.rssi != null && r.rssi > p.max) p.max = r.rssi; o.psd.set(r.psd, p); });
       const cobertura = [...byMov.values()].map(o => ({ mov: o.mov, s2: esS2(o.mov), lecturas: o.n, antenas: o.psd.size, lista: [...o.psd.entries()].sort((a, b) => b[1].n - a[1].n).map(([p, v]) => `${p} (${v.n} · máx ${v.max})`).join(', '), media: r1(o.sum / (o.cnt || 1)), max: [...o.psd.values()].reduce((m, v) => Math.max(m, v.max), -1), primerPsd: o.primer.psd, primer: o.primer.t, ultPsd: o.ult.psd, ultimo: o.ult.t, porPsd: esS2(o.mov) ? [...o.psd.entries()].map(([p, v]) => [p, v.n, v.max]) : null })).sort((a, b) => b.antenas - a.antenas || b.lecturas - a.lecturas);
       const s2 = cobertura.filter(c => c.s2);
+      try { if (typeof window !== 'undefined' && window.__mdzS2Report) window.__mdzS2Report(s2.map(c => c.mov)); } catch (e) {}   // v23: RAFI avisa códigos 2 nuevos
       const s2Antenas = new Set(); all.forEach(r => { if (esS2(r.mov)) s2Antenas.add(r.psd); });
       const s2PorPsd = [...byPsd.keys()].map(psd => { const L = byPsd.get(psd).filter(r => esS2(r.mov)); return { psd, codigos: new Set(L.map(r => r.mov)).size, lecturas: L.length }; }).filter(x => x.codigos).sort((a, b) => b.codigos - a.codigos);
       // --- resumen ejecutivo ---
@@ -12432,6 +12433,641 @@ html body.hunter-preauth.login-fail #mdz-fail-fx{ display:block; }
       was = vis;
     }).observe(err, { attributes: true, attributeFilter: ['class'], childList: true, characterData: true, subtree: true });
   }
+})();
+</script>
+<style id="hunter-v23-css">
+/* ===== v23 · Sala técnica: grupo electrógeno + sala de servidores (solo dev) ===== */
+#view-sala h2 > span .hud-ico { width:100%; height:100%; fill:none; stroke:currentColor; stroke-width:1.7; stroke-linecap:round; stroke-linejoin:round; }
+.v23-st { display:inline-flex; align-items:center; gap:5px; padding:1px 8px; border-radius:999px; font-size:10.5px; font-weight:800; letter-spacing:.03em; white-space:nowrap; }
+.v23-st::before { content:""; width:6px; height:6px; border-radius:50%; background:currentColor; box-shadow:0 0 6px currentColor; }
+.v23-st.ok { background:rgba(34,197,94,.14); color:#86efac; }
+.v23-st.warn { background:rgba(245,158,11,.14); color:#fcd34d; }
+.v23-st.bad { background:rgba(239,68,68,.16); color:#fca5a5; }
+.v23-st.mute { background:rgba(148,163,184,.12); color:#cbd5e1; }
+.v23-kpi { position:relative; padding:10px 12px; }
+.v23-kpi > p:first-child { font-size:19px; font-weight:800; line-height:1.15; color:#fff; }
+.v23-kpi > p:nth-child(2) { font-size:10.5px; color:#94a3b8; text-transform:uppercase; letter-spacing:.04em; margin-top:2px; }
+.v23-kpi > small { display:block; font-size:10.5px; color:#cbd5e1; margin-top:4px; }
+.v23-kpi.bad { border-color:rgba(239,68,68,.6) !important; box-shadow:inset 0 0 18px rgba(239,68,68,.12) !important; }
+.v23-kpi.warn { border-color:rgba(245,158,11,.6) !important; }
+.v23-gauge { height:6px; margin-top:6px; background:rgba(255,255,255,.08); overflow:hidden; }
+.v23-gauge i { display:block; height:100%; background:linear-gradient(90deg, #ef4444, #f59e0b 30%, #22c55e 60%); }
+.v23-week { display:flex; flex-wrap:wrap; gap:4px; }
+.v23-week span { width:15px; height:15px; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.1); }
+.v23-week span.ok { background:rgba(34,197,94,.55); border-color:rgba(34,197,94,.8); }
+.v23-week span.bad { background:rgba(239,68,68,.55); border-color:rgba(239,68,68,.8); }
+.v23-week span.now { outline:1px solid #fff; outline-offset:1px; }
+.v23-chart { position:relative; height:210px; }
+.v23-fields .row { display:grid; grid-template-columns:1fr 110px 80px auto; gap:6px; align-items:center; margin:5px 0; }
+.v23-fields input, .v23-fields select { padding:6px 8px; background:rgba(0,0,0,.35); border:1px solid rgba(255,255,255,.14); color:#fff; font-size:12px; min-width:0; }
+.v23-seg { display:inline-flex; border:1px solid rgba(255,255,255,.16); }
+.v23-seg button { padding:6px 10px; font-size:11.5px; font-weight:800; color:#cbd5e1; background:transparent; cursor:pointer; }
+.v23-seg button + button { border-left:1px solid rgba(255,255,255,.16); }
+.v23-seg button.on.ok { background:rgba(34,197,94,.25); color:#bbf7d0; }
+.v23-seg button.on.bad { background:rgba(239,68,68,.28); color:#fecaca; }
+.v23-seg button.on.mute { background:rgba(148,163,184,.22); color:#fff; }
+@media (max-width:640px){
+  #view-sala .p-5 { padding:12px !important; }
+  .v23-fields .row { grid-template-columns:1fr 1fr; }
+  .v23-kpi > p:first-child { font-size:16px; }
+}
+
+/* ===== v23 · RAFI: avisos proactivos y resumen del día (solo dev) ===== */
+#rafi-badge { position:absolute; top:-4px; left:-4px; z-index:3; min-width:20px; height:20px; padding:0 5px; border-radius:999px; display:none; align-items:center; justify-content:center;
+  font:800 11px/1 system-ui,sans-serif; color:#fff; background:#ef4444; border:2px solid #0b0f1a; box-shadow:0 0 10px rgba(239,68,68,.7); cursor:pointer; }
+#rafi-badge.on { display:flex; }
+#rafi-badge.warn { background:#f59e0b; color:#1a1003; box-shadow:0 0 10px rgba(245,158,11,.7); }
+#rafi-brief { position:fixed; right:14px; bottom:80px; z-index:10000; width:min(360px, calc(100vw - 28px)); max-height:min(70vh, 560px); overflow:auto; display:none;
+  padding:14px; color:#e5edf9; font:500 12.5px/1.45 system-ui,sans-serif;
+  background:linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.02) 30%), rgba(8,12,24,.86);
+  -webkit-backdrop-filter:blur(16px) saturate(160%); backdrop-filter:blur(16px) saturate(160%);
+  border:1px solid rgba(var(--sk,255,176,0),.45); box-shadow:inset 0 1px 0 rgba(255,255,255,.16), 0 20px 50px -18px rgba(0,0,0,.9);
+  clip-path:polygon(12px 0,100% 0,100% calc(100% - 12px),calc(100% - 12px) 100%,0 100%,0 12px); }
+#rafi-brief.on { display:block; animation:rbIn .25s ease-out; }
+@keyframes rbIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:none; } }
+#rafi-brief h4 { margin:0; font-size:13.5px; font-weight:800; color:#fff; }
+#rafi-brief .rb-sub { font-size:11px; color:#94a3b8; margin:2px 0 10px; }
+#rafi-brief .rb-it { display:grid; grid-template-columns:auto 1fr auto; gap:8px; align-items:start; padding:7px 0; border-top:1px solid rgba(255,255,255,.07); }
+#rafi-brief .rb-dot { width:9px; height:9px; margin-top:4px; border-radius:50%; background:#22c55e; box-shadow:0 0 8px currentColor; color:#22c55e; }
+#rafi-brief .rb-dot.bad { background:#ef4444; color:#ef4444; } #rafi-brief .rb-dot.warn { background:#f59e0b; color:#f59e0b; } #rafi-brief .rb-dot.info { background:#38bdf8; color:#38bdf8; }
+#rafi-brief button { all:unset; cursor:pointer; font-size:11px; font-weight:800; padding:2px 8px; border:1px solid rgba(255,255,255,.2); color:#e2e8f0; white-space:nowrap; }
+#rafi-brief button:hover { background:rgba(255,255,255,.1); }
+#rafi-brief button:focus-visible { outline:2px solid #fff; outline-offset:2px; }
+#rafi-brief .rb-x { position:absolute; top:8px; right:10px; border:0; font-size:15px; padding:2px 6px; }
+#rafi-brief .rb-ok { padding:8px 0; color:#bbf7d0; }
+@media (max-width:768px) { #rafi-brief { right:8px; bottom:calc(132px + env(safe-area-inset-bottom)); } }
+@media (prefers-reduced-motion:reduce) { #rafi-brief.on { animation:none; } }
+</style>
+<script id="hunter-v23-js">
+(() => {
+  'use strict';
+  const $ = id => document.getElementById(id);
+  const esc = v => (typeof escapeHtml === 'function' ? escapeHtml(v == null ? '' : String(v)) : String(v == null ? '' : v).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])));
+  const dev = () => typeof isDevRole === 'function' && isDevRole();
+  const logged = () => !!(typeof hunterSession !== 'undefined' && hunterSession) && !document.body.classList.contains('hunter-preauth');
+  const sb = () => (typeof hunterSbClient !== 'undefined' ? hunterSbClient : null);
+  const toast = m => { try { showToast(m); } catch (e) {} };
+  const hoy = () => new Date(Date.now() - 5 * 3600e3).toISOString().slice(0, 10);   // fecha de Lima
+  const num = v => { if (v === '' || v == null) return null; const n = Number(String(v).replace(',', '.')); return isFinite(n) ? n : null; };
+  const fmt = (v, d = 1) => v == null || v === '' ? '—' : Number(v).toLocaleString('es-PE', { minimumFractionDigits: 0, maximumFractionDigits: d });
+  const fdate = s => s ? s.split('-').reverse().join('/') : '—';
+  const daysBetween = (a, b) => Math.round((Date.parse(b) - Date.parse(a)) / 864e5);
+  const SQLF = 'supabase_v23_sala_tecnica.sql';
+  const missing = e => e && (/does not exist|schema cache|PGRST205|42P01/i.test(e.message || '') || e.code === '42P01' || e.code === 'PGRST205');
+  const errBox = e => missing(e)
+    ? `<div class="v21-msg warn">Falta crear las tablas en Supabase: ejecuta <code>${SQLF}</code> una vez en el SQL Editor y vuelve a abrir este módulo.</div>`
+    : `<div class="v21-msg err">No se pudo leer o guardar en Supabase: ${esc(e && e.message || e)}${e && e.code ? ` <code>${esc(e.code)}</code>` : ''}</div>`;
+  // semana ISO (lunes a domingo) de una fecha AAAA-MM-DD
+  function isoWeek(s) {
+    const d = new Date(s + 'T12:00:00Z'), day = (d.getUTCDay() + 6) % 7;
+    d.setUTCDate(d.getUTCDate() - day + 3);
+    const y = d.getUTCFullYear(), w1 = new Date(Date.UTC(y, 0, 4));
+    return y + '-S' + String(1 + Math.round(((d - w1) / 864e5 - 3 + ((w1.getUTCDay() + 6) % 7)) / 7)).padStart(2, '0');
+  }
+  const mondayOf = s => { const d = new Date(s + 'T12:00:00Z'); d.setUTCDate(d.getUTCDate() - (d.getUTCDay() + 6) % 7); return d.toISOString().slice(0, 10); };
+  const addDays = (s, n) => { const d = new Date(s + 'T12:00:00Z'); d.setUTCDate(d.getUTCDate() + n); return d.toISOString().slice(0, 10); };
+
+  /* ---------------- vista propia en el riel (solo dev) ---------------- */
+  const ICON = '<svg class="hud-ico" viewBox="0 0 24 24"><rect x="3" y="7" width="13" height="11" rx="1.5"/><path d="M16 10h2.5l2.5 2.5V18h-5"/><path d="M6 18v2M13 18v2"/><path d="M10.5 8.8 8.3 12.6h3l-2.2 3.8"/></svg>';
+  const nav = document.createElement('button');
+  nav.id = 'nav-sala'; nav.dataset.v = 'sala'; nav.title = 'Sala técnica: grupo electrógeno y servidores (dev)'; nav.className = 'ui-hidden'; nav.innerHTML = ICON;
+  nav.addEventListener('click', () => window.setView('sala'));
+  (document.getElementById('nav-caja') || document.getElementById('nav-milton') || document.getElementById('nav-noc')).after(nav);
+  const sec = document.createElement('section');
+  sec.id = 'view-sala';
+  sec.className = 'view ui-hidden map panel flex-1 min-w-0 flex flex-col overflow-hidden';
+  (document.getElementById('view-caja') || document.getElementById('view-milton') || document.getElementById('view-noc')).after(sec);
+  let opened = false;
+  const _sv = window.setView;
+  window.setView = function (v) {
+    if (v === 'sala') {
+      if (!dev()) { toast('Módulo solo para dev'); return; }
+      document.querySelectorAll('.rail button[data-v]').forEach(b => b.classList.toggle('on', b.dataset.v === v));
+      if ($('side')) $('side').classList.add('ui-hidden');
+      document.querySelectorAll('section[id^="view-"]').forEach(s => s.classList.toggle('ui-hidden', s.id !== 'view-sala'));
+      if (!opened) { opened = true; loadAll(); } else loadAll();
+      return;
+    }
+    sec.classList.add('ui-hidden');
+    return _sv.apply(this, arguments);
+  };
+  function syncRole() {
+    const ok = logged() && dev();
+    nav.classList.toggle('ui-hidden', !ok);
+    if (!ok && !sec.classList.contains('ui-hidden')) { sec.classList.add('ui-hidden'); try { _sv('filter'); } catch (e) {} }
+    if (!ok && opened) { opened = false; reset(); }
+  }
+
+  sec.innerHTML = `<div class="flex flex-wrap items-center justify-between gap-3 px-5 pt-4 pb-3 border-b border-white/10">
+    <div><h2 class="text-base font-bold text-white flex items-center gap-2"><span class="text-[var(--accent)] inline-block" style="width:24px;height:24px">${ICON}</span>Sala técnica</h2>
+    <p class="text-[11px] text-slate-400">Prueba semanal del grupo electrógeno · control de la sala de servidores · solo dev</p></div>
+    <div class="flex gap-2 flex-wrap"><div class="v21-tabs" role="tablist">
+      <button data-tab="ge" class="on">Grupo electrógeno</button><button data-tab="sala">Sala de servidores</button><button data-tab="cfg">Configurar</button></div>
+      <button class="v21-btn" id="st-xls"><i class="fa-solid fa-file-excel"></i>Excel</button>
+      <button class="v21-btn" id="st-reload" title="Actualizar"><i class="fa-solid fa-rotate"></i></button></div></div>
+    <div class="flex-1 overflow-y-auto scroll p-5 space-y-4"><div id="st-msg"></div><div id="st-body" class="space-y-4"></div></div>`;
+
+  /* ---------------- estado ---------------- */
+  const DEF_CFG = { equipos: ['GE-01'], umbrales: { combustible_min: 30, temp_max: 27, hum_min: 40, hum_max: 60, ups_max: 80, dias_max: 7 }, campos_ge: [], campos_sala: [] };
+  const S = { tab: 'ge', ge: [], sala: [], cfg: JSON.parse(JSON.stringify(DEF_CFG)), editGe: null, editSala: null, charts: [], equipo: null };
+  const U = () => Object.assign({}, DEF_CFG.umbrales, S.cfg.umbrales || {});
+  /* ---------- mantenimiento preventivo según el horómetro ---------- */
+  const PLAN_BASE = [
+    { tarea: 'Cambio de aceite y filtro de aceite', cada_h: 250 },
+    { tarea: 'Filtro de combustible', cada_h: 500 },
+    { tarea: 'Filtro de aire', cada_h: 500 },
+    { tarea: 'Refrigerante, correas y revisión general', cada_h: 1000 }
+  ];
+  function planOf(eq) {
+    if (!S.cfg.mant || typeof S.cfg.mant !== 'object') S.cfg.mant = {};
+    if (!Array.isArray(S.cfg.mant[eq])) S.cfg.mant[eq] = PLAN_BASE.map(x => ({ ...x, ultimo_h: null, ultimo_fecha: null }));
+    return S.cfg.mant[eq];
+  }
+  function hwOf(list) {
+    const d = []; for (let i = 1; i < list.length; i++) { const a = list[i - 1], b = list[i]; if (a.horometro_h == null || b.horometro_h == null) continue; const dd = daysBetween(a.fecha, b.fecha), dh = Number(b.horometro_h) - Number(a.horometro_h); if (dd > 0 && dh >= 0) d.push(dh / dd * 7); }
+    return d.length ? d.slice(-8).reduce((x, y) => x + y, 0) / Math.min(8, d.length) : null;
+  }
+  const lastHoro = list => { for (let i = list.length - 1; i >= 0; i--) if (list[i].horometro_h != null) return Number(list[i].horometro_h); return null; };
+  // estado de cada tarea: ok / warn (faltan ≤ 10 % o ≤ 25 h) / bad (vencida) / mute (sin dato del último servicio)
+  function mantState(t, horo, hw) {
+    if (t.ultimo_h == null || horo == null || !(t.cada_h > 0)) return { lvl: 'mute', faltan: null, fecha: null };
+    const faltan = Number(t.ultimo_h) + Number(t.cada_h) - horo;
+    const lvl = faltan <= 0 ? 'bad' : (faltan <= Math.max(25, t.cada_h * .1) ? 'warn' : 'ok');
+    const fecha = hw && hw > 0 && faltan > 0 ? addDays(hoy(), Math.round(faltan / hw * 7)) : null;
+    return { lvl, faltan, fecha };
+  }
+  function reset() { S.ge = []; S.sala = []; S.editGe = S.editSala = null; killCharts(); $('st-body').innerHTML = ''; $('st-msg').innerHTML = ''; }
+  function killCharts() { S.charts.forEach(c => { try { c.destroy(); } catch (e) {} }); S.charts = []; }
+
+  async function loadAll() {
+    const c = sb();
+    if (!c) { $('st-msg').innerHTML = '<div class="v21-msg err">Sin conexión con Supabase.</div>'; return; }
+    $('st-msg').innerHTML = '<div class="v21-msg ok">Cargando…</div>';
+    const [g, s, k] = await Promise.all([
+      c.from('mdz_ge_registros').select('*').order('fecha', { ascending: true }).order('id', { ascending: true }).limit(3000),
+      c.from('mdz_sala_registros').select('*').order('fecha', { ascending: true }).order('id', { ascending: true }).limit(3000),
+      c.from('mdz_sala_config').select('valor').eq('clave', 'general').maybeSingle()
+    ]);
+    const bad = [g, s, k].find(x => x.error);
+    if (bad) { $('st-msg').innerHTML = errBox(bad.error); $('st-body').innerHTML = ''; killCharts(); return; }
+    S.ge = g.data || []; S.sala = s.data || [];
+    const v = k.data && k.data.valor;
+    S.cfg = Object.assign(JSON.parse(JSON.stringify(DEF_CFG)), v || {});
+    if (!Array.isArray(S.cfg.equipos) || !S.cfg.equipos.length) S.cfg.equipos = ['GE-01'];
+    $('st-msg').innerHTML = !k.data ? `<div class="v21-msg warn">Supabase respondió sin configuración. Si ya ejecutaste <code>${SQLF}</code>, sal y vuelve a entrar con tu código 2FA.</div>` : '';
+    draw();
+  }
+
+  /* ---------------- alertas ---------------- */
+  function geAlerts(r, prev) {
+    const u = U(), a = [];
+    if (r.encendido_auto === 'FALLA') a.push(['bad', 'Encendido automático falló']);
+    if (r.encendido_auto === 'NO_PROBADO') a.push(['warn', 'Encendido no probado']);
+    if (r.combustible_pct != null && Number(r.combustible_pct) < u.combustible_min) a.push(['bad', `Combustible bajo (${fmt(r.combustible_pct)} %)`]);
+    if (prev && r.horometro_h != null && prev.horometro_h != null && Number(r.horometro_h) < Number(prev.horometro_h)) a.push(['warn', 'Horómetro menor que el registro anterior']);
+    return a;
+  }
+  function salaAlerts(r) {
+    const u = U(), a = [];
+    if (r.temperatura_c != null && Number(r.temperatura_c) > u.temp_max) a.push(['bad', `Temperatura alta (${fmt(r.temperatura_c)} °C)`]);
+    if (r.humedad_pct != null && (Number(r.humedad_pct) < u.hum_min || Number(r.humedad_pct) > u.hum_max)) a.push(['warn', `Humedad fuera de rango (${fmt(r.humedad_pct)} %)`]);
+    if (r.carga_ups_pct != null && Number(r.carga_ups_pct) > u.ups_max) a.push(['bad', `UPS muy cargado (${fmt(r.carga_ups_pct)} %)`]);
+    if (r.aire_acond === 'FALLA') a.push(['bad', 'Aire acondicionado con falla']);
+    if (r.limpieza === 'PENDIENTE') a.push(['warn', 'Limpieza pendiente']);
+    if (r.alarmas && r.alarmas.trim()) a.push(['warn', 'Alarmas: ' + r.alarmas.trim()]);
+    return a;
+  }
+  const pills = a => a.length ? a.map(([k, t]) => `<span class="v23-st ${k}">${esc(t)}</span>`).join(' ') : '<span class="v23-st ok">Sin alertas</span>';
+
+  /* ---------------- campos extra ---------------- */
+  const fieldsOf = kind => (Array.isArray(S.cfg['campos_' + kind]) ? S.cfg['campos_' + kind] : []).filter(f => f && f.key && f.label);
+  function extraInputs(kind, rec) {
+    const ex = (rec && rec.extras) || {};
+    return fieldsOf(kind).map(f => {
+      const id = `x-${kind}-${f.key}`, v = ex[f.key];
+      const lab = esc(f.label) + (f.unidad ? ` (${esc(f.unidad)})` : '');
+      if (f.tipo === 'sino') return `<label>${lab}<select id="${id}"><option value="">—</option><option value="SI"${v === 'SI' ? ' selected' : ''}>Sí / OK</option><option value="NO"${v === 'NO' ? ' selected' : ''}>No / Falla</option></select></label>`;
+      return `<label>${lab}<input id="${id}" ${f.tipo === 'numero' ? 'inputmode="decimal"' : 'maxlength="200"'} value="${esc(v == null ? '' : v)}"></label>`;
+    }).join('');
+  }
+  function readExtras(kind) {
+    const out = {};
+    fieldsOf(kind).forEach(f => {
+      const el = $(`x-${kind}-${f.key}`); if (!el) return;
+      const v = el.value.trim(); if (v === '') return;
+      out[f.key] = f.tipo === 'numero' ? num(v) : v.slice(0, 200);
+    });
+    return out;
+  }
+  const extraText = (kind, r) => fieldsOf(kind).map(f => { const v = r.extras && r.extras[f.key]; return v == null || v === '' ? '' : `${esc(f.label)}: <b>${esc(v)}${f.unidad ? ' ' + esc(f.unidad) : ''}</b>`; }).filter(Boolean).join(' · ');
+
+  /* ---------------- dibujo ---------------- */
+  function draw() {
+    killCharts();
+    sec.querySelectorAll('.v21-tabs button').forEach(b => b.classList.toggle('on', b.dataset.tab === S.tab));
+    if (S.tab === 'ge') drawGe(); else if (S.tab === 'sala') drawSala(); else drawCfg();
+  }
+  const seg = (name, val, opts) => `<div class="v23-seg" data-seg="${name}">${opts.map(([v, t, k]) => `<button type="button" data-v="${v}" class="${k}${val === v ? ' on' : ''}">${t}</button>`).join('')}</div>`;
+
+  function weeksStrip(list) {
+    const u = U(), today = hoy(), start = addDays(mondayOf(today), -7 * 11), byWeek = new Map();
+    list.forEach(r => { const w = isoWeek(r.fecha); const okR = r.encendido_auto ? r.encendido_auto === 'OK' : true; byWeek.set(w, (byWeek.get(w) || true) && okR); });
+    let html = '';
+    for (let i = 0; i < 12; i++) {
+      const d = addDays(start, i * 7), w = isoWeek(d), has = byWeek.has(w), cur = i === 11;
+      html += `<span class="${has ? (byWeek.get(w) ? 'ok' : 'bad') : (cur ? '' : 'bad')}${cur ? ' now' : ''}" title="${w} · desde ${fdate(d)}: ${has ? 'registrado' : (cur ? 'pendiente esta semana' : 'sin registro')}"></span>`;
+    }
+    void u; return html;
+  }
+
+  function drawGe() {
+    const u = U(), eqs = S.cfg.equipos;
+    if (!S.equipo || !eqs.includes(S.equipo)) S.equipo = eqs[0];
+    const list = S.ge.filter(r => r.equipo === S.equipo);
+    const last = list[list.length - 1], prev = list[list.length - 2];
+    const dias = last ? daysBetween(last.fecha, hoy()) : null;
+    const thisWeek = list.some(r => isoWeek(r.fecha) === isoWeek(hoy()));
+    // horas de uso por semana (promedio de las últimas 8 diferencias válidas)
+    const hw = hwOf(list), horo = lastHoro(list), plan = planOf(S.equipo);
+    const fallas = list.filter(r => r.encendido_auto === 'FALLA').length;
+    const lastA = last ? geAlerts(last, prev) : [];
+    const e = S.editGe ? S.ge.find(r => r.id === S.editGe) : null;
+    const f = e || { fecha: hoy(), equipo: S.equipo, encendido_auto: 'OK' };
+    $('st-body').innerHTML = `
+      ${eqs.length > 1 ? `<div class="v21-bar"><span class="text-[11px] text-slate-400 uppercase font-bold">Equipo</span>${eqs.map(q => `<button class="v21-mini${q === S.equipo ? ' ok' : ''}" data-eq="${esc(q)}">${esc(q)}</button>`).join('')}</div>` : ''}
+      ${!last ? `<div class="v21-msg warn">Aún no hay registros de <b>${esc(S.equipo)}</b>. Completa el formulario de abajo con la prueba de esta semana.</div>`
+        : (!thisWeek ? `<div class="v21-msg ${dias > u.dias_max ? 'err' : 'warn'}">Falta la prueba de esta semana (${isoWeek(hoy())}). El último registro fue hace ${dias} día${dias === 1 ? '' : 's'}.</div>` : '')}
+      <div class="v21-kpis">
+        <div class="card v23-kpi${dias != null && dias > u.dias_max ? ' bad' : ''}"><p>${last ? fdate(last.fecha) : '—'}</p><p>Último registro</p><small>${last ? `hace ${dias} día${dias === 1 ? '' : 's'}` : 'sin datos'}</small></div>
+        <div class="card v23-kpi${last && last.encendido_auto === 'FALLA' ? ' bad' : ''}"><p>${last ? ({ OK: 'OK', FALLA: 'FALLA', NO_PROBADO: 'No probado' }[last.encendido_auto]) : '—'}</p><p>Encendido automático</p><small>${last && last.arranque_seg != null ? `tomó carga en ${fmt(last.arranque_seg)} s` : (fallas ? `${fallas} falla${fallas === 1 ? '' : 's'} en el historial` : '&nbsp;')}</small></div>
+        <div class="card v23-kpi${last && last.combustible_pct != null && Number(last.combustible_pct) < u.combustible_min ? ' bad' : ''}"><p>${last ? fmt(last.combustible_pct) + ' %' : '—'}</p><p>Combustible</p><div class="v23-gauge" aria-hidden="true"><i style="width:${last && last.combustible_pct != null ? Math.max(0, Math.min(100, Number(last.combustible_pct))) : 0}%"></i></div></div>
+        <div class="card v23-kpi"><p>${last ? fmt(last.horometro_h) + ' h' : '—'}</p><p>Horómetro</p><small>${last && prev && last.horometro_h != null && prev.horometro_h != null ? `+${fmt(Number(last.horometro_h) - Number(prev.horometro_h))} h desde el registro anterior` : '&nbsp;'}</small></div>
+        <div class="card v23-kpi"><p>${hw != null ? fmt(hw) + ' h' : '—'}</p><p>Uso promedio por semana</p><small>${last && last.bateria_v != null ? `batería ${fmt(last.bateria_v, 2)} V` : '&nbsp;'}</small></div>
+      </div>
+      <div class="card p-3"><div class="flex flex-wrap items-center justify-between gap-2"><h3 class="text-xs font-bold uppercase tracking-wider text-slate-300">Últimas 12 semanas</h3><div class="v23-week">${weeksStrip(list)}</div></div>
+        <div class="mt-2 text-[11.5px]">${last ? pills(lastA) : ''}</div></div>
+      <div class="card p-3" id="mant-card"><div class="flex flex-wrap items-center justify-between gap-2 mb-2"><h3 class="text-xs font-bold uppercase tracking-wider text-slate-300">Mantenimiento preventivo · ${esc(S.equipo)}</h3>
+        <span class="text-[11px] text-slate-400">Horómetro actual: <b class="text-white">${horo != null ? fmt(horo) + ' h' : 'sin dato'}</b>${hw ? ` · uso ≈ ${fmt(hw)} h/semana` : ''}</span></div>
+        <table class="v21-tbl"><thead><tr><th>Tarea</th><th class="n">Cada (h)</th><th class="n">Último servicio (h)</th><th>Fecha</th><th class="n">Faltan</th><th>Estado</th><th></th></tr></thead><tbody>
+        ${plan.map((t, i) => { const m = mantState(t, horo, hw); return `<tr data-mi="${i}">
+          <td><input data-mk="tarea" maxlength="80" value="${esc(t.tarea)}" style="width:100%;min-width:150px" aria-label="Tarea"></td>
+          <td class="n"><input data-mk="cada_h" inputmode="decimal" value="${esc(t.cada_h ?? '')}" style="width:70px;text-align:right" aria-label="Cada cuántas horas"></td>
+          <td class="n"><input data-mk="ultimo_h" inputmode="decimal" placeholder="—" value="${esc(t.ultimo_h ?? '')}" style="width:90px;text-align:right" aria-label="Horómetro del último servicio"></td>
+          <td>${fdate(t.ultimo_fecha)}</td>
+          <td class="n">${m.faltan == null ? '—' : (m.faltan <= 0 ? `vencido ${fmt(-m.faltan)} h` : fmt(m.faltan) + ' h')}</td>
+          <td><span class="v23-st ${m.lvl}">${m.lvl === 'bad' ? 'Vencido' : m.lvl === 'warn' ? 'Próximo' : m.lvl === 'ok' ? 'Al día' : 'Falta el dato'}</span>${m.fecha ? ` <span class="text-[10.5px] text-slate-400">≈ ${fdate(m.fecha)}</span>` : ''}</td>
+          <td style="white-space:nowrap"><button class="v21-mini ok" data-mdone="${i}" ${horo == null ? 'disabled title="Registra primero el horómetro"' : ''}>Hecho hoy</button> <button class="v21-mini bad" data-mdel="${i}" aria-label="Quitar tarea">✕</button></td></tr>`; }).join('')}
+        </tbody></table>
+        <div class="flex flex-wrap gap-2 mt-2"><button class="v21-btn" id="mant-add"><i class="fa-solid fa-plus"></i>Agregar tarea</button><button class="v21-btn pri" id="mant-save"><i class="fa-solid fa-floppy-disk"></i>Guardar plan</button>
+        <span class="text-[11px] text-slate-400 self-center">"Hecho hoy" anota el horómetro actual como último servicio y guarda.</span></div></div>
+      <div class="v21-grid2">
+        <form class="card p-4 space-y-3" id="ge-form" autocomplete="off">
+          <h3 class="text-xs font-bold uppercase tracking-wider text-slate-300">${e ? 'Editar registro del ' + fdate(e.fecha) : 'Registrar prueba semanal'}</h3>
+          <div class="v21-form">
+            <label>Fecha<input type="date" id="ge-fecha" value="${esc(f.fecha)}" required max="${addDays(hoy(), 1)}"></label>
+            <label>Equipo<select id="ge-equipo">${eqs.map(q => `<option${q === (f.equipo || S.equipo) ? ' selected' : ''}>${esc(q)}</option>`).join('')}</select></label>
+            <label class="full">Encendido automático ${seg('ge-enc', f.encendido_auto, [['OK', 'Encendió OK', 'ok'], ['FALLA', 'Falló', 'bad'], ['NO_PROBADO', 'No se probó', 'mute']])}</label>
+            <label>Nivel de combustible (%)<input id="ge-comb" inputmode="decimal" placeholder="0 a 100" value="${esc(f.combustible_pct ?? '')}"></label>
+            <label>Horómetro (horas)<input id="ge-horo" inputmode="decimal" placeholder="${prev || last ? 'último: ' + fmt((e ? prev : last) && (e ? prev : last).horometro_h) : 'ej. 1250.5'}" value="${esc(f.horometro_h ?? '')}"></label>
+            <label>Tiempo de arranque (s)<input id="ge-arr" inputmode="decimal" placeholder="opcional" value="${esc(f.arranque_seg ?? '')}"></label>
+            <label>Batería (V)<input id="ge-bat" inputmode="decimal" placeholder="opcional, ej. 12.6" value="${esc(f.bateria_v ?? '')}"></label>
+            ${extraInputs('ge', e)}
+            <label class="full">Observación<textarea id="ge-obs" rows="2" maxlength="1000" placeholder="Ruidos, fugas, cambio de filtro, recarga de combustible…">${esc(f.observacion || '')}</textarea></label>
+          </div>
+          <div class="flex flex-wrap gap-2"><button class="v21-btn pri" type="submit"><i class="fa-solid fa-floppy-disk"></i>${e ? 'Guardar cambios' : 'Guardar registro'}</button>${e ? '<button class="v21-btn" type="button" id="ge-cancel">Cancelar</button>' : ''}</div>
+        </form>
+        <div class="card p-4"><h3 class="text-xs font-bold uppercase tracking-wider text-slate-300 mb-2">Combustible y horómetro</h3>${list.length >= 2 ? '<div class="v23-chart"><canvas id="ge-chart" aria-label="Gráfico de combustible y horómetro"></canvas></div>' : '<p class="text-[12px] text-slate-400">El gráfico aparece desde el segundo registro.</p>'}</div>
+      </div>
+      <div class="card p-3"><h3 class="text-xs font-bold uppercase tracking-wider text-slate-300 mb-2">Historial · ${esc(S.equipo)} (${list.length})</h3>
+        ${list.length ? `<table class="v21-tbl"><thead><tr><th>Fecha</th><th>Semana</th><th>Encendido</th><th class="n">Combustible</th><th class="n">Horómetro</th><th class="n">Arranque</th><th class="n">Batería</th><th>Alertas / notas</th><th></th></tr></thead><tbody>
+        ${list.slice().reverse().map((r, i, arr) => { const p = arr[i + 1]; const a = geAlerts(r, p); const ex = extraText('ge', r);
+          return `<tr><td>${fdate(r.fecha)}</td><td>${isoWeek(r.fecha)}</td><td><span class="v23-st ${r.encendido_auto === 'OK' ? 'ok' : r.encendido_auto === 'FALLA' ? 'bad' : 'mute'}">${r.encendido_auto === 'NO_PROBADO' ? 'No probado' : r.encendido_auto}</span></td>
+          <td class="n">${fmt(r.combustible_pct)}${r.combustible_pct != null ? ' %' : ''}</td><td class="n">${fmt(r.horometro_h)}</td><td class="n">${r.arranque_seg != null ? fmt(r.arranque_seg) + ' s' : '—'}</td><td class="n">${r.bateria_v != null ? fmt(r.bateria_v, 2) + ' V' : '—'}</td>
+          <td style="white-space:normal;min-width:180px">${a.filter(x => x[0] !== 'ok').map(x => `<span class="v23-st ${x[0]}">${esc(x[1])}</span>`).join(' ')} ${ex ? `<span class="text-[11px] text-slate-300">${ex}</span>` : ''} ${r.observacion ? `<span class="text-[11px] text-slate-400">${esc(r.observacion)}</span>` : ''}</td>
+          <td style="white-space:nowrap"><button class="v21-mini" data-edge="${r.id}">Editar</button> <button class="v21-mini bad" data-delge="${r.id}">Borrar</button></td></tr>`; }).join('')}
+        </tbody></table>` : '<p class="text-[12px] text-slate-400">Sin registros todavía.</p>'}</div>`;
+    if (list.length >= 2) chart('ge-chart', list.map(r => fdate(r.fecha).slice(0, 5)), [
+      { label: 'Combustible %', data: list.map(r => r.combustible_pct == null ? null : Number(r.combustible_pct)), borderColor: '#22c55e', backgroundColor: 'rgba(34,197,94,.15)', fill: true, yAxisID: 'y', tension: .3, spanGaps: true },
+      { label: 'Horómetro h', data: list.map(r => r.horometro_h == null ? null : Number(r.horometro_h)), borderColor: '#fbbf24', yAxisID: 'y1', tension: .2, spanGaps: true }
+    ], { y: { min: 0, max: 100, title: '%' }, y1: { title: 'h' } }, u.combustible_min);
+  }
+
+  function drawSala() {
+    const u = U(), list = S.sala, last = list[list.length - 1];
+    const dias = last ? daysBetween(last.fecha, hoy()) : null, thisWeek = list.some(r => isoWeek(r.fecha) === isoWeek(hoy()));
+    const e = S.editSala ? list.find(r => r.id === S.editSala) : null;
+    const f = e || { fecha: hoy(), aire_acond: 'OK', limpieza: 'OK' };
+    const la = last ? salaAlerts(last) : [];
+    const k = (cond, cls) => cond ? ' ' + cls : '';
+    $('st-body').innerHTML = `
+      ${!last ? '<div class="v21-msg warn">Aún no hay registros de la sala de servidores. Completa el formulario de abajo.</div>'
+        : (!thisWeek ? `<div class="v21-msg ${dias > u.dias_max ? 'err' : 'warn'}">Falta la revisión de esta semana (${isoWeek(hoy())}). La última fue hace ${dias} día${dias === 1 ? '' : 's'}.</div>` : '')}
+      <div class="v21-kpis">
+        <div class="card v23-kpi${k(last && last.temperatura_c != null && Number(last.temperatura_c) > u.temp_max, 'bad')}"><p>${last ? fmt(last.temperatura_c) + ' °C' : '—'}</p><p>Temperatura</p><small>máx. recomendado ${u.temp_max} °C</small></div>
+        <div class="card v23-kpi${k(last && last.humedad_pct != null && (Number(last.humedad_pct) < u.hum_min || Number(last.humedad_pct) > u.hum_max), 'warn')}"><p>${last ? fmt(last.humedad_pct) + ' %' : '—'}</p><p>Humedad</p><small>rango ${u.hum_min} a ${u.hum_max} %</small></div>
+        <div class="card v23-kpi${k(last && last.carga_ups_pct != null && Number(last.carga_ups_pct) > u.ups_max, 'bad')}"><p>${last ? fmt(last.carga_ups_pct) + ' %' : '—'}</p><p>Carga del UPS</p><small>${last && last.autonomia_min != null ? `autonomía ${fmt(last.autonomia_min)} min` : '&nbsp;'}</small></div>
+        <div class="card v23-kpi"><p>${last && last.carga_kw != null ? fmt(last.carga_kw, 2) + ' kW' : '—'}</p><p>Carga eléctrica</p><small>${last ? fdate(last.fecha) : '&nbsp;'}</small></div>
+        <div class="card v23-kpi${k(last && last.aire_acond === 'FALLA', 'bad')}"><p>${last ? ({ OK: 'OK', FALLA: 'FALLA', NO_APLICA: 'No aplica' }[last.aire_acond]) : '—'}</p><p>Aire acondicionado</p><small>${last ? 'limpieza: ' + (last.limpieza === 'OK' ? 'al día' : 'pendiente') : '&nbsp;'}</small></div>
+      </div>
+      <div class="card p-3"><div class="flex flex-wrap items-center justify-between gap-2"><h3 class="text-xs font-bold uppercase tracking-wider text-slate-300">Últimas 12 semanas</h3><div class="v23-week">${weeksStrip(list)}</div></div>
+        <div class="mt-2 text-[11.5px]">${last ? pills(la) : ''}</div></div>
+      <div class="v21-grid2">
+        <form class="card p-4 space-y-3" id="sala-form" autocomplete="off">
+          <h3 class="text-xs font-bold uppercase tracking-wider text-slate-300">${e ? 'Editar revisión del ' + fdate(e.fecha) : 'Registrar revisión de la sala'}</h3>
+          <div class="v21-form">
+            <label>Fecha<input type="date" id="sa-fecha" value="${esc(f.fecha)}" required max="${addDays(hoy(), 1)}"></label>
+            <label>Temperatura (°C)<input id="sa-temp" inputmode="decimal" value="${esc(f.temperatura_c ?? '')}"></label>
+            <label>Humedad (%)<input id="sa-hum" inputmode="decimal" value="${esc(f.humedad_pct ?? '')}"></label>
+            <label>Carga del UPS (%)<input id="sa-ups" inputmode="decimal" value="${esc(f.carga_ups_pct ?? '')}"></label>
+            <label>Autonomía del UPS (min)<input id="sa-aut" inputmode="decimal" value="${esc(f.autonomia_min ?? '')}"></label>
+            <label>Carga eléctrica (kW)<input id="sa-kw" inputmode="decimal" placeholder="opcional" value="${esc(f.carga_kw ?? '')}"></label>
+            <label class="full">Aire acondicionado ${seg('sa-aire', f.aire_acond, [['OK', 'Funciona', 'ok'], ['FALLA', 'Con falla', 'bad'], ['NO_APLICA', 'No aplica', 'mute']])}</label>
+            <label class="full">Limpieza ${seg('sa-limp', f.limpieza, [['OK', 'Al día', 'ok'], ['PENDIENTE', 'Pendiente', 'bad']])}</label>
+            ${extraInputs('sala', e)}
+            <label class="full">Alarmas activas<input id="sa-alarm" maxlength="500" placeholder="Ej. alarma de puerta, ventilador del rack 2…" value="${esc(f.alarmas || '')}"></label>
+            <label class="full">Observación<textarea id="sa-obs" rows="2" maxlength="1000">${esc(f.observacion || '')}</textarea></label>
+          </div>
+          <div class="flex flex-wrap gap-2"><button class="v21-btn pri" type="submit"><i class="fa-solid fa-floppy-disk"></i>${e ? 'Guardar cambios' : 'Guardar revisión'}</button>${e ? '<button class="v21-btn" type="button" id="sa-cancel">Cancelar</button>' : ''}</div>
+        </form>
+        <div class="card p-4"><h3 class="text-xs font-bold uppercase tracking-wider text-slate-300 mb-2">Temperatura, humedad y UPS</h3>${list.length >= 2 ? '<div class="v23-chart"><canvas id="sa-chart" aria-label="Gráfico de temperatura, humedad y UPS"></canvas></div>' : '<p class="text-[12px] text-slate-400">El gráfico aparece desde el segundo registro.</p>'}</div>
+      </div>
+      <div class="card p-3"><h3 class="text-xs font-bold uppercase tracking-wider text-slate-300 mb-2">Historial (${list.length})</h3>
+        ${list.length ? `<table class="v21-tbl"><thead><tr><th>Fecha</th><th class="n">Temp.</th><th class="n">Humedad</th><th class="n">UPS</th><th class="n">Autonomía</th><th class="n">kW</th><th>Aire</th><th>Alertas / notas</th><th></th></tr></thead><tbody>
+        ${list.slice().reverse().map(r => { const a = salaAlerts(r); const ex = extraText('sala', r);
+          return `<tr><td>${fdate(r.fecha)}</td><td class="n">${r.temperatura_c != null ? fmt(r.temperatura_c) + ' °C' : '—'}</td><td class="n">${r.humedad_pct != null ? fmt(r.humedad_pct) + ' %' : '—'}</td><td class="n">${r.carga_ups_pct != null ? fmt(r.carga_ups_pct) + ' %' : '—'}</td><td class="n">${r.autonomia_min != null ? fmt(r.autonomia_min) + ' min' : '—'}</td><td class="n">${r.carga_kw != null ? fmt(r.carga_kw, 2) : '—'}</td>
+          <td><span class="v23-st ${r.aire_acond === 'OK' ? 'ok' : r.aire_acond === 'FALLA' ? 'bad' : 'mute'}">${r.aire_acond === 'NO_APLICA' ? 'No aplica' : r.aire_acond}</span></td>
+          <td style="white-space:normal;min-width:180px">${a.map(x => `<span class="v23-st ${x[0]}">${esc(x[1])}</span>`).join(' ')} ${ex ? `<span class="text-[11px] text-slate-300">${ex}</span>` : ''} ${r.observacion ? `<span class="text-[11px] text-slate-400">${esc(r.observacion)}</span>` : ''}</td>
+          <td style="white-space:nowrap"><button class="v21-mini" data-edsa="${r.id}">Editar</button> <button class="v21-mini bad" data-delsa="${r.id}">Borrar</button></td></tr>`; }).join('')}
+        </tbody></table>` : '<p class="text-[12px] text-slate-400">Sin registros todavía.</p>'}</div>`;
+    if (list.length >= 2) chart('sa-chart', list.map(r => fdate(r.fecha).slice(0, 5)), [
+      { label: 'Temperatura °C', data: list.map(r => r.temperatura_c == null ? null : Number(r.temperatura_c)), borderColor: '#f87171', yAxisID: 'y', tension: .3, spanGaps: true },
+      { label: 'Humedad %', data: list.map(r => r.humedad_pct == null ? null : Number(r.humedad_pct)), borderColor: '#38bdf8', yAxisID: 'y1', tension: .3, spanGaps: true },
+      { label: 'UPS %', data: list.map(r => r.carga_ups_pct == null ? null : Number(r.carga_ups_pct)), borderColor: '#a78bfa', borderDash: [5, 4], yAxisID: 'y1', tension: .3, spanGaps: true }
+    ], { y: { title: '°C' }, y1: { min: 0, max: 100, title: '%' } }, null);
+  }
+
+  function drawCfg() {
+    const u = U();
+    const fieldRows = kind => (Array.isArray(S.cfg['campos_' + kind]) ? S.cfg['campos_' + kind] : []).map((f, i) => `<div class="row" data-kind="${kind}" data-i="${i}">
+      <input data-k="label" maxlength="40" value="${esc(f.label)}" aria-label="Nombre del campo">
+      <select data-k="tipo" aria-label="Tipo"><option value="numero"${f.tipo === 'numero' ? ' selected' : ''}>Número</option><option value="texto"${f.tipo === 'texto' ? ' selected' : ''}>Texto</option><option value="sino"${f.tipo === 'sino' ? ' selected' : ''}>Sí / No</option></select>
+      <input data-k="unidad" maxlength="12" placeholder="unidad" value="${esc(f.unidad || '')}" aria-label="Unidad">
+      <button type="button" class="v21-mini bad" data-delf="${kind}:${i}">Quitar</button></div>`).join('') || '<p class="text-[12px] text-slate-400">Sin campos extra.</p>';
+    $('st-body').innerHTML = `
+      <div class="v21-msg ok">Aquí decides qué se registra. Los campos extra aparecen en el formulario, en el historial y en el Excel. Si quitas un campo, los datos ya guardados no se borran.</div>
+      <div class="v21-grid2">
+        <div class="card p-4 space-y-3"><h3 class="text-xs font-bold uppercase tracking-wider text-slate-300">Grupos electrógenos</h3>
+          <p class="text-[11.5px] text-slate-400">Un nombre por línea. Si tienes más de un grupo, aparece un selector arriba del formulario.</p>
+          <textarea id="cf-eq" rows="3" class="w-full" style="padding:7px 10px;background:rgba(0,0,0,.35);border:1px solid rgba(255,255,255,.14);color:#fff;font-size:12.5px">${esc(S.cfg.equipos.join('\n'))}</textarea>
+          <h3 class="text-xs font-bold uppercase tracking-wider text-slate-300 pt-2">Umbrales de alerta</h3>
+          <div class="v21-form">
+            <label>Combustible mínimo (%)<input id="cf-comb" inputmode="decimal" value="${u.combustible_min}"></label>
+            <label>Días máximos sin registro<input id="cf-dias" inputmode="numeric" value="${u.dias_max}"></label>
+            <label>Temperatura máxima (°C)<input id="cf-temp" inputmode="decimal" value="${u.temp_max}"></label>
+            <label>Carga máxima del UPS (%)<input id="cf-ups" inputmode="decimal" value="${u.ups_max}"></label>
+            <label>Humedad mínima (%)<input id="cf-hmin" inputmode="decimal" value="${u.hum_min}"></label>
+            <label>Humedad máxima (%)<input id="cf-hmax" inputmode="decimal" value="${u.hum_max}"></label>
+          </div></div>
+        <div class="card p-4 space-y-3 v23-fields">
+          <h3 class="text-xs font-bold uppercase tracking-wider text-slate-300">Campos extra · grupo electrógeno</h3>
+          <p class="text-[11.5px] text-slate-400">Ej.: nivel de aceite, refrigerante, voltaje de salida, frecuencia (Hz), fugas.</p>
+          ${fieldRows('ge')}<button type="button" class="v21-btn" data-addf="ge"><i class="fa-solid fa-plus"></i>Agregar campo</button>
+          <h3 class="text-xs font-bold uppercase tracking-wider text-slate-300 pt-3">Campos extra · sala de servidores</h3>
+          <p class="text-[11.5px] text-slate-400">Ej.: extintor vigente, puerta cerrada, carga por rack, estado del switch.</p>
+          ${fieldRows('sala')}<button type="button" class="v21-btn" data-addf="sala"><i class="fa-solid fa-plus"></i>Agregar campo</button>
+        </div>
+      </div>
+      <button class="v21-btn pri" id="cf-save"><i class="fa-solid fa-floppy-disk"></i>Guardar configuración</button>`;
+  }
+
+  function chart(id, labels, datasets, axes, refLine) {
+    const cv = $(id); if (!cv || typeof Chart === 'undefined') return;
+    const grid = 'rgba(255,255,255,.07)', tick = '#94a3b8';
+    const scales = {};
+    Object.entries(axes).forEach(([k, a]) => { scales[k] = { position: k === 'y' ? 'left' : 'right', min: a.min, max: a.max, grid: { color: k === 'y' ? grid : 'transparent' }, ticks: { color: tick, font: { size: 10 } }, title: { display: true, text: a.title, color: tick, font: { size: 10 } } }; });
+    scales.x = { grid: { color: grid }, ticks: { color: tick, font: { size: 10 }, maxRotation: 0, autoSkip: true } };
+    if (refLine != null) datasets.push({ label: 'Mínimo', data: labels.map(() => refLine), borderColor: 'rgba(239,68,68,.6)', borderDash: [3, 3], pointRadius: 0, borderWidth: 1, yAxisID: 'y' });
+    const RM = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+    S.charts.push(new Chart(cv, { type: 'line', data: { labels, datasets: datasets.map(d => Object.assign({ borderWidth: 2, pointRadius: 2.5 }, d)) },
+      options: { responsive: true, maintainAspectRatio: false, animation: RM ? false : { duration: 500 }, interaction: { mode: 'index', intersect: false },
+        plugins: { legend: { labels: { color: '#cbd5e1', boxWidth: 10, font: { size: 10.5 } } } }, scales } }));
+  }
+
+  /* ---------------- guardar / editar / borrar ---------------- */
+  const segVal = name => { const b = sec.querySelector(`[data-seg="${name}"] button.on`); return b ? b.dataset.v : null; };
+  function rangeErr(label, v, min, max) { return v != null && (v < min || v > max) ? `${label}: debe estar entre ${min} y ${max}` : null; }
+  async function done(error, okMsg) {
+    if (error) { $('st-msg').innerHTML = errBox(error); toast('No se guardó'); return false; }
+    toast(okMsg); await loadAll(); setTimeout(() => { try { refreshRafi(); } catch (e) {} }, 200); return true;
+  }
+  sec.addEventListener('submit', async ev => {
+    ev.preventDefault();
+    const c = sb(); if (!c) return;
+    const btn = ev.target.querySelector('button[type=submit]'); if (btn) btn.disabled = true;
+    try {
+      if (ev.target.id === 'ge-form') {
+        const row = { fecha: $('ge-fecha').value, equipo: $('ge-equipo').value, encendido_auto: segVal('ge-enc') || 'OK', combustible_pct: num($('ge-comb').value), horometro_h: num($('ge-horo').value), arranque_seg: num($('ge-arr').value), bateria_v: num($('ge-bat').value), observacion: $('ge-obs').value.trim() || null, extras: readExtras('ge') };
+        const er = [!row.fecha && 'Falta la fecha', rangeErr('Combustible', row.combustible_pct, 0, 100), rangeErr('Horómetro', row.horometro_h, 0, 10000000), rangeErr('Arranque', row.arranque_seg, 0, 3600), rangeErr('Batería', row.bateria_v, 0, 60)].filter(Boolean);
+        if (er.length) { $('st-msg').innerHTML = `<div class="v21-msg err">${er.map(esc).join('<br>')}</div>`; return; }
+        const q = S.editGe ? c.from('mdz_ge_registros').update(row).eq('id', S.editGe) : c.from('mdz_ge_registros').insert(row);
+        const { error } = await q; const wasEdit = !!S.editGe;
+        if (!error) { S.editGe = null; S.equipo = row.equipo; }
+        await done(error, wasEdit ? 'Registro actualizado' : 'Prueba semanal guardada');
+      } else if (ev.target.id === 'sala-form') {
+        const row = { fecha: $('sa-fecha').value, temperatura_c: num($('sa-temp').value), humedad_pct: num($('sa-hum').value), carga_ups_pct: num($('sa-ups').value), autonomia_min: num($('sa-aut').value), carga_kw: num($('sa-kw').value), aire_acond: segVal('sa-aire') || 'OK', limpieza: segVal('sa-limp') || 'OK', alarmas: $('sa-alarm').value.trim() || null, observacion: $('sa-obs').value.trim() || null, extras: readExtras('sala') };
+        const er = [!row.fecha && 'Falta la fecha', rangeErr('Temperatura', row.temperatura_c, -20, 80), rangeErr('Humedad', row.humedad_pct, 0, 100), rangeErr('Carga del UPS', row.carga_ups_pct, 0, 100), rangeErr('Autonomía', row.autonomia_min, 0, 100000), rangeErr('Carga eléctrica', row.carga_kw, 0, 100000)].filter(Boolean);
+        if (er.length) { $('st-msg').innerHTML = `<div class="v21-msg err">${er.map(esc).join('<br>')}</div>`; return; }
+        const q = S.editSala ? c.from('mdz_sala_registros').update(row).eq('id', S.editSala) : c.from('mdz_sala_registros').insert(row);
+        const { error } = await q; const wasEdit = !!S.editSala;
+        if (!error) S.editSala = null;
+        await done(error, wasEdit ? 'Revisión actualizada' : 'Revisión guardada');
+      }
+    } finally { if (btn && btn.isConnected) btn.disabled = false; }
+  });
+  function readCfgForm() {
+    // conserva lo que se está escribiendo en los campos extra antes de redibujar
+    sec.querySelectorAll('.v23-fields .row').forEach(rw => {
+      const f = S.cfg['campos_' + rw.dataset.kind][Number(rw.dataset.i)]; if (!f) return;
+      rw.querySelectorAll('[data-k]').forEach(el => { f[el.dataset.k] = el.value.trim(); });
+    });
+    const eq = $('cf-eq'); if (eq) S.cfg.equipos = [...new Set(eq.value.split('\n').map(s => s.trim().toUpperCase().slice(0, 60)).filter(Boolean))].slice(0, 20);
+    const g = (id, d) => { const v = num($(id) && $(id).value); return v == null ? d : v; }, u = U();
+    if ($('cf-comb')) S.cfg.umbrales = { combustible_min: g('cf-comb', u.combustible_min), dias_max: g('cf-dias', u.dias_max), temp_max: g('cf-temp', u.temp_max), ups_max: g('cf-ups', u.ups_max), hum_min: g('cf-hmin', u.hum_min), hum_max: g('cf-hmax', u.hum_max) };
+  }
+  const slug = s => String(s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_|_$/g, '').slice(0, 30) || 'campo';
+  sec.addEventListener('click', async ev => {
+    const b = ev.target.closest('button'); if (!b || !sec.contains(b)) return;
+    if (b.closest('.v21-tabs') && b.dataset.tab) { if (S.tab === 'cfg') readCfgForm(); S.tab = b.dataset.tab; draw(); return; }
+    if (b.id === 'st-reload') { loadAll(); return; }
+    if (b.id === 'st-xls') { exportXls(); return; }
+    if (b.parentElement && b.parentElement.dataset.seg) { b.parentElement.querySelectorAll('button').forEach(x => x.classList.toggle('on', x === b)); return; }
+    if (b.dataset.eq) { S.equipo = b.dataset.eq; S.editGe = null; draw(); return; }
+    if (b.id === 'ge-cancel') { S.editGe = null; draw(); return; }
+    if (b.id === 'sa-cancel') { S.editSala = null; draw(); return; }
+    if (b.dataset.edge) { S.editGe = Number(b.dataset.edge); draw(); $('ge-form') && $('ge-form').scrollIntoView({ behavior: 'smooth', block: 'center' }); return; }
+    if (b.dataset.edsa) { S.editSala = Number(b.dataset.edsa); draw(); $('sala-form') && $('sala-form').scrollIntoView({ behavior: 'smooth', block: 'center' }); return; }
+    const c = sb(); if (!c) return;
+    if (b.dataset.delge || b.dataset.delsa) {
+      if (b.dataset.sure !== '1') { b.dataset.sure = '1'; b.textContent = '¿Seguro?'; setTimeout(() => { if (b.isConnected) { b.dataset.sure = ''; b.textContent = 'Borrar'; } }, 4000); return; }
+      const t = b.dataset.delge ? 'mdz_ge_registros' : 'mdz_sala_registros', id = Number(b.dataset.delge || b.dataset.delsa);
+      const { error } = await c.from(t).delete().eq('id', id); await done(error, 'Registro borrado'); return;
+    }
+    if (b.id === 'mant-add' || b.id === 'mant-save' || b.dataset.mdone || b.dataset.mdel) {
+      const plan = planOf(S.equipo);
+      sec.querySelectorAll('#mant-card tr[data-mi]').forEach(tr => { const t = plan[Number(tr.dataset.mi)]; if (!t) return;
+        tr.querySelectorAll('[data-mk]').forEach(el => { const k = el.dataset.mk; t[k] = k === 'tarea' ? el.value.trim().slice(0, 80) : num(el.value); }); });
+      if (b.id === 'mant-add') { if (plan.length >= 20) { toast('Máximo 20 tareas'); return; } plan.push({ tarea: 'Nueva tarea', cada_h: 250, ultimo_h: null, ultimo_fecha: null }); draw(); return; }
+      if (b.dataset.mdel) { if (b.dataset.sure !== '1') { b.dataset.sure = '1'; b.textContent = '¿Quitar?'; return; } plan.splice(Number(b.dataset.mdel), 1); }
+      if (b.dataset.mdone) { const t = plan[Number(b.dataset.mdone)], horo = lastHoro(S.ge.filter(r => r.equipo === S.equipo)); if (!t || horo == null) return; t.ultimo_h = horo; t.ultimo_fecha = hoy(); }
+      S.cfg.mant[S.equipo] = plan.filter(t => t.tarea).map(t => ({ tarea: t.tarea, cada_h: t.cada_h > 0 ? t.cada_h : null, ultimo_h: t.ultimo_h != null && t.ultimo_h >= 0 ? t.ultimo_h : null, ultimo_fecha: t.ultimo_fecha || null }));
+      b.disabled = true;
+      const { error } = await c.from('mdz_sala_config').upsert({ clave: 'general', valor: cfgPayload() }, { onConflict: 'clave' });
+      if (b.isConnected) b.disabled = false;
+      await done(error, b.dataset.mdone ? 'Servicio anotado' : 'Plan de mantenimiento guardado'); return;
+    }
+    if (b.dataset.addf) { readCfgForm(); const k = 'campos_' + b.dataset.addf; if (!Array.isArray(S.cfg[k])) S.cfg[k] = []; if (S.cfg[k].length >= 15) { toast('Máximo 15 campos'); return; } S.cfg[k].push({ key: '', label: 'Nuevo campo', tipo: 'numero', unidad: '' }); draw(); const rows = sec.querySelectorAll(`.v23-fields .row[data-kind="${b.dataset.addf}"] input[data-k="label"]`); if (rows.length) { rows[rows.length - 1].focus(); rows[rows.length - 1].select(); } return; }
+    if (b.dataset.delf) { readCfgForm(); const [k, i] = b.dataset.delf.split(':'); S.cfg['campos_' + k].splice(Number(i), 1); draw(); return; }
+    if (b.id === 'cf-save') {
+      readCfgForm();
+      ['ge', 'sala'].forEach(k => { const used = new Set(); S.cfg['campos_' + k] = (S.cfg['campos_' + k] || []).filter(f => f.label).map(f => { let key = f.key || slug(f.label), n = 2; while (used.has(key)) key = (f.key || slug(f.label)) + '_' + n++; used.add(key); return { key, label: f.label.slice(0, 40), tipo: ['numero', 'texto', 'sino'].includes(f.tipo) ? f.tipo : 'texto', unidad: (f.unidad || '').slice(0, 12) }; }); });
+      const u = S.cfg.umbrales;
+      if (u.hum_min >= u.hum_max) { $('st-msg').innerHTML = '<div class="v21-msg err">La humedad mínima debe ser menor que la máxima.</div>'; return; }
+      b.disabled = true;
+      const { error } = await c.from('mdz_sala_config').upsert({ clave: 'general', valor: cfgPayload() }, { onConflict: 'clave' });
+      if (b.isConnected) b.disabled = false;
+      await done(error, 'Configuración guardada');
+    }
+  });
+
+  function cfgPayload() {
+    const mant = {}; Object.entries(S.cfg.mant || {}).forEach(([k, v]) => { if (S.cfg.equipos.includes(k) && Array.isArray(v)) mant[k] = v; });
+    return { equipos: S.cfg.equipos, umbrales: S.cfg.umbrales, campos_ge: S.cfg.campos_ge, campos_sala: S.cfg.campos_sala, mant };
+  }
+  function exportXls() {
+    if (typeof XLSX === 'undefined') { toast('Excel no disponible'); return; }
+    const exG = fieldsOf('ge'), exS = fieldsOf('sala');
+    const ge = S.ge.map(r => Object.assign({ 'FECHA': r.fecha, 'SEMANA': isoWeek(r.fecha), 'EQUIPO': r.equipo, 'ENCENDIDO AUTOMÁTICO': r.encendido_auto, 'COMBUSTIBLE %': r.combustible_pct == null ? '' : Number(r.combustible_pct), 'HORÓMETRO H': r.horometro_h == null ? '' : Number(r.horometro_h), 'ARRANQUE S': r.arranque_seg == null ? '' : Number(r.arranque_seg), 'BATERÍA V': r.bateria_v == null ? '' : Number(r.bateria_v) },
+      Object.fromEntries(exG.map(f => [f.label.toUpperCase() + (f.unidad ? ' ' + f.unidad : ''), (r.extras || {})[f.key] ?? ''])), { 'OBSERVACIÓN': r.observacion || '' }));
+    const sa = S.sala.map(r => Object.assign({ 'FECHA': r.fecha, 'SEMANA': isoWeek(r.fecha), 'TEMPERATURA °C': r.temperatura_c == null ? '' : Number(r.temperatura_c), 'HUMEDAD %': r.humedad_pct == null ? '' : Number(r.humedad_pct), 'CARGA UPS %': r.carga_ups_pct == null ? '' : Number(r.carga_ups_pct), 'AUTONOMÍA MIN': r.autonomia_min == null ? '' : Number(r.autonomia_min), 'CARGA KW': r.carga_kw == null ? '' : Number(r.carga_kw), 'AIRE ACONDICIONADO': r.aire_acond, 'LIMPIEZA': r.limpieza, 'ALARMAS': r.alarmas || '' },
+      Object.fromEntries(exS.map(f => [f.label.toUpperCase() + (f.unidad ? ' ' + f.unidad : ''), (r.extras || {})[f.key] ?? ''])), { 'OBSERVACIÓN': r.observacion || '' }));
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(ge.length ? ge : [{ 'FECHA': '' }]), 'Grupo electrógeno');
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(sa.length ? sa : [{ 'FECHA': '' }]), 'Sala de servidores');
+    XLSX.writeFile(wb, `sala_tecnica_${hoy()}.xlsx`);
+  }
+
+  const _ar = window.applySessionRoleUI;
+  if (typeof _ar === 'function') window.applySessionRoleUI = function () { const r = _ar.apply(this, arguments); syncRole(); return r; };
+  setInterval(syncRole, 1000); syncRole();
+  window.__mdzSala = { S, draw, loadAll };
+
+  /* =====================================================================
+     RAFI · avisos proactivos y resumen del día (solo dev)
+     ===================================================================== */
+  const BRIEF_KEY = 'mdz_rafi_brief_dia', S2_NEW = 'mdz_s2_nuevos', S2_SEEN = 'mdz_s2_conocidos';
+  const ls = { get: (k, d) => { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch (e) { return d; } }, set: (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} } };
+  // MiltonPro avisa los códigos 2 de cada análisis; los que nunca se vieron quedan como "nuevos"
+  window.__mdzS2Report = codes => {
+    try {
+      const seen = new Set(ls.get(S2_SEEN, [])), first = seen.size === 0, nuevos = new Set(ls.get(S2_NEW, []));
+      codes.forEach(c => { if (!seen.has(c)) { if (!first) nuevos.add(c); seen.add(c); } });
+      ls.set(S2_SEEN, [...seen].slice(-5000)); ls.set(S2_NEW, [...nuevos].slice(-200));
+      setTimeout(refreshRafi, 300);
+    } catch (e) {}
+  };
+  let rafiAl = [], rafiBusy = false;
+  async function computeAlerts() {
+    const out = [], c = sb();
+    // 2FA por vencer
+    try {
+      if (typeof mdzMfaAgeDays === 'function' && typeof hunterSession !== 'undefined' && hunterSession) {
+        const age = mdzMfaAgeDays(hunterSession), max = (typeof MDZ_MFA_DAYS !== 'undefined' ? MDZ_MFA_DAYS : 10);
+        if (isFinite(age)) { const left = Math.max(0, Math.ceil(max - age)); if (left <= 2) out.push({ lvl: left <= 1 ? 'bad' : 'warn', txt: left <= 0 ? 'Tu 2FA venció: al salir te pedirá el código.' : `Tu 2FA vence en ${left} día${left === 1 ? '' : 's'}. Ten a mano tu autenticador.` }); }
+      }
+    } catch (e) {}
+    // grupo electrógeno y sala
+    if (c) {
+      const [g, sl, k] = await Promise.all([
+        c.from('mdz_ge_registros').select('*').order('fecha', { ascending: true }).order('id', { ascending: true }).limit(3000),
+        c.from('mdz_sala_registros').select('*').order('fecha', { ascending: false }).order('id', { ascending: false }).limit(1),
+        c.from('mdz_sala_config').select('valor').eq('clave', 'general').maybeSingle()
+      ]);
+      if (!g.error && !k.error) {
+        if (k.data && k.data.valor && (sec.classList.contains('ui-hidden') || S.tab !== 'cfg')) S.cfg = Object.assign(JSON.parse(JSON.stringify(DEF_CFG)), k.data.valor);
+        const u = U(), eqs = (S.cfg.equipos && S.cfg.equipos.length) ? S.cfg.equipos : ['GE-01'];
+        eqs.forEach(eq => {
+          const list = (g.data || []).filter(r => r.equipo === eq), last = list[list.length - 1];
+          if (!last) { out.push({ lvl: 'warn', txt: `${eq}: aún no hay pruebas registradas.`, go: 'sala' }); return; }
+          const dias = daysBetween(last.fecha, hoy());
+          if (last.encendido_auto === 'FALLA') out.push({ lvl: 'bad', txt: `${eq}: el encendido automático falló el ${fdate(last.fecha)}.`, go: 'sala' });
+          if (last.combustible_pct != null && Number(last.combustible_pct) < u.combustible_min) out.push({ lvl: 'bad', txt: `${eq}: combustible al ${fmt(last.combustible_pct)} % (mínimo ${u.combustible_min} %).`, go: 'sala' });
+          if (!list.some(r => isoWeek(r.fecha) === isoWeek(hoy()))) out.push({ lvl: dias > u.dias_max ? 'bad' : 'warn', txt: `${eq}: falta la prueba semanal (última hace ${dias} día${dias === 1 ? '' : 's'}).`, go: 'sala' });
+          const horo = lastHoro(list), hw = hwOf(list);
+          (Array.isArray((S.cfg.mant || {})[eq]) ? S.cfg.mant[eq] : []).forEach(t => { const m = mantState(t, horo, hw);
+            if (m.lvl === 'bad') out.push({ lvl: 'bad', txt: `${eq}: mantenimiento vencido · ${t.tarea} (${fmt(-m.faltan)} h de atraso).`, go: 'sala' });
+            else if (m.lvl === 'warn') out.push({ lvl: 'warn', txt: `${eq}: pronto toca ${t.tarea} (faltan ${fmt(m.faltan)} h${m.fecha ? ', ≈ ' + fdate(m.fecha) : ''}).`, go: 'sala' }); });
+        });
+        const sr = !sl.error && sl.data && sl.data[0];
+        if (sr) salaAlerts(sr).forEach(([lvl, t]) => out.push({ lvl: lvl === 'bad' ? 'bad' : 'warn', txt: 'Sala de servidores: ' + t + '.', go: 'sala', tab: 'sala' }));
+      }
+    }
+    // códigos 2 nuevos (MiltonPro)
+    const nuevos = ls.get(S2_NEW, []);
+    if (nuevos.length) out.push({ lvl: 'warn', txt: `${nuevos.length} código${nuevos.length === 1 ? '' : 's'} 2 nuevo${nuevos.length === 1 ? '' : 's'} en MiltonPro: ${nuevos.slice(0, 6).join(', ')}${nuevos.length > 6 ? '…' : ''}`, go: 'milton', s2: 1 });
+    // antenas sin visita (inventario cargado)
+    try {
+      const rows = typeof excelData !== 'undefined' ? excelData : []; let pend = 0, tot = 0;
+      rows.forEach(r => { const i = info(r); if (!i.punto) return; tot++; if (!i.visitado) pend++; });
+      if (tot && pend) out.push({ lvl: 'info', txt: `${pend} de ${tot} antenas siguen sin visita registrada.`, go: 'maint' });
+    } catch (e) {}
+    const rank = { bad: 0, warn: 1, info: 2 };
+    return out.sort((a, b) => rank[a.lvl] - rank[b.lvl]);
+  }
+  const badge = document.createElement('span'); badge.id = 'rafi-badge'; badge.setAttribute('role', 'button'); badge.tabIndex = 0;
+  const brief = document.createElement('div'); brief.id = 'rafi-brief'; brief.setAttribute('role', 'dialog'); brief.setAttribute('aria-label', 'Resumen del día de RAFI');
+  function mountRafiBits() {
+    const fab = $('rafi-fab'); if (!fab) return false;
+    if (!badge.isConnected) fab.appendChild(badge);
+    if (!brief.isConnected) document.body.appendChild(brief);
+    return true;
+  }
+  function drawBrief() {
+    const h = new Date(Date.now() - 5 * 3600e3).getUTCHours(), saludo = h < 12 ? 'Buenos días' : h < 19 ? 'Buenas tardes' : 'Buenas noches';
+    const nombre = (typeof hunterPerfil !== 'undefined' && hunterPerfil && hunterPerfil.nombre) ? ', ' + esc(hunterPerfil.nombre) : '';
+    const bad = rafiAl.filter(a => a.lvl === 'bad').length, warn = rafiAl.filter(a => a.lvl === 'warn').length;
+    brief.innerHTML = `<button class="rb-x" data-rb="x" aria-label="Cerrar">✕</button><h4>🧑‍🚀 ${saludo}${nombre}</h4>
+      <div class="rb-sub">Resumen del ${fdate(hoy())} · ${bad ? bad + ' urgente' + (bad === 1 ? '' : 's') : 'nada urgente'}${warn ? ' · ' + warn + ' por revisar' : ''}</div>
+      ${rafiAl.length ? rafiAl.map((a, i) => `<div class="rb-it"><span class="rb-dot ${a.lvl}"></span><span>${esc(a.txt)}</span><span>${a.go ? `<button data-rb="go" data-i="${i}">Ir</button>` : ''}${a.s2 ? ` <button data-rb="s2">Visto</button>` : ''}</span></div>`).join('')
+        : '<div class="rb-ok">✓ Todo en orden: grupo electrógeno, sala de servidores y accesos sin avisos.</div>'}`;
+  }
+  async function refreshRafi() {
+    const ok = logged() && dev();
+    if (!ok) { badge.classList.remove('on'); brief.classList.remove('on'); return; }
+    if (!mountRafiBits() || rafiBusy) return;
+    rafiBusy = true;
+    try { rafiAl = await computeAlerts(); } catch (e) { rafiAl = []; } finally { rafiBusy = false; }
+    const n = rafiAl.filter(a => a.lvl !== 'info').length, hasBad = rafiAl.some(a => a.lvl === 'bad');
+    badge.textContent = n > 9 ? '9+' : String(n); badge.classList.toggle('on', n > 0); badge.classList.toggle('warn', !hasBad);
+    badge.title = n ? `RAFI tiene ${n} aviso${n === 1 ? '' : 's'}` : ''; badge.setAttribute('aria-label', badge.title || 'Sin avisos');
+    const hello = $('rafi-hello'); if (hello && n) hello.textContent = `Tengo ${n} aviso${n === 1 ? '' : 's'} para ti 👀`;
+    if (brief.classList.contains('on')) drawBrief();
+    // resumen automático: una vez al día al entrar
+    if (ls.get(BRIEF_KEY, '') !== hoy()) { ls.set(BRIEF_KEY, hoy()); drawBrief(); brief.classList.add('on'); }
+  }
+  const toggleBrief = () => { if (brief.classList.contains('on')) brief.classList.remove('on'); else { drawBrief(); brief.classList.add('on'); } };
+  badge.addEventListener('click', e => { e.stopPropagation(); toggleBrief(); });
+  badge.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleBrief(); } });
+  brief.addEventListener('click', e => {
+    const b = e.target.closest('[data-rb]'); if (!b) return;
+    if (b.dataset.rb === 'x') { brief.classList.remove('on'); return; }
+    if (b.dataset.rb === 's2') { ls.set(S2_NEW, []); refreshRafi(); return; }
+    if (b.dataset.rb === 'go') { const a = rafiAl[Number(b.dataset.i)]; if (!a) return; brief.classList.remove('on'); if (a.tab) S.tab = a.tab; else if (a.go === 'sala') S.tab = 'ge'; try { window.setView(a.go); } catch (er) {} }
+  });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape' && brief.classList.contains('on')) brief.classList.remove('on'); });
+  window.__mdzRafiRefresh = refreshRafi;
+  let wasOk = false;
+  setInterval(() => { const ok = logged() && dev(); if (ok && !wasOk) setTimeout(refreshRafi, 2500); if (!ok && wasOk) refreshRafi(); wasOk = ok; }, 1000);
+  setInterval(() => { if (logged() && dev()) refreshRafi(); }, 10 * 60e3);
 })();
 </script>
 </body>
