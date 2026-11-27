@@ -6058,6 +6058,7 @@ async function mdzRafiAstro(btn){
         octo.rotation.set(-.25*press,Math.sin(t*1.3)*.35*q+look*.4,Math.sin(t*24)*.12*shake);
       }
       if(u.mantle){const b=2.4+press*5;u.mantle.scale.set(.96+Math.sin(t*b)*.05,1.12-Math.sin(t*b)*.06,1+Math.sin(t*b)*.05)}
+      try{window.__mdzRafiTick&&window.__mdzRafiTick(t,wrap,u,q,cv)}catch(e){}   // v25: personalidad y reacciones de RAFI
       r.render(sc,cam);
     })(0);
   }catch(e){btn.textContent='🧑‍🚀'}
@@ -10384,6 +10385,7 @@ body.theme-day #view-fusion .fx-drop b { color: #0f172a; }
   $f('fx-est-clear').addEventListener('click', () => { if (S.estLayer && S.map) S.map.removeLayer(S.estLayer); S.estLayer = null; $f('fx-est-out').innerHTML = ''; if (!S.result) $f('fx-mapcard').classList.add('hidden'); });
   let estInit = false;
   function initEst() { if (estInit) return; if (!$f('fx-est-rows').children.length) addEstRow(null, 92); estInit = true; }
+  window.__mdzFx = { catalogo, resolverPSD, loadPsdMap, loadRefs, ring, quant, psdKey, U };   // v25: lo usa la estimación de robos
 
   /* ---------------------------- flujo ---------------------------- */
   async function run() {
@@ -10712,6 +10714,11 @@ body.theme-day #view-milton .mp-ins p { color: #1e293b; }
       const s2 = cobertura.filter(c => c.s2);
       try { if (typeof window !== 'undefined' && window.__mdzS2Report) window.__mdzS2Report(s2.map(c => c.mov)); } catch (e) {}   // v23: RAFI avisa códigos 2 nuevos
       const s2Antenas = new Set(); all.forEach(r => { if (esS2(r.mov)) s2Antenas.add(r.psd); });
+      // v25: línea de tiempo por código 2 (bloques de 5 min por antena con su RSSI máximo) para estimar ubicación de robos
+      const s2Set = new Set(s2.map(c => c.mov)), s2T = new Map();
+      all.forEach(r => { if (!s2Set.has(r.mov)) return; const k = r.mov + '|' + r.psd + '|' + Math.floor(r.t / 300000); const o = s2T.get(k), v = r.rssi == null ? -1 : r.rssi; if (!o) s2T.set(k, [r.mov, r.psd, r.t, v, 1]); else { o[4]++; if (v > o[3]) { o[3] = v; o[2] = r.t; } } });
+      const s2Lect = {}; for (const o of s2T.values()) (s2Lect[o[0]] = s2Lect[o[0]] || []).push([o[1], o[2], o[3], o[4]]);
+      for (const k in s2Lect) { s2Lect[k].sort((a, b) => a[1] - b[1]); if (s2Lect[k].length > 2000) s2Lect[k] = s2Lect[k].slice(-2000); }
       const s2PorPsd = [...byPsd.keys()].map(psd => { const L = byPsd.get(psd).filter(r => esS2(r.mov)); return { psd, codigos: new Set(L.map(r => r.mov)).size, lecturas: L.length }; }).filter(x => x.codigos).sort((a, b) => b.codigos - a.codigos);
       // --- resumen ejecutivo ---
       const nPsd = psdRows.length, efG = r2(psdRows.reduce((s, p) => s + p.ef, 0) / nPsd);
@@ -10738,7 +10745,7 @@ body.theme-day #view-milton .mp-ins p { color: #1e293b; }
       return {
         ok: true, avisos, archivos: arch, dups, dias: dias.size, total: all.length, tmin, tmax, nPsd, nMov: byMov.size,
         kpi: { efG, efPond, mtbfG, mttrG, jamm: all.filter(isJ).length, crit: all.filter(r => r.rssi != null && r.rssi < CRIT).length, caidas: cortesKpi.length, saltos: saltos.length, rebotes: rebotes.length, s2: s2.length, s2Antenas: s2Antenas.size },
-        psd: psdRows, tags, saltos, rebotes, cortes, horas, fallasPH, heat, serie: serieArr, jamPsd, jamTags, jamPerm: jamPermU, cobertura, s2, s2PorPsd, ins, P
+        psd: psdRows, tags, saltos, rebotes, cortes, horas, fallasPH, heat, serie: serieArr, jamPsd, jamTags, jamPerm: jamPermU, cobertura, s2, s2PorPsd, s2Lect, ins, P
       };
     }
     return { analizar, readBook, parseFecha, fmtT, fmtDur };
@@ -10908,6 +10915,7 @@ body.theme-day #view-milton .mp-ins p { color: #1e293b; }
       const R = await runJob('milton', files, params());
       if (R.error) { setMsgs([['err', esc(R.error)]]); S.R = null; $m('mp-out').classList.add('hidden'); return; }
       S.R = R;
+      try { window.__mdzMpLast = R; if (window.__mdzS2Report) window.__mdzS2Report((R.s2 || []).map(c => c.mov)); if (window.__mdzRoboRefresh) window.__mdzRoboRefresh(); } catch (e) {}   // v25: el aviso de códigos 2 corre aquí (el análisis va en un Worker)
       const omit = R.archivos.filter(a => !/^OK/.test(a.estado));
       setMsgs([...R.avisos.map(a => ['warn', esc(a)]), ...omit.map(a => ['warn', `${esc(a.archivo)}: ${esc(a.estado)}`]),
         ['ok', `Listo en ${((performance.now() - t0) / 1000).toFixed(1)} s: ${R.total.toLocaleString('es-PE')} lecturas de ${R.nPsd} antena${R.nPsd === 1 ? '' : 's'} y ${R.nMov} móviles, del ${fmtT(R.tmin).slice(0, 16)} al ${fmtT(R.tmax).slice(0, 16)} (${R.dias} día${R.dias === 1 ? '' : 's'}).`]]);
@@ -13054,6 +13062,7 @@ html body.hunter-preauth.login-fail #mdz-fail-fx{ display:block; }
     if (!mountRafiBits() || rafiBusy) return;
     rafiBusy = true;
     try { rafiAl = await computeAlerts(); } catch (e) { rafiAl = []; } finally { rafiBusy = false; }
+    window.__mdzRafiAlerts = rafiAl;   // v25: RAFI con IA usa estos avisos
     const n = rafiAl.filter(a => a.lvl !== 'info').length, hasBad = rafiAl.some(a => a.lvl === 'bad');
     badge.textContent = n > 9 ? '9+' : String(n); badge.classList.toggle('on', n > 0); badge.classList.toggle('warn', !hasBad);
     badge.title = n ? `RAFI tiene ${n} aviso${n === 1 ? '' : 's'}` : ''; badge.setAttribute('aria-label', badge.title || 'Sin avisos');
@@ -13577,8 +13586,466 @@ html body #mdz-report .warn, html body #mdz-report .warn * { color:#b45309 !impo
   if (typeof _ar === 'function') window.applySessionRoleUI = function () { const r = _ar.apply(this, arguments); syncRole(); return r; };
   setInterval(syncRole, 1000); syncRole();
   setTimeout(flush, 4000);
-  window.__mdzInc = { I, incLoad, incDraw };
+  window.__mdzInc = { I, incLoad, incDraw, openForm };
 })();
 </script>
+<style id="hunter-v25-css">
+/* ===== v25 · RAFI con IA, ubicación estimada de robos y personalidad de RAFI (solo dev) ===== */
+#view-robo h2 > span .hud-ico { width:100%; height:100%; fill:none; stroke:currentColor; stroke-width:1.7; stroke-linecap:round; stroke-linejoin:round; }
+#robo-map { height:520px; overflow:hidden; border:1px solid rgba(255,255,255,.1); background:#0b0f17; }
+@media (max-width:760px){ #robo-map { height:380px; } #view-robo .p-5 { padding:12px !important; } }
+body:not(.theme-day) #robo-map .leaflet-tile-pane { filter: invert(1) hue-rotate(195deg) brightness(.84) contrast(.94) saturate(.55); }
+.v25-grid { display:grid; grid-template-columns:1fr; gap:14px; }
+@media (min-width:1150px){ .v25-grid { grid-template-columns:minmax(0,1.6fr) minmax(0,1fr); } }
+.v25-res { padding:10px 12px; border-left:3px solid var(--c,#38bdf8); background:rgba(255,255,255,.04); font-size:12.3px; color:#dbe4f3; line-height:1.5; }
+.v25-res b { color:#fff; }
+.v25-res small { display:block; color:#94a3b8; font-size:11px; margin-top:3px; }
+.v25-pin { width:26px; height:26px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:800; color:#0b0f17; border:2px solid #fff; box-shadow:0 0 10px rgba(0,0,0,.6); }
+.v25-now { width:34px; height:34px; border-radius:50%; background:#ef4444; border:3px solid #fff; display:flex; align-items:center; justify-content:center; font-size:16px; animation:v25pulse 1.6s ease-out infinite; }
+@keyframes v25pulse { 0%{ box-shadow:0 0 0 0 rgba(239,68,68,.75); } 100%{ box-shadow:0 0 0 22px rgba(239,68,68,0); } }
+.v25-tower { display:flex; align-items:center; gap:4px; white-space:nowrap; font-size:10.5px; font-weight:800; color:#fff; text-shadow:0 1px 3px #000; }
+.v25-tower i { font-style:normal; font-size:16px; }
+.v25-legend { display:flex; flex-wrap:wrap; gap:10px; font-size:11px; color:#94a3b8; align-items:center; }
+.v25-legend .grad { width:90px; height:8px; background:linear-gradient(90deg,#38bdf8,#a78bfa,#f472b6,#ef4444); display:inline-block; }
+/* chat de RAFI con IA */
+#rafi-pop .rp-tabs button[data-tab="ia"] { position:relative; }
+#rafi-pop .rp-tabs button[data-tab="ia"]::after { content:"IA"; margin-left:4px; font-size:9px; font-weight:900; padding:0 4px; border-radius:4px; background:linear-gradient(135deg,#a78bfa,#38bdf8); color:#0b0f17; }
+.v25-chat { display:flex; flex-direction:column; gap:8px; }
+.v25-mode { font-size:10.5px; color:#94a3b8; }
+.v25-mode b { color:var(--accent,#38bdf8); }
+.v25-msgs { max-height:280px; overflow-y:auto; display:flex; flex-direction:column; gap:6px; padding-right:2px; }
+.v25-m { padding:7px 10px; border-radius:12px; font-size:12.3px; line-height:1.45; white-space:pre-wrap; word-break:break-word; }
+.v25-m.u { align-self:flex-end; background:rgba(56,189,248,.18); color:#e0f2fe; max-width:88%; }
+.v25-m.a { align-self:flex-start; background:rgba(255,255,255,.07); color:#e2e8f0; max-width:96%; }
+.v25-m.e { align-self:stretch; background:rgba(239,68,68,.14); color:#fecaca; }
+.v25-m small { display:block; margin-top:4px; font-size:10px; color:#94a3b8; }
+.v25-sug { display:flex; flex-wrap:wrap; gap:5px; }
+.v25-sug button { all:unset; cursor:pointer; font-size:10.5px; padding:3px 8px; border-radius:999px; border:1px solid rgba(255,255,255,.18); color:#cbd5e1; }
+.v25-sug button:hover, .v25-sug button:focus-visible { background:rgba(255,255,255,.1); color:#fff; }
+.v25-in { display:flex; gap:6px; align-items:flex-end; }
+.v25-in textarea { flex:1; min-width:0; resize:none; padding:7px 9px; border-radius:10px; background:rgba(0,0,0,.4); border:1px solid rgba(255,255,255,.14); color:#fff; font-size:12.5px; outline:none; }
+.v25-in textarea:focus { border-color:var(--accent,#38bdf8); }
+.v25-in button { padding:8px 11px; border-radius:10px; border:0; cursor:pointer; font-weight:800; font-size:12px; background:linear-gradient(135deg,#a78bfa,#38bdf8); color:#0b0f17; }
+.v25-in button:disabled { opacity:.5; cursor:wait; }
+.v25-dots::after { content:"…"; animation:v25dots 1s steps(3) infinite; }
+@keyframes v25dots { 0%{content:"."} 33%{content:".."} 66%{content:"..."} }
+</style>
+<script id="hunter-v25-js">
+(() => {
+  'use strict';
+  const $ = id => document.getElementById(id);
+  const esc = v => (typeof escapeHtml === 'function' ? escapeHtml(v == null ? '' : String(v)) : String(v == null ? '' : v).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])));
+  const dev = () => typeof isDevRole === 'function' && isDevRole();
+  const logged = () => !!(typeof hunterSession !== 'undefined' && hunterSession) && !document.body.classList.contains('hunter-preauth');
+  const sb = () => (typeof hunterSbClient !== 'undefined' ? hunterSbClient : null);
+  const toast = m => { try { showToast(m); } catch (e) {} };
+  const ls = { get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch (e) { return d; } }, set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); return true; } catch (e) { return false; } }, del(k) { try { localStorage.removeItem(k); } catch (e) {} } };
+  // MiltonPro guarda las horas de Lima "como UTC": se leen con getters UTC
+  const fT = t => { if (t == null || !isFinite(t)) return '—'; const s = new Date(t).toISOString(); return s.slice(8, 10) + '/' + s.slice(5, 7) + ' ' + s.slice(11, 16); };
+  const fDist = m => m == null ? '—' : m >= 1000 ? (m / 1000).toLocaleString('es-PE', { maximumFractionDigits: 1 }) + ' km' : Math.round(m) + ' m';
+
+  /* =====================================================================
+     1) UBICACIÓN ESTIMADA DE ROBOS · MiltonPro (códigos 2) × Fusión RF (referencias RSSI ↔ distancia)
+     ===================================================================== */
+  const SAVE_KEY = 'mdz_robo_ultimo_v1';
+  const ICON = '<svg class="hud-ico" viewBox="0 0 24 24"><circle cx="12" cy="11" r="3"/><path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11Z"/><path d="M4 4l3 3M20 4l-3 3"/></svg>';
+  const nav = document.createElement('button');
+  nav.id = 'nav-robo'; nav.dataset.v = 'robo'; nav.title = 'Ubicación estimada de robos (dev)'; nav.className = 'ui-hidden'; nav.innerHTML = ICON;
+  nav.addEventListener('click', () => window.setView('robo'));
+  (document.getElementById('nav-inc') || document.getElementById('nav-sala') || document.getElementById('nav-noc')).after(nav);
+  const sec = document.createElement('section');
+  sec.id = 'view-robo'; sec.className = 'view ui-hidden map panel flex-1 min-w-0 flex flex-col overflow-hidden';
+  (document.getElementById('view-inc') || document.getElementById('view-sala') || document.getElementById('view-noc')).after(sec);
+  sec.innerHTML = `<div class="flex flex-wrap items-center justify-between gap-3 px-5 pt-4 pb-3 border-b border-white/10">
+    <div><h2 class="text-base font-bold text-white flex items-center gap-2"><span class="text-[var(--accent)] inline-block" style="width:24px;height:24px">${ICON}</span>Ubicación estimada de robos</h2>
+    <p class="text-[11px] text-slate-400">Cruza los códigos 2 de MiltonPro con las referencias de Fusión RF (RSSI ↔ distancia) · solo dev</p></div>
+    <div class="flex gap-2 flex-wrap"><button class="v21-btn" id="robo-go-mp"><i class="fa-solid fa-file-import"></i>Procesar en MiltonPro</button>
+      <button class="v21-btn" id="robo-inc" disabled><i class="fa-solid fa-triangle-exclamation"></i>Registrar incidente</button></div></div>
+    <div class="flex-1 overflow-y-auto scroll p-5 space-y-4">
+      <div id="robo-msg"></div>
+      <div class="card p-4 v21-bar" id="robo-bar">
+        <label class="text-[11px] text-slate-400">Código 2 <select id="robo-code" class="sel" style="min-width:190px"></select></label>
+        <label class="text-[11px] text-slate-400">Periodo <select id="robo-win" class="sel"><option value="0">Todo el archivo</option><option value="2">Últimas 2 h vistas</option><option value="6">Últimas 6 h vistas</option><option value="24" selected>Últimas 24 h vistas</option></select></label>
+        <label class="text-[11px] text-slate-400">Agrupar cada <select id="robo-slot" class="sel"><option value="10">10 min</option><option value="15" selected>15 min</option><option value="30">30 min</option><option value="60">1 hora</option></select></label>
+        <button class="v21-btn pri" id="robo-run"><i class="fa-solid fa-location-crosshairs"></i>Estimar ubicación</button>
+      </div>
+      <div class="v25-grid">
+        <div class="space-y-2"><div id="robo-map"></div>
+          <div class="v25-legend"><span><span class="grad"></span> más antiguo → más reciente</span><span>🔴 zona más probable ahora</span><span>📡 antena que lo vio</span><span>Anillo punteado = distancia estimada desde cada antena</span></div></div>
+        <div class="space-y-3" id="robo-out"><div class="v21-msg">Elige un código 2 y pulsa <b>Estimar ubicación</b>.</div></div>
+      </div>
+      <p class="text-[11px] text-slate-500">Es una estimación: el RSSI cambia con edificios, cerros, clima y la antena del vehículo. Mientras más recorridos guardes en Fusión RF (referencias por antena), más precisa será. Sin referencias se usa un modelo genérico y el círculo de incertidumbre es más grande.</p>
+    </div>`;
+
+  const R = { data: null, map: null, layer: null, opened: false, last: null };
+  const _sv = window.setView;
+  window.setView = function (v) {
+    if (v === 'robo') {
+      if (!dev()) { toast('Módulo solo para dev'); return; }
+      document.querySelectorAll('.rail button[data-v]').forEach(b => b.classList.toggle('on', b.dataset.v === v));
+      if ($('side')) $('side').classList.add('ui-hidden');
+      document.querySelectorAll('section[id^="view-"]').forEach(s => s.classList.toggle('ui-hidden', s.id !== 'view-robo'));
+      R.opened = true; roboRefresh(); setTimeout(() => { ensureMap(); try { R.map.invalidateSize(); } catch (e) {} }, 60); return;
+    }
+    sec.classList.add('ui-hidden');
+    return _sv.apply(this, arguments);
+  };
+  function syncRole() {
+    const ok = logged() && dev();
+    nav.classList.toggle('ui-hidden', !ok);
+    if (!ok && !sec.classList.contains('ui-hidden')) { sec.classList.add('ui-hidden'); try { _sv('filter'); } catch (e) {} }
+    if (!ok && R.opened) { R.opened = false; R.data = null; R.last = null; if (R.layer) R.layer.clearLayers(); $('robo-out').innerHTML = ''; }
+  }
+
+  // Toma el último análisis de MiltonPro (en esta sesión) o el guardado en este navegador
+  function loadData() {
+    const mp = window.__mdzMpLast;
+    if (mp && Array.isArray(mp.s2) && mp.s2Lect) {
+      const d = { when: Date.now(), tmin: mp.tmin, tmax: mp.tmax, codes: mp.s2.map(c => ({ mov: c.mov, lecturas: c.lecturas, antenas: c.antenas, media: c.media, primer: c.primer, ultimo: c.ultimo, ultPsd: c.ultPsd })), lect: mp.s2Lect };
+      if (!R.data || R.data.tmax !== d.tmax || R.data.codes.length !== d.codes.length) {
+        R.data = d;
+        if (!ls.set(SAVE_KEY, d)) { // si no cabe, guardamos solo los 30 códigos más recientes
+          const top = [...d.codes].sort((a, b) => b.ultimo - a.ultimo).slice(0, 30), lect = {}; top.forEach(c => lect[c.mov] = d.lect[c.mov]);
+          ls.set(SAVE_KEY, { ...d, codes: top, lect });
+        }
+      }
+    } else if (!R.data) R.data = ls.get(SAVE_KEY, null);
+    return R.data;
+  }
+  function roboRefresh() {
+    if (!R.opened) return;
+    const d = loadData(), sel = $('robo-code'), prev = sel.value;
+    if (!d || !d.codes || !d.codes.length) {
+      $('robo-msg').innerHTML = `<div class="v21-msg warn">${d ? 'El último análisis de MiltonPro no tiene códigos 2.' : 'Todavía no hay datos: procesa los archivos de lecturas en <b>MiltonPro</b> y vuelve aquí.'} Los códigos 2 son móviles de 6 caracteres que empiezan con 2 (ej. 25H696).</div>`;
+      sel.innerHTML = ''; $('robo-run').disabled = true; return;
+    }
+    $('robo-run').disabled = false;
+    $('robo-msg').innerHTML = `<div class="v21-msg ok">${d.codes.length} código${d.codes.length === 1 ? '' : 's'} 2 del análisis de MiltonPro (${fT(d.tmin)} → ${fT(d.tmax)})${window.__mdzMpLast ? '' : ' · guardado en este navegador'}.</div>`;
+    const codes = [...d.codes].sort((a, b) => b.ultimo - a.ultimo);
+    sel.innerHTML = codes.map(c => `<option value="${esc(c.mov)}">${esc(c.mov)} · visto ${fT(c.ultimo)} · ${c.antenas} antena${c.antenas === 1 ? '' : 's'}</option>`).join('');
+    if (prev && codes.some(c => c.mov === prev)) sel.value = prev;
+  }
+  window.__mdzRoboRefresh = () => { R.data = null; roboRefresh(); };
+
+  function ensureMap() {
+    if (R.map || typeof L === 'undefined') return !!R.map;
+    R.map = L.map('robo-map', { zoomControl: true, attributionControl: true }).setView([-12.05, -77.03], 11);
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap', maxZoom: 19 }).addTo(R.map);
+    R.layer = L.layerGroup().addTo(R.map);
+    return true;
+  }
+
+  // ---------- modelo distancia por antena (referencias de Fusión RF) ----------
+  const MODELS = {};
+  async function modelOf(ant) {
+    if (MODELS[ant]) return MODELS[ant];
+    const Fx = window.__mdzFx; let refs = [];
+    const ok = r => isFinite(r.rssi) && isFinite(r.d) && r.d > 0;
+    try { if (Fx) { refs = (await Fx.loadRefs(ant)).filter(ok); const corto = String(ant).replace(/^[^-]+-\s*/, ''); if (!refs.length && corto !== ant) refs = (await Fx.loadRefs(corto)).filter(ok); } } catch (e) {}   // "LIMA-SANTA ANITA" también busca "SANTA ANITA"
+    let model = null;
+    if (refs.length >= 5) {
+      const X = refs.map(r => Math.log10(Math.max(5, r.d))), Y = refs.map(r => r.rssi), n = X.length;
+      const mx = X.reduce((s, x) => s + x, 0) / n, my = Y.reduce((s, y) => s + y, 0) / n;
+      const sxy = X.reduce((s, x, k) => s + (x - mx) * (Y[k] - my), 0), sxx = X.reduce((s, x) => s + (x - mx) ** 2, 0), syy = Y.reduce((s, y) => s + (y - my) ** 2, 0);
+      if (sxx > 0 && syy > 0) { const B = sxy / sxx, A = my - B * mx; if (B < -1) model = { A, B, r2: sxy * sxy / (sxx * syy) }; }
+    }
+    return (MODELS[ant] = { refs, model });
+  }
+  const quant = (a, q) => { const p = (a.length - 1) * q, i = Math.floor(p); return a[i] + (a[Math.min(a.length - 1, i + 1)] - a[i]) * (p - i); };
+  function distFor(M, rssi) {
+    if (rssi == null || rssi < 0) return { med: 1500, lo: 300, hi: 4000, via: 'sin RSSI' };
+    if (M.refs.length) {
+      let w = 8, near = [];
+      while (w <= 40) { near = M.refs.filter(r => Math.abs(r.rssi - rssi) <= w); if (near.length >= 3) break; w += 4; }
+      if (near.length) {
+        const D = near.map(r => r.d).sort((a, b) => a - b);
+        let med = quant(D, .5), lo = D.length >= 4 ? quant(D, .25) : D[0], hi = D.length >= 4 ? quant(D, .75) : D[D.length - 1];
+        if (hi - lo < 40) { lo = Math.max(0, med - 20); hi = med + 20; }
+        return { med, lo, hi, via: 'referencias' };
+      }
+    }
+    if (M.model) { const med = Math.min(100000, Math.max(5, Math.pow(10, (rssi - M.model.A) / M.model.B))); return { med, lo: med * .7, hi: med * 1.3, via: 'modelo' }; }
+    // modelo genérico: 255 ≈ 30 m · 50 ≈ 3 km (curva log-distancia aproximada)
+    const med = Math.min(8000, Math.max(20, Math.pow(10, 1.48 + (255 - Math.min(255, rssi)) * 2 / 205)));
+    return { med, lo: med * .5, hi: med * 1.8, via: 'genérico' };
+  }
+
+  // ---------- posición: multilateración por mínimos cuadrados en metros locales ----------
+  function locate(obs) {
+    const lat0 = obs.reduce((s, o) => s + o.lat, 0) / obs.length, lon0 = obs.reduce((s, o) => s + o.lon, 0) / obs.length;
+    const kx = 111320 * Math.cos(lat0 * Math.PI / 180), ky = 110540;
+    const P = obs.map(o => ({ x: (o.lon - lon0) * kx, y: (o.lat - lat0) * ky, d: o.dist.med, w: 1 / Math.max(400, ((o.dist.hi - o.dist.lo) / 2) ** 2) }));
+    if (obs.length === 1) return { lat: obs[0].lat, lon: obs[0].lon, err: obs[0].dist.hi, solo: true };
+    // inicio: centroide ponderado por cercanía
+    let sw = 0, x = 0, y = 0; P.forEach(p => { const w = 1 / Math.max(25, p.d) ** 2; sw += w; x += p.x * w; y += p.y * w; }); x /= sw; y /= sw;
+    for (let it = 0; it < 300; it++) {
+      let gx = 0, gy = 0, W = 0;
+      for (const p of P) { const dx = x - p.x, dy = y - p.y, r = Math.hypot(dx, dy) || 1, e = r - p.d; gx += p.w * e * dx / r; gy += p.w * e * dy / r; W += p.w; }
+      const step = .5 / W; x -= gx * step; y -= gy * step;
+      if (Math.hypot(gx * step, gy * step) < .05) break;
+    }
+    let se = 0, sw2 = 0; P.forEach(p => { const e = Math.hypot(x - p.x, y - p.y) - p.d; se += p.w * e * e; sw2 += p.w; });
+    const spread = Math.min(...obs.map(o => (o.dist.hi - o.dist.lo) / 2));
+    const err = Math.max(60, Math.sqrt(se / sw2) + spread * (obs.length >= 3 ? .6 : 1));
+    return { lat: lat0 + y / ky, lon: lon0 + x / kx, err };
+  }
+  const grad = k => { const C = [[56, 189, 248], [167, 139, 250], [244, 114, 182], [239, 68, 68]]; const p = Math.min(.999, Math.max(0, k)) * (C.length - 1), i = Math.floor(p), f = p - i; const c = C[i].map((v, j) => Math.round(v + (C[i + 1][j] - v) * f)); return `rgb(${c.join(',')})`; };
+
+  async function estimar() {
+    const d = loadData(), code = $('robo-code').value; if (!d || !code) return;
+    const Fx = window.__mdzFx; if (!Fx) { $('robo-out').innerHTML = '<div class="v21-msg err">No encuentro el módulo Fusión RF en esta página.</div>'; return; }
+    if (!ensureMap()) return;
+    await Fx.loadPsdMap();
+    const cat = Fx.catalogo();
+    let lect = (d.lect[code] || []).map(([psd, t, rssi, n]) => ({ psd, t, rssi, n }));
+    if (!lect.length) { $('robo-out').innerHTML = '<div class="v21-msg warn">No hay lecturas de este código.</div>'; return; }
+    const win = +$('robo-win').value, slotMin = +$('robo-slot').value, tLast = lect[lect.length - 1].t;
+    if (win) lect = lect.filter(l => l.t >= tLast - win * 3600e3);
+    // resolver PSD → antena con coordenadas (misma lógica que Fusión RF)
+    const ant = new Map(), sinAnt = new Set();
+    for (const l of lect) {
+      if (!ant.has(l.psd)) { const a = Fx.resolverPSD(l.psd, cat); ant.set(l.psd, a && isFinite(+a.lat) && isFinite(+a.lon) ? { ...a, lat: +a.lat, lon: +a.lon } : null); }
+      if (!ant.get(l.psd)) sinAnt.add(l.psd);
+    }
+    lect = lect.filter(l => ant.get(l.psd));
+    if (!lect.length) { $('robo-out').innerHTML = `<div class="v21-msg warn">No reconozco las antenas de este código (${[...sinAnt].map(esc).join(', ')}). Asócialas en <b>Fusión RF</b> (PSD → antena) y vuelve a estimar.</div>`; return; }
+    for (const a of new Set([...ant.values()].filter(Boolean).map(a => a.antena))) await modelOf(a);
+    // bloques de tiempo: en cada bloque, el mejor RSSI de cada antena
+    const slots = new Map();
+    for (const l of lect) { const k = Math.floor(l.t / (slotMin * 60e3)); let s = slots.get(k); if (!s) slots.set(k, s = { k, t0: l.t, t1: l.t, by: new Map() }); s.t1 = Math.max(s.t1, l.t); s.t0 = Math.min(s.t0, l.t); const a = ant.get(l.psd), o = s.by.get(a.antena); if (!o || l.rssi > o.rssi) s.by.set(a.antena, { ...a, rssi: l.rssi, n: (o ? o.n : 0) + l.n }); else o.n += l.n; }
+    const pts = [...slots.values()].sort((a, b) => a.k - b.k).map(s => {
+      const obs = [...s.by.values()].map(o => ({ ...o, dist: distFor(MODELS[o.antena], o.rssi) }));
+      return { ...s, obs, pos: locate(obs) };
+    });
+    // ranking de antenas
+    const rank = new Map();
+    for (const l of lect) { const a = ant.get(l.psd); let r = rank.get(a.antena); if (!r) rank.set(a.antena, r = { ...a, n: 0, max: -1, primer: l.t, ultimo: l.t, psd: new Set() }); r.n += l.n; r.max = Math.max(r.max, l.rssi); r.primer = Math.min(r.primer, l.t); r.ultimo = Math.max(r.ultimo, l.t); r.psd.add(l.psd); }
+    const ranking = [...rank.values()].map(r => ({ ...r, dist: distFor(MODELS[r.antena], r.max) })).sort((a, b) => b.ultimo - a.ultimo || b.max - a.max);
+
+    // ---------- dibujo ----------
+    R.layer.clearLayers();
+    const bounds = [];
+    ranking.forEach(r => {
+      L.marker([r.lat, r.lon], { zIndexOffset: 500, icon: L.divIcon({ className: '', iconSize: [20, 20], iconAnchor: [10, 10], html: `<div class="v25-tower"><i>📡</i>${esc(r.antena)}</div>` }) }).bindTooltip(`${esc(r.antena)} · ${r.n} lecturas · RSSI máx ${r.max}`).addTo(R.layer);
+      bounds.push([r.lat, r.lon]);
+    });
+    const last = pts[pts.length - 1];
+    last.obs.forEach(o => { // anillos del último bloque
+      const [out, inn] = Fx.ring([o.lat, o.lon], o.dist.lo, o.dist.hi);
+      L.polygon([out, inn], { color: '#f472b6', weight: 1.2, fillColor: '#f472b6', fillOpacity: .12, dashArray: '5 5', interactive: false }).addTo(R.layer);
+      out.forEach(p => bounds.push(p));
+    });
+    if (pts.length > 1) L.polyline(pts.map(p => [p.pos.lat, p.pos.lon]), { color: '#a78bfa', weight: 2.5, opacity: .8, dashArray: '2 6' }).addTo(R.layer);
+    pts.forEach((p, i) => {
+      if (i === pts.length - 1) return;
+      const c = grad(pts.length > 1 ? i / (pts.length - 1) : 1);
+      L.marker([p.pos.lat, p.pos.lon], { icon: L.divIcon({ className: '', iconSize: [26, 26], iconAnchor: [13, 13], html: `<div class="v25-pin" style="background:${c}">${i + 1}</div>` }) })
+        .bindTooltip(`#${i + 1} · ${fT(p.t0)}–${fT(p.t1).slice(6)} · ${p.obs.map(o => `${esc(o.antena)} (${o.rssi})`).join(', ')} · ±${fDist(p.pos.err)}`).addTo(R.layer);
+    });
+    L.circle([last.pos.lat, last.pos.lon], { radius: last.pos.err, color: '#ef4444', weight: 2, fillColor: '#ef4444', fillOpacity: .16 }).addTo(R.layer);
+    L.marker([last.pos.lat, last.pos.lon], { zIndexOffset: 1000, icon: L.divIcon({ className: '', iconSize: [34, 34], iconAnchor: [17, 17], html: '<div class="v25-now">🚨</div>' }) }).bindTooltip(`Zona más probable · ${fT(last.t1)} · ±${fDist(last.pos.err)}`).addTo(R.layer);
+    bounds.push([last.pos.lat, last.pos.lon]);
+    setTimeout(() => { try { R.map.invalidateSize(); R.map.fitBounds(bounds, { padding: [30, 30], maxZoom: 16 }); } catch (e) {} }, 60);
+
+    const vias = new Set(last.obs.map(o => o.dist.via)), cerca = ranking.slice().sort((a, b) => b.max - a.max)[0];
+    const gmaps = `https://www.google.com/maps?q=${last.pos.lat.toFixed(6)},${last.pos.lon.toFixed(6)}`;
+    R.last = { code, t: last.t1, lat: last.pos.lat, lon: last.pos.lon, err: last.pos.err, antena: cerca.antena, antenas: last.obs.map(o => `${o.antena} (RSSI ${o.rssi})`), gmaps };
+    $('robo-inc').disabled = false;
+    $('robo-out').innerHTML = `
+      <div class="v25-res" style="--c:#ef4444"><b>🚨 ${esc(code)}</b> fue visto por última vez el <b>${fT(last.t1)}</b>.<br>
+        Zona más probable: <b>${last.pos.lat.toFixed(5)}, ${last.pos.lon.toFixed(5)}</b> (± ${fDist(last.pos.err)}).
+        <small>${last.pos.solo ? `Solo lo vio <b>${esc(last.obs[0].antena)}</b> en ese momento: está en algún punto del anillo, a unos ${fDist(last.obs[0].dist.med)} de la antena.` : `Cruce de ${last.obs.length} antenas: ${last.obs.map(o => `${esc(o.antena)} (RSSI ${o.rssi} → ~${fDist(o.dist.med)})`).join(', ')}.`}
+        Distancias por ${[...vias].map(v => v === 'referencias' ? 'referencias guardadas de Fusión RF' : v === 'modelo' ? 'modelo ajustado con tus recorridos' : v === 'genérico' ? 'modelo genérico (aún sin referencias de esa antena)' : v).join(' y ')}.</small>
+        <div class="flex gap-2 flex-wrap mt-2"><a class="v21-mini" href="${gmaps}" target="_blank" rel="noopener">Abrir en Google Maps</a><button class="v21-mini" data-copy="${last.pos.lat.toFixed(6)}, ${last.pos.lon.toFixed(6)}">Copiar coordenadas</button></div></div>
+      <div class="card p-3"><p class="text-xs font-bold text-white mb-2">Recorrido estimado (${pts.length} bloque${pts.length === 1 ? '' : 's'} de ${slotMin} min)</p>
+        <div style="max-height:200px;overflow:auto"><table class="v21-tbl" style="width:100%"><tr><th>#</th><th>Hora</th><th>Antenas (RSSI)</th><th>±</th></tr>
+        ${pts.map((p, i) => `<tr><td><span class="v25-pin" style="display:inline-flex;width:20px;height:20px;font-size:10px;background:${i === pts.length - 1 ? '#ef4444' : grad(pts.length > 1 ? i / (pts.length - 1) : 1)}">${i + 1}</span></td><td>${fT(p.t0)}</td><td>${p.obs.map(o => `${esc(o.antena)} (${o.rssi})`).join(', ')}</td><td>${fDist(p.pos.err)}</td></tr>`).reverse().join('')}</table></div></div>
+      <div class="card p-3"><p class="text-xs font-bold text-white mb-2">Antenas que lo vieron</p>
+        <div style="max-height:220px;overflow:auto"><table class="v21-tbl" style="width:100%"><tr><th>Antena</th><th>Lecturas</th><th>RSSI máx</th><th>Distancia a RSSI máx</th><th>Último</th></tr>
+        ${ranking.map(r => `<tr><td><b>${esc(r.antena)}</b><br><small class="text-slate-500">${[...r.psd].map(esc).join(', ')}</small></td><td>${r.n.toLocaleString('es-PE')}</td><td>${r.max}</td><td>~${fDist(r.dist.med)}<br><small class="text-slate-500">${esc(r.dist.via)}</small></td><td>${fT(r.ultimo)}</td></tr>`).join('')}</table></div></div>
+      ${sinAnt.size ? `<div class="v21-msg warn">Sin coordenadas: ${[...sinAnt].map(esc).join(', ')}. Asócialas en <b>Fusión RF</b> para que también cuenten.</div>` : ''}`;
+    try { window.__mdzRafiReact && window.__mdzRafiReact('ok'); } catch (e) {}
+  }
+  sec.addEventListener('click', async e => {
+    const b = e.target.closest('button,a'); if (!b) return;
+    if (b.id === 'robo-go-mp') { window.setView('milton'); return; }
+    if (b.id === 'robo-run') { b.disabled = true; try { await estimar(); } catch (err) { console.error(err); toast('No se pudo estimar: ' + (err.message || err)); } b.disabled = false; return; }
+    if (b.dataset.copy) { try { await navigator.clipboard.writeText(b.dataset.copy); toast('Coordenadas copiadas'); } catch (er) { toast(b.dataset.copy); } return; }
+    if (b.id === 'robo-inc' && R.last) {
+      const X = R.last, Inc = window.__mdzInc; if (!Inc || !Inc.openForm) { toast('Abre primero el módulo de incidentes'); return; }
+      window.setView('inc');
+      setTimeout(() => {
+        Inc.openForm(null);
+        const set = (id, v) => { const el = $(id); if (el) el.value = v; };
+        set('if-punto', X.antena); set('if-tipo', 'ROBO'); set('if-sev', 'ALTA');
+        set('if-desc', `Código 2 ${X.code} visto por última vez el ${fT(X.t)}.\nZona estimada: ${X.lat.toFixed(6)}, ${X.lon.toFixed(6)} (± ${fDist(X.err)}).\nAntenas: ${X.antenas.join(', ')}.\n${X.gmaps}`);
+      }, 350);
+    }
+  });
+
+  /* =====================================================================
+     2) PERSONALIDAD DE RAFI SEGÚN EL TEMA (casco, gestos y reacciones) · solo dev
+        RAFI es una COPIA del astronauta: el del login no cambia.
+     ===================================================================== */
+  const PERS = {
+    nebula:    { n: 'Explorador curioso', tint: 0xc4b5fd, g: 'curioso', ok: ['¡Descubrimiento! ✨', '¡Eso salió perfecto!'], err: ['Hmm… algo raro pasó 🤔', 'Revisemos eso juntos'] },
+    aurora:    { n: 'Soñador tranquilo', tint: 0x99f6e4, g: 'vaiven', ok: ['¡Qué bonito quedó! 🌌', 'Listo, todo fluye'], err: ['Respira, lo arreglamos 🌿', 'Algo no salió, probemos otra vez'] },
+    marte:     { n: 'Comandante enérgico', tint: 0xfca5a5, g: 'saludo', ok: ['¡Misión cumplida! 🫡', '¡Así se hace, equipo!'], err: ['¡Alerta! Algo falló 🚨', 'Reagrupemos y reintentamos'] },
+    neon:      { n: 'Hacker ingenioso', tint: 0xf0abfc, g: 'glitch', ok: ['Hack completado 😎', '200 OK, como debe ser'], err: ['Error 404 de buena suerte 👾', 'Bug detectado, lo cazamos'] },
+    oceano:    { n: 'Buzo sereno', tint: 0x7dd3fc, g: 'flota', ok: ['¡Viento en popa! 🌊', 'Navegando sin problemas'], err: ['Marea brava, ya pasa 🌊', 'Ajustemos el rumbo'] },
+    solar:     { n: 'Optimista radiante', tint: 0xfde68a, g: 'gira', ok: ['¡Brillante! ☀️', '¡Día de victorias!'], err: ['Una nube pasajera ⛅', 'Tranqui, lo volvemos a intentar'] },
+    esmeralda: { n: 'Sabio paciente', tint: 0x86efac, g: 'asiente', ok: ['Bien hecho, con calma 🍃', 'Paso a paso, perfecto'], err: ['Cada error enseña algo 📜', 'Veamos con calma qué pasó'] },
+    sakura:    { n: 'Amable y detallista', tint: 0xfbcfe8, g: 'latido', ok: ['¡Te quedó hermoso! 🌸', 'Gracias por tu esfuerzo 💖'], err: ['Ups, no pasa nada 🌸', 'Lo resolvemos juntos 💗'] },
+    glaciar:   { n: 'Analista frío y preciso', tint: 0xe0f2fe, g: 'tirita', ok: ['Correcto. Precisión total ❄️', 'Dato registrado sin error'], err: ['Anomalía detectada ❄️', 'Valor fuera de rango, revisar'] },
+    dia:       { n: 'Ejecutivo cordial', tint: 0xe2e8f0, g: 'sobrio', ok: ['Listo, buen trabajo ✅', 'Hecho'], err: ['Hubo un problema, revisemos', 'No se completó la acción'] },
+  };
+  const themeKey = () => document.body.classList.contains('theme-day') ? 'dia' : (PERS[document.body.dataset.theme] ? document.body.dataset.theme : 'nebula');
+  const persNow = () => PERS[themeKey()];
+  let curTheme = null, glassMats = null, octoBase = null, reaction = null, lastReact = 0;
+  function applyLook(u, key) {
+    if (!glassMats) {
+      glassMats = [];
+      (u.head || { traverse() {} }).traverse(o => { const m = o.material; if (m && m.transparent && m.opacity < .5 && m.clearcoat != null) glassMats.push({ m, c: m.color.getHex(), op: m.opacity }); });
+      octoBase = (u.octoMats || []).map(m => ({ m, c: m.color.getHex(), e: m.emissive ? m.emissive.getHex() : 0 }));
+    }
+    const on = dev() && logged();
+    glassMats.forEach(g => { g.m.color.setHex(on ? PERS[key].tint : g.c); g.m.opacity = on ? Math.min(.34, g.op + .1) : g.op; g.m.needsUpdate = true; });
+  }
+  window.__mdzRafiTick = (t, wrap, u, q, cv) => {
+    const on = dev() && logged(), key = on ? themeKey() : 'off';
+    if (key !== curTheme) { curTheme = key; applyLook(u, on ? key : 'nebula'); }
+    if (wrap.userData.base == null) wrap.userData.base = wrap.scale.x;
+    let sc = 1;
+    if (on) {
+      const a = q; // menos movimiento cuando el panel está abierto o el mouse encima
+      switch (PERS[key].g) {
+        case 'curioso': wrap.rotation.z += Math.sin(t * .9) * .14 * a; break;
+        case 'vaiven': wrap.position.x += Math.sin(t * .7) * .05 * a; wrap.rotation.z += Math.sin(t * .7 + .6) * .07 * a; break;
+        case 'saludo': { const p = (t % 5) / 5; if (p < .12) wrap.rotation.x += Math.sin(p / .12 * Math.PI) * .35 * a; break; }
+        case 'glitch': if (Math.sin(t * 6.3) > .985 || Math.sin(t * 9.1) > .99) { wrap.position.x += (Math.random() - .5) * .08 * a; wrap.rotation.y += (Math.random() - .5) * .3 * a; } break;
+        case 'flota': wrap.position.y += Math.sin(t * 1.1) * .07 * a; wrap.rotation.z += Math.sin(t * 1.1 + 1) * .09 * a; break;
+        case 'gira': wrap.rotation.y += Math.sin(t * .45) * .9 * a; break;
+        case 'asiente': wrap.rotation.x += Math.sin(t * .8) * .09 * a; break;
+        case 'latido': { const p = t % 1.4; sc = 1 + (p < .14 ? Math.sin(p / .14 * Math.PI) * .06 : p > .24 && p < .38 ? Math.sin((p - .24) / .14 * Math.PI) * .04 : 0) * a; break; }
+        case 'tirita': wrap.rotation.z += Math.sin(t * 55) * .012 * a; break;
+      }
+    }
+    // reacciones a aciertos y errores
+    if (reaction) {
+      const k = (performance.now() - reaction.t0) / reaction.dur;
+      if (k >= 1) { if (reaction.type === 'err') octoBase.forEach(o => { o.m.color.setHex(o.c); if (o.m.emissive) o.m.emissive.setHex(o.e); }); reaction = null; }
+      else if (reaction.type === 'ok') { wrap.position.y += Math.sin(k * Math.PI) * .28; wrap.rotation.y += k * Math.PI * 2; sc *= 1 + Math.sin(k * Math.PI) * .08; }
+      else { wrap.rotation.z += Math.sin(k * 42) * .28 * (1 - k); wrap.position.x += Math.sin(k * 55) * .05 * (1 - k); }
+    }
+    wrap.scale.setScalar(wrap.userData.base * sc);
+  };
+  function react(type) {
+    if (!(dev() && logged())) return;
+    const now = performance.now(); if (now - lastReact < 2500) return; lastReact = now;
+    reaction = { type, t0: now, dur: type === 'ok' ? 1100 : 1400 };
+    if (type === 'err' && octoBase) octoBase.forEach((o, i) => { o.m.color.setHex(i === 2 ? 0xfecaca : i === 1 ? 0x7f1d1d : 0xef4444); if (o.m.emissive) o.m.emissive.setHex(0x450a0a); });
+    const P = persNow(), hello = $('rafi-hello'), pop = $('rafi-pop');
+    if (hello && !(pop && pop.classList.contains('on'))) { const L2 = P[type]; hello.textContent = L2[Math.floor(Math.random() * L2.length)]; hello.classList.add('on'); clearTimeout(react.tm); react.tm = setTimeout(() => hello.classList.remove('on'), 2600); }
+  }
+  window.__mdzRafiReact = react;
+  // escucha los avisos del tablero (toast) para reaccionar sin tocar cada módulo
+  const RE_ERR = /error|no se pudo|no se guard|no se borr|inv[aá]lid|fall[oó]|denegad|sin conexi[oó]n|rechaz|solo para dev/i;
+  const RE_OK = /guardad|listo|enviad|registrad|actualizad|borrad|agregad|subid|copiad|exportad|sincronizad|respuesta guardada|hecho/i;
+  const tmsg = $('toast-msg');
+  if (tmsg) new MutationObserver(() => { const m = tmsg.textContent || ''; if (RE_ERR.test(m)) react('err'); else if (RE_OK.test(m)) react('ok'); }).observe(tmsg, { childList: true, characterData: true, subtree: true });
+
+  /* =====================================================================
+     3) RAFI CON IA · pestaña "Pregúntame" (Supabase Edge Function "rafi-ia")
+        La clave de la IA NO está aquí: vive como secreto en Supabase.
+     ===================================================================== */
+  const CHAT = { hist: [], busy: false, on: false };
+  const SUG = ['¿Qué debo revisar hoy?', '¿Cómo está el grupo electrógeno?', '¿Hay incidentes abiertos?', 'Resume los códigos 2', '¿Cómo va la caja chica?'];
+  function contexto() {
+    const out = { vista: [...document.querySelectorAll('section[id^="view-"]')].find(s => !s.classList.contains('ui-hidden'))?.id?.slice(5) || null };
+    out.avisos_rafi = (window.__mdzRafiAlerts || []).slice(0, 30).map(a => ({ nivel: a.lvl, texto: a.txt }));
+    try {
+      const inv = { puntos: 0, fijos: 0, moviles: 0, con_coordenadas: 0, visitados: 0, por_tecnologia: {} };
+      (typeof excelData !== 'undefined' ? excelData : []).forEach(r => { const i = info(r); inv.puntos++; i.movil ? inv.moviles++ : inv.fijos++; if (i.ok) inv.con_coordenadas++; if (i.visitado) inv.visitados++; const t = i.tec || 'SIN ESPECIFICAR'; inv.por_tecnologia[t] = (inv.por_tecnologia[t] || 0) + 1; });
+      out.inventario = inv;
+    } catch (e) {}
+    const mp = window.__mdzMpLast;
+    if (mp && mp.kpi) out.miltonpro = { desde: fT(mp.tmin), hasta: fT(mp.tmax), lecturas: mp.total, antenas: mp.nPsd, moviles: mp.nMov, kpi: mp.kpi,
+      codigos2: (mp.s2 || []).slice().sort((a, b) => b.ultimo - a.ultimo).slice(0, 40).map(c => ({ codigo: c.mov, lecturas: c.lecturas, antenas: c.antenas, rssi_medio: c.media, primer: fT(c.primer), ultimo: fT(c.ultimo), ultima_antena: c.ultPsd })) };
+    if (R.last) out.ultima_estimacion_robo = { codigo: R.last.code, visto: fT(R.last.t), lat: +R.last.lat.toFixed(5), lon: +R.last.lon.toFixed(5), margen_m: Math.round(R.last.err), antenas: R.last.antenas };
+    return out;
+  }
+  const mdLite = s => esc(s).replace(/\*\*(.+?)\*\*/g, '<b>$1</b>').replace(/^\s*[-*•]\s+/gm, '• ');
+  function chatHtml() {
+    const P = persNow();
+    return `<div class="v25-chat"><div class="v25-mode">Modo: <b>${esc(P.n)}</b> · respondo con los datos de tu tablero</div>
+      <div class="v25-msgs" id="v25-msgs">${CHAT.hist.length ? CHAT.hist.map(m => `<div class="v25-m ${m.role === 'user' ? 'u' : m.err ? 'e' : 'a'}">${m.role === 'user' ? esc(m.text) : mdLite(m.text)}${m.meta ? `<small>${esc(m.meta)}</small>` : ''}</div>`).join('')
+        : `<div class="v25-m a">¡Hola! Pregúntame lo que quieras sobre el grupo electrógeno, la sala de servidores, incidentes, caja chica, el inventario o los códigos 2 de MiltonPro.</div>`}
+        ${CHAT.busy ? '<div class="v25-m a"><span class="v25-dots">Pensando</span></div>' : ''}</div>
+      ${CHAT.hist.length ? '' : `<div class="v25-sug">${SUG.map(s => `<button type="button" data-sug="${esc(s)}">${esc(s)}</button>`).join('')}</div>`}
+      <div class="v25-in"><textarea id="v25-q" rows="2" maxlength="1000" placeholder="Escribe tu pregunta…" aria-label="Pregunta para RAFI"></textarea><button type="button" id="v25-send" ${CHAT.busy ? 'disabled' : ''} aria-label="Enviar">➤</button></div>
+      ${CHAT.hist.length ? '<div class="v25-sug"><button type="button" data-clear="1">Nueva conversación</button></div>' : ''}</div>`;
+  }
+  function drawChat() {
+    const pop = $('rafi-pop'); if (!pop || !CHAT.on) return;
+    const body = pop.querySelector('.rp-body'); if (!body) return;
+    const q = $('v25-q'), keep = q ? q.value : '';
+    body.innerHTML = chatHtml();
+    const m = $('v25-msgs'); if (m) m.scrollTop = m.scrollHeight;
+    const nq = $('v25-q'); if (nq) { nq.value = keep; }
+  }
+  async function errText(error) {
+    try { const ctx = error && error.context; if (ctx && typeof ctx.json === 'function') { const j = await ctx.clone().json(); if (j && j.error) return j.error; } } catch (e) {}
+    const m = String(error && error.message || error);
+    if (/Failed to send|fetch|FunctionsFetchError|404|not found/i.test(m)) return 'No encuentro la función "rafi-ia" en Supabase. Sigue la guía de instalación (paso 3) para publicarla.';
+    return m;
+  }
+  async function ask(texto) {
+    texto = String(texto || '').trim().slice(0, 1000); if (!texto || CHAT.busy) return;
+    const c = sb(); if (!c || !c.functions) { toast('Sin conexión con Supabase'); return; }
+    const historial = CHAT.hist.filter(m => !m.err).slice(-8).map(m => ({ role: m.role, text: m.text }));
+    CHAT.hist.push({ role: 'user', text: texto }); CHAT.busy = true; drawChat();
+    try {
+      const { data, error } = await c.functions.invoke('rafi-ia', { body: { pregunta: texto, historial, contexto: contexto(), personalidad: persNow().n } });
+      if (error) throw error;
+      if (!data || !data.respuesta) throw new Error((data && data.error) || 'Respuesta vacía');
+      CHAT.hist.push({ role: 'assistant', text: data.respuesta, meta: [data.proveedor === 'anthropic' ? 'Claude' : 'Gemini', data.modelo].filter(Boolean).join(' · ') });
+      react('ok');
+    } catch (e) {
+      CHAT.hist.push({ role: 'assistant', err: true, text: await errText(e) }); react('err');
+    } finally { CHAT.busy = false; drawChat(); const q = $('v25-q'); if (q) q.focus(); }
+  }
+  function mountChatTab() {
+    const pop = $('rafi-pop'); if (!pop || !pop.classList.contains('v10')) return;
+    const tabs = pop.querySelector('.rp-tabs'); if (!tabs) return;
+    const has = tabs.querySelector('[data-tab="ia"]'), ok = logged() && dev();
+    if (!ok) { if (has) has.remove(); CHAT.on = false; return; }
+    if (has) return;
+    const b = document.createElement('button'); b.dataset.tab = 'ia'; b.textContent = 'Pregúntame'; tabs.appendChild(b);
+    if (pop.dataset.v25) return; pop.dataset.v25 = '1';
+    // capturamos antes que el manejador de v10 para no tocar su lógica de pestañas
+    pop.addEventListener('click', e => {
+      const t = e.target.closest('[data-tab]');
+      if (t) {
+        if (t.dataset.tab === 'ia') { e.stopPropagation(); CHAT.on = true; pop.querySelectorAll('.rp-tabs button').forEach(x => x.classList.toggle('on', x === t)); drawChat(); setTimeout(() => { const q = $('v25-q'); if (q) q.focus(); }, 30); }
+        else CHAT.on = false;
+        return;
+      }
+      if (!CHAT.on) return;
+      const s = e.target.closest('[data-sug]'); if (s) { e.stopPropagation(); ask(s.dataset.sug); return; }
+      if (e.target.closest('[data-clear]')) { e.stopPropagation(); CHAT.hist = []; drawChat(); return; }
+      if (e.target.closest('#v25-send')) { e.stopPropagation(); const q = $('v25-q'); ask(q && q.value); return; }
+    }, true);
+    pop.addEventListener('keydown', e => { if (CHAT.on && e.target.id === 'v25-q' && e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); ask(e.target.value); } });
+    // al abrir el panel, v10 dibuja su pestaña: si la nuestra estaba activa, la volvemos a mostrar
+    new MutationObserver(() => { if (CHAT.on && pop.classList.contains('on') && !pop.querySelector('.v25-chat')) { pop.querySelectorAll('.rp-tabs button').forEach(x => x.classList.toggle('on', x.dataset.tab === 'ia')); drawChat(); } }).observe(pop.querySelector('.rp-body') || pop, { childList: true });
+  }
+
+  const _ar = window.applySessionRoleUI;
+  if (typeof _ar === 'function') window.applySessionRoleUI = function () { const r = _ar.apply(this, arguments); syncRole(); return r; };
+  setInterval(() => { syncRole(); mountChatTab(); if (!(logged() && dev()) && CHAT.hist.length) { CHAT.hist = []; CHAT.on = false; } }, 1000);
+  syncRole();
+})();
+</script>
+
 </body>
 </html>
