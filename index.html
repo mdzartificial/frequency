@@ -11652,7 +11652,8 @@ html body.dx .dx-halo.crit{ animation:dxRadar 1.7s ease-out infinite; }
   const missing = e => e && (/does not exist|schema cache|PGRST205|42P01/i.test(e.message || '') || e.code === '42P01' || e.code === 'PGRST205');
   const errBox = e => missing(e)
     ? `<div class="v21-msg warn">Falta crear las tablas en Supabase: ejecuta <code>${SQLF}</code> una vez en el SQL Editor y vuelve a abrir este módulo.</div>`
-    : `<div class="v21-msg err">No se pudo leer de Supabase: ${esc(e && e.message || e)}</div>`;
+    : `<div class="v21-msg err">No se pudo leer de Supabase: ${esc(e && e.message || e)}${e && e.code ? ` <code>${esc(e.code)}</code>` : ''}${/permission denied|42501|row-level security/i.test((e && (e.message + ' ' + e.code)) || '') ? '<br>Permiso denegado: ejecuta <code>supabase_v22_reparar_modulos.sql</code> y vuelve a iniciar sesión con tu código 2FA.' : ''}</div>`;
+  const rlsEmpty = () => `<div class="v21-msg warn">Supabase respondió sin datos. Si ya ejecutaste el SQL, lo más probable es que tu sesión no tenga el 2FA vigente para estas tablas: pulsa Salir, entra de nuevo con tu código 2FA y vuelve a abrir el módulo. Si sigue igual, ejecuta <code>supabase_v22_reparar_modulos.sql</code>.</div>`;
   // Monto con formatos mixtos → número (S/.5700,00 · S/.4,842.00 · 3040.02)
   function parseMonto(v) {
     if (typeof v === 'number') return n2(v);
@@ -11756,7 +11757,7 @@ html body.dx .dx-halo.crit{ animation:dxRadar 1.7s ease-out infinite; }
     ]);
     if (r.error) { DS.err = r.error; DS.rows = []; $('dir-msg').innerHTML = errBox(r.error); dirDraw(); return; }
     DS.err = null; DS.rows = r.data || []; DS.precios = new Map(((p && p.data) || []).map(x => [x.punto, Number(x.precio)]));
-    $('dir-msg').innerHTML = ''; dirDraw();
+    $('dir-msg').innerHTML = DS.rows.length ? '' : rlsEmpty(); dirDraw();
   }
   function dirDraw() {
     const I = invIndex();
@@ -11874,7 +11875,7 @@ html body.dx .dx-halo.crit{ animation:dxRadar 1.7s ease-out infinite; }
     ]);
     const bad = [m, p, v, e].find(x => x.error);
     if (bad) { CS.err = bad.error; $('caja-msg').innerHTML = errBox(bad.error); $('caja-body').innerHTML = ''; return; }
-    CS.err = null; $('caja-msg').innerHTML = '';
+    CS.err = null; $('caja-msg').innerHTML = (!(v.data || []).length && !(p.data || []).length) ? rlsEmpty() : '';
     CS.mov = m.data || []; CS.pl = p.data || []; CS.est = e.data || [];
     (v.data || []).forEach(x => CS.vi[x.perfil] = x);
     CS.zona = (z && z.data) ? z.data : null;
