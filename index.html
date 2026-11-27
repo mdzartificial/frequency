@@ -1442,11 +1442,6 @@ body:not(.theme-day):not(.hunter-preauth) .panel,body:not(.theme-day):not(.hunte
 #lt-o .sc{overflow:auto;padding:10px}#lt-o table{border-collapse:collapse;width:100%}#lt-o td,#lt-o th{border:1px solid #fff2;padding:2px}
 #lt-o input{width:100%;min-width:90px;background:#0008;color:#fff;padding:4px;border:0;outline:0}#lt-o button{padding:4px 10px;border-radius:8px;background:#ffffff18;color:#fff;font-weight:700;margin:2px}
 </style>
-<style id="hunter-sin-transicion">
-#transition-meter{display:none!important}
-section[id^="view-"],section.view,.fade{animation:none!important;transition:none!important}
-.marker-blink{animation:none!important}
-</style>
 </head>
 <body class="hunter-preauth">
   <!-- =========================================================
@@ -1592,7 +1587,7 @@ section[id^="view-"],section.view,.fade{animation:none!important;transition:none
         <svg class="hud-ico" viewBox="0 0 24 24"><polygon points="12 2.5 21 8.5 12 14.5 3 8.5"/><path d="M3 13l9 6 9-6"/><path d="M3 17l9 6 9-6" opacity="0.65"/></svg>
       </button>
 
-      <button id="nav-noc" data-v="noc" onclick="setView('noc')" title="Tabla de Disponibilidad">
+      <button id="nav-noc" data-v="noc" onclick="setView('noc')" title="Tabla de disponibilidad">
         <svg class="hud-ico" viewBox="0 0 24 24"><rect x="2.5" y="4" width="19" height="14" rx="2.5"/><path d="M5.5 12h3l1.7-4 2.6 7 1.8-3H18.5"/><path d="M8.5 21h7M12 18v3"/></svg>
       </button>
 
@@ -1648,7 +1643,7 @@ section[id^="view-"],section.view,.fade{animation:none!important;transition:none
           </div>
 
           <div class="mt-auto pt-4 border-t border-white/10">
-            <h2 class="text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-2">Skynet Status</h2>
+            <h2 class="text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-2">Supabase Status</h2>
             <div class="chip px-3.5 py-2.5 flex items-center justify-between">
               <span class="text-xs font-semibold text-slate-300">Estado</span>
               <span class="inline-flex items-center gap-2 text-xs font-bold tracking-wider">
@@ -1794,7 +1789,7 @@ section[id^="view-"],section.view,.fade{animation:none!important;transition:none
           <div class="flex flex-wrap items-center justify-between gap-3 px-5 pt-4 pb-3 border-b border-white/10">
             <div>
               <h2 class="text-base font-bold text-white flex items-center gap-2">
-                <i class="fa-solid fa-chart-line text-[var(--accent)]"></i> Tabla de Disponibilidad
+                <i class="fa-solid fa-chart-line text-[var(--accent)]"></i> Tabla de disponibilidad
               </h2>
               <p class="text-[11px] text-slate-400">DETEKTOR · REPOTENCIADOS · LOJACK · <span id="nocBannerCorte" class="text-slate-300">Esperando reportes...</span></p>
             </div>
@@ -1923,7 +1918,7 @@ section[id^="view-"],section.view,.fade{animation:none!important;transition:none
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-4">
               <div class="lg:col-span-5 card p-4 space-y-2.5 text-xs">
                 <h3 class="text-xs font-bold uppercase tracking-wider text-slate-300">2. Guardar Consulta / Guía</h3>
-                <select id="rafi-faq-cat" class="sel w-full max-w-none"><option value="CONSOLA NOC">Tabla de Disponibilidad</option><option value="COMANDOS AT">Comandos AT</option><option value="MAPA / GPS">Mapa / GPS</option><option value="RED / RF">Red / RF</option></select>
+                <select id="rafi-faq-cat" class="sel w-full max-w-none"><option value="CONSOLA NOC">Tabla de disponibilidad</option><option value="COMANDOS AT">Comandos AT</option><option value="MAPA / GPS">Mapa / GPS</option><option value="RED / RF">Red / RF</option></select>
                 <input id="rafi-faq-q" type="text" placeholder="Pregunta frecuente..." class="w-full px-3 py-2 rounded-lg bg-black/40 border border-white/10 text-white outline-none focus:border-[var(--accent)]">
                 <textarea id="rafi-faq-a" rows="3" placeholder="Respuesta o procedimiento paso a paso..." class="w-full px-3 py-2 rounded-lg bg-black/40 border border-white/10 text-white outline-none focus:border-[var(--accent)]"></textarea>
                 <button type="button" onclick="saveRafiQuestion()" class="btn w-full py-2 rounded-lg text-xs font-bold text-white cursor-pointer">Guardar en RAFI</button>
@@ -2100,9 +2095,13 @@ section[id^="view-"],section.view,.fade{animation:none!important;transition:none
       "TARJETA","TRIMMER (OHM)","MODO DE RADIO","TIPO","LATITUD","LONGITUD","PRECIO DE ALQUILER MENSUAL",
       "PRECIO DE EQUIPOS","OBSERVACION"
     ];
+    // v26: columnas nuevas que agrega el dev (se guardan en "extras") y nombres visibles
+    function mdzHeaders() { const c = Array.isArray(window.__mdzCustomCols) ? window.__mdzCustomCols : []; return [...SKYNET_CANONICAL_HEADERS, ...c.filter(k => !SKYNET_CANONICAL_HEADERS.includes(k))]; }
+    const MDZ_LABELS = { "MODEM SIM": "MODEM SIM QUECLINK" };
+    const mdzLabel = k => MDZ_LABELS[String(k).toUpperCase()] || k;
 
     const DEFAULT_RAFI_FAQS = [
-      { id: "faq-1", cat: "CONSOLA NOC", q: "¿Cuándo un punto pasa a estado ROJO en la Tabla de Disponibilidad?", a: "Cuando supera el umbral de horas sin reportar configurado en 'Amarillo' (por defecto > 48 horas), salvo que figure como DESINSTALADO." },
+      { id: "faq-1", cat: "CONSOLA NOC", q: "¿Cuándo un punto pasa a estado ROJO en la Tabla de disponibilidad?", a: "Cuando supera el umbral de horas sin reportar configurado en 'Amarillo' (por defecto > 48 horas), salvo que figure como DESINSTALADO." },
       { id: "faq-2", cat: "COMANDOS AT", q: "¿Cómo saber si un reseteador usa AT+GTDOS o AT+GTOUT?", a: "Revisa el prefijo del IMEI en la tarjeta del punto: GV58CG, GV58LAU y GV57CG usan AT+GTDOS; GV300W y GV55W usan AT+GTOUT." },
       { id: "faq-3", cat: "MAPA / GPS", q: "¿Cómo ubicar las antenas más cercanas a un punto GPS?", a: "En Mapa Táctico, pulsa 'Colocar Punto GPS' y haz clic en el mapa o ingresa latitud y longitud para ver el Top 5 más cercano." }
     ];
@@ -2697,7 +2696,7 @@ section[id^="view-"],section.view,.fade{animation:none!important;transition:none
       const row = excelData[rowIndex]; if (!row) return;
       $("editor-modal-title").textContent = `Ficha del Registro #${rowIndex + 1}`;
       $("btn-delete-record").classList.remove("ui-hidden");
-      $("editor-fields-container").innerHTML = SKYNET_CANONICAL_HEADERS.map(k => `<div><label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">${escapeHtml(k)}</label><input type="text" data-col="${escapeHtml(k)}" value="${escapeHtml(row[k] ?? "")}" class="dev-modal-field w-full px-3 py-2 text-xs rounded-lg bg-black/40 border border-white/10 text-white outline-none focus:border-[var(--accent)]"></div>`).join("");
+      $("editor-fields-container").innerHTML = mdzHeaders().map(k => `<div><label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">${escapeHtml(mdzLabel(k))}</label><input type="text" data-col="${escapeHtml(k)}" value="${escapeHtml(row[k] ?? "")}" class="dev-modal-field w-full px-3 py-2 text-xs rounded-lg bg-black/40 border border-white/10 text-white outline-none focus:border-[var(--accent)]"></div>`).join("");
       $("record-editor-modal").classList.remove("ui-hidden");
     }
 
@@ -2706,7 +2705,7 @@ section[id^="view-"],section.view,.fade{animation:none!important;transition:none
       editingRowIndex = -1;
       $("editor-modal-title").textContent = "Agregar Nuevo Punto";
       $("btn-delete-record").classList.add("ui-hidden");
-      $("editor-fields-container").innerHTML = SKYNET_CANONICAL_HEADERS.map(k => `<div><label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">${escapeHtml(k)}</label><input type="text" data-col="${escapeHtml(k)}" value="" placeholder="${escapeHtml(k)}..." class="dev-modal-field w-full px-3 py-2 text-xs rounded-lg bg-black/40 border border-white/10 text-white outline-none focus:border-[var(--accent)]"></div>`).join("");
+      $("editor-fields-container").innerHTML = mdzHeaders().map(k => `<div><label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">${escapeHtml(mdzLabel(k))}</label><input type="text" data-col="${escapeHtml(k)}" value="" placeholder="${escapeHtml(mdzLabel(k))}..." class="dev-modal-field w-full px-3 py-2 text-xs rounded-lg bg-black/40 border border-white/10 text-white outline-none focus:border-[var(--accent)]"></div>`).join("");
       $("record-editor-modal").classList.remove("ui-hidden");
     }
 
@@ -2739,8 +2738,9 @@ section[id^="view-"],section.view,.fade{animation:none!important;transition:none
 
     function exportModifiedExcel() {
       if (!isDevRole() || !excelData.length) return;
-      const cleanRows = excelData.map(r => { const obj = {}; SKYNET_CANONICAL_HEADERS.forEach(c => { obj[c] = r[c] !== undefined ? r[c] : ""; }); return obj; });
-      const ws = XLSX.utils.json_to_sheet(cleanRows, { header: SKYNET_CANONICAL_HEADERS });
+      const H = mdzHeaders();
+      const cleanRows = excelData.map(r => { const obj = {}; H.forEach(c => { obj[c] = r[c] !== undefined ? r[c] : ""; }); return obj; });
+      const ws = XLSX.utils.json_to_sheet(cleanRows, { header: H });
       const wb = XLSX.utils.book_new();
       XLSX.utils.book_append_sheet(wb, ws, "LISTA DEFINITIVA");
       XLSX.writeFile(wb, `MDZ_HUNTER_${new Date().toISOString().slice(0, 10)}.xlsx`);
@@ -2804,7 +2804,7 @@ section[id^="view-"],section.view,.fade{animation:none!important;transition:none
                   <div class="flex items-center justify-between pb-2.5 mb-3 border-b border-white/10"><h4 class="text-xs font-bold text-white uppercase">Reseteador (${escapeHtml(eq.modelo)})</h4></div>
                   <div class="mb-3">${cmds}</div>
                   <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
-                    <div class="chip px-3 py-2 flex justify-between gap-2"><span class="text-slate-400">IMEI RESETEADOR</span><span class="mono font-bold text-white truncate">${escapeHtml(imei)}</span></div>
+                    <div class="chip px-3 py-2 flex justify-between gap-2"><span class="text-slate-400">IMEI</span><span class="mono font-bold text-white truncate">${escapeHtml(imei)}</span></div>
                     <div class="chip px-3 py-2 flex justify-between gap-2"><span class="text-slate-400">SIM ${op ? `<span class="px-1.5 py-0.5 rounded border text-[9px] ${oc}">${op}</span>` : ""}</span><span class="mono font-bold text-white truncate">${escapeHtml(sim)}</span></div>
                   </div>
                 </div>
@@ -2830,19 +2830,26 @@ section[id^="view-"],section.view,.fade{animation:none!important;transition:none
 
     function renderAdditionalData(row, excluded, realIdx) {
       const dev = isDevRole(), ex = new Set(excluded.filter(Boolean).map(k => String(k).toUpperCase()));
-      let h = "";
-      const _rk = k => { const n = normalizeText(k).replace(/[^a-z0-9]/g, ""); if (n.includes("slot")) return 100; const o = ["pl", "cp", "status", "modemqueclink", "modemsim", "radio", "vlu"]; const p = o.indexOf(n); return p < 0 ? 50 : p; };
-      Object.entries(row).map((e, ix) => [e, ix]).sort((a, b) => _rk(a[0][0]) - _rk(b[0][0]) || a[1] - b[1]).map(x => x[0]).forEach(([k, v]) => {
-        if (k.startsWith("_") || ex.has(k.toUpperCase())) return;
+      // v26: orden → ID/PL, CP, STATUS, MODEM QUECLINK, MODEM SIM QUECLINK, RADIO, VLU · luego el resto · los SLOT al final
+      const TOP = ["ID", "PL", "CP", "STATUS", "MODEM QUECLINK", "MODEM SIM", "RADIO", "VLU"];
+      const isSlot = k => /SLOT/i.test(k);
+      const keys = Object.keys(row).filter(k => !k.startsWith("_") && !ex.has(k.toUpperCase()));
+      (Array.isArray(window.__mdzCustomCols) ? window.__mdzCustomCols : []).forEach(c => { if (!keys.includes(c) && !ex.has(c)) keys.push(c); });
+      const rank = k => { const i = TOP.indexOf(k.toUpperCase()); return i >= 0 ? i : isSlot(k) ? 900 : 100; };
+      keys.sort((a, b) => rank(a) - rank(b));
+      let h = "", slotHead = false;
+      keys.forEach(k => {
+        const v = row[k];
         if (!dev && isEmpty(v)) return;
-        const n = normalizeText(k), safeCol = k.replace(/\\/g, "\\\\").replace(/'/g, "\\'");
+        const n = normalizeText(k), safeCol = k.replace(/\\/g, "\\\\").replace(/'/g, "\\'"), lab = mdzLabel(k), top = rank(k) < 100;
+        if (isSlot(k) && !slotHead) { slotHead = true; h += `<div class="col-span-full v26-slot-h">Slots de transmisión</div>`; }
         if (n === "vlu") {
           const vHtml = dev ? `<input type="text" value="${escapeHtml(v ?? "")}" onchange="updateCardFieldInline(${realIdx}, '${escapeHtml(safeCol)}', this.value, false)" class="inline-dev-input text-sm font-bold text-amber-200 mt-1">` : `<p class="text-sm font-bold text-amber-200 break-words mt-0.5">${escapeHtml(v)}</p>`;
           h += `<div class="col-span-full p-2.5 rounded-xl bg-amber-500/10 border border-amber-400/25"><p class="text-[10px] font-bold text-amber-300 uppercase">VLU</p>${vHtml}</div>`;
           return;
         }
         const fHtml = dev ? `<input type="text" value="${escapeHtml(v ?? "")}" onchange="updateCardFieldInline(${realIdx}, '${escapeHtml(safeCol)}', this.value, false)" class="inline-dev-input text-xs font-semibold mt-1">` : `<p class="text-xs font-semibold text-white break-words mt-0.5">${escapeHtml(v)}</p>`;
-        h += `<div class="chip px-2.5 py-2"><p class="text-[9px] font-bold uppercase text-slate-400 truncate">${escapeHtml(/^\s*modem\s*sim\s*$/i.test(k) ? "MODEM SIM QUECLINK" : k)}</p>${fHtml}</div>`;
+        h += `<div class="chip px-2.5 py-2${top ? " v26-key" : ""}${isSlot(k) ? " v26-slot" : ""}"><p class="text-[9px] font-bold uppercase text-slate-400 truncate" title="${escapeHtml(lab)}">${escapeHtml(lab)}</p>${fHtml}</div>`;
       });
       return h || `<div class="col-span-full text-xs text-slate-500 italic">Sin datos adicionales.</div>`;
     }
@@ -2854,7 +2861,7 @@ section[id^="view-"],section.view,.fade{animation:none!important;transition:none
 
     function setView(v) {
       if (!excelData.length && v !== "noc" && v !== "rafi") { showToast("Sin datos cargados"); return; }
-      if (isNocOnlyRole() && !["filter", "noc", "rafi"].includes(v)) { showToast("Acceso solo a Búsqueda, NOC y RAFI"); v = "filter"; }
+      if (isNocOnlyRole() && !["filter", "noc", "rafi"].includes(v)) { showToast("Acceso solo a Búsqueda, Disponibilidad y RAFI"); v = "filter"; }
       document.querySelectorAll(".rail button[data-v]").forEach(b => b.classList.toggle("on", b.dataset.v === v));
       $("side").classList.toggle("ui-hidden", v !== "filter");
       $("view-filter").classList.toggle("ui-hidden", v !== "filter");
@@ -3020,7 +3027,7 @@ section[id^="view-"],section.view,.fade{animation:none!important;transition:none
       const pts = []; let miss = 0;
       const validPoints = src.map(info).filter(i => { if (!i.ok) miss++; return i.ok; });
       validPoints.forEach(i => {
-        L.circleMarker([i.lat, i.lon], { radius: 6.5, color: col(i), fillColor: col(i), fillOpacity: 0.85, weight: 1.8, className: "" }).bindPopup(popupHtml(i), { maxWidth: 320 }).addTo(layer);
+        L.circleMarker([i.lat, i.lon], { radius: 6.5, color: col(i), fillColor: col(i), fillOpacity: 0.85, weight: 1.8, className: i.visitado ? "" : "marker-blink" }).bindPopup(popupHtml(i), { maxWidth: 320 }).addTo(layer);
         pts.push([i.lat, i.lon]);
       });
       map.addLayer(layer);
@@ -5974,7 +5981,7 @@ animate();
 
 <script>
 (function(){const f=document.createElement('div');f.id='rafi-fab';f.innerHTML='<div id="rafi-pop"><b>🚀 ¡Hola, soy RAFI!</b><p style="margin:6px 0">¿Qué buscas?</p><div id="rafi-guide" style="display:grid;gap:4px"></div><textarea id="rafi-cq" rows="2" placeholder="Escribe tu consulta o pregunta..."></textarea><button class="rb" id="rafi-send">Enviar consulta</button><div id="rafi-inbox" style="margin-top:8px"></div></div><button id="rafi-btn" title="RAFI">🚀</button>';
-function mount(){document.body.appendChild(f);const g=f.querySelector('#rafi-guide');[['filter','Buscar puntos / antenas'],['map','Mapa táctico y GPS'],['tech','Analizador de tecnologías'],['maint','Plan de mantenimiento'],['price','Analizador de precios'],['noc','Tabla de Disponibilidad'],['rast','Rastreadores'],['rafi','Centro de consola / FAQ']].forEach(([v,t])=>{const b=document.createElement('button');b.textContent='→ '+t;b.style.cssText='text-align:left;padding:4px 8px;border-radius:8px;background:#ffffff10;color:#e2e8f0;cursor:pointer';b.onclick=()=>{try{setView(v)}catch(e){}f.querySelector('#rafi-pop').classList.remove('on')};g.appendChild(b)});
+function mount(){document.body.appendChild(f);const g=f.querySelector('#rafi-guide');[['filter','Buscar puntos / antenas'],['map','Mapa táctico y GPS'],['tech','Analizador de tecnologías'],['maint','Plan de mantenimiento'],['price','Analizador de precios'],['noc','Tabla de disponibilidad'],['rast','Rastreadores'],['rafi','Centro de consola / FAQ']].forEach(([v,t])=>{const b=document.createElement('button');b.textContent='→ '+t;b.style.cssText='text-align:left;padding:4px 8px;border-radius:8px;background:#ffffff10;color:#e2e8f0;cursor:pointer';b.onclick=()=>{try{setView(v)}catch(e){}f.querySelector('#rafi-pop').classList.remove('on')};g.appendChild(b)});
 f.querySelector('#rafi-btn').onclick=()=>{f.querySelector('#rafi-pop').classList.toggle('on');inbox()};
 f.querySelector('#rafi-send').onclick=async()=>{const t=f.querySelector('#rafi-cq').value.trim();if(!t)return;const row={texto:t,usuario:(hunterSession?.user?.email)||'anon'};let ok=false;try{if(hunterSbClient){const{error}=await hunterSbClient.from('rafi_consultas').insert(row);ok=!error}}catch(e){}
 if(!ok){const l=JSON.parse(localStorage.getItem('rafi_consultas_local')||'[]');l.push({...row,creado:new Date().toISOString()});localStorage.setItem('rafi_consultas_local',JSON.stringify(l))}
@@ -7227,7 +7234,7 @@ body.hunter-preauth #login-floating-card{transform:perspective(1400px) rotateX(v
     });
   }
 
-  /* ---------- Tabla de Disponibilidad también puede exportar Excel ---------- */
+  /* ---------- Consola NOC también puede exportar Excel ---------- */
   const canExport = () => isDevRole() || isNocOnlyRole();
   const _apply = window.applySessionRoleUI;
   window.applySessionRoleUI = function (s) {
@@ -7671,7 +7678,7 @@ html body:not(.hunter-preauth) #rast-list::-webkit-scrollbar-thumb:hover {
 }
 </style>
 <style id="hunter-noc-file-fix">
-/* Estilo compacto y angular para los 3 selectores de Excel en Tabla de Disponibilidad */
+/* Estilo compacto y angular para los 3 selectores de Excel en Consola NOC */
 html body:not(.hunter-preauth):not(.theme-day) #view-noc input[type="file"] {
   padding: 4px 6px !important;
   font-family: var(--font-mono) !important;
@@ -8660,7 +8667,7 @@ html body.tema-ejecutivo:not(.hunter-preauth) .hud-ico { filter: none !important
         <div class="v10-scroll-x" style="max-height:420px;overflow-y:auto"><table class="v10-t"><thead><tr>
           ${d.columnas.map((c, j) => `<th>${esc(c)}${ed ? ` <button class="x" data-a="ren" data-j="${j}" title="Renombrar">✎</button><button class="x" data-a="dcol" data-j="${j}" title="Borrar columna">✕</button>` : ''}</th>`).join('')}${ed ? '<th></th>' : ''}
         </tr></thead><tbody>
-          ${d.filas.map((f, i) => `<tr>${d.columnas.map((c, j) => `<td class="${isNum(c) ? 'num' : ''}"><input data-i="${i}" data-j="${j}" maxlength="200" ${ed ? '' : 'readonly'} value="${esc(f[j] ?? '')}" ${isNum(c) ? 'inputmode="decimal"' : ''}></td>`).join('')}${ed ? `<td><button class="x" data-a="drow" data-i="${i}" title="Borrar fila">✕</button></td>` : ''}</tr>`).join('')
+          ${d.filas.map((f, i) => `<tr>${d.columnas.map((c, j) => `<td class="${isNum(c) ? 'num' : ''}"><input data-i="${i}" data-j="${j}" maxlength="200" ${ed ? '' : 'readonly'} value="${esc(f[j] ?? '')}" ${isNum(c) ? 'inputmode="decimal"' : ''}></td>`).join('')}${ed ? `<td class="v26-mv"><button class="x" data-a="up" data-i="${i}" title="Subir fila" ${i ? '' : 'disabled'}>▲</button><button class="x" data-a="down" data-i="${i}" title="Bajar fila" ${i < d.filas.length - 1 ? '' : 'disabled'}>▼</button><button class="x" data-a="drow" data-i="${i}" title="Borrar fila">✕</button></td>` : ''}</tr>`).join('')
             || `<tr><td colspan="${d.columnas.length + 1}" style="padding:14px;color:#64748b">${ed ? 'Sin filas. Pulsa “＋ Fila” para empezar.' : 'Aún no hay información registrada.'}</td></tr>`}
           ${d.filas.length && tot.some(v => v !== null) ? `<tr class="tot">${tot.map((v, j) => `<td class="${v !== null ? 'num' : ''}">${v !== null ? v.toLocaleString('es-PE', { maximumFractionDigits: 2 }) : (j ? '' : 'TOTAL')}</td>`).join('')}${ed ? '<td></td>' : ''}</tr>` : ''}
         </tbody></table></div>
@@ -8695,12 +8702,14 @@ html body.tema-ejecutivo:not(.hunter-preauth) .hud-ico { filter: none !important
       else if (a === 'ren') { const j = +b.dataset.j; const n = cleanName(prompt('Nuevo nombre de la columna:', d.columnas[j])); if (!n) return; d.columnas[j] = n; }
       else if (a === 'dcol') { const j = +b.dataset.j; if (!confirm(`¿Borrar la columna "${d.columnas[j]}" y sus datos?`)) return; d.columnas.splice(j, 1); d.filas.forEach(f => f.splice(j, 1)); }
       else if (a === 'drow') { d.filas.splice(+b.dataset.i, 1); }
+      else if (a === 'up' || a === 'down') { const i = +b.dataset.i, k = a === 'up' ? i - 1 : i + 1; if (k < 0 || k >= d.filas.length) return; [d.filas[i], d.filas[k]] = [d.filas[k], d.filas[i]]; }
       else if (a === 'save') { if (await tlSave(o.mod, d)) { st.dirty = false; if (st.local && o.localKey) { try { localStorage.removeItem(o.localKey); } catch (e) {} } st.local = false; } }
       if (a !== 'save') st.dirty = true;
       draw(); o.onChange && o.onChange(d);
     });
     return { load, get data() { return st.d; }, redraw: draw };
   }
+  window.__mdzEditTable = EditTable; window.__mdzTl = { load: tlLoad, save: tlSave };   // v26: RAFI y otros módulos reutilizan la tabla editable
   const colIdx = (cols, re) => cols.findIndex(c => re.test(c));
 
   /* ============================== 1. MAPA ============================== */
@@ -9150,7 +9159,7 @@ html body.tema-ejecutivo:not(.hunter-preauth) .hud-ico { filter: none !important
     ['tech', 'Analizador de tecnologías', 'tecnologia modelos operador claro movistar rastreo laboratorio distribucion editar'],
     ['maint', 'Plan de mantenimiento', 'mantenimiento checklist tecnico urgente proximo revision sector pendiente programado'],
     ['price', 'Analizador de precios y costos', 'precio alquiler costo equipo proveedor almacen estructura radio fuente cotizar zona viaticos margen'],
-    ['noc', 'Tabla de Disponibilidad', 'noc disponibilidad sla porcentaje corte historial semanal mensual anual reporte excel detektor lojack repotenciado'],
+    ['noc', 'Tabla de disponibilidad', 'noc consola efectividad disponibilidad sla porcentaje corte historial semanal mensual anual reporte excel detektor lojack repotenciado'],
     ['rast', 'Rastreadores', 'rastreador vehiculo interno bateria parada antenas placa unidad analisis lectura'],
     ['rafi', 'Centro RAFI (FAQ y búsqueda avanzada)', 'faq preguntas guia consola busqueda avanzada']
   ];
@@ -11968,18 +11977,16 @@ html body.dx .dx-halo.crit{ animation:dxRadar 1.7s ease-out infinite; }
   function calcViaje(inp) {
     const pl = CS.pl.find(p => p.id === inp.pl), det = [];
     const per = inp.tec + (inp.yo ? 1 : 0);
-    const local = !!pl && /\b(lima|callao)\b/i.test(String(pl.destino || '') + ' ' + String(pl.zona || '')) && inp.dias <= 1;
     (pl ? pl.items || [] : []).forEach(it => {
       const m = Number(it.monto) || 0, f = { por_viaje: 1, por_dia: inp.dias, por_persona: per, por_persona_dia: per * inp.dias }[it.modo] ?? 1;
       det.push({ concepto: it.concepto, detalle: `${soles(m)} ${MODOS[it.modo] || ''}`, total: n2(m * f), cero: !m });
     });
     const T = CS.vi.TECNICO || { desayuno: 20, almuerzo: 30, cena: 20, hospedaje_noche: 0 }, R = CS.vi.RESPONSABLE || { desayuno: 30, almuerzo: 30, cena: 30, hospedaje_noche: 0 };
     const dia = v => (Number(v.desayuno) || 0) + (Number(v.almuerzo) || 0) + (Number(v.cena) || 0);
-    if (local) det.push({ concepto: 'Viáticos y hospedaje', detalle: 'No aplica: destino en Lima de 1 día (solo cochera/adicionales)', total: 0 });
-    if (!local && inp.tec) det.push({ concepto: `Viáticos técnicos (${inp.tec})`, detalle: `${soles(dia(T))} por día × ${inp.dias} día${inp.dias > 1 ? 's' : ''}`, total: n2(inp.tec * inp.dias * dia(T)) });
-    if (!local && inp.yo) det.push({ concepto: 'Viáticos responsable', detalle: `${soles(dia(R))} por día × ${inp.dias} día${inp.dias > 1 ? 's' : ''}`, total: n2(inp.dias * dia(R)) });
+    if (inp.tec) det.push({ concepto: `Viáticos técnicos (${inp.tec})`, detalle: `${soles(dia(T))} por día × ${inp.dias} día${inp.dias > 1 ? 's' : ''}`, total: n2(inp.tec * inp.dias * dia(T)) });
+    if (inp.yo) det.push({ concepto: 'Viáticos responsable', detalle: `${soles(dia(R))} por día × ${inp.dias} día${inp.dias > 1 ? 's' : ''}`, total: n2(inp.dias * dia(R)) });
     const hosp = inp.noches * (inp.tec * (Number(T.hospedaje_noche) || 0) + (inp.yo ? Number(R.hospedaje_noche) || 0 : 0));
-    if (!local && inp.noches && per) det.push({ concepto: `Hospedaje (${inp.noches} noche${inp.noches > 1 ? 's' : ''})`, detalle: 'según viáticos por persona', total: n2(hosp), cero: !hosp });
+    if (inp.noches && per) det.push({ concepto: `Hospedaje (${inp.noches} noche${inp.noches > 1 ? 's' : ''})`, detalle: 'según viáticos por persona', total: n2(hosp), cero: !hosp });
     return { pl, det, total: n2(det.reduce((a, d) => a + d.total, 0)), per };
   }
   // Costos reales registrados en el analizador de precios (tabla "Costos de mantenimiento por zona")
@@ -13740,6 +13747,7 @@ body:not(.theme-day) #robo-map .leaflet-tile-pane { filter: invert(1) hue-rotate
     R.map = L.map('robo-map', { zoomControl: true, attributionControl: true }).setView([-12.05, -77.03], 11);
     L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap', maxZoom: 19 }).addTo(R.map);
     R.layer = L.layerGroup().addTo(R.map);
+    window.__mdzRoboMapRef = R.map;   // v26: capa "Focos de robo"
     return true;
   }
 
@@ -14004,6 +14012,7 @@ body:not(.theme-day) #robo-map .leaflet-tile-pane { filter: invert(1) hue-rotate
   async function errText(error) {
     try { const ctx = error && error.context; if (ctx && typeof ctx.json === 'function') { const j = await ctx.clone().json(); if (j && j.error) return j.error; } } catch (e) {}
     const m = String(error && error.message || error);
+    if (m === 'TIMEOUT') return 'Tardé demasiado (más de 75 s) y corté la espera. Vuelve a intentar; si se repite, revisa en Supabase → Edge Functions → rafi-ia → Logs.';
     if (/Failed to send|fetch|FunctionsFetchError|404|not found/i.test(m)) return 'No encuentro la función "rafi-ia" en Supabase. Sigue la guía de instalación (paso 3) para publicarla.';
     return m;
   }
@@ -14013,7 +14022,12 @@ body:not(.theme-day) #robo-map .leaflet-tile-pane { filter: invert(1) hue-rotate
     const historial = CHAT.hist.filter(m => !m.err).slice(-8).map(m => ({ role: m.role, text: m.text }));
     CHAT.hist.push({ role: 'user', text: texto }); CHAT.busy = true; drawChat();
     try {
-      const { data, error } = await c.functions.invoke('rafi-ia', { body: { pregunta: texto, historial, contexto: contexto(), personalidad: persNow().n } });
+      // aviso si tarda (la primera pregunta despierta la función: "arranque en frío") y corte a los 75 s
+      const slow = setTimeout(() => { const d = document.querySelector('#v25-msgs .v25-dots'); if (d) d.textContent = 'Pensando (la primera pregunta puede tardar unos segundos mientras despierto)'; }, 7000);
+      let tm; const limite = new Promise((_, rej) => { tm = setTimeout(() => rej(new Error('TIMEOUT')), 75000); });
+      let data, error;
+      try { ({ data, error } = await Promise.race([c.functions.invoke('rafi-ia', { body: { pregunta: texto, historial, contexto: Object.assign(contexto(), window.__mdzIaExtra ? window.__mdzIaExtra(texto) : {}), personalidad: persNow().n } }), limite])); }
+      finally { clearTimeout(slow); clearTimeout(tm); }
       if (error) throw error;
       if (!data || !data.respuesta) throw new Error((data && data.error) || 'Respuesta vacía');
       CHAT.hist.push({ role: 'assistant', text: data.respuesta, meta: [data.proveedor === 'anthropic' ? 'Claude' : 'Gemini', data.modelo].filter(Boolean).join(' · ') });
@@ -14051,6 +14065,1011 @@ body:not(.theme-day) #robo-map .leaflet-tile-pane { filter: invert(1) hue-rotate
   const _ar = window.applySessionRoleUI;
   if (typeof _ar === 'function') window.applySessionRoleUI = function () { const r = _ar.apply(this, arguments); syncRole(); return r; };
   setInterval(() => { syncRole(); mountChatTab(); if (!(logged() && dev()) && CHAT.hist.length) { CHAT.hist = []; CHAT.on = false; } }, 1000);
+  syncRole();
+})();
+</script>
+
+<style id="hunter-v26-css">
+/* ===== v26 · sin transición entre módulos, mapa sin parpadeo, validación de puntos, columnas nuevas,
+   comandos de RAFI, rastreadores y módulo Recuperos ===== */
+/* 1) Sin barrido ni desvanecido al cambiar de módulo */
+#dx-scan, #dx-scan.run { display:none !important; }
+html body.dx .dx-enter, .dx-enter { animation:none !important; }
+/* 2) Mapa táctico: los puntos ya no se prenden y apagan. Solo palpita el punto GPS que colocas (.v10-car) */
+.marker-blink { animation:none !important; }
+html body.dx .dx-halo.warn, html body.dx .dx-halo.crit { animation:none !important; stroke-opacity:.55; stroke-width:3; }
+.leaflet-overlay-pane path.v12-target { animation:none !important; stroke-opacity:.95; fill-opacity:.22; stroke-width:3; }
+
+/* 3) Parámetros: datos clave resaltados y slots al final */
+.v26-key { border-color:rgba(56,189,248,.35) !important; background:rgba(56,189,248,.07) !important; }
+.v26-key > p:first-child { color:#7dd3fc !important; }
+.v26-slot-h { margin-top:6px; padding-top:8px; border-top:1px dashed rgba(255,255,255,.12); font-size:9.5px; font-weight:800; letter-spacing:.08em; text-transform:uppercase; color:#64748b; }
+.v26-slot { opacity:.82; }
+
+/* 4) Validación de puntos */
+.v26-vdot { display:inline-flex; align-items:center; gap:6px; padding:5px 10px; border-radius:999px; font-size:11px; font-weight:800; cursor:pointer; border:1px solid; white-space:nowrap; background:transparent; }
+.v26-vdot i { width:9px; height:9px; border-radius:50%; display:inline-block; }
+.v26-vdot.pen { color:#fcd34d; border-color:rgba(251,191,36,.45); background:rgba(251,191,36,.08); }
+.v26-vdot.pen i { background:#f59e0b; box-shadow:0 0 6px #f59e0b; }
+.v26-vdot.ok { color:#86efac; border-color:rgba(34,197,94,.5); background:rgba(34,197,94,.1); }
+.v26-vdot.ok i { background:#22c55e; box-shadow:0 0 6px #22c55e; }
+.v26-vdot:hover, .v26-vdot:focus-visible { filter:brightness(1.2); outline:none; }
+article.v26-ok { box-shadow:inset 3px 0 0 #22c55e; }
+article.v26-pen { box-shadow:inset 3px 0 0 #f59e0b; }
+#v26-val .v26-prog { height:7px; border-radius:9px; background:rgba(255,255,255,.08); overflow:hidden; }
+#v26-val .v26-prog i { display:block; height:100%; background:linear-gradient(90deg,#22c55e,#38bdf8); }
+.v26-seg { display:grid; grid-template-columns:repeat(3,1fr); gap:3px; padding:3px; border-radius:11px; background:rgba(0,0,0,.3); border:1px solid rgba(255,255,255,.08); }
+.v26-seg button { padding:6px 4px; border-radius:8px; font-size:10.5px; font-weight:800; color:#94a3b8; background:transparent; border:0; cursor:pointer; line-height:1.15; }
+.v26-seg button b { display:block; font-size:14px; color:#e2e8f0; }
+.v26-seg button.on { background:var(--accent,#38bdf8); color:#06121f; }
+.v26-seg button.on b { color:#06121f; }
+.v26-mini { font-size:10.5px; color:#94a3b8; background:none; border:0; cursor:pointer; text-decoration:underline; padding:0; }
+.v26-mini:hover { color:#fff; }
+
+/* 5) Columnas nuevas (modal) */
+#v26-cols { position:fixed; inset:0; z-index:9000; display:none; align-items:center; justify-content:center; background:rgba(2,6,12,.66); padding:16px; }
+#v26-cols.on { display:flex; }
+#v26-cols .bx { width:min(460px,100%); max-height:86vh; overflow:auto; background:#0d121c; border:1px solid rgba(255,255,255,.14); border-radius:16px; padding:18px; box-shadow:0 20px 60px rgba(0,0,0,.6); }
+#v26-cols h3 { font-size:15px; font-weight:800; color:#fff; margin:0 0 4px; }
+#v26-cols p { font-size:11.5px; color:#94a3b8; margin:0 0 12px; line-height:1.45; }
+#v26-cols .it { display:flex; align-items:center; justify-content:space-between; gap:8px; padding:8px 10px; border-radius:10px; background:rgba(255,255,255,.05); margin-bottom:6px; font-size:12px; font-weight:700; color:#e2e8f0; }
+#v26-cols input { flex:1; min-width:0; padding:9px 11px; border-radius:10px; background:rgba(0,0,0,.4); border:1px solid rgba(255,255,255,.14); color:#fff; font-size:12.5px; outline:none; text-transform:uppercase; }
+#v26-cols input:focus { border-color:var(--accent,#38bdf8); }
+
+/* 6) Tablas editables: mover filas */
+td.v26-mv { white-space:nowrap; }
+td.v26-mv .x { margin-left:2px; }
+td.v26-mv .x[disabled] { opacity:.25; cursor:default; }
+
+/* 7) Rastreadores: selector Unidades / Análisis */
+#view-rast .v26-rtabs { display:grid; grid-template-columns:1fr 1fr; gap:8px; padding:12px 20px 0; }
+#view-rast .v26-rtabs button { display:flex; align-items:center; gap:10px; text-align:left; padding:10px 14px; border-radius:12px; border:1px solid rgba(255,255,255,.1); background:rgba(255,255,255,.03); color:#cbd5e1; cursor:pointer; transition:background .15s,border-color .15s; }
+#view-rast .v26-rtabs button:hover { background:rgba(255,255,255,.07); }
+#view-rast .v26-rtabs button .ic { width:34px; height:34px; border-radius:10px; display:flex; align-items:center; justify-content:center; background:rgba(255,255,255,.06); color:var(--accent,#38bdf8); font-size:15px; flex:none; }
+#view-rast .v26-rtabs button b { display:block; font-size:13px; color:#fff; }
+#view-rast .v26-rtabs button small { display:block; font-size:10.5px; color:#94a3b8; }
+#view-rast .v26-rtabs button.on { border-color:var(--accent,#38bdf8); background:linear-gradient(135deg,rgba(56,189,248,.16),rgba(56,189,248,.04)); box-shadow:inset 0 -2px 0 var(--accent,#38bdf8); }
+#view-rast .v26-rtabs button.on .ic { background:var(--accent,#38bdf8); color:#06121f; }
+#view-rast .v26-rtabs .ct { margin-left:auto; font-size:11px; font-weight:800; padding:2px 8px; border-radius:999px; background:rgba(255,255,255,.08); color:#e2e8f0; }
+@media (max-width:640px){ #view-rast .v26-rtabs { padding:10px 12px 0; } #view-rast .v26-rtabs button small { display:none; } }
+
+/* 8) RAFI · comandos y conocimiento */
+#rafi-pop .rp-body { grid-template-columns:minmax(0,1fr); }
+#v26-kbres, .v26-cmd, .v26-kb-q { min-width:0; }
+.v26-cmd .s { overflow-wrap:anywhere; }
+.v26-kb-q { display:flex; gap:6px; }
+.v26-chips { display:flex; flex-wrap:wrap; gap:4px; }
+.v26-chips button { font-size:10px; font-weight:800; padding:3px 8px; border-radius:999px; border:1px solid rgba(255,255,255,.16); background:transparent; color:#cbd5e1; cursor:pointer; }
+.v26-chips button.on, .v26-chips button:hover { background:var(--accent,#38bdf8); color:#06121f; border-color:transparent; }
+.v26-cmd { padding:8px 9px; border-radius:10px; background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.08); font-size:11.5px; }
+.v26-cmd .t { font-weight:800; color:#fff; }
+.v26-cmd .t em { font-style:normal; font-weight:700; color:var(--accent,#38bdf8); }
+.v26-cmd .s { color:#94a3b8; font-size:10.5px; margin-top:2px; }
+.v26-cmd .c { display:flex; align-items:stretch; margin-top:6px; border-radius:8px; overflow:hidden; border:1px solid rgba(255,255,255,.1); }
+.v26-cmd .c code { flex:1; min-width:0; padding:6px 8px; background:rgba(0,0,0,.45); color:#a5f3fc; font:11px ui-monospace,Menlo,Consolas,monospace; white-space:nowrap; overflow-x:auto; }
+.v26-cmd .c button { padding:0 10px; border:0; background:var(--accent,#38bdf8); color:#06121f; font-weight:800; font-size:11px; cursor:pointer; }
+.v26-kbsec h3 { font-size:12px; font-weight:800; text-transform:uppercase; letter-spacing:.06em; color:#cbd5e1; }
+.v26-kbsec .v10-sec { margin-top:8px; }
+
+/* 9) Recuperos */
+#view-recup h2 > span svg { width:100%; height:100%; fill:none; stroke:currentColor; stroke-width:1.7; stroke-linecap:round; stroke-linejoin:round; }
+.v26-tabs { display:flex; gap:4px; flex-wrap:wrap; padding:3px; border-radius:12px; background:rgba(0,0,0,.28); border:1px solid rgba(255,255,255,.08); }
+.v26-tabs button { padding:7px 12px; border-radius:9px; font-size:11.5px; font-weight:800; color:#94a3b8; background:transparent; border:0; cursor:pointer; white-space:nowrap; }
+.v26-tabs button:hover { color:#fff; }
+.v26-tabs button.on { background:var(--accent,#38bdf8); color:#06121f; }
+@media (max-width:760px){ .v26-tabs { flex-wrap:nowrap; overflow-x:auto; } }
+.v26-live { display:inline-flex; align-items:center; gap:6px; font-size:11px; font-weight:800; padding:5px 10px; border-radius:999px; background:rgba(0,0,0,.35); color:#cbd5e1; border:1px solid rgba(255,255,255,.1); }
+.v26-live i { width:8px; height:8px; border-radius:50%; background:#64748b; }
+.v26-live.on i { background:#22c55e; box-shadow:0 0 8px #22c55e; }
+.v26-live.poll i { background:#f59e0b; }
+.v26-filt { display:grid; grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:8px; }
+.v26-filt label { font-size:9.5px; font-weight:800; text-transform:uppercase; letter-spacing:.06em; color:#94a3b8; display:block; }
+.v26-filt select, .v26-filt input { width:100%; margin-top:3px; }
+.v26-k { padding:12px; border-radius:14px; background:rgba(255,255,255,.035); border:1px solid rgba(255,255,255,.08); border-left:4px solid var(--c,#38bdf8); min-width:0; }
+.v26-k p { margin:0; font-size:9.5px; font-weight:800; text-transform:uppercase; letter-spacing:.06em; color:#94a3b8; }
+.v26-k div { font-size:22px; font-weight:900; color:var(--c,#38bdf8); margin-top:2px; line-height:1.15; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.v26-k small { color:#94a3b8; font-size:10px; }
+.v26-kg { display:grid; grid-template-columns:repeat(auto-fill,minmax(160px,1fr)); gap:10px; }
+@media (max-width:640px){ .v26-kg { grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; } .v26-k div { font-size:18px; } }
+.v26-ins { display:grid; grid-template-columns:repeat(auto-fill,minmax(230px,1fr)); gap:10px; }
+.v26-ins .card { padding:12px; }
+.v26-ins .card p { margin:0 0 4px; font-size:10px; font-weight:800; text-transform:uppercase; letter-spacing:.06em; color:var(--accent,#38bdf8); }
+.v26-ins .card b { font-size:12.5px; color:#fff; }
+.v26-cg { display:grid; grid-template-columns:repeat(auto-fit,minmax(min(420px,100%),1fr)); gap:12px; }
+.v26-ch { padding:14px; min-width:0; }
+.v26-ch .ct { margin:0; font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:.07em; color:#cbd5e1; }
+.v26-ch .ds { margin:3px 0 8px; font-size:11px; color:#94a3b8; line-height:1.4; }
+.v26-ch .cv { position:relative; height:270px; }
+.v26-ch.full { grid-column:1/-1; }
+.v26-map { height:min(620px,70vh); overflow:hidden; border:1px solid rgba(255,255,255,.1); background:#0b0f17; border-radius:12px; }
+body:not(.theme-day) .v26-map .leaflet-tile-pane { filter: invert(1) hue-rotate(195deg) brightness(.84) contrast(.94) saturate(.55); }
+.v26-mapbar { display:flex; gap:6px; flex-wrap:wrap; align-items:center; margin-bottom:8px; }
+.v26-pill { padding:6px 12px; border-radius:999px; border:1px solid rgba(255,255,255,.14); background:rgba(0,0,0,.25); color:#cbd5e1; font-weight:800; font-size:11px; cursor:pointer; }
+.v26-pill.on { background:var(--accent,#38bdf8); color:#06121f; border-color:transparent; }
+.v26-mrk { width:14px; height:14px; border-radius:50%; border:2px solid #fff; box-shadow:0 0 4px rgba(0,0,0,.6); }
+.v26-mrk.open { width:16px; height:16px; border:3px solid #fff; outline:2px solid rgba(239,68,68,.9); }
+.v26-tbl { width:100%; border-collapse:collapse; font-size:11.5px; }
+.v26-tbl th { position:sticky; top:0; background:#0d121c; text-align:left; padding:8px; font-size:9.5px; letter-spacing:.06em; color:#94a3b8; text-transform:uppercase; z-index:1; }
+.v26-tbl td { padding:7px 8px; border-bottom:1px solid rgba(255,255,255,.06); color:#e2e8f0; vertical-align:top; }
+.v26-tbl tr:hover td { background:rgba(255,255,255,.035); }
+.v26-tbl tr[data-go] { cursor:pointer; }
+.v26-bar { height:6px; border-radius:9px; background:rgba(255,255,255,.08); overflow:hidden; min-width:60px; margin-bottom:2px; }
+.v26-bar i { display:block; height:100%; background:linear-gradient(90deg,#22c55e,#38bdf8); }
+.v26-tag { padding:2px 8px; border-radius:999px; font-size:10px; font-weight:800; white-space:nowrap; }
+.v26-hm { width:100%; border-collapse:separate; border-spacing:2px; font-size:9.5px; }
+.v26-hm td, .v26-hm th { text-align:center; padding:0; height:22px; color:#cbd5e1; font-weight:700; }
+.v26-hm td { border-radius:4px; }
+.v26-hm th { color:#94a3b8; font-weight:800; }
+.v26-ant { display:flex; gap:14px; flex-wrap:wrap; align-items:center; font-size:11px; color:#94a3b8; margin-bottom:10px; }
+.v26-legend { display:flex; flex-wrap:wrap; gap:12px; font-size:11px; color:#94a3b8; margin-top:6px; }
+.v26-legend span { display:inline-flex; align-items:center; gap:5px; }
+.v26-legend i { width:11px; height:11px; border-radius:50%; display:inline-block; border:2px solid #fff; }
+.v26-gv { display:flex; flex-wrap:wrap; gap:5px; }
+.v26-gs { display:grid; grid-template-columns:minmax(0,3fr) minmax(220px,1fr); gap:12px; }
+@media (max-width:980px){ .v26-gs { grid-template-columns:1fr; } }
+/* leaflet.markercluster (estilos incluidos aquí porque el CSP solo deja hojas de estilo de cdnjs) */
+.marker-cluster-small{background-color:rgba(181,226,140,.6)}.marker-cluster-small div{background-color:rgba(110,204,57,.6)}
+.marker-cluster-medium{background-color:rgba(241,211,87,.6)}.marker-cluster-medium div{background-color:rgba(240,194,12,.6)}
+.marker-cluster-large{background-color:rgba(253,156,115,.6)}.marker-cluster-large div{background-color:rgba(241,128,23,.6)}
+.marker-cluster{background-clip:padding-box;border-radius:20px}.marker-cluster div{width:30px;height:30px;margin-left:5px;margin-top:5px;text-align:center;border-radius:15px;font:12px "Helvetica Neue",Arial,Helvetica,sans-serif;color:#111;font-weight:800}.marker-cluster span{line-height:30px}
+.leaflet-cluster-anim .leaflet-marker-icon,.leaflet-cluster-anim .leaflet-marker-shadow{transition:transform .3s ease-out,opacity .3s ease-in}
+/* robo: focos */
+.v26-focos .row { display:flex; justify-content:space-between; gap:8px; font-size:12px; padding:4px 0; border-bottom:1px dashed rgba(255,255,255,.08); color:#e2e8f0; }
+.v26-focos .row:last-child { border-bottom:0; }
+</style>
+<script id="hunter-v26-js">
+(() => {
+  'use strict';
+  const $ = id => document.getElementById(id);
+  const esc = v => (typeof escapeHtml === 'function' ? escapeHtml(v == null ? '' : String(v)) : String(v == null ? '' : v).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])));
+  const dev = () => typeof isDevRole === 'function' && isDevRole();
+  const logged = () => !!(typeof hunterSession !== 'undefined' && hunterSession) && !document.body.classList.contains('hunter-preauth');
+  const sb = () => (typeof hunterSbClient !== 'undefined' ? hunterSbClient : null);
+  const toast = m => { try { showToast(m); } catch (e) {} };
+  const ls = { get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch (e) { return d; } }, set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); return true; } catch (e) { return false; } } };
+  const rows = () => (typeof excelData !== 'undefined' && Array.isArray(excelData) ? excelData : []);
+  const puntoOf = r => { const k = typeof findColumn === 'function' ? findColumn(r, ['PUNTOS', 'PUNTO']) : 'PUNTOS'; return k ? String(r[k] ?? '').trim() : ''; };
+  const keyOf = p => String(p || '').trim().toUpperCase().replace(/\s+/g, ' ').slice(0, 200);
+  const copy = t => { try { if (typeof copyToClipboard === 'function') copyToClipboard(t); else { navigator.clipboard.writeText(t); toast('Copiado'); } } catch (e) { toast('No se pudo copiar'); } };
+  const strip = v => String(v ?? '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
+
+  /* =====================================================================
+     1) VALIDACIÓN DE PUNTOS · VALIDADO / PENDIENTE (solo dev, Supabase mdz_puntos_validacion)
+     ===================================================================== */
+  const VAL = { map: new Map(), filtro: 'ALL', loaded: false, local: false, loading: false };
+  const VAL_LS = 'mdz_val_v1';
+  const estadoDe = p => (VAL.map.get(keyOf(p)) || {}).estado === 'VALIDADO' ? 'VALIDADO' : 'PENDIENTE';
+  async function valLoad() {
+    if (VAL.loading || !dev() || !logged()) return;
+    VAL.loading = true;
+    try {
+      const { data, error } = await sb().from('mdz_puntos_validacion').select('punto_key,estado,actualizado').limit(10000);
+      if (error) throw error;
+      VAL.map = new Map((data || []).map(r => [r.punto_key, { estado: r.estado, t: r.actualizado }])); VAL.local = false;
+    } catch (e) {
+      VAL.map = new Map(Object.entries(ls.get(VAL_LS, {}))); VAL.local = true;
+    } finally { VAL.loading = false; VAL.loaded = true; valPanel(); }
+  }
+  async function valSet(punto, estado) {
+    const k = keyOf(punto); if (!k || !dev()) return;
+    VAL.map.set(k, { estado, t: new Date().toISOString() });
+    if (VAL.local) { ls.set(VAL_LS, Object.fromEntries(VAL.map)); }
+    else {
+      const { error } = await sb().from('mdz_puntos_validacion').upsert({ punto_key: k, punto: String(punto).slice(0, 200), estado }, { onConflict: 'punto_key' });
+      if (error) { VAL.local = true; ls.set(VAL_LS, Object.fromEntries(VAL.map)); toast('Guardado solo en este navegador: ' + error.message); }
+    }
+    toast(estado === 'VALIDADO' ? `Validado: ${punto}` : `Pendiente: ${punto}`);
+    valPanel();
+    if (VAL.filtro !== 'ALL') { try { executeSearch(true); } catch (e) {} } else paintDots();
+  }
+  function uniquePoints() { const m = new Map(); rows().forEach((r, i) => { const p = puntoOf(r), k = keyOf(p); if (k && !m.has(k)) m.set(k, { p, i }); }); return m; }
+  const side = $('global-stats-container');
+  const valBox = document.createElement('div'); valBox.id = 'v26-val'; valBox.className = 'mt-5 ui-hidden';
+  if (side) side.before(valBox);
+  function valPanel() {
+    if (!dev() || !logged()) { valBox.classList.add('ui-hidden'); return; }
+    valBox.classList.remove('ui-hidden');
+    const U = uniquePoints(); let ok = 0; U.forEach((_, k) => { if ((VAL.map.get(k) || {}).estado === 'VALIDADO') ok++; });
+    const tot = U.size, pen = tot - ok, pc = tot ? ok / tot * 100 : 0;
+    valBox.innerHTML = `<div class="flex items-center justify-between mb-2"><h2 class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Validación de puntos</h2><span class="text-[10.5px] font-bold text-[var(--accent)]">${pc.toFixed(0)}%</span></div>
+      <div class="v26-prog" title="${ok} de ${tot} validados"><i style="width:${pc.toFixed(1)}%"></i></div>
+      <p class="text-[10.5px] text-slate-400 mt-1.5 mb-2">${ok.toLocaleString()} de ${tot.toLocaleString()} puntos validados${VAL.local ? ' · <span class="text-amber-300">guardado solo en este navegador (ejecuta el SQL v26)</span>' : ''}</p>
+      <div class="v26-seg" role="group" aria-label="Filtrar por validación">
+        <button data-vf="ALL" class="${VAL.filtro === 'ALL' ? 'on' : ''}"><b>${tot.toLocaleString()}</b>Todos</button>
+        <button data-vf="VALIDADO" class="${VAL.filtro === 'VALIDADO' ? 'on' : ''}"><b>${ok.toLocaleString()}</b>Validados</button>
+        <button data-vf="PENDIENTE" class="${VAL.filtro === 'PENDIENTE' ? 'on' : ''}"><b>${pen.toLocaleString()}</b>Pendientes</button>
+      </div>
+      <div class="flex justify-between mt-2"><span class="text-[10px] text-slate-500">Toca el indicador de cada ficha para cambiarlo</span><button class="v26-mini" data-vf="reset">Reiniciar ciclo</button></div>`;
+  }
+  valBox.addEventListener('click', async e => {
+    const b = e.target.closest('[data-vf]'); if (!b || !dev()) return;
+    if (b.dataset.vf === 'reset') {
+      if (!confirm('¿Reiniciar el ciclo? Todos los puntos vuelven a PENDIENTE para empezar una nueva revisión.')) return;
+      if (!VAL.local) { const { error } = await sb().from('mdz_puntos_validacion').delete().neq('punto_key', ''); if (error) { toast('No se pudo reiniciar: ' + error.message); return; } }
+      VAL.map.clear(); ls.set(VAL_LS, {}); toast('Ciclo reiniciado: todo PENDIENTE'); valPanel(); try { executeSearch(true); } catch (e2) {} return;
+    }
+    VAL.filtro = b.dataset.vf; valPanel();
+    try { executeSearch(true); } catch (e2) {}
+  });
+  // filtra la lista de resultados y agrega el indicador arriba a la derecha de cada ficha
+  let lastItems = [];
+  const _rr = window.renderResults;
+  window.renderResults = function (items) {
+    let list = items || [];
+    if (dev() && VAL.filtro !== 'ALL') {
+      list = list.filter(({ row }) => estadoDe(puntoOf(row)) === VAL.filtro);
+      const rc = $('results-count'); if (rc) { rc.textContent = `${list.length.toLocaleString()} ${VAL.filtro === 'VALIDADO' ? 'validado' : 'pendiente'}${list.length === 1 ? '' : 's'}`; rc.classList.remove('hidden'); }
+    }
+    lastItems = list;
+    const r = _rr.call(this, list);
+    if (dev() && VAL.filtro !== 'ALL' && !list.length && items && items.length) {
+      const rc = $('results-container'); if (rc) rc.innerHTML = `<div class="text-center py-16 text-slate-500"><p class="text-base font-semibold text-slate-300">Ningún resultado ${VAL.filtro === 'VALIDADO' ? 'validado' : 'pendiente'}</p><p class="text-xs mt-1">Cambia el filtro en “Validación de puntos”.</p></div>`;
+    }
+    paintDots();
+    return r;
+  };
+  function paintDots() {
+    if (!dev()) return;
+    lastItems.forEach(({ row }, i) => {
+      const card = $('card-item-' + i); if (!card) return;
+      const p = puntoOf(row), est = estadoDe(p), ok = est === 'VALIDADO';
+      card.classList.toggle('v26-ok', ok); card.classList.toggle('v26-pen', !ok);
+      let b = card.querySelector('.v26-vdot');
+      if (!b) { const host = card.querySelector('.shrink-0'); if (!host) return; b = document.createElement('button'); b.type = 'button'; host.prepend(b); }
+      b.className = 'v26-vdot ' + (ok ? 'ok' : 'pen'); b.dataset.p = p;
+      b.innerHTML = `<i></i>${ok ? 'Validado' : 'Pendiente'}`; b.title = ok ? 'Validado · toca para volver a pendiente' : 'Pendiente · toca cuando termines de actualizar';
+    });
+  }
+  document.addEventListener('click', e => { const b = e.target.closest('.v26-vdot'); if (!b || !dev()) return; e.stopPropagation(); valSet(b.dataset.p, estadoDe(b.dataset.p) === 'VALIDADO' ? 'PENDIENTE' : 'VALIDADO'); });
+  // con la búsqueda vacía y un filtro activo, muestra todos los puntos de ese estado
+  const _es = window.executeSearch;
+  window.executeSearch = function (keep) {
+    const q = typeof searchInput !== 'undefined' && searchInput ? String(searchInput.value || '').trim() : '';
+    if (!q && dev() && VAL.filtro !== 'ALL' && rows().length) {
+      const U = uniquePoints(), items = [];
+      U.forEach(({ p, i }) => { if (estadoDe(p) === VAL.filtro) items.push({ row: rows()[i], realIdx: i }); });
+      try { lastMatchedItems = items; activeSearchTechFilter = 'ALL'; } catch (e) {}
+      const ts = $('tech-summary-container'); if (ts) ts.classList.add('hidden');
+      window.renderResults(items.slice(0, 200));
+      const rc = $('results-count'); if (rc) { rc.textContent = `${items.length.toLocaleString()} ${VAL.filtro === 'VALIDADO' ? 'validados' : 'pendientes'}${items.length > 200 ? ' · mostrando 200' : ''}`; rc.classList.remove('hidden'); }
+      return;
+    }
+    return _es.apply(this, arguments);
+  };
+
+  /* =====================================================================
+     2) COLUMNAS NUEVAS EN LA BASE DE PUNTOS (todas las fichas · tablas_libres "puntos_columnas")
+     ===================================================================== */
+  window.__mdzCustomCols = window.__mdzCustomCols || [];
+  const COLS_MOD = 'puntos_columnas';
+  let colsSig = '', colsLoaded = false;
+  async function colsLoad() {
+    try { const d = await window.__mdzTl.load(COLS_MOD); window.__mdzCustomCols = d ? d.filas.map(f => String(f[0] || '').trim().toUpperCase()).filter(Boolean) : []; } catch (e) {}
+    colsLoaded = true; colsSig = ''; colsApply();
+  }
+  function colsApply() {
+    const R = rows(), C = window.__mdzCustomCols, sig = R.length + '|' + (R[0] ? puntoOf(R[0]) : '') + '|' + C.join(',');
+    if (sig === colsSig) return; colsSig = sig;
+    if (C.length) R.forEach(r => C.forEach(c => { if (!(c in r)) r[c] = ''; }));
+  }
+  async function colsSave() {
+    const ok = await window.__mdzTl.save(COLS_MOD, { columnas: ['COLUMNA'], filas: window.__mdzCustomCols.map(c => [c]) });
+    colsSig = ''; colsApply(); return ok;
+  }
+  const colsModal = document.createElement('div'); colsModal.id = 'v26-cols'; colsModal.setAttribute('role', 'dialog'); colsModal.setAttribute('aria-label', 'Columnas nuevas');
+  document.body.appendChild(colsModal);
+  function colsDraw() {
+    const C = window.__mdzCustomCols;
+    colsModal.innerHTML = `<div class="bx"><div class="flex justify-between items-start gap-3"><h3>Columnas nuevas de la base de puntos</h3><button class="v21-btn" data-c="x" aria-label="Cerrar">✕</button></div>
+      <p>Escribe el título (ej. <b>MODEM 5G</b>, <b>SERIE NUEVA TECNOLOGÍA</b>). Aparece en <b>todas las fichas</b>: en Parámetros, en “Editar”, en “Agregar punto” y en el Excel exportado. Luego rellenas el dato punto por punto.</p>
+      ${C.length ? C.map((c, i) => `<div class="it"><span>${esc(c)}</span><button class="v21-btn" data-c="del" data-i="${i}" title="Quitar columna">✕</button></div>`).join('') : '<div class="v21-msg">Aún no agregaste columnas.</div>'}
+      <div class="flex gap-2 mt-3"><input id="v26-col-n" maxlength="40" placeholder="Título de la columna" aria-label="Título de la columna"><button class="v21-btn pri" data-c="add">Agregar</button></div>
+      <p class="mt-3" style="margin-bottom:0">Quitar una columna solo la oculta del formulario: los datos ya escritos se conservan en Supabase.</p></div>`;
+  }
+  colsModal.addEventListener('click', async e => {
+    if (e.target === colsModal) { colsModal.classList.remove('on'); return; }
+    const b = e.target.closest('[data-c]'); if (!b) return;
+    if (b.dataset.c === 'x') { colsModal.classList.remove('on'); return; }
+    if (!dev()) return;
+    if (b.dataset.c === 'add') {
+      const n = String($('v26-col-n').value || '').replace(/[<>"'`]/g, '').trim().toUpperCase().replace(/\s+/g, ' ').slice(0, 40);
+      if (!n) return;
+      const all = typeof mdzHeaders === 'function' ? mdzHeaders() : [];
+      if (all.includes(n) || n.startsWith('_')) { toast('Esa columna ya existe'); return; }
+      window.__mdzCustomCols.push(n);
+      if (await colsSave()) { toast('Columna agregada: ' + n); } else window.__mdzCustomCols.pop();
+    }
+    if (b.dataset.c === 'del') {
+      const i = +b.dataset.i, n = window.__mdzCustomCols[i];
+      if (!confirm(`¿Quitar la columna "${n}" del formulario?`)) return;
+      window.__mdzCustomCols.splice(i, 1);
+      if (!(await colsSave())) window.__mdzCustomCols.splice(i, 0, n); else toast('Columna quitada: ' + n);
+    }
+    colsDraw(); try { executeSearch(true); } catch (e2) {}
+  });
+  colsModal.addEventListener('keydown', e => { if (e.key === 'Escape') colsModal.classList.remove('on'); if (e.key === 'Enter' && e.target.id === 'v26-col-n') colsModal.querySelector('[data-c="add"]').click(); });
+  const addBtn = $('btn-add-point-dev');
+  const colBtn = document.createElement('button'); colBtn.type = 'button'; colBtn.id = 'v26-cols-btn';
+  colBtn.className = 'ui-hidden px-3 py-1 rounded-lg text-xs font-semibold bg-white/5 text-slate-200 border border-white/15 hover:bg-white/10 transition cursor-pointer';
+  colBtn.innerHTML = '<i class="fa-solid fa-table-columns mr-1"></i>Columnas';
+  colBtn.addEventListener('click', () => { colsDraw(); colsModal.classList.add('on'); setTimeout(() => { const i = $('v26-col-n'); if (i) i.focus(); }, 30); });
+  if (addBtn) addBtn.before(colBtn);
+  // botón "+ Columna" también dentro de la ficha de edición
+  const edModal = $('record-editor-modal');
+  if (edModal) new MutationObserver(() => {
+    const cont = $('editor-fields-container'); if (!cont || !dev() || edModal.classList.contains('ui-hidden') || cont.querySelector('.v26-addcol')) return;
+    const d = document.createElement('div'); d.className = 'v26-addcol flex items-end';
+    d.innerHTML = '<button type="button" class="w-full px-3 py-2 text-xs rounded-lg border border-dashed border-white/20 text-slate-300 hover:text-white">＋ Columna nueva</button>';
+    d.firstChild.addEventListener('click', () => { colsDraw(); colsModal.classList.add('on'); });
+    cont.appendChild(d);
+  }).observe(edModal, { attributes: true, attributeFilter: ['class'], subtree: true, childList: true });
+
+  /* =====================================================================
+     3) RASTREADORES · selector Unidades / Análisis más claro
+     ===================================================================== */
+  function rastTabs() {
+    const view = $('view-rast'); if (!view) return;
+    const tabs = view.querySelector('.v10-tabs'); if (!tabs || tabs.dataset.v26) return;
+    tabs.dataset.v26 = '1';
+    const bar = document.createElement('div'); bar.className = 'v26-rtabs'; bar.setAttribute('role', 'tablist');
+    const U = tabs.querySelector('[data-t="u"]'), A = tabs.querySelector('[data-t="a"]'); if (!U || !A) return;
+    U.innerHTML = '<span class="ic"><i class="fa-solid fa-car-side"></i></span><span><b>Unidades</b><small>Equipos de rastreo y su estado</small></span><span class="ct" id="v26-rt-u"></span>';
+    A.innerHTML = '<span class="ic"><i class="fa-solid fa-chart-column"></i></span><span><b>Análisis</b><small>Lecturas: batería, paradas y antenas</small></span>';
+    U.setAttribute('role', 'tab'); A.setAttribute('role', 'tab');
+    bar.append(U, A); tabs.replaceWith(bar);
+    bar.addEventListener('click', e => { const b = e.target.closest('[data-t]'); if (!b) return; bar.querySelectorAll('button').forEach(x => { x.classList.toggle('on', x === b); x.setAttribute('aria-selected', x === b ? 'true' : 'false'); }); });
+    // el manejador original estaba en el contenedor viejo: lo replicamos sin tocar su lógica
+    bar.addEventListener('click', e => { const b = e.target.closest('[data-t]'); if (!b) return; view.classList.toggle('v10-an', b.dataset.t === 'a'); if (b.dataset.t === 'a') { const s = view.querySelector('#rast-analisis select'); if (s) s.dispatchEvent(new Event('change')); } });
+    view.firstElementChild.after(bar);
+  }
+  function rastCount() { const c = $('rast-count'), t = $('v26-rt-u'); if (c && t) t.textContent = c.textContent; }
+
+  /* =====================================================================
+     4) RAFI · COMANDOS RÁPIDOS Y CONOCIMIENTO (tablas_libres "rafi_kb:*")
+        Todos los roles consultan; solo dev agrega o edita.
+     ===================================================================== */
+  const KB = { t: [], at: 0, loading: false, chip: 'TODOS', q: '' };
+  async function kbLoad(force) {
+    if (KB.loading || (!force && Date.now() - KB.at < 60000) || !logged() || !sb()) return KB.t;
+    KB.loading = true;
+    try {
+      const { data, error } = await sb().from('tablas_libres').select('modulo,columnas,filas');
+      if (!error) KB.t = (data || []).filter(d => String(d.modulo).startsWith('rafi_kb:')).map(d => ({ mod: d.modulo, nombre: d.modulo.slice(8).replace(/_/g, ' '), columnas: Array.isArray(d.columnas) ? d.columnas : [], filas: Array.isArray(d.filas) ? d.filas : [] }))
+        .sort((a, b) => (a.mod === 'rafi_kb:comandos_at' ? -1 : b.mod === 'rafi_kb:comandos_at' ? 1 : a.nombre.localeCompare(b.nombre)));
+      KB.at = Date.now();
+    } catch (e) {} finally { KB.loading = false; }
+    return KB.t;
+  }
+  const copyCol = cols => { let j = cols.findIndex(c => /COMANDO/i.test(c)); if (j < 0) j = cols.findIndex(c => /TEL[EÉ]FONO|ANEXO|CORREO|ENLACE|LINK|COPIAR/i.test(c)); return j; };
+  function kbItems() {
+    const out = [];
+    KB.t.forEach(t => { const cc = copyCol(t.columnas); t.filas.forEach(f => { if (f.some(x => String(x || '').trim())) out.push({ t, f, cc, txt: strip(t.nombre + ' ' + t.columnas.map((c, j) => f[j]).join(' ')) }); }); });
+    return out;
+  }
+  const STOP = new Set(['el', 'la', 'los', 'las', 'de', 'del', 'para', 'por', 'un', 'una', 'que', 'me', 'dame', 'dime', 'como', 'cual', 'es', 'en', 'y', 'o', 'al', 'se', 'mi', 'necesito', 'quiero', 'comando', 'comandos']);
+  function kbSearch(q, chip, max = 40, loose = false) {
+    let words = strip(q).split(/[\s,¿?¡!.]+/).filter(w => w.length > 1);
+    if (loose) words = words.filter(w => !STOP.has(w));
+    return kbItems().filter(it => chip === 'TODOS' || String(it.f[0] || '').toUpperCase() === chip || it.t.nombre.toUpperCase() === chip)
+      .map(it => ({ ...it, s: words.length ? words.reduce((a, w) => a + (it.txt.includes(w) ? 1 : 0), 0) : 1 }))
+      .filter(it => it.s > 0 && (loose || !words.length || it.s >= Math.min(words.length, Math.max(1, words.length - 1))))
+      .sort((a, b) => b.s - a.s).slice(0, max);
+  }
+  const kbFor = q => (strip(q).split(/[\s,¿?¡!.]+/).some(w => w.length > 1 && !STOP.has(w)) ? kbSearch(q, 'TODOS', 25, true) : []).map(it => ({ tabla: it.t.nombre, ...Object.fromEntries(it.t.columnas.map((c, j) => [c, String(it.f[j] ?? '').slice(0, 300)])) }));
+  function kbCard(it) {
+    const c = it.t.columnas, f = it.f, cc = it.cc;
+    const title = c[0] && c[2] ? `${esc(f[0] || '')} · <em>${esc(f[2] || '')}</em>` : esc(f[0] || it.t.nombre);
+    const rest = c.map((n, j) => j === cc || j === 0 || (j === 2 && c[2]) ? '' : (String(f[j] || '').trim() ? `${esc(n)}: ${esc(f[j])}` : '')).filter(Boolean).join(' · ');
+    const val = cc >= 0 ? String(f[cc] || '').trim() : '';
+    return `<div class="v26-cmd"><div class="t">${title}</div>${rest ? `<div class="s">${rest}</div>` : ''}${val ? `<div class="c"><code>${esc(val)}</code><button type="button" data-copy="${esc(val)}">Copiar</button></div>` : ''}</div>`;
+  }
+  const KBT = { on: false };
+  function kbDraw() {
+    const pop = $('rafi-pop'); if (!pop || !KBT.on) return;
+    const body = pop.querySelector('.rp-body'); if (!body) return;
+    const keep = $('v26-kbq') ? $('v26-kbq').value : KB.q;
+    const cmds = KB.t.find(t => t.mod === 'rafi_kb:comandos_at');
+    const chips = ['TODOS', ...new Set((cmds ? cmds.filas.map(f => String(f[0] || '').toUpperCase()).filter(Boolean) : [])), ...KB.t.filter(t => t !== cmds).map(t => t.nombre.toUpperCase())];
+    const res = kbSearch(keep, KB.chip);
+    body.innerHTML = `<div class="v26-kb-q"><input id="v26-kbq" maxlength="80" placeholder="Ej. bloquear gv58, iccid, reset, claro…" aria-label="Buscar comando" value="${esc(keep)}"></div>
+      <div class="v26-chips">${chips.map(c => `<button type="button" data-chip="${esc(c)}" class="${KB.chip === c ? 'on' : ''}">${esc(c)}</button>`).join('')}</div>
+      <div id="v26-kbres" style="display:grid;gap:6px">${KB.loading && !KB.t.length ? '<p class="v10-sub">Cargando…</p>' : res.length ? res.map(kbCard).join('') : `<p class="v10-sub">${KB.t.length ? 'No encontré eso. ' : 'Aún no hay comandos cargados (ejecuta el SQL v26). '}${dev() ? 'Agrégalo en Centro RAFI → Conocimiento de RAFI.' : 'Pídelo en la pestaña Preguntar.'}</p>`}</div>`;
+  }
+  function kbRedrawRes() { const box = $('v26-kbres'), q = $('v26-kbq'); if (!box || !q) return; KB.q = q.value; const res = kbSearch(q.value, KB.chip); box.innerHTML = res.length ? res.map(kbCard).join('') : '<p class="v10-sub">No encontré eso.</p>'; }
+  function mountKbTab() {
+    const pop = $('rafi-pop'); if (!pop || !pop.classList.contains('v10')) return;
+    const tabs = pop.querySelector('.rp-tabs'); if (!tabs) return;
+    const has = tabs.querySelector('[data-tab="kb"]');
+    if (!logged()) { if (has) has.remove(); KBT.on = false; return; }
+    if (has) return;
+    const b = document.createElement('button'); b.dataset.tab = 'kb'; b.textContent = 'Comandos';
+    const g = tabs.querySelector('[data-tab="guia"]'); if (g) g.after(b); else tabs.appendChild(b);
+    if (pop.dataset.v26) return; pop.dataset.v26 = '1';
+    pop.addEventListener('click', async e => {
+      const t = e.target.closest('[data-tab]');
+      if (t) {
+        if (t.dataset.tab === 'kb') { e.stopPropagation(); KBT.on = true; pop.querySelectorAll('.rp-tabs button').forEach(x => x.classList.toggle('on', x === t)); kbDraw(); await kbLoad(); kbDraw(); setTimeout(() => { const q = $('v26-kbq'); if (q) q.focus(); }, 30); }
+        else KBT.on = false;
+        return;
+      }
+      if (!KBT.on) return;
+      const c = e.target.closest('[data-copy]'); if (c) { e.stopPropagation(); copy(c.dataset.copy); return; }
+      const ch = e.target.closest('[data-chip]'); if (ch) { e.stopPropagation(); KB.chip = ch.dataset.chip; KB.q = $('v26-kbq') ? $('v26-kbq').value : ''; kbDraw(); }
+    }, true);
+    pop.addEventListener('input', e => { if (KBT.on && e.target.id === 'v26-kbq') kbRedrawRes(); });
+    new MutationObserver(() => { if (KBT.on && pop.classList.contains('on') && !pop.querySelector('#v26-kbq')) { pop.querySelectorAll('.rp-tabs button').forEach(x => x.classList.toggle('on', x.dataset.tab === 'kb')); kbDraw(); } }).observe(pop.querySelector('.rp-body') || pop, { childList: true });
+  }
+  // Centro RAFI: sección "Conocimiento de RAFI" (todos leen, dev edita, agrega y borra tablas)
+  const kbSec = document.createElement('div'); kbSec.className = 'card p-4 v26-kbsec'; kbSec.id = 'v26-kbsec';
+  const rafiScroll = $('view-rafi') && $('view-rafi').querySelector('.overflow-y-auto');
+  if (rafiScroll) rafiScroll.prepend(kbSec);
+  const KBV = { sig: '', tables: [] };
+  async function kbView(force) {
+    if (!rafiScroll || $('view-rafi').classList.contains('ui-hidden') || !logged()) return;
+    await kbLoad(force);
+    const sig = (dev() ? 'd' : 'v') + KB.t.map(t => t.mod).join('|');
+    if (sig === KBV.sig && !force) return; KBV.sig = sig;
+    kbSec.innerHTML = `<div class="flex flex-wrap items-center justify-between gap-2"><div><h3>🧠 Conocimiento de RAFI</h3><p class="text-[11px] text-slate-400">Comandos AT, directorio y lo que necesites. RAFI los muestra en su pestaña <b>Comandos</b> y la IA los usa para responder.</p></div>
+      ${dev() ? '<button class="v21-btn pri" data-kb="new"><i class="fa-solid fa-plus"></i>Nueva tabla</button>' : ''}</div><div id="v26-kbt"></div>`;
+    const host = $('v26-kbt'); KBV.tables = [];
+    if (!KB.t.length) { host.innerHTML = `<div class="v21-msg warn mt-3">No hay tablas de conocimiento todavía. ${dev() ? 'Ejecuta el SQL v26 (trae tus comandos AT y el directorio) o crea una con “Nueva tabla”.' : ''}</div>`; return; }
+    KB.t.forEach(t => {
+      const box = document.createElement('div'); box.className = 'mt-3'; host.appendChild(box);
+      if (dev() && t.mod !== 'rafi_kb:comandos_at') { const del = document.createElement('div'); del.className = 'flex justify-end'; del.innerHTML = `<button class="v26-mini" data-kb="del" data-mod="${esc(t.mod)}">Borrar tabla “${esc(t.nombre)}”</button>`; host.appendChild(del); }
+      if (typeof window.__mdzEditTable !== 'function') { box.innerHTML = '<div class="v21-msg">Tabla no disponible.</div>'; return; }
+      const et = window.__mdzEditTable(box, { mod: t.mod, defCols: t.columnas.length ? t.columnas : ['TEMA', 'DETALLE', 'DATO A COPIAR'], numRe: /(?!)/, title: t.nombre.toUpperCase(), sub: `${t.filas.length} filas · ${dev() ? 'edita, mueve con ▲▼ y pulsa Guardar' : 'solo lectura'}`, icon: t.mod === 'rafi_kb:comandos_at' ? '⌨️' : '📒', onChange: () => { KB.at = 0; } });
+      et.load(); KBV.tables.push(et);
+    });
+  }
+  kbSec.addEventListener('click', async e => {
+    const b = e.target.closest('[data-kb]'); if (!b || !dev()) return;
+    if (b.dataset.kb === 'new') {
+      const n = String(prompt('Nombre de la nueva tabla (ej. Procedimientos, Proveedores, Claves de soporte):') || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_|_$/g, '').slice(0, 40);
+      if (!n) return;
+      if (KB.t.some(t => t.mod === 'rafi_kb:' + n)) { toast('Esa tabla ya existe'); return; }
+      if (await window.__mdzTl.save('rafi_kb:' + n, { columnas: ['TEMA', 'DETALLE', 'DATO A COPIAR'], filas: [] })) { KB.at = 0; kbView(true); }
+    }
+    if (b.dataset.kb === 'del') {
+      if (!confirm('¿Borrar esta tabla de conocimiento y todo su contenido?')) return;
+      const { error } = await sb().from('tablas_libres').delete().eq('modulo', b.dataset.mod);
+      toast(error ? 'No se pudo borrar: ' + error.message : 'Tabla borrada'); KB.at = 0; kbView(true);
+    }
+  });
+
+  /* =====================================================================
+     5) RECUPEROS · tablero completo con el Excel de consola (Supabase mdz_recuperos, solo dev)
+     ===================================================================== */
+  // Lector del Excel (el mismo que usa la función recuperos-ingesta)
+  // Convierte el Excel "STATUS DE RECUPERO" (todas sus hojas) en filas para public.mdz_recuperos
+  function mdzParseRecuperos(XLSX, wb, fuente) {
+    const clean = v => v == null ? '' : String(v).normalize('NFD').replace(/[̀-ͯ]/g, '').toUpperCase().replace(/\s+/g, ' ').trim();
+    const txt = (v, n) => { const s = v == null ? '' : String(v).replace(/\s+/g, ' ').trim(); return s && s !== '-' ? s.slice(0, n) : null; };
+    const COLS = { n: ['N°'], op: ['N° DE OP.', 'N° OP.', 'N DE OP.'], date: ['FECHA', 'FECHA DE ROBO'], hour: ['HORA DE DENUNCIA A HUNTER', 'HORA DE DENUNCIA'], diff: ['DIFERENCIA HORA DE ROBO Y DENUNCIA'], type: ['TIPO'], brand: ['MARCA'], model: ['MODELO'], mod: ['MODALIDAD DE ROBO', 'MODALIDAD'], ins: ['ASEGURADORA'], dev: ['DISPOSITIVO'], zone: ['LUGAR DE ROBO', 'DISTRITO'], status: ['STATUS DE RECUPERO'], devst: ['ESTADO DEL DISPOSITIVO'], plate: ['PLACA'], reconf: ['RECONFIRMADO'], taxi: ['TAXI'], trec: ['TIEMPO DE RECUPERO'], lrec: ['LUGAR DE RECUPERO'], obs: ['OBSERVACION'], vlu: ['VLU'], owner: ['PROPIETARIO'] };
+    const pad = n => String(n).padStart(2, '0');
+    const pDate = v => {
+      if (v == null || v === '') return null;
+      if (v instanceof Date && !isNaN(v)) return `${v.getFullYear()}-${pad(v.getMonth() + 1)}-${pad(v.getDate())}`;
+      if (typeof v === 'number' && v > 1) { const d = new Date(Math.round((v - 25569) * 864e5)); return isNaN(d.getTime()) ? null : `${d.getUTCFullYear()}-${pad(d.getUTCMonth() + 1)}-${pad(d.getUTCDate())}`; }
+      const m = String(v).match(/(\d{1,2})[\/-](\d{1,2})[\/-](\d{2,4})/); if (m) { let y = +m[3]; if (y < 100) y += 2000; return `${y}-${pad(+m[2])}-${pad(+m[1])}`; }
+      return null;
+    };
+    const pHour = v => {
+      if (v == null || v === '') return null;
+      if (v instanceof Date && !isNaN(v)) return `${pad(v.getHours())}:${pad(v.getMinutes())}`;
+      if (typeof v === 'number') { const f = v % 1, mins = Math.round(f * 1440); return `${pad(Math.floor(mins / 60) % 24)}:${pad(mins % 60)}`; }
+      const m = String(v).match(/(\d{1,2})(?::(\d{2}))?\s*(AM|PM|A\.M\.|P\.M\.)?/i); if (!m) return null;
+      let h = +m[1]; const a = (m[3] || '').toUpperCase().replace(/\./g, ''); if (a === 'PM' && h < 12) h += 12; if (a === 'AM' && h === 12) h = 0;
+      return h < 24 ? `${pad(h)}:${pad(+(m[2] || 0))}` : null;
+    };
+    const out = new Map();
+    for (const sn of wb.SheetNames) {
+      const mx = XLSX.utils.sheet_to_json(wb.Sheets[sn], { header: 1, defval: '', raw: true });
+      const hi = mx.slice(0, 25).findIndex(r => { const t = r.map(clean).join('|'); return t.includes('STATUS DE RECUPERO') && t.includes('DISPOSITIVO'); });
+      if (hi < 0) continue;
+      const H = mx[hi].map(clean), ix = {};
+      for (const k in COLS) { ix[k] = H.findIndex(h => COLS[k].includes(h)); if (ix[k] < 0 && k !== 'n') ix[k] = H.findIndex(h => h && COLS[k].some(c => h.startsWith(c))); }
+      for (let i = hi + 1; i < mx.length; i++) {
+        const w = mx[i], g = k => ix[k] >= 0 ? w[ix[k]] : '';
+        if (/TOTAL/.test(clean(w.slice(0, 3).join(' ')))) break;   // debajo vienen los cuadros de totales
+        if (ix.n >= 0 && !(parseFloat(g('n')) > 0)) continue;
+        const st = txt(g('status'), 80), zona = txt(g('zone'), 200), placa = txt(g('plate'), 20);
+        if (!st && !zona && !placa) continue;
+        if (!/[A-Z]/i.test(String(placa || '') + String(zona || ''))) continue;   // filas de números sueltos
+        const op = parseInt(String(g('op')).replace(/\D/g, ''), 10), fecha = pDate(g('date'));
+        const clave = isFinite(op) && op > 0 ? 'OP' + op : (fecha || 'SF') + '|' + (placa || 'SP') + '|' + (zona || '');
+        out.set(clave.slice(0, 80), {
+          clave: clave.slice(0, 80), op: isFinite(op) && op > 0 ? op : null, fecha, hoja: txt(sn, 60),
+          tipo: txt(g('type'), 80), marca: txt(g('brand'), 80), modelo: txt(g('model'), 120), placa,
+          hora_denuncia: pHour(g('hour')), demora_txt: txt(g('diff'), 60), modalidad: txt(g('mod'), 120), aseguradora: txt(g('ins'), 120),
+          propietario: txt(g('owner'), 200), dispositivo: txt(g('dev'), 120), vlu: txt(g('vlu'), 60), taxi: txt(g('taxi'), 20), reconfirmado: txt(g('reconf'), 20),
+          lugar_robo: zona, tiempo_recupero_txt: txt(g('trec'), 60), lugar_recupero: txt(g('lrec'), 200), status: st, observacion: txt(g('obs'), 1000),
+          estado_dispositivo: txt(g('devst'), 200), fuente: txt(fuente, 200)
+        });
+      }
+    }
+    return [...out.values()];
+  }
+  const D={'SAN MARTIN DE PORRES':[-12.0135,-77.0586],'VILLA EL SALVADOR':[-12.2154,-76.9351],'SAN JUAN DE MIRAFLORES':[-12.1646,-76.9691],'VILLA MARIA DEL TRIUNFO':[-12.1578,-76.9272],'LOS OLIVOS':[-11.9877,-77.0732],'CALLAO':[-12.0566,-77.1181],'VENTANILLA':[-11.8756,-77.1264],'CARABAYLLO':[-11.8894,-77.0244],'COMAS':[-11.9353,-77.0531],'ATE':[-12.0241,-76.9142],'PUENTE PIEDRA':[-11.8647,-77.0778],'SANTIAGO DE SURCO':[-12.1436,-76.9916],'SURCO':[-12.1436,-76.9916],'MIRAFLORES':[-12.1111,-77.0315],'CERCADO DE LIMA':[-12.0464,-77.0428],'SAN JUAN DE LURIGANCHO':[-11.9847,-76.9931],'SAN BORJA':[-12.1091,-76.9984],'LA VICTORIA':[-12.0722,-77.0231],'SURQUILLO':[-12.1189,-77.0175],'BARRANCO':[-12.1456,-77.0219],'CHORRILLOS':[-12.1764,-77.0125],'LA MOLINA':[-12.0833,-76.95],'SAN MIGUEL':[-12.0775,-77.0914],'MAGDALENA':[-12.0914,-77.0708],'JESUS MARIA':[-12.0733,-77.0456],'LINCE':[-12.085,-77.0342],'BRENA':[-12.0583,-77.0528],'PUEBLO LIBRE':[-12.0775,-77.0622],'INDEPENDENCIA':[-11.9931,-77.0506],'RIMAC':[-12.0303,-77.0281],'EL AGUSTINO':[-12.0447,-76.9969],'SANTA ANITA':[-12.0453,-76.9714],'SAN LUIS':[-12.0764,-76.9972],'LURIN':[-12.2753,-76.8706],'CHACLACAYO':[-11.9767,-76.7683],'LURIGANCHO':[-11.9453,-76.7003],'SAN ISIDRO':[-12.0977,-77.0365],'PACHACAMAC':[-12.2285,-76.8615],'CIENEGUILLA':[-12.1178,-76.8133],'ANCON':[-11.7738,-77.175],'SANTA ROSA':[-11.8,-77.17],'SAN BARTOLO':[-12.3833,-76.7833],'LIMA':[-12.0464,-77.0428],'ICA':[-14.0638,-75.7430]};
+  const DK = Object.keys(D).sort((a, b) => b.length - a.length), DR = DK.map(k => [k, new RegExp('(^| )' + k + '( |$)')]);
+  const dkey = z => !z ? null : D[z] ? z : (DR.find(x => x[1].test(z)) || [])[0] || null;
+  const cl = v => v == null ? '' : String(v).normalize('NFD').replace(/[̀-ͯ]/g, '').toUpperCase().replace(/\s+/g, ' ').trim();
+  const DAYS = ['DOM', 'LUN', 'MAR', 'MIÉ', 'JUE', 'VIE', 'SÁB'], MESES = ['ENE', 'FEB', 'MAR', 'ABR', 'MAY', 'JUN', 'JUL', 'AGO', 'SEP', 'OCT', 'NOV', 'DIC'];
+  const SUBC = { 'GPS BASE': '#22d3ee', 'GPS-PP': '#a78bfa', 'GPS 360': '#f59e0b', 'HUNTER PRO': '#f43f5e', 'GPS AMI': '#10b981', 'PP SECURITY': '#ec4899', 'HUNTER TOYOTA': '#3b82f6' };
+  const CLSC = { GPS: '#22d3ee', LOJACK: '#f59e0b', DETEKTOR: '#a78bfa', OTROS: '#64748b' };
+  const hash = s => { let h = 2166136261; for (const c of String(s)) h = Math.imul(h ^ c.charCodeAt(0), 16777619); return (h >>> 0) / 4294967296; };
+  const pDiff = v => { const t = cl(v); if (!t || t === '-') return null; let m = 0, x; if ((x = t.match(/(\d+)\s*D/))) m += x[1] * 1440; if ((x = t.match(/(\d+)\s*H/))) m += x[1] * 60; if ((x = t.match(/(\d+)\s*M/))) m += +x[1]; return m || null; };
+  // Todo lo que diga GPS (GPS-PP, 360, AMI, HUNTER PRO, PP SECURITY…) se une como GPS. LOJACK y DETEKTOR van aparte.
+  function devInfo(d) {
+    const t = cl(d); if (!t || /^[%\d]+$/.test(t)) return { cls: 'OTROS', tags: [], gl: false, gd: false, hybrid: false };
+    const gps = /GPS|HUNTER|PP|AMI|360/.test(t), lj = /LOJACK|VLU/.test(t), dk = /DETEK/.test(t), tags = [];
+    if (gps) { if (/PP SECURITY|PP-SECURITY|PP- SECURITY/.test(t)) tags.push('PP SECURITY'); if (/GPS-PP|GPS PP|GPS-GPS PP/.test(t)) tags.push('GPS-PP'); if (/360/.test(t)) tags.push('GPS 360'); if (/AMI/.test(t)) tags.push('GPS AMI'); if (/HUNTER PRO/.test(t)) tags.push('HUNTER PRO'); if (/HUNTER TOYOTA/.test(t)) tags.push('HUNTER TOYOTA'); if (!tags.length) tags.push('GPS BASE'); }
+    return { cls: gps ? 'GPS' : lj ? 'LOJACK' : dk ? 'DETEKTOR' : 'OTROS', tags, hybrid: gps && (lj || dk), gl: gps && lj, gd: gps && dk };
+  }
+  function enrich(r) {
+    const st = cl(r.status), z0 = cl(r.lugar_robo).split('-')[0].replace(/[^A-Z0-9 ]/g, ' ').replace(/\s+/g, ' ').trim(), kz = dkey(z0);
+    const zone = kz ? (kz === 'SURCO' ? 'SANTIAGO DE SURCO' : kz === 'LIMA' ? 'CERCADO DE LIMA' : kz) : z0;
+    const date = r.fecha ? new Date(r.fecha + 'T12:00:00') : null, ok = date && !isNaN(date);
+    const hh = r.hora_denuncia ? parseInt(String(r.hora_denuncia), 10) : NaN, k = dkey(zone);
+    const o = {
+      id: r.id, clave: r.clave, op: r.op, status: st, recovered: /^SI$|RECUPER/.test(st) && !/^NO/.test(st), zone,
+      month: ok ? MESES[date.getMonth()] + ' ' + date.getFullYear() : cl(r.hoja) || 'SIN FECHA', mk: ok ? date.getFullYear() + '-' + String(date.getMonth() + 1).padStart(2, '0') : '0000',
+      type: cl(r.tipo), brand: cl(r.marca), model: cl(r.modelo), mod: cl(r.modalidad), ins: cl(r.aseguradora), devRaw: cl(r.dispositivo), ...devInfo(r.dispositivo),
+      devst: cl(r.estado_dispositivo), plate: cl(r.placa), date: ok ? date : null, hour: isFinite(hh) && hh >= 0 && hh < 24 ? hh : null, horaTxt: r.hora_denuncia || '',
+      diff: pDiff(r.demora_txt), diffTxt: r.demora_txt || '', trec: pDiff(r.tiempo_recupero_txt), trecTxt: r.tiempo_recupero_txt || '', lrec: cl(r.lugar_recupero),
+      reconf: /^SI/.test(cl(r.reconfirmado)), taxi: /^SI/.test(cl(r.taxi)), obs: r.observacion || '', owner: cl(r.propietario), fuente: r.fuente || '',
+      coords: k ? [D[k][0] + (hash(r.clave) - .5) * .014, D[k][1] + (hash(r.clave + '·') - .5) * .014] : null,
+    };
+    o.h = [o.plate, o.month, o.zone, o.type, o.brand, o.model, o.mod, o.ins, o.devRaw, o.cls, o.tags.join(' '), o.devst, o.status, cl(o.obs), o.lrec, o.owner, o.op].join(' ');
+    return o;
+  }
+  const count = (rs, f) => { const o = {}; rs.forEach(r => [].concat(f(r)).forEach(k => { if (k) o[k] = (o[k] || 0) + 1; })); return o; };
+  const topN = (o, n = 10) => Object.entries(o).sort((a, b) => b[1] - a[1]).slice(0, n);
+  const pct = (a, b) => b ? +(a / b * 100).toFixed(1) : 0;
+  const med = a => { if (!a.length) return null; a = [...a].sort((x, y) => x - y); return a[Math.floor(a.length / 2)]; };
+  const fmtM = m => m == null ? '--' : m < 60 ? m + ' min' : m < 1440 ? (m / 60).toFixed(1) + ' h' : (m / 1440).toFixed(1) + ' d';
+  const rateBy = (rs, f, n = 10, min = 3) => { const t = count(rs, f), r = count(rs.filter(x => x.recovered), f); return Object.keys(t).filter(k => t[k] >= min).map(k => [k, pct(r[k] || 0, t[k])]).sort((a, b) => b[1] - a[1]).slice(0, n); };
+  const hav = (a, b, c, d) => { const t = x => x * Math.PI / 180, q = Math.sin(t(c - a) / 2) ** 2 + Math.cos(t(a)) * Math.cos(t(c)) * Math.sin(t(d - b) / 2) ** 2; return 12742 * Math.asin(Math.sqrt(q)); };
+  const fd = d => d ? String(d.getDate()).padStart(2, '0') + '/' + String(d.getMonth() + 1).padStart(2, '0') + '/' + d.getFullYear() : '-';
+  const limaNow = () => new Date(Date.now() - 5 * 3600e3);
+
+  const REC = { raw: [], data: [], loaded: false, loading: false, err: '', view: 'resumen', opened: false, q: '', live: false, ch: null, maxId: 0, nuevos: [], at: 0, M: {}, ANT: { on: false, r: 8, reg: 'ALL' }, GV: 'ALL' };
+  const SEEN = 'mdz_recup_visto_v1';
+  const RICON = '<svg viewBox="0 0 24 24"><path d="M3 20h18"/><path d="M6 16v-5M10 16V8M14 16v-3M18 16V6"/><circle cx="18" cy="4" r="1.6"/></svg>';
+  const rnav = document.createElement('button');
+  rnav.id = 'nav-recup'; rnav.dataset.v = 'recup'; rnav.title = 'Recuperos · robos del Excel de consola (dev)'; rnav.className = 'ui-hidden'; rnav.innerHTML = '<svg class="hud-ico" viewBox="0 0 24 24" style="fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round"><path d="M3 20h18"/><path d="M6 16v-5M10 16V8M14 16v-3M18 16V6"/><circle cx="18" cy="4" r="1.6"/></svg>';
+  rnav.addEventListener('click', () => window.setView('recup'));
+  ($('nav-robo') || $('nav-noc')).after(rnav);
+  const rsec = document.createElement('section');
+  rsec.id = 'view-recup'; rsec.className = 'view ui-hidden map panel flex-1 min-w-0 flex flex-col overflow-hidden';
+  ($('view-robo') || $('view-noc')).after(rsec);
+  const VIEWS = [['resumen', 'Resumen'], ['mapa', 'Mapa general'], ['gps', 'Mapa por tecnología'], ['tec', 'Tecnología'], ['tiempos', 'Tiempos y horarios'], ['zonas', 'Zonas y riesgo'], ['veh', 'Vehículos'], ['datos', 'Datos']];
+  rsec.innerHTML = `<div class="flex flex-wrap items-center justify-between gap-3 px-5 pt-4 pb-3 border-b border-white/10">
+    <div><h2 class="text-base font-bold text-white flex items-center gap-2"><span class="text-[var(--accent)] inline-block" style="width:24px;height:24px">${RICON}</span>Recuperos</h2>
+    <p class="text-[11px] text-slate-400">Robos y recuperos del Excel de consola · GPS unificado / LOJACK / DETEKTOR · solo dev</p></div>
+    <div class="flex gap-2 flex-wrap items-center"><span class="v26-live" id="rc-live" title="Estado de la actualización automática"><i></i><span>Conectando…</span></span>
+      <label class="v21-btn" title="Subir el Excel STATUS DE RECUPERO a mano"><i class="fa-solid fa-file-arrow-up"></i>Subir Excel<input type="file" id="rc-file" accept=".xlsx,.xls,.xlsm" hidden></label>
+      <button class="v21-btn" id="rc-reload"><i class="fa-solid fa-rotate"></i>Actualizar</button>
+      <button class="v21-btn" id="rc-csv"><i class="fa-solid fa-download"></i>CSV</button></div></div>
+    <div class="flex-1 overflow-y-auto scroll p-5 space-y-4" id="rc-scroll">
+      <div id="rc-msg"></div>
+      <details class="card p-4" id="rc-fbox" open><summary class="cursor-pointer text-[11px] font-bold uppercase tracking-wider text-slate-300 select-none">Búsqueda y filtros <span id="rc-cnt" class="text-[var(--accent)] ml-2"></span></summary>
+        <div class="flex gap-2 mt-3 flex-wrap"><input id="rc-q" class="flex-1 min-w-[200px] px-3 py-2 text-xs rounded-lg bg-black/40 border border-white/10 text-white outline-none focus:border-[var(--accent)]" placeholder="Placa, zona, HILUX, GPS 360, ASALTO… (combina palabras)" aria-label="Buscar en recuperos">
+        <button class="v21-btn" id="rc-clear">↻ Limpiar</button></div>
+        <div class="v26-filt mt-3" id="rc-filters"></div></details>
+      <div class="v26-tabs" id="rc-tabs" role="tablist">${VIEWS.map(([k, t]) => `<button role="tab" data-rv="${k}" class="${k === 'resumen' ? 'on' : ''}">${t}</button>`).join('')}</div>
+      ${VIEWS.map(([k]) => `<div class="rc-view${k === 'resumen' ? '' : ' ui-hidden'}" id="rcv-${k}"></div>`).join('')}
+    </div>`;
+  if (window.innerWidth < 760) $('rc-fbox').removeAttribute('open');   // en celular los filtros empiezan plegados
+  // vistas con mapa: el contenedor del mapa se crea una sola vez
+  $('rcv-mapa').innerHTML = `<div class="card p-4"><div class="v26-mapbar" id="rc-mb1"><span class="text-[11px] font-bold uppercase tracking-wider text-slate-300 mr-2">Mapa general</span></div><div id="rc-map1" class="v26-map"></div>
+    <div class="v26-legend"><span><i style="background:#10b981"></i>Recuperado</span><span><i style="background:#ef4444;outline:2px solid rgba(239,68,68,.9)"></i>En proceso (borde grueso, sin parpadeo)</span><span>Ubicación aproximada por distrito</span></div><div id="rc-ap1"></div></div><div class="v26-cg mt-3" id="rc-mapa-ch"></div>`;
+  $('rcv-gps').innerHTML = `<div class="card p-4"><div class="v26-mapbar" id="rc-mb2"><span class="text-[11px] font-bold uppercase tracking-wider text-slate-300 mr-2">Mapa por tecnología</span></div>
+    <div class="v26-gs"><div id="rc-map2" class="v26-map"></div><div><div class="v26-gv" id="rc-gv"></div><div class="v26-kg mt-3" id="rc-gk" style="grid-template-columns:repeat(3,1fr)"></div><p class="text-[11px] font-bold uppercase tracking-wider text-slate-300 mt-4 mb-2">Variantes de GPS · tasa de recupero</p><div id="rc-gs"></div></div></div><div id="rc-ap2"></div></div>`;
+
+  const FL = [['mes', 'Mes', r => [r.month]], ['est', 'Estado', r => [r.recovered ? 'RECUPERADO' : 'EN PROCESO']], ['zona', 'Zona', r => [r.zone]], ['mod', 'Modalidad', r => [r.mod]], ['cls', 'Tecnología', r => [r.cls]], ['sub', 'Variante GPS', r => r.tags], ['tipo', 'Tipo', r => [r.type]], ['ins', 'Aseguradora', r => [r.ins]], ['marca', 'Marca', r => [r.brand]], ['comb', 'Combinación', r => [r.gl ? 'GPS + LOJACK' : r.gd ? 'GPS + DETEKTOR' : r.cls === 'GPS' ? 'SOLO GPS' : r.cls]], ['rec', 'Reconfirmado', r => [r.reconf ? 'SI' : 'NO']]];
+  function buildFilters() {
+    const prev = {}; FL.forEach(([id]) => { const s = $('rcf-' + id); if (s) prev[id] = s.value; });
+    $('rc-filters').innerHTML = FL.map(([id, l, f]) => {
+      let v = id === 'mes' ? [...new Map(REC.data.map(r => [r.month, r.mk])).entries()].sort((a, b) => b[1].localeCompare(a[1])).map(x => x[0]) : [...new Set(REC.data.flatMap(f).filter(Boolean))].sort();
+      return `<label>${l}<select id="rcf-${id}" class="sel max-w-none"><option>TODOS</option>${v.map(x => `<option ${prev[id] === x ? 'selected' : ''}>${esc(x)}</option>`).join('')}</select></label>`;
+    }).join('');
+  }
+  function filt() {
+    const t = cl(REC.q).split(' ').filter(Boolean);
+    const sel = FL.map(([id, , f]) => [($('rcf-' + id) || {}).value || 'TODOS', f]);
+    return REC.data.filter(r => sel.every(([v, f]) => v === 'TODOS' || f(r).includes(v)) && t.every(x => r.h.includes(x)));
+  }
+
+  // ---------- gráficos (Chart.js, ya cargado en el tablero) ----------
+  const CH = {};
+  const TX = '#94a3b8', GR = 'rgba(148,163,184,.12)';
+  const DESC = { trend: 'Casos por periodo. La línea celeste muestra cuántos tenían GPS.', st: 'Casos ya recuperados frente a los que siguen en proceso.', cls: 'Reparto por tecnología. GPS une GPS, PP, 360, AMI, Hunter Pro y PP Security.', rcls: 'De cada 100 casos de una tecnología, cuántos se recuperaron.', comb: 'Solo GPS, GPS junto con LOJACK o DETEKTOR, y las tecnologías sin GPS.', sub: 'Casos por variante de GPS (un caso con varias variantes cuenta en cada una).', rsub: '% de recupero por variante de GPS (2 o más casos).', open: 'Dónde se concentra el trabajo pendiente.', devst: 'Condición del dispositivo GPS al momento del robo.', devall: 'Condición del dispositivo en todas las tecnologías.', cm: 'Casos de cada mes divididos por tecnología.', dz: 'Distritos con más robos de vehículos con GPS.', raw: 'Dispositivos tal como vienen en el Excel.', t2: 'Evolución de los incidentes.', hr: 'Hora de denuncia a Hunter. La serie clara es la parte con GPS.', dy: 'Qué días se concentran más los robos.', df: 'Tiempo entre el robo y la denuncia. Mientras antes, mejor el recupero.', tc: 'Tiempo desde la denuncia hasta recuperar el vehículo.', fr: 'Madrugada 0-5 h, mañana 6-11 h, tarde 12-17 h, noche 18-23 h.', mr: '% de casos recuperados por mes.', zs: 'Las 10 zonas con más casos.', zr: '% de recupero por zona (3 o más casos).', lr: 'Dónde se encontraron los vehículos.', zm: 'Zonas con más asaltos a mano armada.', md: 'Modelos con más robos.', br: 'Marcas con más robos.', rm: '% de recupero por marca (5 o más casos).', ty: 'Tipo de vehículo.', mo: 'Cómo se cometieron los robos.', rmo: '% de recupero por modalidad (3 o más casos).', in: 'Aseguradoras con más casos.', ri: '% de recupero por aseguradora (5 o más casos).', ow: 'Propietarios o flotas con más robos (dato privado, solo dev).', rw: 'Propietarios con más casos sin recuperar.', pl: 'Placas que aparecen más de una vez.', ta: 'Taxis frente a particulares.' };
+  function box(host, id, t, full) {
+    const d = document.createElement('div'); d.className = 'card v26-ch' + (full ? ' full' : '');
+    d.innerHTML = `<p class="ct">${esc(t)}</p><p class="ds">${esc(DESC[id] || '')}</p><div class="cv"><canvas id="rcc-${id}" aria-label="${esc(t)}"></canvas></div>`;
+    host.appendChild(d); return d.querySelector('canvas');
+  }
+  function mk(host, id, t, cfg, full) {
+    if (CH[id]) { try { CH[id].destroy(); } catch (e) {} delete CH[id]; }
+    if (typeof Chart === 'undefined') return;
+    const cv = box(host, id, t, full), horiz = cfg.options && cfg.options.indexAxis === 'y', pie = cfg.type === 'doughnut';
+    const base = { responsive: true, maintainAspectRatio: false, animation: false,
+      plugins: { legend: { display: pie || (cfg.data.datasets.length > 1), position: pie ? 'bottom' : 'top', labels: { color: TX, boxWidth: 10, font: { size: 11 } } }, datalabels: { display: false }, tooltip: { intersect: false } },
+      scales: pie ? {} : { x: { ticks: { color: TX, font: { size: 10 }, autoSkip: !horiz, maxRotation: 50 }, grid: { color: GR }, stacked: !!cfg.stacked }, y: { ticks: { color: TX, font: { size: 10 } }, grid: { color: GR }, beginAtZero: true, stacked: !!cfg.stacked } } };
+    const opt = Object.assign({}, base, cfg.options || {}); opt.plugins = Object.assign({}, base.plugins, (cfg.options || {}).plugins || {}); if (!pie) opt.scales = base.scales;
+    CH[id] = new Chart(cv.getContext('2d'), { type: cfg.type, data: cfg.data, options: opt });
+  }
+  const hb = (h, id, t, e, c, unit) => mk(h, id, t, { type: 'bar', data: { labels: e.map(x => x[0]), datasets: [{ label: unit || 'Casos', data: e.map(x => x[1]), backgroundColor: c, borderRadius: 4 }] }, options: { indexAxis: 'y' } });
+  const vb = (h, id, t, k, vals, c, full) => mk(h, id, t, { type: 'bar', data: { labels: k, datasets: [{ label: 'Casos', data: vals, backgroundColor: c, borderRadius: 4 }] } }, full);
+  const dn = (h, id, t, e, cols) => mk(h, id, t, { type: 'doughnut', data: { labels: e.map(x => x[0]), datasets: [{ data: e.map(x => x[1]), backgroundColor: cols || ['#38bdf8', '#a78bfa', '#f59e0b', '#10b981', '#f43f5e', '#64748b', '#ec4899', '#eab308'], borderWidth: 0 }] }, options: { cutout: '58%' } });
+  const tkey = (r, sp) => { const y = r.date.getFullYear(), m = String(r.date.getMonth() + 1).padStart(2, '0'); return sp > 120 ? `${y}-${m}` : `${y}-${m}-${String(r.date.getDate()).padStart(2, '0')}`; };
+  const K = (l, v, c, s) => `<div class="v26-k" style="--c:${c}"><p>${esc(l)}</p><div title="${esc(v)}">${esc(typeof v === 'number' ? v.toLocaleString() : v)}</div><small>${s ? esc(s) : '&nbsp;'}</small></div>`;
+
+  // ---------- vistas ----------
+  function vResumen(d, g) {
+    const el = $('rcv-resumen'), rec = d.filter(r => r.recovered).length, gr = g.filter(r => r.recovered).length, lj = d.filter(r => r.cls === 'LOJACK'), dk = d.filter(r => r.cls === 'DETEKTOR');
+    const hrs = Array(24).fill(0), dys = Array(7).fill(0); d.forEach(r => { if (r.hour != null) hrs[r.hour]++; if (r.date) dys[r.date.getDay()]++; });
+    const ph = Math.max(...hrs), pd = Math.max(...dys), dd = d.filter(r => r.diff != null), pl = topN(count(d, r => r.plate), 1e5).filter(x => x[1] > 1);
+    const fr = { 'Madrugada': 0, 'Mañana': 0, 'Tarde': 0, 'Noche': 0 }; d.forEach(r => { if (r.hour != null) fr[r.hour < 6 ? 'Madrugada' : r.hour < 12 ? 'Mañana' : r.hour < 18 ? 'Tarde' : 'Noche']++; }); const fk = topN(fr, 1)[0];
+    const hoy = limaNow(), d7 = d.filter(r => r.date && (hoy - r.date) / 864e5 <= 7).length, d30 = d.filter(r => r.date && (hoy - r.date) / 864e5 <= 30).length;
+    const KP = [['Incidentes', d.length, '#94a3b8'], ['Recuperados', rec, '#10b981'], ['En proceso', d.length - rec, '#f59e0b'], ['Tasa de recupero', pct(rec, d.length) + '%', '#38bdf8'], ['Últimos 7 días', d7, '#f43f5e', d30 + ' en 30 días'],
+      ['Casos con GPS', g.length, '#22d3ee', 'GPS unificado'], ['Recupero GPS', pct(gr, g.length) + '%', '#06b6d4'], ['Recupero LOJACK', pct(lj.filter(r => r.recovered).length, lj.length) + '%', '#f59e0b', lj.length + ' casos'], ['Recupero DETEKTOR', pct(dk.filter(r => r.recovered).length, dk.length) + '%', '#a78bfa', dk.length + ' casos'],
+      ['Demora mediana denuncia', fmtM(med(dd.map(r => r.diff))), '#06b6d4', 'robo → Hunter'], ['Denuncia ≤30 min', pct(dd.filter(r => r.diff <= 30).length, dd.length) + '%', '#22c55e'], ['Denuncia >6 h', pct(dd.filter(r => r.diff > 360).length, dd.length) + '%', '#ef4444'], ['Tiempo recupero mediano', fmtM(med(d.filter(r => r.trec != null).map(r => r.trec))), '#10b981'],
+      ['Hora pico', ph > 0 ? hrs.indexOf(ph) + ' h' : '--', '#f43f5e'], ['Día pico', pd > 0 ? DAYS[dys.indexOf(pd)] : '--', '#a855f7'], ['Franja crítica', fk && fk[1] ? fk[0] : '--', '#ec4899', fk ? pct(fk[1], d.length) + '% de casos' : ''], ['Zonas afectadas', Object.keys(count(d, r => r.zone)).length, '#3b82f6'],
+      ['Placas reincidentes', pl.length, '#f59e0b', 'robadas más de 1 vez'], ['Taxis', pct(d.filter(r => r.taxi).length, d.length) + '%', '#eab308'], ['Reconfirmados', pct(d.filter(r => r.reconf).length, d.length) + '%', '#14b8a6'], ['Sin cía. de seguros', pct(d.filter(r => /SIN C/.test(r.ins)).length, d.length) + '%', '#f87171'], ['Mixtos GPS + otro', g.filter(r => r.hybrid).length, '#8b5cf6'], ['Meses con datos', Object.keys(count(d, r => r.month)).length, '#64748b']];
+    const z = topN(count(d, r => r.zone), 1)[0], zo = topN(count(d.filter(r => !r.recovered), r => r.zone), 1)[0], md = topN(count(d, r => r.mod), 1)[0], mo = topN(count(d, r => r.model), 1)[0], gz = topN(count(g, r => r.zone), 1)[0], gs = topN(count(g, r => r.tags), 1)[0], bz = rateBy(d, r => r.zone, 1, 5)[0];
+    const wz = Object.entries(count(d, r => r.zone)).filter(x => x[1] >= 5).map(([k, t]) => [k, pct(d.filter(r => r.zone === k && r.recovered).length, t)]).sort((a, b) => a[1] - b[1])[0];
+    const I = [['🔥 Zona dominante', z && `${z[0]}: ${z[1]} incidentes (${pct(z[1], d.length)}%)`], ['🚨 Mayor carga abierta', zo && `${zo[0]}: ${zo[1]} en proceso`], ['⚠ Modalidad líder', md && `${md[0]} (${md[1]})`], ['🚗 Modelo más robado', mo && `${mo[0]} (${mo[1]})`], ['📡 Variante GPS líder', gs && `${gs[0]}: ${gs[1]} casos`], ['📍 Foco GPS', gz && `${gz[0]}: ${gz[1]} casos`], ['✅ Mejor recupero (≥5)', bz && `${bz[0]}: ${bz[1]}%`], ['❌ Peor recupero (≥5)', wz && `${wz[0]}: ${wz[1]}%`], ['🔁 Reincidencia', pl[0] && `${pl[0][0]} aparece ${pl[0][1]} veces`]];
+    el.innerHTML = `<div class="v26-kg">${KP.map(x => K(...x)).join('')}</div><h3 class="text-xs font-bold uppercase tracking-wider text-slate-300 mt-5 mb-2">Patrones detectados</h3><div class="v26-ins">${I.filter(x => x[1]).map(([t, x]) => `<div class="card"><p>${t}</p><b>${esc(x)}</b></div>`).join('')}</div><div class="v26-cg mt-4" id="rc-res-ch"></div>`;
+    const h = $('rc-res-ch'), ds = d.filter(r => r.date).map(r => +r.date), sp = ds.length ? (Math.max(...ds) - Math.min(...ds)) / 864e5 : 0, tr = count(d.filter(r => r.date), r => tkey(r, sp)), tg = count(g.filter(r => r.date), r => tkey(r, sp)), tk = Object.keys(tr).sort();
+    mk(h, 'trend', 'Evolución · total vs GPS', { type: 'line', data: { labels: tk, datasets: [{ label: 'Total', data: tk.map(k => tr[k]), borderColor: '#38bdf8', backgroundColor: 'rgba(56,189,248,.18)', fill: true, tension: .35, pointRadius: 2 }, { label: 'GPS', data: tk.map(k => tg[k] || 0), borderColor: '#22d3ee', borderDash: [5, 4], tension: .35, pointRadius: 0 }] } });
+    dn(h, 'st', 'Recuperado vs en proceso', [['RECUPERADO', rec], ['EN PROCESO', d.length - rec]], ['#10b981', '#f59e0b']);
+  }
+  function vTec(d, g) {
+    const h = $('rcv-tec'); h.innerHTML = '<div class="v26-cg" id="rc-tec-ch"></div>'; const H = $('rc-tec-ch'), c1 = topN(count(d, r => r.cls));
+    dn(H, 'comb', 'Combinaciones de tecnología', topN(count(d, r => r.gl ? 'GPS + LOJACK' : r.gd ? 'GPS + DETEKTOR' : r.cls === 'GPS' ? 'SOLO GPS' : r.cls)), ['#22d3ee', '#e879f9', '#f59e0b', '#a78bfa', '#fb7185', '#64748b']);
+    dn(H, 'cls', 'GPS unificado vs LOJACK vs DETEKTOR', c1, c1.map(x => CLSC[x[0]] || '#64748b'));
+    mk(H, 'rcls', 'Tasa de recupero por tecnología (%)', { type: 'bar', data: { labels: c1.map(x => x[0]), datasets: [{ label: '% recupero', data: c1.map(x => pct(d.filter(r => r.cls === x[0] && r.recovered).length, x[1])), backgroundColor: c1.map(x => CLSC[x[0]] || '#64748b'), borderRadius: 5 }] } });
+    const sb2 = topN(count(g, r => r.tags)); mk(H, 'sub', 'Variantes dentro de GPS', { type: 'bar', data: { labels: sb2.map(x => x[0]), datasets: [{ label: 'Casos', data: sb2.map(x => x[1]), backgroundColor: sb2.map(x => SUBC[x[0]] || '#22d3ee'), borderRadius: 5 }] } });
+    hb(H, 'rsub', 'Recupero por variante GPS (%)', rateBy(g, r => r.tags, 10, 2), '#22d3ee', '% recupero');
+    hb(H, 'open', 'Tecnologías con casos abiertos', topN(count(d.filter(r => !r.recovered), r => r.cls)), '#f59e0b');
+    hb(H, 'devst', 'Estado del dispositivo (GPS)', topN(count(g, r => r.devst), 8), '#f43f5e');
+    hb(H, 'devall', 'Estado del dispositivo (todas)', topN(count(d, r => r.devst), 8), '#ec4899');
+    const ms = [...new Map(d.map(r => [r.month, r.mk])).entries()].sort((a, b) => a[1].localeCompare(b[1])).map(x => x[0]);
+    mk(H, 'cm', 'Tecnología por mes', { type: 'bar', stacked: true, data: { labels: ms, datasets: ['GPS', 'LOJACK', 'DETEKTOR', 'OTROS'].map(c => ({ label: c, data: ms.map(m => d.filter(r => r.month === m && r.cls === c).length), backgroundColor: CLSC[c] })) } }, true);
+    hb(H, 'dz', 'Zonas con más casos GPS', topN(count(g, r => r.zone)), '#22d3ee'); hb(H, 'raw', 'Dispositivos (texto original)', topN(count(d, r => r.devRaw), 10), '#6366f1');
+  }
+  function vTiempos(d) {
+    const h = $('rcv-tiempos'), ds = d.filter(r => r.date).map(r => +r.date), sp = ds.length ? (Math.max(...ds) - Math.min(...ds)) / 864e5 : 0, tr = count(d.filter(r => r.date), r => tkey(r, sp)), tk = Object.keys(tr).sort();
+    const hrs = Array(24).fill(0), hg = Array(24).fill(0), dys = Array(7).fill(0), mx = Array.from({ length: 7 }, () => Array(24).fill(0)), Hh = [...Array(24).keys()].map(i => String(i).padStart(2, '0') + 'h');
+    d.forEach(r => { if (r.date) dys[r.date.getDay()]++; if (r.hour != null) { hrs[r.hour]++; if (r.cls === 'GPS') hg[r.hour]++; if (r.date) mx[r.date.getDay()][r.hour]++; } });
+    const mm = Math.max(1, ...mx.flat()), cell = v => { const k = v / mm; return v ? `background:rgba(239,68,68,${(.12 + k * .85).toFixed(2)});color:${k > .5 ? '#fff' : '#fecaca'}` : 'background:rgba(255,255,255,.03);color:transparent'; };
+    h.innerHTML = `<div class="card v26-ch"><p class="ct">Matriz día × hora</p><p class="ds">Cruce de día de la semana y hora de denuncia. Mientras más rojo, más casos en esa combinación.</p><div class="v10-scroll-x"><table class="v26-hm"><tr><th></th>${Hh.map(x => `<th>${x.slice(0, 2)}</th>`).join('')}</tr>${DAYS.map((n, i) => `<tr><th>${n}</th>${mx[i].map((v, j) => `<td style="${cell(v)}" title="${n} ${Hh[j]}: ${v} casos">${v || ''}</td>`).join('')}</tr>`).join('')}</table></div></div><div class="v26-cg mt-3" id="rc-tie-ch"></div>`;
+    const H = $('rc-tie-ch');
+    mk(H, 't2', 'Evolución temporal', { type: 'line', data: { labels: tk, datasets: [{ label: 'Incidentes', data: tk.map(k => tr[k]), borderColor: '#38bdf8', backgroundColor: 'rgba(56,189,248,.18)', fill: true, tension: .35, pointRadius: 2 }] } }, true);
+    mk(H, 'hr', 'Hora de denuncia', { type: 'bar', data: { labels: Hh, datasets: [{ label: 'Total', data: hrs, backgroundColor: '#0ea5e9', borderRadius: 3 }, { label: 'GPS', data: hg, backgroundColor: 'rgba(34,211,238,.45)', borderRadius: 3 }] } });
+    vb(H, 'dy', 'Incidentes por día de semana', DAYS, dys, '#a78bfa');
+    const rg = (f, lim) => { const o = Object.fromEntries(lim.map(x => [x[1], 0])); d.forEach(r => { const m = r[f]; if (m == null) return; o[lim.find(([x]) => m <= x)[1]]++; }); return o; };
+    const df = rg('diff', [[15, '0-15 min'], [30, '16-30 min'], [60, '31-60 min'], [120, '1-2 h'], [360, '2-6 h'], [1e12, '>6 h']]); vb(H, 'df', 'Demora robo → denuncia', Object.keys(df), Object.values(df), '#06b6d4');
+    const tc = rg('trec', [[60, '<1 h'], [360, '1-6 h'], [1440, '6-24 h'], [4320, '1-3 d'], [10080, '3-7 d'], [1e12, '>7 d']]); vb(H, 'tc', 'Tiempo hasta recupero', Object.keys(tc), Object.values(tc), '#10b981');
+    const fv = [0, 0, 0, 0]; d.forEach(r => { if (r.hour != null) fv[r.hour < 6 ? 0 : r.hour < 12 ? 1 : r.hour < 18 ? 2 : 3]++; }); dn(H, 'fr', 'Franjas horarias', [['Madrugada', fv[0]], ['Mañana', fv[1]], ['Tarde', fv[2]], ['Noche', fv[3]]], ['#6366f1', '#f59e0b', '#ef4444', '#0ea5e9']);
+    const ms = [...new Map(d.map(r => [r.month, r.mk])).entries()].sort((a, b) => a[1].localeCompare(b[1])).map(x => x[0]);
+    mk(H, 'mr', 'Tasa de recupero por mes (%)', { type: 'line', data: { labels: ms, datasets: [{ label: '% recupero', data: ms.map(m => pct(d.filter(r => r.month === m && r.recovered).length, d.filter(r => r.month === m).length)), borderColor: '#10b981', tension: .35, pointRadius: 3 }] } });
+  }
+  function zonasRisk(d) {
+    const z = {}; d.forEach(r => { if (!r.zone) return; const o = z[r.zone] = z[r.zone] || { t: 0, r: 0, g: 0 }; o.t++; if (r.recovered) o.r++; if (r.cls === 'GPS') o.g++; });
+    const E = Object.entries(z), mt = Math.max(...E.map(x => x[1].t), 1), mo = Math.max(...E.map(x => x[1].t - x[1].r), 1);
+    return E.map(([k, v]) => [k, v, Math.round((v.t / mt * .6 + (v.t - v.r) / mo * .4) * 100)]).sort((a, b) => b[2] - a[2]);
+  }
+  function vZonas(d) {
+    const h = $('rcv-zonas'), R = zonasRisk(d);
+    h.innerHTML = `<div class="card p-4"><p class="text-[11px] font-bold uppercase tracking-wider text-slate-300 mb-2">Índice de riesgo por zona (60% volumen + 40% casos abiertos)</p><div style="max-height:380px;overflow:auto"><table class="v26-tbl"><tr><th>#</th><th>Zona</th><th>Total</th><th>Recup.</th><th>Abiertos</th><th>GPS</th><th>% recupero</th><th>Riesgo</th></tr>${R.map(([k, v, s], i) => `<tr><td>${i + 1}</td><td><b>${esc(k)}</b></td><td>${v.t}</td><td>${v.r}</td><td>${v.t - v.r}</td><td>${v.g}</td><td><div class="v26-bar"><i style="width:${pct(v.r, v.t)}%"></i></div>${pct(v.r, v.t)}%</td><td><span class="v26-tag" style="background:${s > 66 ? '#7f1d1d' : s > 33 ? '#78350f' : '#064e3b'};color:#fff">${s}</span></td></tr>`).join('')}</table></div></div><div class="v26-cg mt-3" id="rc-zon-ch"></div>`;
+    const H = $('rc-zon-ch'), zt = R.slice(0, 10);
+    mk(H, 'zs', 'Zonas críticas · recuperados vs en proceso', { type: 'bar', stacked: true, data: { labels: zt.map(x => x[0]), datasets: [{ label: 'Recuperado', data: zt.map(x => x[1].r), backgroundColor: '#10b981' }, { label: 'En proceso', data: zt.map(x => x[1].t - x[1].r), backgroundColor: '#ef4444' }] }, options: { indexAxis: 'y' } });
+    hb(H, 'zr', 'Recupero por zona (≥3 casos, %)', rateBy(d, r => r.zone, 10, 3), '#10b981', '% recupero'); hb(H, 'lr', 'Lugares de recupero', topN(count(d, r => r.lrec), 10), '#06b6d4'); hb(H, 'zm', 'Zonas con asalto a mano armada', topN(count(d.filter(r => /ARMADA/.test(r.mod)), r => r.zone)), '#f43f5e');
+  }
+  function vVeh(d) {
+    const h = $('rcv-veh'); h.innerHTML = '<div class="v26-cg" id="rc-veh-ch"></div>'; const H = $('rc-veh-ch');
+    hb(H, 'md', 'Modelos más afectados', topN(count(d, r => r.model)), '#ec4899'); hb(H, 'br', 'Marcas más afectadas', topN(count(d, r => r.brand)), '#8b5cf6'); hb(H, 'rm', 'Recupero por marca (≥5, %)', rateBy(d, r => r.brand, 10, 5), '#10b981', '% recupero');
+    dn(H, 'ty', 'Tipos de vehículo', topN(count(d, r => r.type), 8)); dn(H, 'mo', 'Modalidades de robo', topN(count(d, r => r.mod), 8)); hb(H, 'rmo', 'Recupero por modalidad (≥3, %)', rateBy(d, r => r.mod, 8, 3), '#22c55e', '% recupero');
+    hb(H, 'in', 'Aseguradoras', topN(count(d, r => r.ins)), '#3b82f6'); hb(H, 'ri', 'Recupero por aseguradora (≥5, %)', rateBy(d, r => r.ins, 8, 5), '#14b8a6', '% recupero');
+    hb(H, 'ow', 'Propietarios / flotas más afectados', topN(count(d, r => r.owner), 10), '#8b5cf6'); hb(H, 'rw', 'Propietarios con más casos abiertos', topN(count(d.filter(r => !r.recovered), r => r.owner), 10), '#f43f5e');
+    hb(H, 'pl', 'Placas reincidentes', topN(count(d, r => r.plate), 1e5).filter(x => x[1] > 1).slice(0, 10), '#f59e0b'); hb(H, 'ta', 'Taxi vs particular', [['TAXI', d.filter(r => r.taxi).length], ['PARTICULAR', d.filter(r => !r.taxi).length]], '#eab308');
+  }
+  function vDatos(d) {
+    const h = $('rcv-datos'), n = Math.min(d.length, 500);
+    h.innerHTML = `<div class="card p-4"><p class="text-[11px] font-bold uppercase tracking-wider text-slate-300 mb-2">${d.length.toLocaleString()} registros${REC.q ? ` para “${esc(REC.q)}”` : ''} · mostrando ${n}</p><div class="v10-scroll-x" style="max-height:calc(100vh - 300px);overflow:auto"><table class="v26-tbl"><tr><th>Fecha</th><th>N° Op.</th><th>Placa</th><th>Zona</th><th>Vehículo</th><th>Dispositivo</th><th>Modalidad</th><th>Hora</th><th>Demora</th><th>Estado</th><th>Observación</th></tr>${d.slice(0, 500).map(r => `<tr><td>${fd(r.date)}</td><td>${esc(r.op || '')}</td><td><b>${esc(r.plate)}</b></td><td>${esc(r.zone)}</td><td>${esc([r.type, r.brand, r.model].filter(Boolean).join(' '))}</td><td><span class="v26-tag" style="background:${CLSC[r.cls] || '#334155'}33;color:${CLSC[r.cls] || '#fff'}">${esc(r.devRaw || '-')}</span></td><td>${esc(r.mod)}</td><td>${esc(r.horaTxt || '-')}</td><td>${esc(r.diffTxt || '-')}</td><td><span class="v26-tag" style="background:${r.recovered ? '#064e3b' : '#78350f'};color:#fff">${esc(r.status || '-')}</span></td><td style="max-width:260px">${esc(String(r.obs).slice(0, 160))}</td></tr>`).join('')}</table></div></div>`;
+  }
+
+  // ---------- mapas ----------
+  const LIBS = { heat: 'https://cdn.jsdelivr.net/npm/leaflet.heat@0.2.0/dist/leaflet-heat.js', cluster: 'https://cdn.jsdelivr.net/npm/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js' };
+  const libP = {};
+  const loadLib = k => libP[k] || (libP[k] = new Promise(res => { const s = document.createElement('script'); s.src = LIBS[k]; s.async = true; s.onload = () => res(true); s.onerror = () => res(false); document.head.appendChild(s); setTimeout(() => res(false), 12000); }));
+  function antenas() {
+    const m = new Map();
+    rows().forEach(r => { try { const i = info(r); if (i.movil || !i.ok || !i.punto) return; const k = keyOf(i.punto); if (!m.has(k)) m.set(k, [String(i.punto), i.lat, i.lon, /^LIMA/i.test(i.punto) || (i.lat > -12.9 && i.lat < -11.5 && i.lon > -77.4 && i.lon < -76.5)]); } catch (e) {} });
+    return [...m.values()];
+  }
+  function mkMap(n) {
+    if (REC.M[n] || typeof L === 'undefined') return REC.M[n];
+    const m = L.map('rc-map' + n, { preferCanvas: true }).setView([-12.0464, -77.0428], 11);
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap', maxZoom: 19 }).addTo(m);
+    const M = { n, m, mode: 'heat', pts: [], cur: null, rows: [], L: { points: L.layerGroup(), heat: L.layerGroup(), zones: L.layerGroup(), clusters: L.layerGroup() }, bar: $('rc-mb' + n), ap: $('rc-ap' + n) };
+    [['heat', 'Calor'], ['zones', 'Focos por distrito'], ['clusters', 'Agrupados'], ['points', 'Puntos']].forEach(([k, l]) => { const b = document.createElement('button'); b.type = 'button'; b.className = 'v26-pill' + (k === M.mode ? ' on' : ''); b.textContent = l; b.dataset.mode = k; M.bar.appendChild(b); });
+    const ab = document.createElement('button'); ab.type = 'button'; ab.className = 'v26-pill'; ab.dataset.ant = '1'; ab.style.marginLeft = 'auto'; ab.textContent = '📡 Cobertura de antenas'; M.bar.appendChild(ab);
+    const fs = document.createElement('button'); fs.type = 'button'; fs.className = 'v26-pill'; fs.dataset.fs = '1'; fs.textContent = '⛶'; fs.title = 'Pantalla completa'; M.bar.appendChild(fs);
+    M.bar.addEventListener('click', e => {
+      const b = e.target.closest('button'); if (!b) return;
+      if (b.dataset.mode) { M.mode = b.dataset.mode; M.bar.querySelectorAll('[data-mode]').forEach(x => x.classList.toggle('on', x === b)); showL(M); }
+      if (b.dataset.ant) { REC.ANT.on = !REC.ANT.on; document.querySelectorAll('#view-recup [data-ant]').forEach(x => x.classList.toggle('on', REC.ANT.on)); Object.values(REC.M).forEach(drawAnt); }
+      if (b.dataset.fs) { const el = m.getContainer(); if (document.fullscreenElement) document.exitFullscreen(); else if (el.requestFullscreen) el.requestFullscreen(); }
+    });
+    document.addEventListener('fullscreenchange', () => setTimeout(() => m.invalidateSize(), 250));
+    REC.M[n] = M; return M;
+  }
+  const showL = M => { if (M.cur) M.m.removeLayer(M.cur); M.cur = M.L[M.mode]; M.m.addLayer(M.cur); };
+  const popup = r => `<div style="min-width:210px;font-size:12px"><b style="font-size:14px">${esc(r.plate || 'CASO')}</b>${r.op ? ` · Op. ${esc(r.op)}` : ''}<hr style="margin:4px 0;border-color:#26304266"><b>${r.recovered ? '🟢 RECUPERADO' : '🔴 EN PROCESO'}</b><br>📍 ${esc(r.zone || '-')}<br>🚗 ${esc([r.type, r.brand, r.model].filter(Boolean).join(' '))}<br>📡 ${esc(r.devRaw || '-')}${r.devst ? ' · ' + esc(r.devst) : ''}<br>⚠ ${esc(r.mod || '-')}<br>🕒 ${esc(r.horaTxt || '-')} · demora ${esc(r.diffTxt || '-')}<br>📅 ${fd(r.date)}</div>`;
+  function draw(M, rs, color) {
+    if (!M) return; M.rows = rs; Object.values(M.L).forEach(l => l.clearLayers()); M.pts = [];
+    const cluster = window.L && L.markerClusterGroup ? L.markerClusterGroup({ maxClusterRadius: 45 }) : null;
+    rs.forEach(r => {
+      if (!r.coords) return; M.pts.push(r.coords); const c = color(r);
+      const ic = () => L.divIcon({ className: '', html: `<div class="v26-mrk${r.recovered ? '' : ' open'}" style="background:${c}"></div>`, iconSize: [16, 16], iconAnchor: [8, 8] });
+      M.L.points.addLayer(L.marker(r.coords, { icon: ic() }).bindPopup(popup(r)));
+      (cluster || M.L.clusters).addLayer(L.marker(r.coords, { icon: ic() }).bindPopup(popup(r)));
+    });
+    if (cluster) M.L.clusters.addLayer(cluster);
+    const withC = rs.filter(r => r.coords);
+    if (withC.length && L.heatLayer) M.L.heat.addLayer(L.heatLayer(withC.map(r => [...r.coords, r.recovered ? .5 : 1]), { radius: 30, blur: 22, maxZoom: 15, gradient: { .2: '#38bdf8', .45: '#a78bfa', .7: '#f472b6', 1: '#ef4444' } }));
+    else withC.forEach(r => L.circleMarker(r.coords, { radius: 14, stroke: false, fillColor: r.recovered ? '#f59e0b' : '#ef4444', fillOpacity: .16 }).addTo(M.L.heat));
+    const z = {}; rs.forEach(r => { const k = dkey(r.zone); if (!k) return; z[k] = z[k] || { t: 0, r: 0 }; z[k].t++; if (r.recovered) z[k].r++; });
+    Object.entries(z).forEach(([k, v]) => { const c = v.t - v.r > v.r ? '#ef4444' : '#10b981'; L.circle(D[k], { radius: Math.max(700, Math.sqrt(v.t) * 450), color: c, weight: 2, dashArray: '5 5', fillColor: c, fillOpacity: .26 }).bindPopup(`<b>${esc(k)}</b><br>Total <b>${v.t}</b> · Recuperados <b>${v.r}</b> · Abiertos <b>${v.t - v.r}</b><br>Recupero <b>${pct(v.r, v.t)}%</b>`).addTo(M.L.zones); });
+    showL(M);
+    // encuadre: el grupo principal (Lima), sin que un caso lejano (ej. Ica) aleje todo el mapa
+    const cLa = med(M.pts.map(x => x[0])), cLo = med(M.pts.map(x => x[1])), near = M.pts.filter(x => hav(cLa, cLo, x[0], x[1]) <= 70), fitPts = near.length >= M.pts.length * .7 ? near : M.pts;
+    setTimeout(() => { M.m.invalidateSize(); if (fitPts.length) M.m.fitBounds(fitPts, { padding: [30, 30], maxZoom: 13 }); }, 80);
+    drawAnt(M);
+  }
+  function drawAnt(M) {
+    if (!M || !M.m) return; if (M.ant) { M.m.removeLayer(M.ant); M.ant = null; }
+    const P = M.ap; if (!REC.ANT.on || !M.rows) { if (P) P.innerHTML = ''; return; }
+    const R = REC.ANT.r, A = antenas().filter(a => REC.ANT.reg === 'ALL' || (REC.ANT.reg === 'LIMA') === a[3]), rs = M.rows.filter(r => r.coords);
+    if (!A.length) { P.innerHTML = '<div class="v21-msg warn mt-3">No encuentro antenas con coordenadas en la base de puntos. Carga la base para ver la cobertura.</div>'; return; }
+    M.ant = L.layerGroup().addTo(M.m);
+    const S = A.map(a => { const z = {}; let t = 0, rc = 0, g = 0; rs.forEach(r => { if (hav(a[1], a[2], r.coords[0], r.coords[1]) <= R) { t++; if (r.recovered) rc++; if (r.cls === 'GPS') g++; z[r.zone] = (z[r.zone] || 0) + 1; } }); return { a, t, rc, g, z }; });
+    const H = {}; rs.forEach(r => { const k = dkey(r.zone); if (!k) return; const x = H[k] = H[k] || { k, t: 0, o: 0 }; x.t++; if (!r.recovered) x.o++; });
+    const HL = Object.values(H).sort((x, y) => y.t - x.t).map(x => { const c = D[x.k]; return { ...x, c, n: A.map(a => [a, hav(c[0], c[1], a[1], a[2])]).sort((p, q) => p[1] - q[1]).slice(0, 3) }; });
+    const mx = Math.max(...S.map(s => s.t), 1), col = s => s.t >= .66 * mx ? '#ef4444' : s.t >= .33 * mx ? '#f59e0b' : s.t > 0 ? '#22c55e' : '#64748b';
+    S.forEach(s => { const a = s.a, c = col(s); L.circle([a[1], a[2]], { radius: R * 1000, color: c, weight: 1, fillColor: c, fillOpacity: .05 }).addTo(M.ant);
+      L.marker([a[1], a[2]], { icon: L.divIcon({ className: '', html: `<div style="font-size:20px;filter:drop-shadow(0 0 4px ${c})">📡</div>`, iconSize: [22, 22], iconAnchor: [11, 11] }) }).bindTooltip(esc(a[0])).bindPopup(`<b>📡 ${esc(a[0])}</b><br>Radio ${R} km · casos en radio <b>${s.t}</b> (🟢 ${s.rc} · 🔴 ${s.t - s.rc})<br>Con GPS ${s.g} · recupero ${pct(s.rc, s.t)}%`).addTo(M.ant); });
+    HL.slice(0, 10).forEach(x => { const [a, dd] = x.n[0]; L.polyline([x.c, [a[1], a[2]]], { color: '#fbbf24', weight: 2, dashArray: '6 6' }).bindTooltip(`${esc(x.k)} → ${esc(a[0])} · ${dd.toFixed(1)} km`).addTo(M.ant); L.circleMarker(x.c, { radius: 6 + Math.sqrt(x.t), color: '#fff', weight: 2, fillColor: '#ef4444', fillOpacity: .85 }).bindTooltip(`FOCO ${esc(x.k)}: ${x.t} casos`).addTo(M.ant); });
+    const md = rs.map(r => Math.min(...A.map(a => hav(a[1], a[2], r.coords[0], r.coords[1])))), cov = md.filter(x => x <= R).length, dm = med(md.map(x => +x.toFixed(2))), unc = HL.filter(x => x.n[0][1] > R), top1 = [...S].sort((x, y) => y.t - x.t)[0], idle = S.filter(s => !s.t).length, rk = [...S].sort((x, y) => y.t - x.t).slice(0, 15);
+    const td = x => x.n.map(([a, dd]) => `<td>${esc(a[0].replace('LIMA-', ''))}<br><small style="color:${dd <= R ? '#22c55e' : '#ef4444'}">${dd.toFixed(1)} km</small></td>`).join('');
+    P.innerHTML = `<div class="card p-4 mt-3"><div class="v26-ant"><b class="text-white">📡 Análisis de antenas (de tu base de puntos)</b><label>Radio: <b id="rc-rv${M.n}" class="text-[var(--accent)]">${R} km</b> <input type="range" min="1" max="40" value="${R}" data-antr="1" style="vertical-align:middle"></label>
+      <label>Región <select class="sel" data-antg="1">${[['ALL', 'Todas'], ['LIMA', 'Solo Lima'], ['PROV', 'Solo provincias']].map(([v, l]) => `<option value="${v}" ${REC.ANT.reg === v ? 'selected' : ''}>${l}</option>`).join('')}</select></label><small>Distancias aproximadas: los casos se ubican por distrito.</small></div>
+      <div class="v26-kg mb-3">${K('Antenas', A.length, '#38bdf8')}${K('Con casos en radio', A.length - idle, '#22c55e')}${K('Sin casos', idle, '#64748b')}${K('Casos cubiertos', pct(cov, rs.length) + '%', '#10b981')}${K('Distancia mediana', (dm ?? 0) + ' km', '#06b6d4', 'caso → antena')}${K('Focos sin cobertura', unc.length, '#ef4444')}${K('Antena más cargada', top1 && top1.t ? top1.a[0].replace('LIMA-', '') + ' · ' + top1.t : '--', '#f59e0b')}</div>
+      <div class="v26-cg"><div><p class="text-[11px] font-bold uppercase tracking-wider text-slate-300 mb-2">Focos de robo → 3 antenas más cercanas (clic para ir)</p><div style="max-height:360px;overflow:auto"><table class="v26-tbl"><tr><th>Foco</th><th>Casos</th><th>Abiertos</th><th>Antena 1</th><th>Antena 2</th><th>Antena 3</th><th>Cob.</th></tr>${HL.slice(0, 25).map(x => `<tr data-go="${x.c[0]},${x.c[1]}"><td><b>${esc(x.k)}</b></td><td>${x.t}</td><td>${x.o}</td>${td(x)}<td>${x.n[0][1] <= R ? '✅' : '❌'}</td></tr>`).join('')}</table></div></div>
+      <div><p class="text-[11px] font-bold uppercase tracking-wider text-slate-300 mb-2">Antenas con más casos en su radio</p><div style="max-height:360px;overflow:auto"><table class="v26-tbl"><tr><th>#</th><th>Antena</th><th>Casos</th><th>Recup.</th><th>Abiertos</th><th>GPS</th><th>Zona principal</th></tr>${rk.map((s, i) => `<tr data-go="${s.a[1]},${s.a[2]}"><td>${i + 1}</td><td><b>${esc(s.a[0])}</b></td><td><div class="v26-bar"><i style="width:${pct(s.t, mx)}%"></i></div>${s.t}</td><td>${s.rc}</td><td>${s.t - s.rc}</td><td>${s.g}</td><td>${esc((Object.entries(s.z).sort((x, y) => y[1] - x[1])[0] || ['-'])[0])}</td></tr>`).join('')}</table></div></div></div></div>`;
+  }
+  rsec.addEventListener('click', e => { const tr = e.target.closest('tr[data-go]'); if (!tr) return; const [la, lo] = tr.dataset.go.split(',').map(Number), M = REC.M[REC.view === 'gps' ? 2 : 1]; if (M) { M.m.flyTo([la, lo], 13); M.m.getContainer().scrollIntoView({ behavior: 'smooth', block: 'center' }); } });
+  rsec.addEventListener('input', e => { const r = e.target.closest('[data-antr]'); if (r) { const M = REC.M[REC.view === 'gps' ? 2 : 1]; const lab = M && $('rc-rv' + M.n); if (lab) lab.textContent = r.value + ' km'; } });
+  rsec.addEventListener('change', e => {
+    if (e.target.closest('[data-antr]')) { REC.ANT.r = +e.target.value; Object.values(REC.M).forEach(drawAnt); return; }
+    if (e.target.closest('[data-antg]')) { REC.ANT.reg = e.target.value; Object.values(REC.M).forEach(drawAnt); return; }
+    if (e.target.closest('#rc-filters')) render();
+  });
+  const GVT = ['ALL', 'GPS BASE', 'GPS-PP', 'GPS 360', 'HUNTER PRO', 'GPS AMI', 'PP SECURITY', 'HUNTER TOYOTA', 'GL', 'GD', 'LOJACK', 'DETEKTOR', 'OTROS'];
+  const GVL = { ALL: 'Todos', GL: 'GPS + LOJACK', GD: 'GPS + DETEKTOR' }, GVC = { ALL: '#fff', GL: '#e879f9', GD: '#fb7185', LOJACK: CLSC.LOJACK, DETEKTOR: CLSC.DETEKTOR, OTROS: CLSC.OTROS, ...SUBC };
+  const GVF = k => k === 'ALL' ? () => true : k === 'GL' ? r => r.gl : k === 'GD' ? r => r.gd : ['LOJACK', 'DETEKTOR', 'OTROS'].includes(k) ? r => r.cls === k : r => r.tags.includes(k);
+  function vGps(d, g) {
+    const M = mkMap(2), rs = d.filter(GVF(REC.GV));
+    draw(M, rs, r => r.gl ? '#e879f9' : r.gd ? '#fb7185' : r.cls === 'GPS' ? (SUBC[r.tags[0]] || '#22d3ee') : (CLSC[r.cls] || '#64748b'));
+    $('rc-gv').innerHTML = GVT.map(k => { const c = d.filter(GVF(k)).length; if (!c && k !== 'ALL') return ''; return `<button type="button" class="v26-pill ${REC.GV === k ? 'on' : ''}" data-gv="${k}"><span style="color:${GVC[k]};margin-right:5px">●</span>${GVL[k] || k} (${c})</button>`; }).join('');
+    const rc = rs.filter(r => r.recovered).length, sc = rs.filter(r => !r.coords).length;
+    $('rc-gk').innerHTML = K('En mapa', rs.length - sc, '#22d3ee') + K('Recup.', rc, '#10b981') + K('Abiertos', rs.length - rc, '#ef4444') + `<div style="grid-column:1/-1;font-size:11px;color:#94a3b8">Total del filtro: <b>${rs.length}</b>. Borde grueso = sigue en proceso.${sc ? ` <span class="text-amber-300">${sc} sin ubicación (distrito no reconocido).</span>` : ''}</div>`;
+    const st = count(g, r => r.tags), sr = count(g.filter(r => r.recovered), r => r.tags);
+    $('rc-gs').innerHTML = topN(st).map(([k, v]) => `<div style="margin-bottom:10px"><div style="display:flex;justify-content:space-between;font-weight:700;font-size:11px"><span style="color:${SUBC[k]}">● ${esc(k)}</span><span>${v} · ${pct(sr[k] || 0, v)}%</span></div><div class="v26-bar"><i style="width:${pct(sr[k] || 0, v)}%"></i></div></div>`).join('') || '<small class="text-slate-400">Sin casos GPS</small>';
+  }
+  rsec.addEventListener('click', e => { const b = e.target.closest('[data-gv]'); if (b) { REC.GV = b.dataset.gv; render(); } });
+  function vMapa(d) {
+    draw(mkMap(1), d, r => r.recovered ? '#10b981' : '#ef4444');
+    const H = $('rc-mapa-ch'); H.innerHTML = '';
+    hb(H, 'zs2', 'Distritos con más casos', topN(count(d, r => r.zone), 10), '#ef4444');
+    const sinU = d.filter(r => !r.coords);
+    H.insertAdjacentHTML('beforeend', `<div class="card v26-ch"><p class="ct">Casos sin ubicar</p><p class="ds">El lugar de robo no coincide con un distrito conocido. Revisa cómo viene escrito en el Excel.</p><div style="max-height:240px;overflow:auto">${sinU.length ? `<table class="v26-tbl"><tr><th>Placa</th><th>Lugar de robo</th></tr>${sinU.slice(0, 60).map(r => `<tr><td>${esc(r.plate)}</td><td>${esc(r.zone || '(vacío)')}</td></tr>`).join('')}</table>` : '<p class="text-xs text-emerald-300">Todos los casos tienen distrito reconocido ✓</p>'}</div></div>`);
+  }
+
+  function render() {
+    if (!REC.opened) return;
+    REC.q = $('rc-q').value || '';
+    const d = filt(), g = d.filter(r => r.cls === 'GPS');
+    $('rc-cnt').textContent = REC.data.length ? `${d.length.toLocaleString()} de ${REC.data.length.toLocaleString()} casos` : '';
+    rsec.querySelectorAll('[data-rv]').forEach(b => b.classList.toggle('on', b.dataset.rv === REC.view));
+    rsec.querySelectorAll('.rc-view').forEach(v => v.classList.toggle('ui-hidden', v.id !== 'rcv-' + REC.view));
+    if (!REC.data.length) { rsec.querySelectorAll('.rc-view').forEach(v => { if (!/mapa|gps/.test(v.id)) v.innerHTML = ''; }); return; }
+    const fn = { resumen: vResumen, mapa: vMapa, gps: vGps, tec: vTec, tiempos: vTiempos, zonas: vZonas, veh: vVeh, datos: vDatos }[REC.view];
+    try { fn(d, g); } catch (e) { console.error(e); $('rc-msg').innerHTML = `<div class="v21-msg warn">No se pudo dibujar esta vista: ${esc(e.message)}</div>`; }
+  }
+  rsec.addEventListener('click', e => { const b = e.target.closest('[data-rv]'); if (!b) return; REC.view = b.dataset.rv; if (/mapa|gps/.test(REC.view)) Promise.all([loadLib('heat'), loadLib('cluster')]).then(render); render(); });
+  let qT; $('rc-q').addEventListener('input', () => { clearTimeout(qT); qT = setTimeout(render, 220); });
+  $('rc-q').addEventListener('keydown', e => { if (e.key === 'Enter') { REC.view = 'datos'; render(); } });
+  $('rc-clear').addEventListener('click', () => { $('rc-q').value = ''; FL.forEach(([id]) => { const s = $('rcf-' + id); if (s) s.value = 'TODOS'; }); REC.GV = 'ALL'; render(); });
+  $('rc-csv').addEventListener('click', () => {
+    const d = filt(); if (!d.length) { toast('No hay registros para exportar'); return; }
+    const q = v => `"${String(v ?? '').replace(/"/g, '""')}"`;
+    const csv = [['Fecha', 'N° Op', 'Mes', 'Estado', 'Zona', 'Tipo', 'Marca', 'Modelo', 'Placa', 'Modalidad', 'Aseguradora', 'Dispositivo', 'Tecnología', 'Hora denuncia', 'Demora', 'Tiempo recupero', 'Lugar recupero'], ...d.map(r => [fd(r.date), r.op, r.month, r.status, r.zone, r.type, r.brand, r.model, r.plate, r.mod, r.ins, r.devRaw, r.cls, r.horaTxt, r.diffTxt, r.trecTxt, r.lrec])].map(x => x.map(q).join(',')).join('\n');
+    const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob(['﻿' + csv], { type: 'text/csv' })); a.download = `recuperos_${new Date().toISOString().slice(0, 10)}.csv`; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 4000); toast('CSV exportado');
+  });
+
+  // ---------- datos: Supabase + subida manual + tiempo real ----------
+  async function recLoad(silent) {
+    if (REC.loading || !dev() || !logged() || !sb()) return;
+    REC.loading = true;
+    try {
+      let all = [], from = 0;
+      for (;;) { const { data, error } = await sb().from('mdz_recuperos').select('*').order('fecha', { ascending: false }).order('id', { ascending: false }).range(from, from + 999); if (error) throw error; all = all.concat(data || []); if (!data || data.length < 1000 || all.length >= 20000) break; from += 1000; }
+      const prevMax = REC.maxId;
+      REC.raw = all; REC.data = all.map(enrich); REC.loaded = true; REC.err = ''; REC.at = Date.now();
+      REC.maxId = all.reduce((m, r) => Math.max(m, Number(r.id) || 0), 0);
+      let seen = ls.get(SEEN, null); if (seen == null) { seen = REC.maxId; ls.set(SEEN, seen); }
+      REC.nuevos = REC.data.filter(r => Number(r.id) > seen);
+      if (prevMax && REC.maxId > prevMax) {
+        const nv = REC.data.filter(r => Number(r.id) > prevMax);
+        if (nv.length) toast(`🚨 ${nv.length} robo${nv.length === 1 ? '' : 's'} nuevo${nv.length === 1 ? '' : 's'} del Excel de consola${nv[0] ? ': ' + [nv[0].plate, nv[0].zone].filter(Boolean).join(' · ') : ''}`);
+      }
+      if (REC.opened) { ls.set(SEEN, REC.maxId); REC.nuevos = []; }
+    } catch (e) {
+      REC.err = /does not exist|relation|schema cache|42P01/i.test(e.message || '') ? 'Falta la tabla de recuperos: ejecuta en Supabase el archivo supabase_v26_recuperos_validacion.sql.' : 'No pude leer los recuperos: ' + (e.message || e);
+    } finally { REC.loading = false; }
+    if (REC.opened) { msg(); buildFilters(); render(); }
+    focosDraw();
+  }
+  function msg() {
+    const el = $('rc-msg'); if (!el) return;
+    if (REC.err) { el.innerHTML = `<div class="v21-msg warn">${esc(REC.err)}</div>`; return; }
+    if (!REC.data.length) { el.innerHTML = '<div class="v21-msg">Aún no hay casos. Pulsa <b>Subir Excel</b> con el archivo STATUS DE RECUPERO, o configura el envío automático desde Outlook (guía v26).</div>'; return; }
+    const last = REC.raw.reduce((m, r) => (r.actualizado && r.actualizado > m ? r.actualizado : m), '');
+    el.innerHTML = `<div class="v21-msg ok">${REC.data.length.toLocaleString()} casos en Supabase${last ? ` · última actualización ${new Date(last).toLocaleString('es-PE', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })}` : ''}${REC.raw[0] && REC.raw[0].fuente ? ` · último archivo: ${esc(REC.raw[0].fuente)}` : ''}</div>`;
+  }
+  function live() {
+    const el = $('rc-live'); if (!el) return;
+    el.className = 'v26-live ' + (REC.live ? 'on' : REC.loaded ? 'poll' : '');
+    el.querySelector('span').textContent = REC.live ? 'En vivo' : REC.loaded ? 'Revisa cada minuto' : 'Conectando…';
+    el.title = REC.live ? 'Tiempo real activo: cuando llega un Excel nuevo, el tablero se actualiza solo' : 'Sin tiempo real: el tablero vuelve a consultar Supabase cada minuto';
+  }
+  let rtT = null;
+  function subscribe() {
+    if (REC.ch || !sb() || typeof sb().channel !== 'function') return;
+    try {
+      REC.ch = sb().channel('v26-recuperos').on('postgres_changes', { event: '*', schema: 'public', table: 'mdz_recuperos' }, () => { clearTimeout(rtT); rtT = setTimeout(() => recLoad(true), 1500); })
+        .subscribe(st => { REC.live = st === 'SUBSCRIBED'; live(); });
+    } catch (e) { REC.ch = null; }
+  }
+  function unsubscribe() { if (REC.ch) { try { sb().removeChannel(REC.ch); } catch (e) {} REC.ch = null; REC.live = false; } }
+  $('rc-reload').addEventListener('click', () => recLoad());
+  $('rc-file').addEventListener('change', async e => {
+    const f = e.target.files && e.target.files[0]; e.target.value = ''; if (!f || !dev()) return;
+    if (typeof XLSX === 'undefined') { toast('No cargó la librería de Excel'); return; }
+    try {
+      $('rc-msg').innerHTML = `<div class="v21-msg">Leyendo ${esc(f.name)}…</div>`;
+      const wb = XLSX.read(new Uint8Array(await f.arrayBuffer()), { type: 'array' });
+      const filas = mdzParseRecuperos(XLSX, wb, f.name);
+      if (!filas.length) { $('rc-msg').innerHTML = '<div class="v21-msg warn">No encontré la cabecera “STATUS DE RECUPERO” y “DISPOSITIVO” en ninguna hoja.</div>'; return; }
+      for (let i = 0; i < filas.length; i += 500) { const { error } = await sb().from('mdz_recuperos').upsert(filas.slice(i, i + 500), { onConflict: 'clave' }); if (error) throw error; }
+      toast(`Excel subido: ${filas.length} casos guardados`); await recLoad();
+    } catch (err) { $('rc-msg').innerHTML = `<div class="v21-msg warn">No se pudo subir: ${esc(err.message || err)}</div>`; }
+  });
+
+  // ---------- RAFI: aviso de robos nuevos ----------
+  (window.__mdzRafiExtra = window.__mdzRafiExtra || []).push(async () => {
+    if (!dev() || !REC.nuevos.length) return [];
+    const n = REC.nuevos.length, ej = REC.nuevos.slice(0, 3).map(r => [r.plate, r.zone].filter(Boolean).join(' · ')).join(', ');
+    return [{ lvl: 'warn', txt: `${n} robo${n === 1 ? '' : 's'} nuevo${n === 1 ? '' : 's'} del Excel de consola: ${ej}${n > 3 ? '…' : ''}`, go: 'recup' }];
+  });
+
+  /* =====================================================================
+     6) UBICACIÓN ESTIMADA DE ROBOS · focos y estimaciones con los recuperos
+     ===================================================================== */
+  const focos = document.createElement('div'); focos.className = 'card p-4 v26-focos'; focos.id = 'v26-focos';
+  const roboBar = $('robo-bar'); if (roboBar) roboBar.after(focos);
+  let focoLayer = null, focoOn = false;
+  function estimar(d) {
+    const now = limaNow(), h = now.getUTCHours(), wd = now.getUTCDay(), fr = x => x < 6 ? 0 : x < 12 ? 1 : x < 18 ? 2 : 3, FR = ['madrugada', 'mañana', 'tarde', 'noche'];
+    const conH = d.filter(r => r.hour != null), cerca = conH.filter(r => Math.min(Math.abs(r.hour - h), 24 - Math.abs(r.hour - h)) <= 1).length;
+    const riesgoH = conH.length ? (cerca / conH.length) / (3 / 24) : 0, conD = d.filter(r => r.date), mismoD = conD.filter(r => r.date.getDay() === wd).length, riesgoD = conD.length ? (mismoD / conD.length) * 7 : 0;
+    const sc = {}; d.forEach(r => { if (!r.zone) return; let s = 0; if (r.hour != null && fr(r.hour) === fr(h)) s += 1; if (r.date && r.date.getDay() === wd) s += .5; if (r.date && (now - r.date) / 864e5 <= 30) s += .5; if (s) sc[r.zone] = (sc[r.zone] || 0) + s; });
+    const cls = ['GPS', 'LOJACK', 'DETEKTOR'].map(c => { const x = d.filter(r => r.cls === c); return [c, x.length, pct(x.filter(r => r.recovered).length, x.length)]; });
+    return { h, wd, franja: FR[fr(h)], riesgoH, riesgoD, zonas: topN(sc, 5), cls, abiertos: d.filter(r => !r.recovered).length, d7: d.filter(r => r.date && (now - r.date) / 864e5 <= 7).length, demora: med(d.filter(r => r.diff != null).map(r => r.diff)) };
+  }
+  function focosDraw() {
+    if (!focos.isConnected) return;
+    if (!dev() || !logged()) { focos.innerHTML = ''; return; }
+    if (REC.err) { focos.innerHTML = `<p class="text-[11px] font-bold uppercase tracking-wider text-slate-300">Focos de robo · Excel de consola</p><div class="v21-msg warn mt-2">${esc(REC.err)}</div>`; return; }
+    if (!REC.loaded) { focos.innerHTML = '<p class="text-[11px] text-slate-400">Cargando focos de robo…</p>'; return; }
+    if (!REC.data.length) { focos.innerHTML = '<p class="text-[11px] font-bold uppercase tracking-wider text-slate-300">Focos de robo · Excel de consola</p><div class="v21-msg mt-2">Sin casos todavía. Sube el Excel en el módulo <b>Recuperos</b>.</div>'; return; }
+    const E = estimar(REC.data), nv = x => x >= 1.5 ? ['ALTO', '#ef4444'] : x >= 1.1 ? ['MEDIO', '#f59e0b'] : ['BAJO', '#22c55e'], a = nv(E.riesgoH), b = nv(E.riesgoD);
+    focos.innerHTML = `<div class="flex flex-wrap items-center justify-between gap-2 mb-2"><p class="text-[11px] font-bold uppercase tracking-wider text-slate-300">Focos de robo y estimaciones · ${REC.data.length.toLocaleString()} casos del Excel de consola</p>
+      <div class="flex gap-2"><button class="v21-btn${focoOn ? ' pri' : ''}" data-foco="map">${focoOn ? 'Ocultar' : 'Mostrar'} focos en el mapa</button><button class="v21-btn" data-foco="go">Abrir Recuperos</button></div></div>
+      <div class="v26-kg">${K('Riesgo a esta hora', a[0], a[1], `${E.h} h · ${E.riesgoH.toFixed(1)}× el promedio`)}${K('Riesgo de hoy', b[0], b[1], `${DAYS[E.wd]} · ${E.riesgoD.toFixed(1)}× el promedio`)}${K('Casos abiertos', E.abiertos, '#f59e0b')}${K('Últimos 7 días', E.d7, '#f43f5e')}${K('Demora típica denuncia', fmtM(E.demora), '#06b6d4')}</div>
+      <div class="v26-cg mt-3"><div><p class="text-[11px] text-slate-400 mb-1">Distritos más probables ahora (franja ${E.franja}, ${DAYS[E.wd]} y casos recientes)</p>${E.zonas.map(([z, s], i) => `<div class="row"><span>${i + 1}. <b>${esc(z)}</b></span><span class="text-slate-400">puntaje ${s.toFixed(1)}</span></div>`).join('') || '<p class="text-xs text-slate-500">Sin datos de horario.</p>'}</div>
+      <div><p class="text-[11px] text-slate-400 mb-1">Recupero por tecnología (GPS unificado)</p>${E.cls.map(([c, n, p]) => `<div class="row"><span style="color:${CLSC[c]}">● <b>${c}</b> · ${n} casos</span><span><b>${p}%</b></span></div>`).join('')}</div></div>
+      <p class="text-[10.5px] text-slate-500 mt-2">Estimación estadística con el historial: no reemplaza la ubicación por RSSI de arriba. Los casos se ubican por distrito.</p>`;
+  }
+  focos.addEventListener('click', e => {
+    const b = e.target.closest('[data-foco]'); if (!b) return;
+    if (b.dataset.foco === 'go') { window.setView('recup'); return; }
+    const m = window.__mdzRoboMapRef; if (!m) { toast('Abre el mapa de ubicación primero'); return; }
+    focoOn = !focoOn;
+    if (focoLayer) { m.removeLayer(focoLayer); focoLayer = null; }
+    if (focoOn) {
+      focoLayer = L.layerGroup().addTo(m);
+      const z = {}; REC.data.forEach(r => { const k = dkey(r.zone); if (!k) return; z[k] = z[k] || { t: 0, o: 0 }; z[k].t++; if (!r.recovered) z[k].o++; });
+      const mx = Math.max(1, ...Object.values(z).map(v => v.t));
+      Object.entries(z).forEach(([k, v]) => { const c = v.o > v.t / 2 ? '#ef4444' : '#f59e0b'; L.circle(D[k], { radius: 500 + 2200 * Math.sqrt(v.t / mx), stroke: true, color: c, weight: 1, fillColor: c, fillOpacity: .12 + .3 * v.t / mx }).bindTooltip(`${esc(k)}: ${v.t} robos · ${v.o} abiertos`).addTo(focoLayer); });
+    }
+    focosDraw();
+  });
+
+  // ---------- IA: conocimiento + resumen de recuperos (sin placas ni propietarios) ----------
+  window.__mdzIaExtra = texto => {
+    const out = {};
+    try { const k = kbFor(texto); if (k.length) out.conocimiento_rafi = k; } catch (e) {}
+    if (dev() && REC.data.length) {
+      const d = REC.data, E = estimar(d), rec = d.filter(r => r.recovered).length;
+      out.recuperos = { casos: d.length, recuperados: rec, tasa_recupero_pct: pct(rec, d.length), abiertos: d.length - rec, ultimos_7_dias: E.d7,
+        por_tecnologia: Object.fromEntries(E.cls.map(([c, n, p]) => [c, { casos: n, recupero_pct: p }])),
+        zonas_riesgo: zonasRisk(d).slice(0, 10).map(([z, v, s]) => ({ zona: z, casos: v.t, abiertos: v.t - v.r, indice: s })),
+        ahora: { hora: E.h, riesgo_hora: +E.riesgoH.toFixed(2), riesgo_dia: +E.riesgoD.toFixed(2), distritos_probables: E.zonas.map(x => x[0]) },
+        ultimos_casos: d.filter(r => r.date).slice(0, 8).map(r => ({ fecha: fd(r.date), zona: r.zone, tecnologia: r.cls, estado: r.recovered ? 'RECUPERADO' : 'EN PROCESO', modalidad: r.mod })) };
+    }
+    return out;
+  };
+
+  /* =====================================================================
+     7) NAVEGACIÓN, ROLES Y CICLO
+     ===================================================================== */
+  const _sv = window.setView;
+  window.setView = function (v) {
+    if (v === 'recup') {
+      if (!dev()) { toast('Módulo solo para dev'); return; }
+      document.querySelectorAll('.rail button[data-v]').forEach(b => b.classList.toggle('on', b.dataset.v === v));
+      if ($('side')) $('side').classList.add('ui-hidden');
+      document.querySelectorAll('section[id^="view-"]').forEach(s => s.classList.toggle('ui-hidden', s.id !== 'view-recup'));
+      REC.opened = true; if (REC.maxId) { ls.set(SEEN, REC.maxId); REC.nuevos = []; }
+      msg(); live(); buildFilters(); render(); subscribe();
+      if (!REC.loaded || Date.now() - REC.at > 60000) recLoad();
+      if (/mapa|gps/.test(REC.view)) Promise.all([loadLib('heat'), loadLib('cluster')]).then(render);
+      return;
+    }
+    rsec.classList.add('ui-hidden'); REC.opened = false;
+    const r = _sv.apply(this, arguments);
+    if (v === 'robo') { focosDraw(); if (dev() && (!REC.loaded || Date.now() - REC.at > 120000)) recLoad(true); }
+    if (v === 'rafi') setTimeout(() => kbView(), 50);
+    return r;
+  };
+  let wasDev = null, wasLogged = null;
+  function syncRole() {
+    const L1 = logged(), D1 = L1 && dev();
+    rnav.classList.toggle('ui-hidden', !D1);
+    colBtn.classList.toggle('ui-hidden', !D1);
+    if (!D1 && !rsec.classList.contains('ui-hidden')) { rsec.classList.add('ui-hidden'); REC.opened = false; try { _sv('filter'); } catch (e) {} }
+    if (D1 !== wasDev || L1 !== wasLogged) {
+      wasDev = D1; wasLogged = L1;
+      if (D1) { valLoad(); recLoad(true); subscribe(); } else { VAL.map.clear(); VAL.loaded = false; VAL.filtro = 'ALL'; REC.raw = []; REC.data = []; REC.loaded = false; REC.nuevos = []; REC.maxId = 0; unsubscribe(); Object.keys(CH).forEach(k => { try { CH[k].destroy(); } catch (e) {} delete CH[k]; }); }
+      if (L1) { colsLoad(); KB.at = 0; } else { window.__mdzCustomCols = []; KB.t = []; }
+      KBV.sig = ''; valPanel(); focosDraw();
+    }
+  }
+  const _ar = window.applySessionRoleUI;
+  if (typeof _ar === 'function') window.applySessionRoleUI = function () { const r = _ar.apply(this, arguments); syncRole(); return r; };
+  let tick = 0;
+  setInterval(() => {
+    tick++; syncRole(); mountKbTab(); rastTabs(); rastCount();
+    if (logged()) colsApply();
+    if (dev() && VAL.loaded && tick % 5 === 0) valPanel();
+    if (dev() && logged() && (REC.opened ? !REC.live && tick % 60 === 0 : tick % 300 === 0)) recLoad(true);
+    if (logged() && !$('view-rafi').classList.contains('ui-hidden')) kbView();
+  }, 1000);
   syncRole();
 })();
 </script>
