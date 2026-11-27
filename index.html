@@ -14288,6 +14288,16 @@ body.theme-day .v27-minfo, body.theme-day .v27-mleg, body.theme-day .v27-heatbtn
 body.theme-day .v27-gauge > div, body.theme-day .v27-clu b, body.theme-day .v27-ant { background:#fff; }
 body.theme-day .v27-clu b { color:#0f172a; }
 body.theme-day .v27-fi { color:#0f172a; background:rgba(15,23,42,.03); border-color:rgba(15,23,42,.1); }
+/* v27.1 · informe semanal gerencial */
+.v27-ig { position:fixed; inset:0; z-index:9000; background:rgba(2,6,23,.72); display:flex; align-items:center; justify-content:center; padding:16px; }
+.v27-ig.hidden { display:none; }
+.v27-ig .panel { width:min(560px,100%); max-height:90vh; overflow:auto; }
+.v27-igopts { display:flex; flex-direction:column; gap:7px; margin-top:12px; font-size:12px; color:#cbd5e1; }
+.v27-igopts label { display:flex; gap:8px; align-items:flex-start; cursor:pointer; }
+.v27-igopts input { margin-top:2px; accent-color:var(--accent,#38bdf8); }
+#mdz-report .rp-exec ul { margin:4px 0 0 18px; padding:0; } #mdz-report .rp-exec li { margin:2px 0; }
+#mdz-report .muted { color:#64748b; }
+#mdz-report img, #mdz-report svg { break-inside:avoid; }
 </style>
 <script id="hunter-v27-js">
 (() => {
@@ -14707,11 +14717,13 @@ body.theme-day .v27-fi { color:#0f172a; background:rgba(15,23,42,.03); border-co
   const fd = d => d ? String(d.getDate()).padStart(2, '0') + '/' + String(d.getMonth() + 1).padStart(2, '0') + '/' + d.getFullYear() : '-';
   const limaNow = () => new Date(Date.now() - 5 * 3600e3);
 
+  // v27.1: Recuperos lo usan dev y consola (noc). Los propietarios siguen solo para dev.
+  const recOk = () => logged() && (dev() || (typeof isNocOnlyRole === 'function' && isNocOnlyRole()));
   const REC = { raw: [], data: [], loaded: false, loading: false, err: '', view: 'resumen', opened: false, q: '', live: false, ch: null, maxId: 0, nuevos: [], at: 0, M: {}, ANT: { on: false, r: 8, reg: 'ALL' }, GV: 'ALL' };
   const SEEN = 'mdz_recup_visto_v1';
   const RICON = '<svg viewBox="0 0 24 24"><path d="M3 20h18"/><path d="M6 16v-5M10 16V8M14 16v-3M18 16V6"/><circle cx="18" cy="4" r="1.6"/></svg>';
   const rnav = document.createElement('button');
-  rnav.id = 'nav-recup'; rnav.dataset.v = 'recup'; rnav.title = 'Recuperos · robos del Excel de consola (dev)'; rnav.className = 'ui-hidden'; rnav.innerHTML = '<svg class="hud-ico" viewBox="0 0 24 24" style="fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round"><path d="M3 20h18"/><path d="M6 16v-5M10 16V8M14 16v-3M18 16V6"/><circle cx="18" cy="4" r="1.6"/></svg>';
+  rnav.id = 'nav-recup'; rnav.dataset.v = 'recup'; rnav.title = 'Recuperos · robos del Excel de consola'; rnav.className = 'ui-hidden'; rnav.innerHTML = '<svg class="hud-ico" viewBox="0 0 24 24" style="fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round"><path d="M3 20h18"/><path d="M6 16v-5M10 16V8M14 16v-3M18 16V6"/><circle cx="18" cy="4" r="1.6"/></svg>';
   rnav.addEventListener('click', () => window.setView('recup'));
   ($('nav-robo') || $('nav-noc')).after(rnav);
   const rsec = document.createElement('section');
@@ -14720,7 +14732,7 @@ body.theme-day .v27-fi { color:#0f172a; background:rgba(15,23,42,.03); border-co
   const VIEWS = [['resumen', 'Resumen'], ['proy', 'Proyecciones'], ['mapa', 'Mapa general'], ['gps', 'Mapa por tecnología'], ['tec', 'Tecnología'], ['tiempos', 'Tiempos y horarios'], ['zonas', 'Zonas y riesgo'], ['veh', 'Vehículos'], ['datos', 'Datos'], ['hist', 'Historial de cargas']];
   rsec.innerHTML = `<div class="flex flex-wrap items-center justify-between gap-3 px-5 pt-4 pb-3 border-b border-white/10">
     <div><h2 class="text-base font-bold text-white flex items-center gap-2"><span class="text-[var(--accent)] inline-block" style="width:24px;height:24px">${RICON}</span>Recuperos</h2>
-    <p class="text-[11px] text-slate-400">Robos y recuperos del Excel de consola · GPS unificado / LOJACK / DETEKTOR · solo dev</p></div>
+    <p class="text-[11px] text-slate-400" id="rc-sub">Robos y recuperos del Excel de consola · GPS unificado / LOJACK / DETEKTOR</p></div>
     <div class="flex gap-2 flex-wrap items-center"><span class="v26-live" id="rc-live" title="Estado de la actualización automática"><i></i><span>Conectando…</span></span>
       <label class="v21-btn" title="Subir el Excel STATUS DE RECUPERO a mano"><i class="fa-solid fa-file-arrow-up"></i>Subir Excel<input type="file" id="rc-file" accept=".xlsx,.xls,.xlsm" hidden></label>
       <button class="v21-btn" id="rc-reload"><i class="fa-solid fa-rotate"></i>Actualizar</button>
@@ -14850,7 +14862,7 @@ body.theme-day .v27-fi { color:#0f172a; background:rgba(15,23,42,.03); border-co
     hb(H, 'md', 'Modelos más afectados', topN(count(d, r => r.model)), '#ec4899'); hb(H, 'br', 'Marcas más afectadas', topN(count(d, r => r.brand)), '#8b5cf6'); hb(H, 'rm', 'Recupero por marca (≥5, %)', rateBy(d, r => r.brand, 10, 5), '#10b981', '% recupero');
     dn(H, 'ty', 'Tipos de vehículo', topN(count(d, r => r.type), 8)); dn(H, 'mo', 'Modalidades de robo', topN(count(d, r => r.mod), 8)); hb(H, 'rmo', 'Recupero por modalidad (≥3, %)', rateBy(d, r => r.mod, 8, 3), '#22c55e', '% recupero');
     hb(H, 'in', 'Aseguradoras', topN(count(d, r => r.ins)), '#3b82f6'); hb(H, 'ri', 'Recupero por aseguradora (≥5, %)', rateBy(d, r => r.ins, 8, 5), '#14b8a6', '% recupero');
-    hb(H, 'ow', 'Propietarios / flotas más afectados', topN(count(d, r => r.owner), 10), '#8b5cf6'); hb(H, 'rw', 'Propietarios con más casos abiertos', topN(count(d.filter(r => !r.recovered), r => r.owner), 10), '#f43f5e');
+    if (dev()) hb(H, 'ow', 'Propietarios / flotas más afectados', topN(count(d, r => r.owner), 10), '#8b5cf6'); if (dev()) hb(H, 'rw', 'Propietarios con más casos abiertos', topN(count(d.filter(r => !r.recovered), r => r.owner), 10), '#f43f5e');
     hb(H, 'pl', 'Placas reincidentes', topN(count(d, r => r.plate), 1e5).filter(x => x[1] > 1).slice(0, 10), '#f59e0b'); hb(H, 'ta', 'Taxi vs particular', [['TAXI', d.filter(r => r.taxi).length], ['PARTICULAR', d.filter(r => !r.taxi).length]], '#eab308');
   }
   function vDatos(d) {
@@ -14975,7 +14987,7 @@ body.theme-day .v27-fi { color:#0f172a; background:rgba(15,23,42,.03); border-co
   const HIST = { list: [], loaded: false, loading: false, err: '', open: null, det: {} };
   const HTBL = 'mdz_recuperos_cargas', BUCKET = 'mdz-recuperos';
   async function histLoad() {
-    if (HIST.loading || !dev() || !logged() || !sb()) return; HIST.loading = true;
+    if (HIST.loading || !recOk() || !sb()) return; HIST.loading = true;
     try { const { data, error } = await sb().from(HTBL).select('id,archivo,ruta,origen,casos,nuevos,actualizados,cambios_estado,recuperados,hojas,creado').order('creado', { ascending: false }).limit(300); if (error) throw error; HIST.list = data || []; HIST.err = ''; }
     catch (e) { HIST.err = /does not exist|relation|schema cache|42P01/i.test(e.message || '') ? 'Falta la tabla del historial: ejecuta en Supabase el archivo supabase_v27_recuperos.sql.' : 'No pude leer el historial: ' + (e.message || e); }
     finally { HIST.loading = false; HIST.loaded = true; }
@@ -14992,7 +15004,7 @@ body.theme-day .v27-fi { color:#0f172a; background:rgba(15,23,42,.03); border-co
       <div class="v26-cg mt-4" id="rc-hist-ch"></div>
       <div class="card p-4 mt-4"><p class="v27-h">Cada Excel subido</p><div class="v10-scroll-x" style="max-height:520px;overflow:auto"><table class="v26-tbl"><tr><th>Fecha</th><th>Archivo</th><th>Origen</th><th>Casos</th><th>Nuevos</th><th>Cambios</th><th>Recuperados</th><th>Hojas</th><th></th></tr>${L0.map(x => `<tr><td>${fdt(x.creado)}</td><td style="max-width:240px;overflow-wrap:anywhere"><b>${esc(x.archivo || '-')}</b></td><td><span class="v26-tag" style="background:${x.origen === 'correo' ? '#1e3a8a' : '#334155'};color:#fff">${x.origen === 'correo' ? 'Correo' : 'Manual'}</span></td><td>${x.casos ?? '-'}</td><td>${x.nuevos ?? '-'}</td><td>${x.cambios_estado ?? '-'}</td><td>${x.recuperados ?? '-'}</td><td style="max-width:180px;font-size:10.5px">${esc((x.hojas || []).slice(0, 4).join(', '))}${(x.hojas || []).length > 4 ? '…' : ''}</td>
         <td style="white-space:nowrap"><button type="button" class="v21-btn" data-hdet="${x.id}">${HIST.open === x.id ? 'Ocultar' : 'Ver cambios'}</button>${x.ruta ? ` <button type="button" class="v21-btn" data-hdl="${x.id}" title="Descargar el Excel original"><i class="fa-solid fa-download"></i></button>` : ''}</td></tr>${HIST.open === x.id ? `<tr><td colspan="9">${histDet(x.id)}</td></tr>` : ''}`).join('')}</table></div>
-      <p class="text-[10.5px] text-slate-500 mt-2">El Excel original se guarda en la carpeta privada “${BUCKET}” de Supabase. Solo dev puede verlo y descargarlo.</p></div>`;
+      <p class="text-[10.5px] text-slate-500 mt-2">El Excel original se guarda en la carpeta privada “${BUCKET}” de Supabase. Solo dev y consola pueden verlo y descargarlo.</p></div>`;
     const H = $('rc-hist-ch'), S = [...L0].reverse().slice(-40), lb = S.map(x => fdt(x.creado).slice(0, 10));
     DESC.hc = 'Por cada Excel: casos nuevos, cambios de estado y recuperos detectados al compararlo con lo que ya había.';
     DESC.ht = 'Cantidad de casos que traía cada Excel.';
@@ -15257,13 +15269,14 @@ body.theme-day .v27-fi { color:#0f172a; background:rgba(15,23,42,.03); border-co
 
   // ---------- datos: Supabase + subida manual + tiempo real ----------
   async function recLoad(silent) {
-    if (REC.loading || !dev() || !logged() || !sb()) return;
+    if (REC.loading || !recOk() || !sb()) return;
     REC.loading = true;
     try {
       let all = [], from = 0;
       for (;;) { const { data, error } = await sb().from('mdz_recuperos').select('*').order('fecha', { ascending: false }).order('id', { ascending: false }).range(from, from + 999); if (error) throw error; all = all.concat(data || []); if (!data || data.length < 1000 || all.length >= 20000) break; from += 1000; }
       const prevMax = REC.maxId;
-      all = all.filter(r => !r.fecha || r.fecha >= '2020-01-01');   // v27: casos antiguos (hoja 2018) fuera
+      all = all.filter(r => !r.fecha || r.fecha >= '2020-01-01');
+      if (dev()) { try { const own = new Map(); for (let f2 = 0; ; f2 += 1000) { const { data, error } = await sb().from('mdz_recuperos_privado').select('clave,propietario').range(f2, f2 + 999); if (error || !data) break; data.forEach(x => own.set(x.clave, x.propietario)); if (data.length < 1000) break; } if (own.size) all.forEach(r => { if (own.has(r.clave)) r.propietario = own.get(r.clave); }); } catch (e) {} }   // v27.1   // v27: casos antiguos (hoja 2018) fuera
       REC.raw = all; REC.data = all.map(enrich); REC.loaded = true; REC.err = ''; REC.at = Date.now();
       REC.maxId = all.reduce((m, r) => Math.max(m, Number(r.id) || 0), 0);
       let seen = ls.get(SEEN, null); if (seen == null) { seen = REC.maxId; ls.set(SEEN, seen); }
@@ -15304,14 +15317,14 @@ body.theme-day .v27-fi { color:#0f172a; background:rgba(15,23,42,.03); border-co
   function unsubscribe() { if (REC.ch) { try { sb().removeChannel(REC.ch); } catch (e) {} REC.ch = null; REC.live = false; } }
   $('rc-reload').addEventListener('click', () => recLoad());
   $('rc-file').addEventListener('change', async e => {
-    const f = e.target.files && e.target.files[0]; e.target.value = ''; if (!f || !dev()) return;
+    const f = e.target.files && e.target.files[0]; e.target.value = ''; if (!f || !recOk()) return;
     if (typeof XLSX === 'undefined') { toast('No cargó la librería de Excel'); return; }
     try { await subirExcel(f); } catch (err) { $('rc-msg').innerHTML = `<div class="v21-msg warn">No se pudo subir: ${esc(err.message || err)}</div>`; }
   });
 
   // ---------- RAFI: aviso de robos nuevos ----------
   (window.__mdzRafiExtra = window.__mdzRafiExtra || []).push(async () => {
-    if (!dev() || !REC.nuevos.length) return [];
+    if (!recOk() || !REC.nuevos.length) return [];
     const n = REC.nuevos.length, ej = REC.nuevos.slice(0, 3).map(r => [r.plate, r.zone].filter(Boolean).join(' · ')).join(', ');
     return [{ lvl: 'warn', txt: `${n} robo${n === 1 ? '' : 's'} nuevo${n === 1 ? '' : 's'} del Excel de consola: ${ej}${n > 3 ? '…' : ''}`, go: 'recup' }];
   });
@@ -15387,7 +15400,7 @@ body.theme-day .v27-fi { color:#0f172a; background:rgba(15,23,42,.03); border-co
   function heatSync() {
     try { if (typeof map !== 'undefined' && map && map instanceof L.Map) heatCtl(map); } catch (e) {}
     if (window.__mdzRoboMapRef) heatCtl(window.__mdzRoboMapRef);
-    const ok = dev() && logged() && REC.loaded && REC.data.length > 0;
+    const ok = recOk() && REC.loaded && REC.data.length > 0;
     HEATM.forEach(m => { const S = m.__v27h; if (!S || !S.btn) return; S.btn.classList.toggle('ui-hidden', !ok);
       if (!ok && S.on) heatToggle(m, false); else if (S.on && S.at !== REC.at) heatToggle(m, true); });
   }
@@ -15396,11 +15409,170 @@ body.theme-day .v27-fi { color:#0f172a; background:rgba(15,23,42,.03); border-co
     ['setView', 'fitBounds', 'invalidateSize'].forEach(k => { const o = L.Map.prototype[k]; L.Map.prototype[k] = function () { const r = o.apply(this, arguments); if (!this.__v27h && this._container) setTimeout(() => heatCtl(this), 0); return r; }; });
   }
 
+  // ---------- v27.1: INFORME SEMANAL GERENCIAL (un botón → PDF) ----------
+  // Une el reporte semanal de la v24 (grupo electrógeno, mantenimiento, sala, caja, visitas, incidentes)
+  // con recuperos, proyecciones, mapa táctico de la semana, red de antenas y Fusión RF.
+  const IG = { busy: false };
+  const isoD = d => d.toISOString().slice(0, 10);
+  const lunes = s => { const d = new Date(s + 'T12:00:00Z'), w = (d.getUTCDay() + 6) % 7; d.setUTCDate(d.getUTCDate() - w); return isoD(d); };
+  const masD = (s, n) => { const d = new Date(s + 'T12:00:00Z'); d.setUTCDate(d.getUTCDate() + n); return isoD(d); };
+  const fdi = s => s ? s.slice(8, 10) + '/' + s.slice(5, 7) + '/' + s.slice(0, 4) : '-';
+  const varTxt = (a, b) => b ? (a >= b ? '<span class="bad">▲ ' : '<span class="ok">▼ ') + Math.abs(Math.round((a - b) / b * 100)) + '%</span>' : (a ? '<span class="bad">nuevo</span>' : '=');
+  // gráfico a imagen (Chart.js sin el tema neón, fondo blanco)
+  function chartImg(cfg, w = 860, h = 300) {
+    try {
+      const C0 = (window.Chart && Object.getPrototypeOf(window.Chart) && Object.getPrototypeOf(window.Chart).register) ? Object.getPrototypeOf(window.Chart) : window.Chart; if (!C0) return '';
+      const cv = document.createElement('canvas'); cv.width = w * 2; cv.height = h * 2; cv.style.width = w + 'px'; cv.style.height = h + 'px';
+      const bg = { id: 'v27bg', beforeDraw(c) { const x = c.ctx; x.save(); x.fillStyle = '#fff'; x.fillRect(0, 0, c.width, c.height); x.restore(); } };
+      const o = cfg.options = cfg.options || {}; o.responsive = false; o.animation = false; o.devicePixelRatio = 2;
+      o.plugins = Object.assign({ neonGlow: false, datalabels: { display: false }, legend: { labels: { color: '#334155', boxWidth: 10, font: { size: 11 } } } }, o.plugins || {});
+      if (cfg.type !== 'doughnut') o.scales = Object.assign({ x: { ticks: { color: '#475569', font: { size: 10 } }, grid: { color: '#e2e8f0' }, stacked: !!cfg.stacked }, y: { beginAtZero: true, ticks: { color: '#475569', font: { size: 10 } }, grid: { color: '#e2e8f0' }, stacked: !!cfg.stacked } }, o.scales || {});
+      cfg.plugins = [bg];
+      const ch = new C0(cv.getContext('2d'), cfg), url = cv.toDataURL('image/png'); ch.destroy(); return url;
+    } catch (e) { return ''; }
+  }
+  // mapa táctico esquemático en SVG (se imprime nítido y sin depender de los mosaicos del mapa)
+  function mapaSvg(A, F, W7) {
+    const pts = [...F.map(x => x.c), ...W7.filter(r => r.coords).map(r => r.coords), ...A.filter(a => a[3]).map(a => [a[1], a[2]])];
+    if (!pts.length) return '';
+    const mla = med(pts.map(p => p[0])), mlo = med(pts.map(p => p[1])), near = pts.filter(p => hav(mla, mlo, p[0], p[1]) <= 45);
+    const la = near.map(p => p[0]), lo = near.map(p => p[1]), pad = .03;
+    let y0 = Math.min(...la) - pad, y1 = Math.max(...la) + pad, x0 = Math.min(...lo) - pad, x1 = Math.max(...lo) + pad;
+    const k = Math.cos(mla * Math.PI / 180), W = 720, H = Math.round(W * (y1 - y0) / ((x1 - x0) * k)); const Hc = Math.min(Math.max(H, 380), 900);
+    const sx = x => ((x - x0) / (x1 - x0)) * W, sy = y => ((y1 - y) / (y1 - y0)) * Hc, inB = (y, x) => y >= y0 && y <= y1 && x >= x0 && x <= x1;
+    const mx = Math.max(1, ...F.map(x => x.t)); let g = '';
+    for (let v = Math.ceil(x0 * 20) / 20; v < x1; v += .05) g += `<line x1="${sx(v)}" y1="0" x2="${sx(v)}" y2="${Hc}" stroke="#e2e8f0" stroke-width="1"/>`;
+    for (let v = Math.ceil(y0 * 20) / 20; v < y1; v += .05) g += `<line x1="0" y1="${sy(v)}" x2="${W}" y2="${sy(v)}" stroke="#e2e8f0" stroke-width="1"/>`;
+    const bub = F.filter(x => inB(...x.c)).map(x => { const r = 6 + 22 * Math.sqrt(x.t / mx), t = x.t ? x.o / x.t : 0, c = mixC(t); return `<circle cx="${sx(x.c[1]).toFixed(1)}" cy="${sy(x.c[0]).toFixed(1)}" r="${r.toFixed(1)}" fill="${c}" fill-opacity=".35" stroke="${c}" stroke-width="1.5"/>`; }).join('');
+    const lbl = F.filter(x => inB(...x.c)).slice(0, 10).map(x => `<text x="${(sx(x.c[1]) + 8).toFixed(1)}" y="${(sy(x.c[0]) - 8).toFixed(1)}" font-size="10" font-weight="700" fill="#0f172a" paint-order="stroke" stroke="#fff" stroke-width="3">${esc(x.k)} (${x.t})</text>`).join('');
+    const ant = A.filter(a => inB(a[1], a[2])).map(a => { const X = sx(a[2]), Y = sy(a[1]); return `<path d="M${X.toFixed(1)} ${(Y - 7).toFixed(1)} L${(X + 6).toFixed(1)} ${(Y + 5).toFixed(1)} L${(X - 6).toFixed(1)} ${(Y + 5).toFixed(1)} Z" fill="#1d4ed8" stroke="#fff" stroke-width="1"/>` + (A.length <= 45 ? `<text x="${(X + 8).toFixed(1)}" y="${(Y + 4).toFixed(1)}" font-size="8.5" fill="#1e3a8a" paint-order="stroke" stroke="#fff" stroke-width="2.5">${esc(antShort(a[0]))}</text>` : ''); }).join('');
+    const sem = W7.filter(r => r.coords && inB(...r.coords)).map(r => `<circle cx="${sx(r.coords[1]).toFixed(1)}" cy="${sy(r.coords[0]).toFixed(1)}" r="4.5" fill="${r.recovered ? '#16a34a' : '#dc2626'}" stroke="#fff" stroke-width="1.5"/>`).join('');
+    return `<svg viewBox="0 0 ${W} ${Hc}" width="100%" style="border:1px solid #cbd5e1;background:#f8fafc;display:block">${g}${bub}${ant}${sem}${lbl}</svg>
+      <p class="muted" style="font-size:9.5px;margin-top:3px">Círculos = robos acumulados por distrito (tamaño = cantidad · color verde→rojo = % abiertos) · ▲ azul = antena · ● rojo = robo de la semana en proceso · ● verde = robo de la semana ya recuperado. Ubicación aproximada por distrito; esquema sin calles.</p>`;
+  }
+  async function informeExtra(from, opt) {
+    const to = masD(from, 6), prevF = masD(from, -7), prevT = masD(from, -1), ymd = r => r.date ? isoD(new Date(r.date.getTime())) : '';
+    const out = { html: '', bullets: [] }; let h = '';
+    const c = sb(), safe = async p => { try { const r = await p; return r.error ? null : r.data; } catch (e) { return null; } };
+    // ---- recuperos ----
+    if (opt.rec) {
+      if (!REC.loaded) await recLoad(true);
+      if (!HIST.loaded) await histLoad();
+      const d = REC.data, W7 = d.filter(r => { const s = ymd(r); return s >= from && s <= to; }), P7 = d.filter(r => { const s = ymd(r); return s >= prevF && s <= prevT; });
+      const recW = d.filter(r => r.recovered && r.statusChanged && r.statusChanged.slice(0, 10) >= from && r.statusChanged.slice(0, 10) <= to);
+      const recDe7 = W7.filter(r => r.recovered).length, abiertos = d.filter(r => !r.recovered), viejos = abiertos.filter(r => r.daysOpen > 30).length;
+      const tasa = pct(d.filter(r => r.recovered).length, d.length), dem = med(W7.filter(r => r.diff != null).map(r => r.diff));
+      const zW = topN(count(W7, r => r.zone), 1)[0], S = serieMensual(d), Z = zonasAlza(d).filter(z => z.d30 >= 2 && z.var > .2).sort((a, b) => (b.d30 - b.base) - (a.d30 - a.base));
+      const cargasW = (HIST.list || []).filter(x => x.creado && x.creado.slice(0, 10) >= from && x.creado.slice(0, 10) <= to);
+      out.bullets.push(`Robos reportados en la semana: <b>${W7.length}</b> (${varTxt(W7.length, P7.length)} frente a la semana anterior, que tuvo ${P7.length}).`);
+      out.bullets.push(`De los robos de la semana ya se recuperaron <b>${recDe7}</b> (${pct(recDe7, W7.length)}%). Recupero histórico: <b>${tasa}%</b>.`);
+      if (recW.length) out.bullets.push(`En la semana pasaron a <b>recuperado ${recW.length}</b> caso${recW.length === 1 ? '' : 's'} (según los cambios de estado de los Excel).`);
+      out.bullets.push(`Casos abiertos: <b>${abiertos.length}</b>, de ellos <b class="${viejos ? 'bad' : ''}">${viejos}</b> con más de 30 días.`);
+      if (zW) out.bullets.push(`Zona con más robos en la semana: <b>${esc(zW[0])}</b> (${zW[1]}).`);
+      if (Z[0]) out.bullets.push(`Zona en alza: <b>${esc(Z[0].k)}</b>, ${Z[0].d30} casos en 30 días frente a ${Z[0].base} de promedio mensual.`);
+      if (S && S.n >= 3) out.bullets.push(`Proyección: el mes en curso cerraría con <b>≈${S.fut[0].mix}</b> casos y el próximo con <b>≈${Math.round(S.fut[1].v)}</b> (rango ${Math.round(S.fut[1].lo)}–${Math.round(S.fut[1].hi)}).`);
+      // series de 12 semanas
+      const wk = []; for (let i = 11; i >= 0; i--) { const a = masD(from, -7 * i), b = masD(a, 6); wk.push([a, d.filter(r => { const s = ymd(r); return s >= a && s <= b; })]); }
+      const gW = chartImg({ type: 'bar', data: { labels: wk.map(([a]) => fdi(a).slice(0, 5)), datasets: [{ label: 'Robos', data: wk.map(([, x]) => x.length), backgroundColor: '#ef4444' }, { label: 'De ellos recuperados', data: wk.map(([, x]) => x.filter(r => r.recovered).length), backgroundColor: '#10b981' }] } });
+      const cl3 = ['GPS', 'LOJACK', 'DETEKTOR'].map(k => [k, d.filter(r => r.cls === k)]);
+      const gT = chartImg({ type: 'bar', data: { labels: cl3.map(x => x[0]), datasets: [{ label: '% recupero (histórico)', data: cl3.map(([, x]) => pct(x.filter(r => r.recovered).length, x.length)), backgroundColor: ['#0891b2', '#d97706', '#7c3aed'] }] }, options: { plugins: { legend: { display: false }, datalabels: { display: true, color: '#0f172a', anchor: 'end', align: 'end', formatter: v => v + '%' } }, scales: { y: { max: 100, beginAtZero: true } } } }, 420, 260);
+      const zt = topN(count(d, r => r.zone), 10).map(x => x[0]);
+      const gZ = chartImg({ type: 'bar', stacked: true, data: { labels: zt, datasets: [{ label: 'Recuperado', data: zt.map(z => d.filter(r => r.zone === z && r.recovered).length), backgroundColor: '#10b981' }, { label: 'En proceso', data: zt.map(z => d.filter(r => r.zone === z && !r.recovered).length), backgroundColor: '#ef4444' }] }, options: { indexAxis: 'y' } }, 420, 260);
+      let gP = '';
+      if (S && S.n >= 3) { const nC = S.comp.length, nul = a => Array(a).fill(null); gP = chartImg({ type: 'line', data: { labels: [...S.comp, ...S.fut.map(x => x.k)].map(mlab), datasets: [{ label: 'Real', data: [...S.ys, ...nul(3)], borderColor: '#0284c7', backgroundColor: 'rgba(2,132,199,.12)', fill: true, tension: .3 }, { label: 'Proyección', data: [...nul(nC - 1), S.ys[nC - 1], S.fut[0].mix, Math.round(S.fut[1].v), Math.round(S.fut[2].v)], borderColor: '#7c3aed', borderDash: [6, 5], tension: .3 }, { label: 'Máximo probable', data: [...nul(nC), ...S.fut.map(x => Math.round(x.hi))], borderColor: 'rgba(124,58,237,.25)', backgroundColor: 'rgba(124,58,237,.10)', fill: '+1', pointRadius: 0 }, { label: 'Mínimo probable', data: [...nul(nC), ...S.fut.map(x => Math.round(x.lo))], borderColor: 'rgba(124,58,237,.25)', pointRadius: 0 }] } }, 860, 260); }
+      const img = (u, w) => u ? `<img src="${u}" style="width:${w || '100%'};max-width:100%;display:block;margin:4px 0">` : '';
+      h += `<h2>Recuperos y robos de la semana</h2>
+        <div class="rp-kpis"><div><b>${W7.length} ${varTxt(W7.length, P7.length)}</b><span>Robos de la semana (anterior: ${P7.length})</span></div><div><b>${recDe7} · ${pct(recDe7, W7.length)}%</b><span>Ya recuperados de la semana</span></div><div><b>${abiertos.length}</b><span>Casos abiertos (${viejos} con +30 días)</span></div><div><b>${dem != null ? fmtM(dem) : '—'}</b><span>Demora mediana de denuncia</span></div></div>
+        ${img(gW)}
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">${img(gT)}${img(gZ)}</div>
+        ${W7.length ? `<table><thead><tr><th>Fecha</th><th>Placa</th><th>Zona</th><th>Vehículo</th><th>Tecnología</th><th>Modalidad</th><th>Estado</th></tr></thead><tbody>${W7.slice(0, 45).map(r => `<tr><td>${fd(r.date)}</td><td>${esc(r.plate || '')}</td><td>${esc(r.zone || '')}</td><td>${esc([r.brand, r.model].filter(Boolean).join(' '))}</td><td>${esc(r.cls)}</td><td>${esc(r.mod || '')}</td><td class="${r.recovered ? 'ok' : 'bad'}">${r.recovered ? 'Recuperado' : 'En proceso'}</td></tr>`).join('')}</tbody></table>${W7.length > 45 ? `<p class="muted">… y ${W7.length - 45} más (ver módulo Recuperos).</p>` : ''}` : '<p class="ok">No se registraron robos con fecha en esta semana.</p>'}`;
+      if (opt.mapa) { const A = antenas(), F = focosDe(d); h += `<h2>Mapa táctico de la semana</h2>${mapaSvg(A, F, W7) || '<p class="muted">Sin ubicaciones para dibujar.</p>'}`;
+        if (A.length) { const cv = cobertura(d, A, REC.ANT.r || 8); h += `<p>Cobertura: <b>${pct(cv.cubiertos, cv.C.length)}%</b> de los robos ocurrió a ≤ ${REC.ANT.r || 8} km de una antena; <b class="${cv.unc.length ? 'warn' : 'ok'}">${cv.unc.length}</b> quedaron fuera.${cv.sug.length ? ` Próxima antena sugerida: <b>${cv.sug.map((s, i) => `${i + 1}) ${esc(s.k)} (cubriría ${s.n})`).join(' · ')}</b>.` : ''}</p>`; } }
+      if (opt.proy && S && S.n >= 3) h += `<h2>Proyecciones</h2>${img(gP)}${Z.length ? `<table><thead><tr><th>Zona en alza</th><th class="n">Últimos 30 días</th><th class="n">Promedio mensual previo</th><th class="n">Proyección 30 días</th><th class="n">Abiertos</th></tr></thead><tbody>${Z.slice(0, 8).map(z => `<tr><td>${esc(z.k)}</td><td class="n">${z.d30}</td><td class="n">${z.base}</td><td class="n"><b>${z.proy}</b></td><td class="n">${z.o}</td></tr>`).join('')}</tbody></table>` : '<p class="ok">Ninguna zona muestra un alza marcada.</p>'}<p class="muted">Regresión lineal con ${S.n} meses completos; rango con 80% de confianza. Estimación, no certeza.</p>`;
+      h += `<h2>Excels de recupero recibidos en la semana</h2>${cargasW.length ? `<table><thead><tr><th>Fecha</th><th>Archivo</th><th>Origen</th><th class="n">Casos</th><th class="n">Nuevos</th><th class="n">Cambios</th><th class="n">Recuperados</th></tr></thead><tbody>${cargasW.map(x => `<tr><td>${fdt(x.creado)}</td><td>${esc(x.archivo || '')}</td><td>${x.origen === 'correo' ? 'Correo' : 'Manual'}</td><td class="n">${x.casos ?? ''}</td><td class="n">${x.nuevos ?? ''}</td><td class="n">${x.cambios_estado ?? ''}</td><td class="n">${x.recuperados ?? ''}</td></tr>`).join('')}</tbody></table>` : '<p class="warn">No se subió ningún Excel de recupero en la semana.</p>'}`;
+      if (!cargasW.length) out.bullets.push('<span class="warn">No se subió ningún Excel de recupero esta semana.</span>');
+    }
+    // ---- red de antenas (inventario cargado) + Fusión RF ----
+    if (opt.red) {
+      const I = []; (typeof excelData !== 'undefined' ? excelData : []).forEach(r => { try { const i = info(r); if (i.punto) I.push(i); } catch (e) {} });
+      const fij = I.filter(i => !i.movil), mov = I.filter(i => i.movil), sinC = fij.filter(i => !i.ok).length, vis = fij.filter(i => i.visitado).length;
+      const tec = topN(count(fij, i => i.tec), 8), opr = topN(count(fij, i => i.op), 4);
+      const rf = c ? await safe(c.from('mdz_rf_referencias').select('antena,origen,creado,fecha_lectura').order('id', { ascending: false }).limit(5000)) : null;
+      const rfW = (rf || []).filter(x => { const s = String(x.creado || x.fecha_lectura || '').slice(0, 10); return s >= from && s <= to; });
+      h += `<h2>Red de antenas y mapa táctico</h2>${I.length ? `<div class="rp-kpis"><div><b>${fij.length}</b><span>Puntos fijos</span></div><div><b>${mov.length}</b><span>Rastreadores / móviles</span></div><div><b class="${vis < fij.length ? 'warn' : 'ok'}">${pct(vis, fij.length)}%</b><span>Visitados (${vis} de ${fij.length})</span></div><div><b class="${sinC ? 'warn' : 'ok'}">${sinC}</b><span>Sin coordenadas</span></div></div>
+        <table><thead><tr><th>Tecnología</th><th class="n">Puntos</th><th>Operador SIM</th><th class="n">Puntos</th></tr></thead><tbody>${Array.from({ length: Math.max(tec.length, opr.length) }, (_, i) => `<tr><td>${tec[i] ? esc(tec[i][0]) : ''}</td><td class="n">${tec[i] ? tec[i][1] : ''}</td><td>${opr[i] ? esc(opr[i][0]) : ''}</td><td class="n">${opr[i] ? opr[i][1] : ''}</td></tr>`).join('')}</tbody></table>` : '<p class="muted">El inventario de puntos no estaba cargado al generar el informe.</p>'}
+        ${rf ? `<p>Fusión RF: <b>${rfW.length}</b> referencia${rfW.length === 1 ? '' : 's'} nueva${rfW.length === 1 ? '' : 's'} en la semana${rfW.length ? ' · antenas: ' + topN(count(rfW, x => x.antena), 6).map(([k, v]) => `${esc(antShort(k))} (${v})`).join(', ') : ''}. Total acumulado: ${rf.length}.</p>` : ''}`;
+      if (I.length) out.bullets.push(`Red: <b>${fij.length}</b> puntos fijos, <b>${pct(vis, fij.length)}%</b> visitados${sinC ? `, ${sinC} sin coordenadas` : ''}.`);
+    }
+    out.html = h; return out;
+  }
+  async function informeGenerar(from, opt) {
+    let rep = null;
+    if (opt.op && typeof window.__mdzBuildReport === 'function') { try { rep = await window.__mdzBuildReport(from); } catch (e) { rep = null; } }
+    if (!rep) { rep = $('mdz-report'); if (!rep) { rep = document.createElement('div'); rep.id = 'mdz-report'; document.body.appendChild(rep); }
+      rep.innerHTML = `<div class="rp-head"><div><h1>x</h1><small>Semana del ${fdi(from)} al ${fdi(masD(from, 6))} · mdzhunter</small></div><small>Generado el ${fdi(isoD(limaNow()))}</small></div><div class="rp-foot">Informe generado automáticamente por HUNTER CORE. Documento interno.</div>`; }
+    const h1 = rep.querySelector('.rp-head h1'); if (h1) h1.textContent = 'HUNTER CORE · INFORME SEMANAL GERENCIAL';
+    const X = await informeExtra(from, opt), foot = rep.querySelector('.rp-foot');
+    // resumen ejecutivo arriba (incluye lo operativo que trae la v24)
+    const op = [...rep.querySelectorAll('.rp-kpis div')].slice(0, 4).map(dv => { const b = dv.querySelector(':scope > b'), s = dv.querySelector(':scope > span'); return b && s ? `${esc(s.textContent)}: <b>${b.innerHTML}</b>.` : ''; }).filter(Boolean);
+    const bl = [...(opt.op ? op : []), ...X.bullets];
+    const ex = document.createElement('div'); ex.className = 'rp-exec';
+    ex.innerHTML = `<h2>Resumen ejecutivo</h2><ul>${bl.map(b => `<li>${b}</li>`).join('')}</ul>`;
+    const head = rep.querySelector('.rp-head'); head.after(ex);
+    const box = document.createElement('div'); box.innerHTML = X.html;
+    if (foot) foot.before(...box.childNodes); else rep.append(...box.childNodes);
+    return rep;
+  }
+  function informeImprimir(from) {
+    const t0 = document.title; document.title = `Informe_semanal_gerencial_HUNTER_${from}`;
+    document.body.classList.add('mdz-printing');
+    const done = () => { document.body.classList.remove('mdz-printing'); document.title = t0; window.removeEventListener('afterprint', done); };
+    window.addEventListener('afterprint', done);
+    setTimeout(() => { try { window.print(); } catch (e) {} setTimeout(() => { if (!window.matchMedia || !matchMedia('print').matches) done(); }, 1500); }, 250);
+  }
+  const igM = document.createElement('div'); igM.className = 'v27-ig hidden'; igM.setAttribute('role', 'dialog'); igM.setAttribute('aria-modal', 'true'); igM.setAttribute('aria-label', 'Informe semanal gerencial');
+  document.body.appendChild(igM);
+  function informeDialog() {
+    if (!dev()) { toast('El informe gerencial es solo para dev'); return; }
+    const hoyS = isoD(limaNow()), pas = masD(lunes(hoyS), -7), act = lunes(hoyS);
+    igM.innerHTML = `<div class="panel card p-5"><div class="flex items-center justify-between mb-2"><h3 class="text-sm font-bold text-white">Informe semanal gerencial</h3><button type="button" class="v21-mini" data-igx="1" aria-label="Cerrar">✕</button></div>
+      <p class="text-[12px] text-slate-300 mb-3">Junta en un solo PDF lo más importante del tablero. Se abre la ventana de impresión: elige <b>Guardar como PDF</b>.</p>
+      <div class="v21-form"><label>Semana desde el lunes<input type="date" id="ig-from" value="${pas}"></label><label>Atajo<select id="ig-q"><option value="${pas}">Semana pasada</option><option value="${act}">Semana actual</option></select></label></div>
+      <div class="v27-igopts">${[['op', 'Operación: grupo electrógeno, mantenimiento, sala de servidores, caja chica, visitas e incidentes'], ['rec', 'Recuperos y robos de la semana'], ['mapa', 'Mapa táctico de la semana (antenas, focos y robos)'], ['proy', 'Proyecciones y zonas en alza'], ['red', 'Red de antenas y Fusión RF']].map(([k, l]) => `<label><input type="checkbox" data-igo="${k}" checked> ${l}</label>`).join('')}</div>
+      <div id="ig-msg" class="mt-2"></div>
+      <div class="flex gap-2 mt-3"><button class="v21-btn pri" id="ig-go" type="button"><i class="fa-solid fa-file-pdf"></i>Generar informe</button><button class="v21-btn" type="button" data-igx="1">Cancelar</button></div></div>`;
+    igM.classList.remove('hidden');
+    $('ig-q').addEventListener('change', e => { $('ig-from').value = e.target.value; });
+    $('ig-go').addEventListener('click', async () => {
+      if (IG.busy) return; IG.busy = true;
+      const from = lunes($('ig-from').value || pas), opt = {}; igM.querySelectorAll('[data-igo]').forEach(x => { opt[x.dataset.igo] = x.checked; });
+      $('ig-msg').innerHTML = '<div class="v21-msg ok">Preparando el informe… (junta datos de Supabase y dibuja los gráficos)</div>';
+      try { await informeGenerar(from, opt); igM.classList.add('hidden'); ls.set('mdz_informe_semana', lunes(isoD(limaNow()))); informeImprimir(from); }
+      catch (er) { $('ig-msg').innerHTML = `<div class="v21-msg warn">No se pudo preparar: ${esc(er.message || er)}</div>`; }
+      finally { IG.busy = false; }
+    });
+  }
+  igM.addEventListener('click', e => { if (e.target === igM || e.target.closest('[data-igx]')) igM.classList.add('hidden'); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape' && !igM.classList.contains('hidden')) igM.classList.add('hidden'); });
+  window.__mdzInformeGerencial = informeDialog;
+  window.__mdzInformeGenerar = informeGenerar;
+  // el botón del reporte semanal de Incidentes ahora abre el informe completo
+  document.addEventListener('click', e => { const b = e.target.closest('#inc-pdf'); if (!b) return; e.preventDefault(); e.stopImmediatePropagation(); informeDialog(); }, true);
+  // botón en Recuperos (solo dev)
+  const igBtn = document.createElement('button'); igBtn.className = 'v21-btn ui-hidden'; igBtn.id = 'rc-informe'; igBtn.type = 'button'; igBtn.innerHTML = '<i class="fa-solid fa-file-pdf"></i>Informe semanal'; igBtn.title = 'Informe semanal gerencial en PDF';
+  igBtn.addEventListener('click', informeDialog); $('rc-csv').after(igBtn);
+  // RAFI: los lunes recuerda generar el informe si aún no se hizo esa semana
+  (window.__mdzRafiExtra = window.__mdzRafiExtra || []).push(async () => {
+    if (!dev()) return []; const n = limaNow(), sem = lunes(isoD(n));
+    if (n.getUTCDay() >= 1 && n.getUTCDay() <= 2 && ls.get('mdz_informe_semana', '') !== sem) return [{ lvl: 'info', txt: 'Ya puedes generar el informe semanal gerencial de la semana pasada (botón “Informe semanal” en Recuperos o Incidentes).', go: 'recup' }];
+    return [];
+  });
+
   // ---------- IA: conocimiento + resumen de recuperos (sin placas ni propietarios) ----------
   window.__mdzIaExtra = texto => {
     const out = {};
     try { const k = kbFor(texto); if (k.length) out.conocimiento_rafi = k; } catch (e) {}
-    if (dev() && REC.data.length) {
+    if (recOk() && REC.data.length) {
       const d = REC.data, E = estimar(d), rec = d.filter(r => r.recovered).length;
       out.recuperos = { casos: d.length, recuperados: rec, tasa_recupero_pct: pct(rec, d.length), abiertos: d.length - rec, ultimos_7_dias: E.d7,
         por_tecnologia: Object.fromEntries(E.cls.map(([c, n, p]) => [c, { casos: n, recupero_pct: p }])),
@@ -15417,7 +15589,7 @@ body.theme-day .v27-fi { color:#0f172a; background:rgba(15,23,42,.03); border-co
   const _sv = window.setView;
   window.setView = function (v) {
     if (v === 'recup') {
-      if (!dev()) { toast('Módulo solo para dev'); return; }
+      if (!recOk()) { toast('Módulo solo para dev y consola'); return; }
       document.querySelectorAll('.rail button[data-v]').forEach(b => b.classList.toggle('on', b.dataset.v === v));
       if ($('side')) $('side').classList.add('ui-hidden');
       document.querySelectorAll('section[id^="view-"]').forEach(s => s.classList.toggle('ui-hidden', s.id !== 'view-recup'));
@@ -15434,15 +15606,18 @@ body.theme-day .v27-fi { color:#0f172a; background:rgba(15,23,42,.03); border-co
     if (v === 'rafi') setTimeout(() => kbView(), 50);
     return r;
   };
-  let wasDev = null, wasLogged = null;
+  let wasDev = null, wasLogged = null, wasRec = null;
   function syncRole() {
-    const L1 = logged(), D1 = L1 && dev();
-    rnav.classList.toggle('ui-hidden', !D1);
-    colBtn.classList.toggle('ui-hidden', !D1);
-    if (!D1 && !rsec.classList.contains('ui-hidden')) { rsec.classList.add('ui-hidden'); REC.opened = false; try { _sv('filter'); } catch (e) {} }
-    if (D1 !== wasDev || L1 !== wasLogged) {
-      wasDev = D1; wasLogged = L1;
-      if (D1) { valLoad(); recLoad(true); subscribe(); histLoad(); } else { HIST.list = []; HIST.loaded = false; HIST.det = {}; HIST.open = null; VAL.map.clear(); VAL.loaded = false; VAL.filtro = 'ALL'; REC.raw = []; REC.data = []; REC.loaded = false; REC.nuevos = []; REC.maxId = 0; unsubscribe(); Object.keys(CH).forEach(k => { try { CH[k].destroy(); } catch (e) {} delete CH[k]; }); }
+    const L1 = logged(), D1 = L1 && dev(), R1 = recOk();
+    rnav.classList.toggle('ui-hidden', !R1);
+    colBtn.classList.toggle('ui-hidden', !D1); igBtn.classList.toggle('ui-hidden', !D1);
+    if (!R1 && !rsec.classList.contains('ui-hidden')) { rsec.classList.add('ui-hidden'); REC.opened = false; try { _sv('filter'); } catch (e) {} }
+    if (D1 !== wasDev || L1 !== wasLogged || R1 !== wasRec) {
+      wasDev = D1; wasLogged = L1; wasRec = R1;
+      if (D1) valLoad(); else { VAL.map.clear(); VAL.loaded = false; VAL.filtro = 'ALL'; }
+      REC.raw = []; REC.data = []; REC.loaded = false; REC.nuevos = []; REC.maxId = 0; HIST.list = []; HIST.loaded = false; HIST.det = {}; HIST.open = null;
+      $('rc-sub').textContent = 'Robos y recuperos del Excel de consola · GPS unificado / LOJACK / DETEKTOR · ' + (D1 ? 'dev' : 'consola (sin propietarios)');
+      if (R1) { recLoad(true); subscribe(); histLoad(); } else { unsubscribe(); Object.keys(CH).forEach(k => { try { CH[k].destroy(); } catch (e) {} delete CH[k]; }); }
       if (L1) { colsLoad(); KB.at = 0; } else { window.__mdzCustomCols = []; KB.t = []; }
       KBV.sig = ''; valPanel(); focosDraw();
     }
@@ -15454,7 +15629,7 @@ body.theme-day .v27-fi { color:#0f172a; background:rgba(15,23,42,.03); border-co
     tick++; syncRole(); heatSync(); mountKbTab(); rastTabs(); rastCount();
     if (logged()) colsApply();
     if (dev() && VAL.loaded && tick % 5 === 0) valPanel();
-    if (dev() && logged() && (REC.opened ? !REC.live && tick % 60 === 0 : tick % 300 === 0)) recLoad(true);
+    if (recOk() && (REC.opened ? !REC.live && tick % 60 === 0 : tick % 300 === 0)) recLoad(true);
     if (logged() && !$('view-rafi').classList.contains('ui-hidden')) kbView();
   }, 1000);
   syncRole();
